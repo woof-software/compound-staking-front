@@ -1,0 +1,92 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@/shared/styles/variables.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: 'Haas Grot Text R';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./shared/fonts/NeueHaasGrotDispRound-55Roman.otf')
+  format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Haas Grot Text R';
+  font-style: normal;
+  font-weight: 500 600;
+  src: url('./shared/fonts/NeueHaasGrotDispRound-65Medium.otf')
+  format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Haas Grot Text R';
+  font-style: normal;
+  font-weight: 700;
+  src: url('./shared/fonts/NeueHaasGrotDispRound-75Bold.otf')
+  format('opentype');
+  font-display: swap;
+}
+
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dark {
+
+}
+
+@theme inline {
+
+}
+
+@layer base {
+  * {
+    font-size: 1rem;
+    font-weight: 400;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'Haas Grot Text R', sans-serif;
+  }
+}
+
+/*=======================*/
+/* Scrollbar Styles */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.highcharts-container .highcharts-background  {
+  fill: transparent;
+}
+
+.disable-scroll-vertical {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+html, body {
+  -ms-overflow-style: none;      /* IE и Edge */
+  scrollbar-width: none;         /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;                 /* Chrome, Safari, Opera */
+}
