@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@/shared/styles/variables.css";
+@import "@/styles/variables.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -8,7 +8,7 @@
   font-family: 'Haas Grot Text R';
   font-style: normal;
   font-weight: 400;
-  src: url('./shared/fonts/NeueHaasGrotDispRound-55Roman.otf')
+  src: url('../public/fonts/NeueHaasGrotDispRound-55Roman.otf')
   format('opentype');
   font-display: swap;
 }
@@ -17,7 +17,7 @@
   font-family: 'Haas Grot Text R';
   font-style: normal;
   font-weight: 500 600;
-  src: url('./shared/fonts/NeueHaasGrotDispRound-65Medium.otf')
+  src: url('../public/fonts/NeueHaasGrotDispRound-65Medium.otf')
   format('opentype');
   font-display: swap;
 }
@@ -26,7 +26,7 @@
   font-family: 'Haas Grot Text R';
   font-style: normal;
   font-weight: 700;
-  src: url('./shared/fonts/NeueHaasGrotDispRound-75Bold.otf')
+  src: url('../public/fonts/NeueHaasGrotDispRound-75Bold.otf')
   format('opentype');
   font-display: swap;
 }

@@ -1,18 +1,42 @@
 {
+  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    "outDir": "./dist/",
-    "noImplicitAny": true,
-    "module": "ESNext",
-    "target": "ES2023",
-    "jsx": "react-jsx",
-    "allowJs": true,
-    "strict": true,
-    "moduleResolution": "bundler",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
-    "isolatedModules": true,
+    "skipLibCheck": true,
+
+    // File Layout
     "baseUrl": ".",
+
+    // Environment Settings
+    "module": "ESNext",
+    "target": "esnext",
+
+    // Outputs
+    "noEmit": true,
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+
+    // JSX / React
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Recommended Options
+    "isolatedModules": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+
+    // Aliases
     "paths": {
       "@/*": ["./src/*"]
     }
