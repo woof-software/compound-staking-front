@@ -1,11 +1,7 @@
-import {
-  type ComponentType,
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useState
-} from 'react';
+import { type ComponentType, type ReactNode, useEffect } from 'react';
+import { create } from 'zustand';
+
+import { DEFAULT_STORAGE_KEY } from '@/consts/consts';
 
 export type Theme = 'dark' | 'light' | 'system';
 
@@ -15,91 +11,66 @@ type ThemeProviderProps = {
   storageKey?: string;
 };
 
-type ThemeProviderState = {
+type ThemeStore = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
 };
 
-const initialState: ThemeProviderState = {
+export const useThemeStore = create<ThemeStore>((set) => ({
   theme: 'system',
-  setTheme: () => null
-};
-
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+  setTheme: (theme) => set({ theme })
+}));
 
 export function ThemeProvider({
   children,
   defaultTheme = 'system',
-  storageKey = 'vite-ui-theme',
-  ...props
+  storageKey = DEFAULT_STORAGE_KEY
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  );
+  const theme = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
 
   useEffect(() => {
-    const root = window.document.documentElement;
+    const stored = localStorage.getItem(storageKey) as Theme | null;
+    setTheme(stored || defaultTheme);
+  }, [storageKey, defaultTheme, setTheme]);
+
+  useEffect(() => {
+    const root = document.documentElement;
 
     root.classList.remove('light', 'dark');
 
     if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
-        .matches
-        ? 'dark'
-        : 'light';
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 
       root.classList.add(systemTheme);
-
       localStorage.setItem(storageKey, systemTheme);
-
-      setTheme(systemTheme);
 
       return;
     }
 
     root.classList.add(theme);
-
     localStorage.setItem(storageKey, theme);
+  }, [theme, storageKey]);
 
-    setTheme(theme);
-  }, [theme]);
-
-  const value = {
-    theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
-    }
-  };
-
-  return (
-    <ThemeProviderContext.Provider
-      {...props}
-      value={value}
-    >
-      {children}
-    </ThemeProviderContext.Provider>
-  );
+  return <>{children}</>;
 }
+
+export const useTheme = () => {
+  const theme = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
+
+  return { theme, setTheme };
+};
 
 export const withTheme = (Component: ComponentType) => {
   return () => {
     return (
       <ThemeProvider
         defaultTheme='system'
-        storageKey='vite-ui-theme'
+        storageKey={DEFAULT_STORAGE_KEY}
       >
         <Component />
       </ThemeProvider>
     );
   };
-};
-
-export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
-
-  if (context === undefined)
-    throw new Error('useTheme must be used within a ThemeProvider');
-
-  return context;
 };
