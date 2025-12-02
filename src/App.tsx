@@ -1,3 +1,5 @@
+import { ThemeSwitcher } from '@/components/common/ThemeSwitcher';
+
 import { useTheme, withTheme } from './app/providers/ThemeProvider/theme-provider';
 
 function App() {
@@ -5,8 +7,10 @@ function App() {
   return (
     <div>
       <p className='read-the-docs'>Click on the Vite and React logos to learn more</p>
-
-      <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>Click</button>
+      <ThemeSwitcher
+        theme={theme}
+        setTheme={setTheme}
+      />
     </div>
   );
 }
