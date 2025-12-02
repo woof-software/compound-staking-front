@@ -1,0 +1,21 @@
+echo '🏗️👷 Styling, testing and building your project before committing'
+
+# Check Prettier
+npm run prettier ||
+(
+  echo '❌❌❌ Prettier Check Failed ❌❌❌
+    Run npm run format and try commit again';
+  false;
+)
+
+# Check ESLint
+npm run lint ||
+(
+  echo '❌❌❌ ESLint Check Failed! ❌❌❌
+    ESLint Check Failed. Make the required changes listed above and try to commit again'
+  false;
+)
+
+# If everything passes... Now we can commit
+echo '✅✅✅ Committing... all checks passed ✅✅✅'
+npx lint-staged
