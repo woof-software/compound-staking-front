@@ -38,12 +38,62 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.dark {
+/* Light theme tokens (default) */
+@theme inline {
+  --color-color-1: #F0F2F5;
+  --color-color-2: #17212B;
+  --color-color-3: #D8DFE5;
+  --color-color-4: #FFFFFF;
+  --color-color-5: #F0F2F5;
+  --color-color-6: #A7B4C2;
+  --color-color-8: #0D131A26;
+  --color-color-9: #D8DFE5;
+  --color-color-10: #FFFFFF;
+  --color-color-11: #F9FAFB;
+  --color-color-12: #D8DFE5;
+  --color-color-13: #DACCFF;
+  --color-color-14: #6F42EB;
+  --color-color-15: #19232E;
+  --color-color-16: #D8DFE5;
+  --color-color-17: #F9FAFB;
+  --color-color-18: #C1CBD6;
+  --color-color-19: #E4E7EB;
+  --color-color-20: #A7B4C2;
+  --color-color-21: #FFE7B8;
+  --color-color-22: #FF871F;
+  --color-color-23: #C5EBDF;
 
+  --font-sans: 'Haas Grot Text R', sans-serif;
 }
 
-@theme inline {
-
+/* Dark overrides */
+@layer theme {
+  :root, :host {
+    @variant dark {
+      --color-color-1: #0D131A;
+      --color-color-2: #FFFFFF;
+      --color-color-3: #1D2833;
+      --color-color-4: #1D2833;
+      --color-color-5: #17212B;
+      --color-color-6: #516070;
+      --color-color-8: #FFFFFF26;
+      --color-color-9: #2B3947;
+      --color-color-10: #19232E;
+      --color-color-11: #17212B;
+      --color-color-12: #2B3947;
+      --color-color-13: #382870;
+      --color-color-14: #DACCFF;
+      --color-color-15: #FFFFFF;
+      --color-color-16: #2B3947;
+      --color-color-17: #19232E;
+      --color-color-18: #516070;
+      --color-color-19: #131B24;
+      --color-color-20: #516070;
+      --color-color-21: #FF871F33;
+      --color-color-22: #FFA947;
+      --color-color-23: #073E2E;
+    }
+  }
 }
 
 @layer base {
@@ -57,6 +107,8 @@
 
   body {
     font-family: 'Haas Grot Text R', sans-serif;
+    background-color: var(--color-color-1);
+    color: var(--color-color-2);
   }
 }
 
@@ -69,10 +121,6 @@
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
-}
-
-.highcharts-container .highcharts-background  {
-  fill: transparent;
 }
 
 .disable-scroll-vertical {
