@@ -1,5 +1,5 @@
 const StakePage = () => {
-  return <div>Stake</div>;
+  return <main className='pt-10 pb-[60px]'>Stake</main>;
 };
 
 export { StakePage };
