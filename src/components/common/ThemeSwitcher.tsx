@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
-import type { Theme } from '@/app/providers/ThemeProvider/theme-provider';
 import { cn } from '@/lib/utils/cn';
+import type { Theme } from '@/shared/types/common';
 
 type ThemeSwitcherProps = {
   theme: Theme;

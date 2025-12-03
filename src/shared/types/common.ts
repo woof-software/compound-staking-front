@@ -16,3 +16,5 @@ export type TClassNames = {
   title?: string;
   description?: string;
 };
+
+export type Theme = 'light' | 'dark' | 'system';
