@@ -1,7 +1,7 @@
 import { type FC, type PropsWithChildren } from 'react';
 import { useEffect } from 'react';
 
-import { Portal } from './Portal';
+import { Portal } from '../common/Portal';
 
 type ModalProps = PropsWithChildren & {
   open: boolean;
