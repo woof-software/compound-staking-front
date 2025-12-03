@@ -43,6 +43,7 @@
   --color-4: #FFFFFF;
   --color-5: #F0F2F5;
   --color-6: #A7B4C2;
+  --color-7: #00C289;
   --color-8: #0D131A26;
   --color-9: #D8DFE5;
   --color-10: #FFFFFF;
@@ -59,6 +60,9 @@
   --color-21: #FFE7B8;
   --color-22: #FF871F;
   --color-23: #C5EBDF;
+  --color-24: #7A8A99;
+
+  --color-border-1: rgba(13, 19, 26, 0.15);
 }
 
 
@@ -70,6 +74,7 @@
   --color-4: #1D2833;
   --color-5: #17212B;
   --color-6: #516070;
+  --color-7: #00C289;
   --color-8: #FFFFFF26;
   --color-9: #2B3947;
   --color-10: #19232E;
@@ -86,6 +91,9 @@
   --color-21: #FF871F33;
   --color-22: #FFA947;
   --color-23: #073E2E;
+  --color-24: #7A8A99;
+
+  --color-border-1: rgba(249, 250, 251, 0.15);
 }
 
 @theme inline {
@@ -95,6 +103,7 @@
   --color-color-4: var(--color-4);
   --color-color-5: var(--color-5);
   --color-color-6: var(--color-6);
+  --color-color-7: var(--color-7);
   --color-color-8: var(--color-8);
   --color-color-9: var(--color-9);
   --color-color-10: var(--color-10);
@@ -111,6 +120,9 @@
   --color-color-21: var(--color-21);
   --color-color-22: var(--color-22);
   --color-color-23: var(--color-23);
+  --color-color-24: var(--color-24);
+
+  --color-border-1: var(--color-border-1);
 
   --shadow-10: 0 2px 1px -1px rgba(0, 0, 0, 0.25), 0 1px 1px 0 rgba(0, 0, 0, 0.25), 0 1px 3px 0 rgba(0, 0, 0, 0.25);
 }
