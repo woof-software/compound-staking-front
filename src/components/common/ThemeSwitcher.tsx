@@ -25,7 +25,7 @@ export const ThemeSwitcher: FC<ThemeSwitcherProps> = ({ theme, setTheme }) => {
         <label className='cursor-pointer flex items-center'>
           <span className='relative h-6 w-[58px] shrink-0 rounded-xl bg-color-9'>
             <input
-              className='outline-none border-none w-[1px] h-[1px] overflow-hidden absolute whitespace-nowrap p-0 m-[-1px]'
+              className='outline-none border-none w-0 h-0 overflow-hidden absolute whitespace-nowrap p-0 m-[-1px]'
               type='checkbox'
               checked={isDark}
               onChange={handleToggle}
