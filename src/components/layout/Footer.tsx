@@ -40,4 +40,4 @@ const Footer = ({ theme, setTheme }: FooterProps) => {
   );
 };
 
-export default Footer;
+export { Footer };

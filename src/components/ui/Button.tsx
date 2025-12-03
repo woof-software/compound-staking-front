@@ -9,7 +9,7 @@ export const Button: FC<ButtonProps> = ({ children, className, disabled, ...prop
     <button
       disabled={disabled}
       className={cn(
-        'flex cursor-pointer items-center justify-center transition',
+        'flex cursor-pointer items-center justify-center transition text-base p-3.5 h-11 hover:brightness-90 w-full bg-color-7 text-white rounded-3xl',
         { 'cursor-not-allowed': disabled },
         className
       )}

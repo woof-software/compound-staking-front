@@ -1,4 +1,6 @@
-export type TClassNames = {
+import type { Currency } from '@/consts/consts';
+
+export type ClassNames = {
   wrapper?: string;
   container?: string;
   label?: string;
@@ -18,3 +20,5 @@ export type TClassNames = {
 };
 
 export type Theme = 'light' | 'dark' | 'system';
+
+export type CurrencyType = ValueOf<typeof Currency>;

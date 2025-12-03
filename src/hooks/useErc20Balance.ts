@@ -56,4 +56,4 @@ const useErc20Balance = () => {
   };
 };
 
-export default useErc20Balance;
+export { useErc20Balance };

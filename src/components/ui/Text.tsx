@@ -11,7 +11,8 @@ const text = cva('text-primary-11', {
       '15': 'text-[15px]',
       '16': 'text-[16px]',
       '17': 'text-[17px]',
-      '40': 'text-[40px]'
+      '40': 'text-[40px]',
+      '45': 'text-[45px]'
     },
     weight: {
       '400': 'font-normal',

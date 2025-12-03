@@ -6,6 +6,6 @@ declare module '*.svg' {
   export default content;
 }
 
-type Values<T> = T[keyof T];
+type ValueOf<T> = T[keyof T];
 
 type AddressType = `0x${string}`;
