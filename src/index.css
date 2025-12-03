@@ -30,6 +30,7 @@
   font-display: swap;
 }
 
+/* Light theme tokens (default) */
 :root {
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -59,8 +60,6 @@
   --color-22: #FF871F;
   --color-23: #C5EBDF;
 }
-
-/* Light theme tokens (default) */
 
 
 /* Dark overrides */
