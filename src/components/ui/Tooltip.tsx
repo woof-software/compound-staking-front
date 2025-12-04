@@ -7,7 +7,7 @@ type TooltipCoordinates = {
   y: number;
 };
 
-type TooltipProps = {
+export type TooltipProps = {
   width: number;
   children: ReactElement<any>;
   content: ReactNode;
