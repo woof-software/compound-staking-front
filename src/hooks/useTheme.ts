@@ -51,8 +51,6 @@ export const useThemeStore = create<State>((set) => {
     theme: actual,
     toggleTheme: () =>
       set((state) => {
-        // Если текущая тема 'system', переключаем на противоположную системной,
-        // чтобы пользователь явно переключился вручную.
         const next: Theme =
           state.theme === 'light'
             ? 'dark'
