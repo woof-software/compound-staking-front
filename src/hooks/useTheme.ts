@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import { DEFAULT_STORAGE_KEY } from '@/consts/consts';
 
 export type Theme = 'light' | 'dark' | 'system';

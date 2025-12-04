@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:is(.dark *));
 
 @font-face {
   font-family: 'Haas Grot Text R';
@@ -30,69 +30,89 @@
   font-display: swap;
 }
 
+/* Light theme tokens (default) */
 :root {
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --color-1: #F0F2F5;
+  --color-2: #17212B;
+  --color-3: #D8DFE5;
+  --color-4: #FFFFFF;
+  --color-5: #F0F2F5;
+  --color-6: #A7B4C2;
+  --color-8: #0D131A26;
+  --color-9: #D8DFE5;
+  --color-10: #FFFFFF;
+  --color-11: #F9FAFB;
+  --color-12: #D8DFE5;
+  --color-13: #DACCFF;
+  --color-14: #6F42EB;
+  --color-15: #19232E;
+  --color-16: #D8DFE5;
+  --color-17: #F9FAFB;
+  --color-18: #C1CBD6;
+  --color-19: #E4E7EB;
+  --color-20: #A7B4C2;
+  --color-21: #FFE7B8;
+  --color-22: #FF871F;
+  --color-23: #C5EBDF;
 }
 
-/* Light theme tokens (default) */
-@theme inline {
-  --color-color-1: #F0F2F5;
-  --color-color-2: #17212B;
-  --color-color-3: #D8DFE5;
-  --color-color-4: #FFFFFF;
-  --color-color-5: #F0F2F5;
-  --color-color-6: #A7B4C2;
-  --color-color-8: #0D131A26;
-  --color-color-9: #D8DFE5;
-  --color-color-10: #FFFFFF;
-  --color-color-11: #F9FAFB;
-  --color-color-12: #D8DFE5;
-  --color-color-13: #DACCFF;
-  --color-color-14: #6F42EB;
-  --color-color-15: #19232E;
-  --color-color-16: #D8DFE5;
-  --color-color-17: #F9FAFB;
-  --color-color-18: #C1CBD6;
-  --color-color-19: #E4E7EB;
-  --color-color-20: #A7B4C2;
-  --color-color-21: #FFE7B8;
-  --color-color-22: #FF871F;
-  --color-color-23: #C5EBDF;
-
-  --font-sans: 'Haas Grot Text R', sans-serif;
-}
 
 /* Dark overrides */
-@layer theme {
-  :root {
-    @variant dark {
-      --color-color-1: #0D131A;
-      --color-color-2: #FFFFFF;
-      --color-color-3: #1D2833;
-      --color-color-4: #1D2833;
-      --color-color-5: #17212B;
-      --color-color-6: #516070;
-      --color-color-8: #FFFFFF26;
-      --color-color-9: #2B3947;
-      --color-color-10: #19232E;
-      --color-color-11: #17212B;
-      --color-color-12: #2B3947;
-      --color-color-13: #382870;
-      --color-color-14: #DACCFF;
-      --color-color-15: #FFFFFF;
-      --color-color-16: #2B3947;
-      --color-color-17: #19232E;
-      --color-color-18: #516070;
-      --color-color-19: #131B24;
-      --color-color-20: #516070;
-      --color-color-21: #FF871F33;
-      --color-color-22: #FFA947;
-      --color-color-23: #073E2E;
-    }
-  }
+.dark {
+  --color-1: #0D131A;
+  --color-2: #FFFFFF;
+  --color-3: #1D2833;
+  --color-4: #1D2833;
+  --color-5: #17212B;
+  --color-6: #516070;
+  --color-8: #FFFFFF26;
+  --color-9: #2B3947;
+  --color-10: #19232E;
+  --color-11: #17212B;
+  --color-12: #2B3947;
+  --color-13: #382870;
+  --color-14: #DACCFF;
+  --color-15: #FFFFFF;
+  --color-16: #2B3947;
+  --color-17: #19232E;
+  --color-18: #516070;
+  --color-19: #131B24;
+  --color-20: #516070;
+  --color-21: #FF871F33;
+  --color-22: #FFA947;
+  --color-23: #073E2E;
+}
+
+@theme inline {
+  --color-color-1: var(--color-1);
+  --color-color-2: var(--color-2);
+  --color-color-3: var(--color-3);
+  --color-color-4: var(--color-4);
+  --color-color-5: var(--color-5);
+  --color-color-6: var(--color-6);
+  --color-color-8: var(--color-8);
+  --color-color-9: var(--color-9);
+  --color-color-10: var(--color-10);
+  --color-color-11: var(--color-11);
+  --color-color-12: var(--color-12);
+  --color-color-13: var(--color-13);
+  --color-color-14: var(--color-14);
+  --color-color-15: var(--color-15);
+  --color-color-16: var(--color-16);
+  --color-color-17: var(--color-17);
+  --color-color-18: var(--color-18);
+  --color-color-19: var(--color-19);
+  --color-color-20: var(--color-20);
+  --color-color-21: var(--color-21);
+  --color-color-22: var(--color-22);
+  --color-color-23: var(--color-23);
+
+  --shadow-10: 0 2px 1px -1px rgba(0, 0, 0, 0.25), 0 1px 1px 0 rgba(0, 0, 0, 0.25), 0 1px 3px 0 rgba(0, 0, 0, 0.25);
 }
 
 @layer base {

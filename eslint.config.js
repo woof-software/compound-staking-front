@@ -15,7 +15,6 @@ export default defineConfig([
   ...tseslint.configs.recommended,
 
   {
-    files: ['*.js', '*.jsx', '*.ts', '*.tsx', '**/src/**/*.test.{js,jsx,ts,tsx}'],
     languageOptions: {
       parser: tseslint.parser,
       ecmaVersion: 'latest',
