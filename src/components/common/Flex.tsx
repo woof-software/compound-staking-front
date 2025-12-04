@@ -38,7 +38,7 @@ const directionClasses: Record<FlexDirection, string> = {
   column: 'flex-col'
 };
 
-export const Flex = ({
+export function Flex({
   children,
   className,
   justify = 'start',
@@ -48,7 +48,7 @@ export const Flex = ({
   fullWidth = true,
   style,
   ...rest
-}: FlexProps) => {
+}: FlexProps) {
   return (
     <div
       className={cn(
@@ -68,4 +68,4 @@ export const Flex = ({
       {children}
     </div>
   );
-};
+}

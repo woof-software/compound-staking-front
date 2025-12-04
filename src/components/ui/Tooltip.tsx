@@ -1,17 +1,17 @@
-import type { FC, HTMLAttributes, ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 import { useId, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils/cn';
 
 type DivProps = Omit<HTMLAttributes<HTMLDivElement>, 'content'>;
 
-type TooltipProps = DivProps & {
+export type TooltipProps = DivProps & {
   content: ReactNode;
   className?: string;
   children: ReactNode;
 };
 
-const Tooltip: FC<TooltipProps> = ({ content, children, className, ...rest }) => {
+export function Tooltip({ content, children, className, ...rest }: TooltipProps) {
   const tooltipId = useId();
 
   const [visible, setVisible] = useState(false);
@@ -57,6 +57,4 @@ const Tooltip: FC<TooltipProps> = ({ content, children, className, ...rest }) =>
       </div>
     </div>
   );
-};
-
-export { Tooltip };
+}
