@@ -1,12 +1,16 @@
-import { RewardsBudget } from './RewardsBudget';
+import { Divider } from '@/components/ui/Divider';
+
 import { StakingAPR } from './StakingAPR';
 import { TotalStaked } from './TotalStaked';
 
 const StatisticsBlock = () => {
   return (
-    <section className='statistics-block-container'>
-      <RewardsBudget />
+    <section className='flex justify-center items-start gap-[100px]'>
       <StakingAPR />
+      <Divider
+        orientation='vertical'
+        thickness={1}
+      />
       <TotalStaked />
     </section>
   );

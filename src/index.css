@@ -61,6 +61,7 @@
   --color-22: #FF871F;
   --color-23: #C5EBDF;
   --color-24: #7A8A99;
+  --color-25: #516070;
 
   --color-border-1: rgba(13, 19, 26, 0.15);
 }
@@ -92,6 +93,7 @@
   --color-22: #FFA947;
   --color-23: #073E2E;
   --color-24: #7A8A99;
+  --color-25: #516070;
 
   --color-border-1: rgba(249, 250, 251, 0.15);
 }
@@ -121,6 +123,7 @@
   --color-color-22: var(--color-22);
   --color-color-23: var(--color-23);
   --color-color-24: var(--color-24);
+  --color-color-25: var(--color-25);
 
   --color-border-1: var(--color-border-1);
 

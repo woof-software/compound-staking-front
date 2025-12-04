@@ -1,3 +1,4 @@
+import { Text } from '@/components/ui/Text';
 import { formatRate, splitNumberUnit } from '@/lib/utils/numbers';
 
 import { useStatisticStakingAPR } from '../../_hooks/useStatisticStakingAPR';
@@ -9,12 +10,30 @@ const StakingAPR = () => {
   const [stakingAprValue, stakingAprUnit] = splitNumberUnit(stakingAprFormatted);
 
   return (
-    <div className='statistics-block-item'>
-      <p className='statistics-block-item__title'>Staking APR up to</p>
-      <p className='statistics-block-item__value'>
+    <div className='flex flex-col items-start gap-1.5'>
+      <Text
+        size='13'
+        weight='500'
+        className='text-color-24'
+      >
+        Staking APR up to
+      </Text>
+      <Text
+        size='40'
+        weight='500'
+        className='text-color-2'
+      >
         {stakingAprValue}
-        <span className='statistics-block-item__value-gray'>{stakingAprUnit}</span>
-      </p>
+        <Text
+          tag='span'
+          size='40'
+          weight='700'
+          lineHeight='38'
+          className='text-color-25'
+        >
+          {stakingAprUnit}
+        </Text>
+      </Text>
     </div>
   );
 };

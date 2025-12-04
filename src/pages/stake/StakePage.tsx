@@ -1,6 +1,7 @@
 import { Text } from '@/components/ui/Text';
 
 import { StakeFlowBlock } from './_components/stake-flow-block/StakeFlowBlock';
+import { StatisticsBlock } from './_components/statistics-block/StatisticsBlock';
 
 const StakePage = () => {
   return (
@@ -25,6 +26,7 @@ const StakePage = () => {
         </Text>{' '}
         tokens to earn yield every second!
       </Text>
+      <StatisticsBlock />
       <StakeFlowBlock />
     </main>
   );
