@@ -43,17 +43,18 @@ const text = cva('text-primary-11', {
   }
 });
 
-export type TextProps = PropsWithChildren &
-  VariantProps<typeof text> & {
-    className?: string;
-    tag?: HeaderTagType;
-  };
+export interface TextProps extends PropsWithChildren, VariantProps<typeof text> {
+  className?: string;
+  tag?: HeaderTagType;
+}
 
-export function Text({ className, size, weight, lineHeight, align, tag: Tag = 'p', children, ...props }: TextProps) {
+export function Text(props: TextProps) {
+  const { className, size, weight, lineHeight, align, tag: Tag = 'p', children, ...rest } = props;
+
   return (
     <Tag
       className={text({ size, weight, lineHeight, align, className })}
-      {...props}
+      {...rest}
     >
       {children}
     </Tag>

@@ -4,7 +4,9 @@ import { cn } from '@/lib/utils/cn';
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
-export function Button({ children, className, disabled, ...props }: ButtonProps) {
+export function Button(props: ButtonProps) {
+  const { children, className, disabled, ...rest } = props;
+
   return (
     <button
       disabled={disabled}
@@ -13,7 +15,7 @@ export function Button({ children, className, disabled, ...props }: ButtonProps)
         { 'cursor-not-allowed': disabled },
         className
       )}
-      {...props}
+      {...rest}
     >
       {children}
     </button>

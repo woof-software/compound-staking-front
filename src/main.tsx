@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 
-import { AppProvider } from '@/app/providers/app-provider';
+import { QueryClientRootProvider } from '@/app/providers/query-client-provider';
 import { routeTree } from '@/app/routes/routeTree.gen';
 
 import './index.css';
@@ -15,7 +15,7 @@ declare module '@tanstack/react-router' {
 }
 
 createRoot(document.getElementById('root')!).render(
-  <AppProvider>
+  <QueryClientRootProvider>
     <RouterProvider router={router} />
-  </AppProvider>
+  </QueryClientRootProvider>
 );
