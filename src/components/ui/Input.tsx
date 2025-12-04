@@ -1,20 +1,30 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { type ChangeEvent, type InputHTMLAttributes, type MutableRefObject } from 'react';
+import { type ChangeEvent, type InputHTMLAttributes } from 'react';
 
 import { COMPOUND_DECIMALS, DEFAULT_INTEGER_PART_LENGTH } from '@/consts/consts';
+import { useAutoFocus } from '@/hooks/useAutoFocus';
 import { useFontSizeFitting } from '@/hooks/useFontSizeFitting';
 import { spawnFloatRegex } from '@/lib/utils/regex';
 
 export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
-  inputRef?: MutableRefObject<HTMLInputElement | null>;
+  integerPartLength?: number;
+  decimals?: number;
   value: string;
   onChange: (value: string) => void;
 };
 
-export function Input({ inputRef, value, className, onChange: _onChange, autoFocus, ...props }: InputProps) {
-  const rootRef = useRef<HTMLInputElement>(null);
+export function Input(props: InputProps) {
+  const {
+    integerPartLength = DEFAULT_INTEGER_PART_LENGTH,
+    decimals = COMPOUND_DECIMALS,
+    value,
+    className,
+    onChange: _onChange,
+    autoFocus,
+    ...rest
+  } = props;
 
-  const ref = inputRef ? inputRef : rootRef;
+  const ref = useRef<HTMLInputElement>(null);
 
   const [adjustedFontSize, setAdjustedFontSize] = useState<number>();
 
@@ -24,16 +34,16 @@ export function Input({ inputRef, value, className, onChange: _onChange, autoFoc
 
   const onChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      let value = event.target.value.replace(/[^0-9.]/g, '');
+      let value = event.target.value;
 
-      const regex = spawnFloatRegex(DEFAULT_INTEGER_PART_LENGTH, COMPOUND_DECIMALS);
+      const regex = spawnFloatRegex(integerPartLength, decimals);
 
       const m = regex.exec(value);
 
       if (m === null || m[0] !== value) {
-        const secondChar = value[1];
+        const secondChar = value[1] || '';
 
-        if (value.startsWith('0') && value.length > 1 && secondChar !== undefined && !Number.isNaN(+secondChar)) {
+        if (value.startsWith('0') && !Number.isNaN(+secondChar)) {
           value = secondChar;
         } else {
           event.preventDefault();
@@ -44,7 +54,7 @@ export function Input({ inputRef, value, className, onChange: _onChange, autoFoc
 
       _onChange(value);
     },
-    [_onChange]
+    [_onChange, decimals, integerPartLength]
   );
 
   useEffect(() => {
@@ -57,15 +67,7 @@ export function Input({ inputRef, value, className, onChange: _onChange, autoFoc
     setAdjustedFontSize(fontSize);
   }, [value, getInputFontSize, ref]);
 
-  useEffect(() => {
-    if (!autoFocus) return;
-
-    const input = ref?.current;
-
-    if (!input) return;
-
-    input.focus();
-  }, [autoFocus, ref]);
+  useAutoFocus(ref, autoFocus);
 
   return (
     <input
@@ -77,7 +79,7 @@ export function Input({ inputRef, value, className, onChange: _onChange, autoFoc
       autoComplete='off'
       autoFocus={autoFocus}
       ref={ref}
-      {...props}
+      {...rest}
     />
   );
 }

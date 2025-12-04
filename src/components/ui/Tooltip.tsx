@@ -5,13 +5,15 @@ import { cn } from '@/lib/utils/cn';
 
 type DivProps = Omit<HTMLAttributes<HTMLDivElement>, 'content'>;
 
-export type TooltipProps = DivProps & {
+export interface TooltipProps extends DivProps {
   content: ReactNode;
   className?: string;
   children: ReactNode;
-};
+}
 
-export function Tooltip({ content, children, className, ...rest }: TooltipProps) {
+export function Tooltip(props: TooltipProps) {
+  const { content, className, children, ...rest } = props;
+
   const tooltipId = useId();
 
   const [visible, setVisible] = useState(false);

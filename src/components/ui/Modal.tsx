@@ -7,24 +7,24 @@ import { Text } from '@/components/ui/Text';
 
 import { Portal } from '../common/Portal';
 
-export type ModalProps = PropsWithChildren & {
+export interface ModalProps extends PropsWithChildren {
   open: boolean;
-
   title: string;
-
   onClose: () => void;
-};
+}
 
-export function Modal({ open, title, children, onClose }: ModalProps) {
+export function Modal(props: ModalProps) {
+  const { open, title, children, onClose } = props;
+
   useEffect(() => {
     function onKeyPress(e: any) {
       if (e.key === 'Escape') onClose();
     }
 
-    document.addEventListener('keydown', onKeyPress);
+    document.addEventListener('keypress', onKeyPress);
 
     return () => {
-      document.removeEventListener('keydown', onKeyPress);
+      document.removeEventListener('keypress', onKeyPress);
     };
   }, [onClose]);
 

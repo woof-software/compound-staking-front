@@ -4,7 +4,7 @@ import { VStack } from '@/components/common/VStack';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 
-const StakeFlowBlock = () => {
+export function StakeFlowBlock() {
   return (
     <Card
       title='Stake'
@@ -86,21 +86,8 @@ const StakeFlowBlock = () => {
             0.00%
           </Text>
         </VStack>
-        <Button
-          // onClick={onOpenModal}
-          className='max-w-[130px] text-[11px] font-medium'
-        >
-          Stake
-        </Button>
+        <Button className='max-w-[130px] text-[11px] font-medium'>Stake</Button>
       </HStack>
-      {/*{isOpen && (*/}
-      {/*  <LazyStakeModal*/}
-      {/*    isOpen={isOpen}*/}
-      {/*    onClose={closeModal}*/}
-      {/*  />*/}
-      {/*)}*/}
     </Card>
   );
-};
-
-export { StakeFlowBlock };
+}

@@ -4,7 +4,7 @@ import { useStatisticTotalStaked } from '@/pages/stake/_hooks/useStatisticTotalS
 
 import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
-const TotalStaked = () => {
+export function TotalStaked() {
   const { totalStaked } = useStatisticTotalStaked();
 
   const totalStakedFormatted = formatUnits(totalStaked);
@@ -40,6 +40,4 @@ const TotalStaked = () => {
       </div>
     </div>
   );
-};
-
-export { TotalStaked };
+}

@@ -1,7 +1,7 @@
 import { units } from '@/consts/consts';
 import type { CurrencyType } from '@/shared/types/common';
 
-export const calculateRoundedUnit = (tokenDecimals: number, value: bigint, formatPrecision: number) => {
+export function calculateRoundedUnit(tokenDecimals: number, value: bigint, formatPrecision: number) {
   const baseUnit = BigInt(10 ** tokenDecimals);
   const scale = 10 ** (formatPrecision + 1);
 
@@ -9,9 +9,9 @@ export const calculateRoundedUnit = (tokenDecimals: number, value: bigint, forma
   const roundingScale = 10 ** formatPrecision;
 
   return Math.round(units * roundingScale) / roundingScale;
-};
+}
 
-export const formatUnits = (num: number, currency?: CurrencyType) => {
+export function formatUnits(num: number, currency?: CurrencyType) {
   const prefix = currency === 'USD' ? '$' : '';
   const digits = currency !== 'USD' ? 4 : 2;
   const threshold = 1 / 10 ** (digits + 1);
@@ -49,15 +49,15 @@ export const formatUnits = (num: number, currency?: CurrencyType) => {
   }
 
   return sign + prefix + absNum.toLocaleString('en-US', { maximumFractionDigits: digits, roundingMode: 'trunc' });
-};
+}
 
-export const formatValueInDollars = (tokenDecimals: number, value: bigint): string => {
+export function formatValueInDollars(tokenDecimals: number, value: bigint): string {
   const formatPrecision = 2;
 
   const roundedUnits = calculateRoundedUnit(tokenDecimals, value, formatPrecision);
 
   return formatUnits(roundedUnits, 'USD');
-};
+}
 
 export function formatUnitsCompact(units: number, currency?: CurrencyType): string {
   const raw = formatUnits(units, currency);
@@ -90,11 +90,11 @@ export function splitNumberUnit(value?: string): [string, string] {
   return [numberPart, unit];
 }
 
-export const formatRate = (value: number, maximumFractionDigits = 2, minimumFractionDigits = 2): string => {
+export function formatRate(value: number, maximumFractionDigits = 2, minimumFractionDigits = 2): string {
   const rate = value * 100;
 
   return `${rate.toLocaleString('en-US', {
     maximumFractionDigits,
     minimumFractionDigits
   })}%`;
-};
+}

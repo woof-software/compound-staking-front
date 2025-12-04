@@ -8,14 +8,13 @@ export type FlexDirection = 'row' | 'column';
 
 type DivProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
-export type FlexProps = PropsWithChildren &
-  DivProps & {
-    justify?: FlexJustify;
-    align?: FlexAlign;
-    direction?: FlexDirection;
-    gap?: number;
-    fullWidth?: boolean;
-  };
+export interface FlexProps extends PropsWithChildren, DivProps {
+  justify?: FlexJustify;
+  align?: FlexAlign;
+  direction?: FlexDirection;
+  gap?: number;
+  fullWidth?: boolean;
+}
 
 const justifyClasses: Record<FlexJustify, string> = {
   start: 'justify-start',
@@ -38,17 +37,19 @@ const directionClasses: Record<FlexDirection, string> = {
   column: 'flex-col'
 };
 
-export function Flex({
-  children,
-  className,
-  justify = 'start',
-  align = 'start',
-  direction = 'row',
-  gap,
-  fullWidth = true,
-  style,
-  ...rest
-}: FlexProps) {
+export function Flex(props: FlexProps) {
+  const {
+    children,
+    className,
+    justify = 'start',
+    align = 'start',
+    direction = 'row',
+    gap,
+    fullWidth = true,
+    style,
+    ...rest
+  } = props;
+
   return (
     <div
       className={cn(
