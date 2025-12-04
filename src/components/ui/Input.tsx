@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { type ChangeEvent, type InputHTMLAttributes, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { type ChangeEvent, type InputHTMLAttributes } from 'react';
 
 import { COMPOUND_DECIMALS, DEFAULT_INTEGER_PART_LENGTH } from '@/consts/consts';
 import { useAutoFocus } from '@/hooks/useAutoFocus';
@@ -7,7 +7,6 @@ import { useFontSizeFitting } from '@/hooks/useFontSizeFitting';
 import { spawnFloatRegex } from '@/lib/utils/regex';
 
 export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
-  ref?: MutableRefObject<HTMLInputElement | null>;
   integerPartLength?: number;
   decimals?: number;
   value: string;
@@ -16,7 +15,6 @@ export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | '
 
 export function Input(props: InputProps) {
   const {
-    ref,
     integerPartLength = DEFAULT_INTEGER_PART_LENGTH,
     decimals = COMPOUND_DECIMALS,
     value,
@@ -25,6 +23,8 @@ export function Input(props: InputProps) {
     autoFocus,
     ...rest
   } = props;
+
+  const ref = useRef<HTMLInputElement>(null);
 
   const [adjustedFontSize, setAdjustedFontSize] = useState<number>();
 
