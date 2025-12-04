@@ -1,8 +1,8 @@
-import { type MutableRefObject, type RefObject, useEffect } from 'react';
+import { RefObject, useEffect } from 'react';
 
-export function useAutoFocus<T extends HTMLElement = HTMLElement>(
-  ref: RefObject<T> | MutableRefObject<T | null> | undefined,
-  autoFocus?: boolean
+export function useAutoFocus<T extends HTMLInputElement = HTMLInputElement>(
+  ref?: RefObject<T>,
+  autoFocus?: boolean,
 ) {
   useEffect(() => {
     if (!autoFocus) return;
