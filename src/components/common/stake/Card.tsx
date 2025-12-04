@@ -1,16 +1,15 @@
 import type { PropsWithChildren } from 'react';
 
 import { InfoIcon } from '@/assets/svg';
+import { Condition } from '@/components/common/Condition';
 import { Text } from '@/components/ui/Text';
 import { Tooltip } from '@/components/ui/Tooltip';
 
-import { View } from '../View';
-
-export type CardProps = PropsWithChildren & {
+export interface CardProps extends PropsWithChildren {
   title: string;
 
   tooltip?: string;
-};
+}
 
 export function Card({ title, tooltip, children }: CardProps) {
   return (
@@ -24,7 +23,7 @@ export function Card({ title, tooltip, children }: CardProps) {
         >
           {title}
         </Text>
-        <View.Condition if={Boolean(tooltip)}>
+        <Condition if={Boolean(tooltip)}>
           <Tooltip
             hideArrow={true}
             content={tooltip}
@@ -32,7 +31,7 @@ export function Card({ title, tooltip, children }: CardProps) {
           >
             <InfoIcon className='text-color-18 size-4' />
           </Tooltip>
-        </View.Condition>
+        </Condition>
       </div>
       <div className='p-10'>{children}</div>
     </section>

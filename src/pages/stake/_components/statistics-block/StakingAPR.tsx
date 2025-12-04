@@ -3,7 +3,7 @@ import { formatRate, splitNumberUnit } from '@/lib/utils/numbers';
 
 import { useStatisticStakingAPR } from '../../_hooks/useStatisticStakingAPR';
 
-const StakingAPR = () => {
+export function StakingAPR() {
   const { stakingAPR } = useStatisticStakingAPR();
 
   const stakingAprFormatted = formatRate(stakingAPR / 100);
@@ -36,6 +36,4 @@ const StakingAPR = () => {
       </Text>
     </div>
   );
-};
-
-export { StakingAPR };
+}

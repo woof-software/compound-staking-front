@@ -1,9 +1,7 @@
-const useStatisticStakingAPR = () => {
+export function useStatisticStakingAPR() {
   const stakingAPR = 6.53;
 
   return {
     stakingAPR
   };
-};
-
-export { useStatisticStakingAPR };
+}
