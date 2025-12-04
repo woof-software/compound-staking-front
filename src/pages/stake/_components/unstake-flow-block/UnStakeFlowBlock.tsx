@@ -1,6 +1,3 @@
-// const LazyRequestUnStakeModal = lazy(() => import('@components/Modals/RequestUnStakeModal'));
-// const LazyUnStakeModal = lazy(() => import('@components/Modals/UnStakeModal'));
-
 import { InfoIcon } from '@/assets/svg';
 import { HStack } from '@/components/common/HStack';
 import { Card } from '@/components/common/stake/Card';
@@ -56,12 +53,7 @@ const UnStakeFlowBlock = () => {
               </Text>
             </div>
           </div>
-          <Button
-            // onClick={onOpenModal}
-            className='max-w-[130px] text-[11px] font-medium'
-          >
-            Request unstake
-          </Button>
+          <Button className='max-w-[130px] text-[11px] font-medium'>Request unstake</Button>
         </div>
       </Card>
       <HStack
@@ -77,8 +69,6 @@ const UnStakeFlowBlock = () => {
           Your funds are ready to be unstaked
         </Text>
       </HStack>
-      {/*<LazyRequestUnStakeModal isOpen={isOpen} onClose={closeModal} />*/}
-      {/*{isOpen && <LazyUnStakeModal isOpen={isOpen} onClose={closeModal} /> }*/}
     </VStack>
   );
 };

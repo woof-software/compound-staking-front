@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { sliceAddress } from '@/lib/utils/common';
 
-const DelegateFlowBlock = () => {
+export function DelegateFlowBlock() {
   return (
     <Card
       title='Delegation'
@@ -65,6 +65,4 @@ const DelegateFlowBlock = () => {
       </HStack>
     </Card>
   );
-};
-
-export { DelegateFlowBlock };
+}
