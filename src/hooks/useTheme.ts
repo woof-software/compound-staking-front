@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 
 import { DEFAULT_STORAGE_KEY } from '@/consts/consts';
-import type { Theme } from '@/shared/types/common';
+
+export type Theme = 'light' | 'dark' | 'system';
 
 type State = {
   theme: Theme;
