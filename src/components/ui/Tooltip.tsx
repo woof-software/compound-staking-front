@@ -1,83 +1,62 @@
-import { cloneElement, type ReactElement, type ReactNode, useRef, useState } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
+import { useId, useRef, useState } from 'react';
 
-import { Portal } from '@/components/common/Portal';
+import { cn } from '@/lib/utils/cn';
 
-type TooltipCoordinates = {
-  x: number;
-  y: number;
-};
+type DivProps = Omit<HTMLAttributes<HTMLDivElement>, 'content'>;
 
-export type TooltipProps = {
-  width: number;
-  children: ReactElement<any>;
+export interface TooltipProps extends DivProps {
   content: ReactNode;
-  under?: boolean;
-  hideArrow?: boolean;
-  mini?: boolean;
-  disabled?: boolean;
-  yOffset?: number;
-  x?: number;
-  y?: number;
-};
+  className?: string;
+  children: ReactNode;
+}
 
-export function Tooltip({
-  width,
-  children,
-  content,
-  under = false,
-  hideArrow = false,
-  mini = false,
-  disabled = false,
-  yOffset = 20,
-  x,
-  y
-}: TooltipProps) {
-  const [showTooltip, setShowTooltip] = useState<boolean>(false);
-  const [coordinates, setCoordinates] = useState<TooltipCoordinates>({ x: 0, y: 0 });
-  const tooltipRef = useRef<HTMLSpanElement | null>(null);
+export function Tooltip(props: TooltipProps) {
+  const { content, className, children, ...rest } = props;
 
-  const onMouseOver = (e: any) => {
-    if (!disabled && tooltipRef.current) {
-      setShowTooltip(true);
-      const triggerEl = e.currentTarget.getBoundingClientRect();
+  const tooltipId = useId();
 
-      // By default, try to set the tooltip above the hovered element.
-      let yCoords = triggerEl.bottom - tooltipRef.current.clientHeight - triggerEl.height - yOffset;
-      // If the tooltip gets cut off above the screen, then move it
-      // below the hovered element instead.
-      if (yCoords < -yOffset || under) {
-        yCoords = triggerEl.bottom;
-      }
+  const [visible, setVisible] = useState(false);
 
-      setCoordinates({
-        x: x ?? triggerEl.left + triggerEl.width / 2 - width / 2,
-        y: y ?? yCoords
-      });
-    }
-  };
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-  const onMouseOut = () => setShowTooltip(false);
+  const show = () => setVisible(true);
+
+  const hide = () => setVisible(false);
 
   return (
-    <>
-      {disabled
-        ? children
-        : cloneElement(children, {
-            onMouseOver,
-            onMouseOut
-          })}
-      {disabled || (
-        <Portal>
-          <span
-            className={`tooltip tooltip${!showTooltip && '--inactive'} tooltip${hideArrow && '--hide-arrow'} tooltip${mini && '--mini'}`}
-            id='tooltip'
-            ref={tooltipRef}
-            style={{ width: width, left: coordinates.x, top: coordinates.y }}
-          >
-            {content}
-          </span>
-        </Portal>
-      )}
-    </>
+    <div
+      ref={wrapperRef}
+      className={cn('relative inline-flex', className)}
+      onMouseEnter={show}
+      onMouseLeave={hide}
+      onFocus={show}
+      onBlur={hide}
+      {...rest}
+    >
+      <span
+        aria-describedby={visible ? tooltipId : undefined}
+        className='inline-flex items-center focus:outline-none'
+        tabIndex={0}
+      >
+        {children}
+      </span>
+      <div
+        id={tooltipId}
+        role='tooltip'
+        className={cn(
+          'absolute z-50 p-4 rounded-lg w-full max-w-[216px] min-w-[216px]',
+          'bg-color-4 text-color-24 shadow-md',
+          'transition-opacity duration-200',
+          'opacity-0 pointer-events-auto',
+          'bottom-5 left-1/2 -translate-x-1/2 -translate-y-1',
+          {
+            'opacity-100 pointer-events-none': visible
+          }
+        )}
+      >
+        <div className='relative text-[11px] font-medium leading-4'>{content}</div>
+      </div>
+    </div>
   );
 }
