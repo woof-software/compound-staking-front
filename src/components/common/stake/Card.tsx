@@ -25,17 +25,8 @@ const Card: FC<CardProps> = ({ title, tooltip, children }) => {
           {title}
         </Text>
         <View.Condition if={Boolean(tooltip)}>
-          <Tooltip
-            classNames={{
-              content: 'stake-block__tooltip-content'
-            }}
-            hideArrow={true}
-            content={<div className='stake-block__tooltip-block'>{tooltip}</div>}
-            width={216}
-          >
-            <div className='stake-block__tooltip-icon'>
-              <InfoIcon className='text-color-18' />
-            </div>
+          <Tooltip content={tooltip}>
+            <InfoIcon className='text-color-18 size-4 cursor-pointer' />
           </Tooltip>
         </View.Condition>
       </div>

@@ -2,6 +2,7 @@ import { Text } from '@/components/ui/Text';
 
 import { StakeFlowBlock } from './_components/stake-flow-block/StakeFlowBlock';
 import { StatisticsBlock } from './_components/statistics-block/StatisticsBlock';
+import { UnStakeFlowBlock } from './_components/unstake-flow-block/UnStakeFlowBlock';
 
 const StakePage = () => {
   return (
@@ -28,6 +29,7 @@ const StakePage = () => {
       </Text>
       <StatisticsBlock />
       <StakeFlowBlock />
+      <UnStakeFlowBlock />
     </main>
   );
 };
