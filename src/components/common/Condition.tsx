@@ -4,14 +4,10 @@ export type ConditionProps = PropsWithChildren<{
   if: any;
 }>;
 
-function Condition({ if: condition, children }: ConditionProps) {
+export function Condition({ if: condition, children }: ConditionProps) {
   if (condition) {
     return <>{children}</>;
   }
 
   return null;
 }
-
-export const View = {
-  Condition
-};

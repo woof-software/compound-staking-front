@@ -5,7 +5,7 @@ import { StatisticsBlock } from './_components/statistics-block/StatisticsBlock'
 
 export function StakePage() {
   return (
-    <main className='pt-10 pb-[60px] flex-1 flex flex-col gap-10'>
+    <main className='pt-10 pb-15 flex-1 flex flex-col gap-10'>
       <Text
         tag='h1'
         size='45'

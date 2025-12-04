@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-type QueryClientRootProviderProps = PropsWithChildren;
+export type QueryClientRootProviderProps = PropsWithChildren;
 
 const queryClient = new QueryClient({
   defaultOptions: {

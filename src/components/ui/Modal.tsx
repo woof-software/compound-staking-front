@@ -3,21 +3,23 @@ import { useEffect } from 'react';
 
 import { Portal } from '../common/Portal';
 
-export type ModalProps = PropsWithChildren & {
+export interface ModalProps extends PropsWithChildren {
   open: boolean;
   onClose: () => void;
-};
+}
 
-export function Modal({ open, children, onClose }: ModalProps) {
+export function Modal(props: ModalProps) {
+  const { open, children, onClose } = props;
+
   useEffect(() => {
     function onKeyPress(e: any) {
       if (e.key === 'Escape') onClose();
     }
 
-    document.addEventListener('keydown', onKeyPress);
+    document.addEventListener('keypress', onKeyPress);
 
     return () => {
-      document.removeEventListener('keydown', onKeyPress);
+      document.removeEventListener('keypress', onKeyPress);
     };
   }, [onClose]);
 
