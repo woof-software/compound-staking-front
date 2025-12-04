@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 
 import { DEFAULT_STORAGE_KEY } from '@/consts/consts';
-import type { Theme } from '@/shared/types/common';
+
+export type Theme = 'light' | 'dark' | 'system';
 
 type State = {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
 };
 
 const getSystemTheme = (): 'light' | 'dark' => {
@@ -49,11 +50,26 @@ export const useThemeStore = create<State>((set) => {
 
   return {
     theme: actual,
-    setTheme: (theme) =>
-      set(() => {
-        setDomTheme(theme);
-        localStorage.setItem(DEFAULT_STORAGE_KEY, theme);
-        return { theme };
+    toggleTheme: () =>
+      set((state) => {
+        let next: Theme;
+
+        if (state.theme === 'light') {
+          next = 'dark';
+        } else if (state.theme === 'dark') {
+          next = 'light';
+        } else {
+          const system = getSystemTheme();
+          if (system === 'dark') {
+            next = 'light';
+          } else {
+            next = 'dark';
+          }
+        }
+
+        setDomTheme(next);
+        localStorage.setItem(DEFAULT_STORAGE_KEY, next);
+        return { theme: next };
       })
   };
 });

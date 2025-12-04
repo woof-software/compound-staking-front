@@ -1,14 +1,12 @@
-import type { FC } from 'react';
-
 import { cn } from '@/lib/utils/cn';
 
-type DividerProps = {
+export type DividerProps = {
   orientation?: 'horizontal' | 'vertical';
   thickness?: number;
   className?: string;
 };
 
-const Divider: FC<DividerProps> = ({ orientation = 'horizontal', thickness = 1, className = '' }) => {
+export function Divider({ orientation = 'horizontal', thickness = 1, className = '' }: DividerProps) {
   const style =
     orientation === 'vertical'
       ? { width: `${thickness}px`, height: '100%', display: 'inline-block' }
@@ -22,6 +20,4 @@ const Divider: FC<DividerProps> = ({ orientation = 'horizontal', thickness = 1, 
       style={style}
     />
   );
-};
-
-export { Divider };
+}

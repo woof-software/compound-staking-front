@@ -1,7 +1,6 @@
-import { cloneElement, type FC, type ReactElement, type ReactNode, useRef, useState } from 'react';
+import { cloneElement, type ReactElement, type ReactNode, useRef, useState } from 'react';
 
 import { Portal } from '@/components/common/Portal';
-import type { ClassNames } from '@/shared/types/common';
 
 type TooltipCoordinates = {
   x: number;
@@ -19,10 +18,9 @@ type TooltipProps = {
   yOffset?: number;
   x?: number;
   y?: number;
-  classNames?: Pick<ClassNames, 'content'>;
 };
 
-const Tooltip: FC<TooltipProps> = ({
+export function Tooltip({
   width,
   children,
   content,
@@ -33,7 +31,7 @@ const Tooltip: FC<TooltipProps> = ({
   yOffset = 20,
   x,
   y
-}) => {
+}: TooltipProps) {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const [coordinates, setCoordinates] = useState<TooltipCoordinates>({ x: 0, y: 0 });
   const tooltipRef = useRef<HTMLSpanElement | null>(null);
@@ -82,6 +80,4 @@ const Tooltip: FC<TooltipProps> = ({
       )}
     </>
   );
-};
-
-export { Tooltip };
+}

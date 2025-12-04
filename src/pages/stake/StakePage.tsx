@@ -3,7 +3,7 @@ import { Text } from '@/components/ui/Text';
 import { StakeFlowBlock } from './_components/stake-flow-block/StakeFlowBlock';
 import { StatisticsBlock } from './_components/statistics-block/StatisticsBlock';
 
-const StakePage = () => {
+export function StakePage() {
   return (
     <main className='pt-10 pb-[60px] flex-1 flex flex-col gap-10'>
       <Text
@@ -30,6 +30,4 @@ const StakePage = () => {
       <StakeFlowBlock />
     </main>
   );
-};
-
-export { StakePage };
+}

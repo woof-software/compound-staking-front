@@ -1,8 +1,6 @@
-'use client';
-
 import { useState } from 'react';
 
-function useInput<T>(initialValue: T): [T, (newValue: T) => void] {
+export function useInput<T>(initialValue: T): [T, (newValue: T) => void] {
   const [value, setValue] = useState<T>(initialValue);
 
   const onChange = (newValue: T) => {
@@ -11,5 +9,3 @@ function useInput<T>(initialValue: T): [T, (newValue: T) => void] {
 
   return [value, onChange];
 }
-
-export { useInput };
