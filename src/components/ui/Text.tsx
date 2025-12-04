@@ -52,7 +52,7 @@ type TextProps = PropsWithChildren &
     tag?: HeaderTagType;
   };
 
-export const Text = ({ className, size, weight, lineHeight, align, tag: Tag = 'p', children, ...props }: TextProps) => {
+const Text = ({ className, size, weight, lineHeight, align, tag: Tag = 'p', children, ...props }: TextProps) => {
   return (
     <Tag
       className={text({ size, weight, lineHeight, align, className })}
@@ -62,3 +62,5 @@ export const Text = ({ className, size, weight, lineHeight, align, tag: Tag = 'p
     </Tag>
   );
 };
+
+export { Text };

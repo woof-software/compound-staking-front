@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils/cn';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
-export const Button: FC<ButtonProps> = ({ children, className, disabled, ...props }) => {
+const Button: FC<ButtonProps> = ({ children, className, disabled, ...props }) => {
   return (
     <button
       disabled={disabled}
@@ -19,3 +19,5 @@ export const Button: FC<ButtonProps> = ({ children, className, disabled, ...prop
     </button>
   );
 };
+
+export { Button };

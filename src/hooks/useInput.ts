@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 
 function useInput<T>(initialValue: T): [T, (newValue: T) => void] {
