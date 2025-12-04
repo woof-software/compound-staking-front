@@ -5,7 +5,7 @@ import type { Theme } from '@/shared/types/common';
 
 type State = {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
 };
 
 const getSystemTheme = (): 'light' | 'dark' => {
@@ -49,11 +49,20 @@ export const useThemeStore = create<State>((set) => {
 
   return {
     theme: actual,
-    setTheme: (theme) =>
-      set(() => {
-        setDomTheme(theme);
-        localStorage.setItem(DEFAULT_STORAGE_KEY, theme);
-        return { theme };
+    toggleTheme: () =>
+      set((state) => {
+        const next: Theme =
+          state.theme === 'light'
+            ? 'dark'
+            : state.theme === 'dark'
+              ? 'light'
+              : getSystemTheme() === 'dark'
+                ? 'light'
+                : 'dark';
+
+        setDomTheme(next);
+        localStorage.setItem(DEFAULT_STORAGE_KEY, next);
+        return { theme: next };
       })
   };
 });
