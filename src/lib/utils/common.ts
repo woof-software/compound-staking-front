@@ -18,6 +18,6 @@ export function noop() {}
  *
  * @returns A shortened string in the format `xxxx...yyyy` or undefined if address is not provided.
  */
-export const sliceAddress = (address: string, limit = 4) => {
+export function sliceAddress(address: string, limit = 4) {
   return `${address.slice(0, limit + 2)}...${address.slice(limit * -1)}`;
-};
+}
