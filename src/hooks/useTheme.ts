@@ -51,14 +51,20 @@ export const useThemeStore = create<State>((set) => {
     theme: actual,
     toggleTheme: () =>
       set((state) => {
-        const next: Theme =
-          state.theme === 'light'
-            ? 'dark'
-            : state.theme === 'dark'
-              ? 'light'
-              : getSystemTheme() === 'dark'
-                ? 'light'
-                : 'dark';
+        let next: Theme;
+
+        if (state.theme === 'light') {
+          next = 'dark';
+        } else if (state.theme === 'dark') {
+          next = 'light';
+        } else {
+          const system = getSystemTheme();
+          if (system === 'dark') {
+            next = 'light';
+          } else {
+            next = 'dark';
+          }
+        }
 
         setDomTheme(next);
         localStorage.setItem(DEFAULT_STORAGE_KEY, next);
