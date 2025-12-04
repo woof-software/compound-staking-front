@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const useBoolean = (initialValue: boolean = false) => {
+export function useBoolean(initialValue: boolean = false) {
   const [value, setValue] = useState<boolean>(() => Boolean(initialValue));
 
   const enable = () => setValue(true);
@@ -12,6 +12,4 @@ const useBoolean = (initialValue: boolean = false) => {
   const update = (value: boolean) => setValue(value);
 
   return { value, setValue, enable, disable, toggle, update };
-};
-
-export { useBoolean };
+}

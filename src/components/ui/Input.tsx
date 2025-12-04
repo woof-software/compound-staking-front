@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { type ChangeEvent, type FC, type InputHTMLAttributes, type MutableRefObject } from 'react';
+import { type ChangeEvent, type InputHTMLAttributes, type MutableRefObject } from 'react';
 
 import { COMPOUND_DECIMALS, DEFAULT_INTEGER_PART_LENGTH } from '@/consts/consts';
 import { useFontSizeFitting } from '@/hooks/useFontSizeFitting';
 import { spawnFloatRegex } from '@/lib/utils/regex';
 
-type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
+export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
   inputRef?: MutableRefObject<HTMLInputElement | null>;
   value: string;
   onChange: (value: string) => void;
 };
 
-const Input: FC<InputProps> = ({ inputRef, value, className, onChange: _onChange, autoFocus, ...props }) => {
+export function Input({ inputRef, value, className, onChange: _onChange, autoFocus, ...props }: InputProps) {
   const rootRef = useRef<HTMLInputElement>(null);
 
   const ref = inputRef ? inputRef : rootRef;
@@ -80,6 +80,4 @@ const Input: FC<InputProps> = ({ inputRef, value, className, onChange: _onChange
       {...props}
     />
   );
-};
-
-export { Input };
+}

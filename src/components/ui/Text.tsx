@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-type HeaderTagType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span';
+export type HeaderTagType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span';
 
 const text = cva('text-primary-11', {
   variants: {
@@ -43,13 +43,13 @@ const text = cva('text-primary-11', {
   }
 });
 
-type TextProps = PropsWithChildren &
+export type TextProps = PropsWithChildren &
   VariantProps<typeof text> & {
     className?: string;
     tag?: HeaderTagType;
   };
 
-const Text = ({ className, size, weight, lineHeight, align, tag: Tag = 'p', children, ...props }: TextProps) => {
+export function Text({ className, size, weight, lineHeight, align, tag: Tag = 'p', children, ...props }: TextProps) {
   return (
     <Tag
       className={text({ size, weight, lineHeight, align, className })}
@@ -58,6 +58,4 @@ const Text = ({ className, size, weight, lineHeight, align, tag: Tag = 'p', chil
       {children}
     </Tag>
   );
-};
-
-export { Text };
+}

@@ -1,13 +1,7 @@
 import { ThemeSwitcher } from '@/components/common/ThemeSwitcher';
 import { TALLY_GOV_URL, TERMS_URL } from '@/consts/consts';
-import type { Theme } from '@/shared/types/common';
 
-type FooterProps = {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-};
-
-const Footer = ({ theme, setTheme }: FooterProps) => {
+export function Footer() {
   return (
     <footer className='bg-transparent mt-auto'>
       <div className='flex py-5 items-center justify-between border-t border-border-1'>
@@ -30,14 +24,9 @@ const Footer = ({ theme, setTheme }: FooterProps) => {
           </a>
         </div>
         <div className='flex justify-end'>
-          <ThemeSwitcher
-            theme={theme}
-            setTheme={setTheme}
-          />
+          <ThemeSwitcher />
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

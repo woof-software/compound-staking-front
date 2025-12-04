@@ -1,14 +1,14 @@
-import { type FC, type PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import { useEffect } from 'react';
 
 import { Portal } from '../common/Portal';
 
-type ModalProps = PropsWithChildren & {
+export type ModalProps = PropsWithChildren & {
   open: boolean;
   onClose: () => void;
 };
 
-const Modal: FC<ModalProps> = ({ open, children, onClose }) => {
+export function Modal({ open, children, onClose }: ModalProps) {
   useEffect(() => {
     function onKeyPress(e: any) {
       if (e.key === 'Escape') onClose();
@@ -24,6 +24,4 @@ const Modal: FC<ModalProps> = ({ open, children, onClose }) => {
   if (!open) return null;
 
   return <Portal>{children}</Portal>;
-};
-
-export { Modal };
+}

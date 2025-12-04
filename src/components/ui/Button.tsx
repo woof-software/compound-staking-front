@@ -1,10 +1,10 @@
-import type { ButtonHTMLAttributes, FC } from 'react';
+import type { ButtonHTMLAttributes } from 'react';
 
 import { cn } from '@/lib/utils/cn';
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
-const Button: FC<ButtonProps> = ({ children, className, disabled, ...props }) => {
+export function Button({ children, className, disabled, ...props }: ButtonProps) {
   return (
     <button
       disabled={disabled}
@@ -18,6 +18,4 @@ const Button: FC<ButtonProps> = ({ children, className, disabled, ...props }) =>
       {children}
     </button>
   );
-};
-
-export { Button };
+}
