@@ -1,13 +1,13 @@
 import { useThemeStore } from './hooks/useTheme';
 
 function App() {
-  const { theme, setTheme } = useThemeStore((state) => state);
+  const { toggleTheme } = useThemeStore();
 
   return (
     <div>
       <p className='read-the-docs'>Click on the Vite and React logos to learn more</p>
 
-      <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>Click</button>
+      <button onClick={toggleTheme}>Click</button>
     </div>
   );
 }
