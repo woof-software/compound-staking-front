@@ -1,14 +1,9 @@
-import type { FC } from 'react';
-
+import { useThemeStore } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils/cn';
-import type { Theme } from '@/shared/types/common';
 
-type ThemeSwitcherProps = {
-  theme: Theme;
-  toggleTheme: () => void;
-};
+export function ThemeSwitcher() {
+  const { theme, toggleTheme } = useThemeStore();
 
-export const ThemeSwitcher: FC<ThemeSwitcherProps> = ({ theme, toggleTheme }) => {
   return (
     <div className='flex items-center'>
       <span className='inline-block h-6 leading-6 max-w-full whitespace-nowrap outline-none'>
@@ -33,4 +28,4 @@ export const ThemeSwitcher: FC<ThemeSwitcherProps> = ({ theme, toggleTheme }) =>
       </span>
     </div>
   );
-};
+}
