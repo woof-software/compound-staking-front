@@ -2,13 +2,15 @@
 // const LazyUnStakeModal = lazy(() => import('@components/Modals/UnStakeModal'));
 
 import { InfoIcon } from '@/assets/svg';
+import { HStack } from '@/components/common/HStack';
 import { Card } from '@/components/common/stake/Card';
+import { VStack } from '@/components/common/VStack';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 
 const UnStakeFlowBlock = () => {
   return (
-    <div className='flex flex-col gap-[5px]'>
+    <VStack gap={5}>
       <Card
         title='Unstake'
         tooltip='Cooldown period for unstaking process is 18d 00h 00m 00s'
@@ -31,7 +33,7 @@ const UnStakeFlowBlock = () => {
                 10.0000 COMP
               </Text>
               <Text
-                size='13'
+                size='11'
                 className='text-color-2'
               >
                 $400.00
@@ -62,7 +64,10 @@ const UnStakeFlowBlock = () => {
           </Button>
         </div>
       </Card>
-      <div className='p-2.5 pl-5 rounded-lg bg-color-26 flex items-center gap-2.5'>
+      <HStack
+        align='center'
+        className='p-2.5 pl-5 w-full rounded-lg bg-color-26 gap-2.5'
+      >
         <InfoIcon className='text-color-7 size-4' />
         <Text
           size='11'
@@ -71,10 +76,10 @@ const UnStakeFlowBlock = () => {
         >
           Your funds are ready to be unstaked
         </Text>
-      </div>
+      </HStack>
       {/*<LazyRequestUnStakeModal isOpen={isOpen} onClose={closeModal} />*/}
       {/*{isOpen && <LazyUnStakeModal isOpen={isOpen} onClose={closeModal} /> }*/}
-    </div>
+    </VStack>
   );
 };
 

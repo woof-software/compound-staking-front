@@ -5,8 +5,6 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 
 const StakeFlowBlock = () => {
-  // const { isOpen, onOpenModal, onCloseModal } = useModal();
-
   return (
     <Card
       title='Stake'

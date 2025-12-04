@@ -1,5 +1,6 @@
 import { Text } from '@/components/ui/Text';
 
+import { DelegateFlowBlock } from './_components/delegate-flow-block/DelegateFlowBlock';
 import { StakeFlowBlock } from './_components/stake-flow-block/StakeFlowBlock';
 import { StatisticsBlock } from './_components/statistics-block/StatisticsBlock';
 import { UnStakeFlowBlock } from './_components/unstake-flow-block/UnStakeFlowBlock';
@@ -30,6 +31,7 @@ const StakePage = () => {
       <StatisticsBlock />
       <StakeFlowBlock />
       <UnStakeFlowBlock />
+      <DelegateFlowBlock />
     </main>
   );
 };

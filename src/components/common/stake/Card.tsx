@@ -14,7 +14,7 @@ type CardProps = PropsWithChildren & {
 
 const Card: FC<CardProps> = ({ title, tooltip, children }) => {
   return (
-    <section className='rounded-lg bg-color-4'>
+    <section className='rounded-lg bg-color-4 w-full'>
       <div className='flex items-center bg-color-11 rounded-lg rounded-b-none gap-3 py-3.5 px-10'>
         <Text
           size='13'
