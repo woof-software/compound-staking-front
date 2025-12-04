@@ -1,4 +1,4 @@
-export type TClassNames = {
+export type ClassNames = {
   wrapper?: string;
   container?: string;
   label?: string;
