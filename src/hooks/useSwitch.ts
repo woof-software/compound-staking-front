@@ -1,36 +1,39 @@
-import { type SetStateAction, useMemo, useState } from 'react';
+import { SetStateAction, useMemo, useState } from 'react';
 
 type UseSwitchRet = {
-  isOpen: boolean;
-  onOpenModal: () => void;
-  onCloseModal: () => void;
-  onToggleModal: () => void;
+  isEnabled: boolean;
+  enable: () => void;
+  disable: () => void;
+  toggle: () => void;
+  update: (v: SetStateAction<boolean>) => void;
 };
 
-export function useSwitch(): UseSwitchRet {
-  const [value, setValue] = useState<boolean>(false);
+export function useSwitch(initial?: boolean): UseSwitchRet {
+  const [isEnabled, setIsEnabled] = useState<boolean>(initial ?? false);
+  
+  if (typeof initial === 'boolean' && initial !== isEnabled) {
+    setIsEnabled(initial);
+  }
 
   const actions = useMemo(() => {
     return {
       enable: () => {
-        setValue(true);
+        setIsEnabled(true);
       },
       disable: () => {
-        setValue(false);
+        setIsEnabled(false);
       },
       toggle: () => {
-        setValue((v) => !v);
+        setIsEnabled((v) => !v);
       },
       update: (v: SetStateAction<boolean>) => {
-        setValue(v);
+        setIsEnabled(v);
       }
     };
   }, []);
 
   return {
-    isOpen: value,
-    onOpenModal: actions.enable,
-    onCloseModal: actions.disable,
-    onToggleModal: actions.toggle
+    isEnabled: isEnabled,
+    ...actions,
   };
 }
