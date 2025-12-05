@@ -10,6 +10,8 @@ export const COMPOUND_DECIMALS = 18;
 export const COMP_ADDRESS = '0xc00e94cb662c3520282e6f5717214004a7f26888';
 export const COMP_USD_PRICE_FEED = '0xdbd020caef83efd542f4de03e3cf0c28a4428bd5';
 
+export const WALLET_CONNECT_PROJECT_ID = '1d7947d532af4a24ece0a9b7e7479a32';
+
 export const Currency = {
   USD: 'USD',
   USDC: 'USDC',

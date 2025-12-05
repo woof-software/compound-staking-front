@@ -20,7 +20,7 @@ export function TotalStaked() {
         Total staked
       </Text>
       <div className='flex items-start gap-3'>
-        <CompoundBlackCircle className='mt-1 size-10' />
+        <CompoundBlackCircle className='mt-1 size-10 text-compound-icon-bg' />
         <Text
           size='40'
           weight='500'
