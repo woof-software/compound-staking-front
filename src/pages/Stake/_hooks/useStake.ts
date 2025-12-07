@@ -1,8 +1,21 @@
 import { erc20Abi, parseUnits } from 'viem';
-import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
+import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 
-import { BASE_TOKEN_DECIMALS, MOCK_BASE_TOKEN_ADDRESS, MOCK_STAKING_VAULT_ADDRESS } from '@/consts/common';
+import {
+  BASE_TOKEN_DECIMALS,
+  MOCK_BASE_TOKEN_ADDRESS,
+  MOCK_STAKING_VAULT_ADDRESS,
+  STAKED_TOKEN_ADDRESS
+} from '@/consts/common';
 import { MockStakingVaultAbi } from '@/shared/abis/MockStakingVault.abi';
+import { StakedBaseTokenAbi } from '@/shared/abis/StakedBaseToken.abi';
+
+type StakeParams = {
+  amount: bigint;
+  claimedRewardsAmount: bigint;
+  startTime: bigint;
+  duration: bigint;
+};
 
 export function useStakeDev() {
   const { address } = useAccount();
@@ -53,6 +66,24 @@ export function useStakeDev() {
     });
   };
 
+  const { data: rawStake, refetch: refetchStake } = useReadContract({
+    address: STAKED_TOKEN_ADDRESS,
+    abi: StakedBaseTokenAbi,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    query: {
+      enabled: Boolean(address)
+    }
+  });
+
+  const stake = rawStake as StakeParams | undefined;
+
+  const showWarning = stake ? stake.amount > 0n : false;
+
+  const isLoading = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
+
+  console.log('rawStake=>', rawStake);
+
   return {
     stakeDev,
 
@@ -68,6 +99,10 @@ export function useStakeDev() {
     isStakePending,
     isStakeConfirming,
     isStakeSuccess,
-    stakeError
+    stakeError,
+
+    showWarning,
+    isLoading,
+    refetchStake
   };
 }

@@ -1,21 +1,12 @@
 import { type FormEvent, useEffect, useState } from 'react';
-import { useAccount, useReadContract } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Card } from '@/components/common/stake/Card';
-import { STAKED_TOKEN_ADDRESS } from '@/consts/common';
-import { StakedBaseTokenAbi } from '@/shared/abis/StakedBaseToken.abi';
 
 import { useStakeDev } from '../../_hooks/useStake';
 
 // const LazyConnectorsModal = lazy(() => import('../connect-wallet/ConnectorsModal'));
-
-type StakeParams = {
-  amount: bigint;
-  claimedRewardsAmount: bigint;
-  startTime: bigint;
-  duration: bigint;
-};
 
 export function StakeFlowBlock() {
   const { address } = useAccount();
@@ -23,32 +14,16 @@ export function StakeFlowBlock() {
 
   const {
     stakeDev,
-    isApprovePending,
     isApproveConfirming,
-    isStakePending,
     isStakeConfirming,
     isStakeSuccess,
     approveError,
-    stakeError
+    stakeError,
+
+    isLoading,
+    refetchStake,
+    showWarning
   } = useStakeDev();
-
-  const { data: rawStake, refetch: refetchStake } = useReadContract({
-    address: STAKED_TOKEN_ADDRESS,
-    abi: StakedBaseTokenAbi,
-    functionName: 'balanceOf',
-    args: address ? [address] : undefined,
-    query: {
-      enabled: Boolean(address)
-    }
-  });
-
-  console.log('rawStake=>', rawStake);
-
-  const stake = rawStake as StakeParams | undefined;
-
-  const showWarning = stake ? stake.amount > 0n : false;
-
-  const isLoading = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
 
   const onStakeClick = (e: FormEvent) => {
     e.preventDefault();
