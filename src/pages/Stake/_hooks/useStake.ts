@@ -1,7 +1,7 @@
 import { erc20Abi, parseUnits } from 'viem';
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 
-import { BASE_TOKEN_ADDRESS, BASE_TOKEN_DECIMALS, MOCK_STAKING_VAULT_ADDRESS } from '@/consts/common';
+import { BASE_TOKEN_DECIMALS, MOCK_BASE_TOKEN_ADDRESS, MOCK_STAKING_VAULT_ADDRESS } from '@/consts/common';
 import { MockStakingVaultAbi } from '@/shared/abis/MockStakingVault.abi';
 
 export function useStakeDev() {
@@ -38,7 +38,7 @@ export function useStakeDev() {
 
     // 1) approve baseToken -> staking vault
     writeApprove({
-      address: BASE_TOKEN_ADDRESS,
+      address: MOCK_BASE_TOKEN_ADDRESS,
       abi: erc20Abi,
       functionName: 'approve',
       args: [MOCK_STAKING_VAULT_ADDRESS, parsedAmount]

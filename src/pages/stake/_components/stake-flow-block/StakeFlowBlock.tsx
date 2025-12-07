@@ -3,8 +3,8 @@ import { useAccount, useReadContract } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Card } from '@/components/common/stake/Card';
-import { MOCK_STAKING_VAULT_ADDRESS } from '@/consts/common';
-import { MockStakingVaultAbi } from '@/shared/abis/MockStakingVault.abi';
+import { STAKED_TOKEN_ADDRESS } from '@/consts/common';
+import { StakedBaseTokenAbi } from '@/shared/abis/StakedBaseToken.abi';
 
 import { useStakeDev } from '../../_hooks/useStake';
 
@@ -33,9 +33,9 @@ export function StakeFlowBlock() {
   } = useStakeDev();
 
   const { data: rawStake, refetch: refetchStake } = useReadContract({
-    address: MOCK_STAKING_VAULT_ADDRESS,
-    abi: MockStakingVaultAbi,
-    functionName: 'getUserStake',
+    address: STAKED_TOKEN_ADDRESS,
+    abi: StakedBaseTokenAbi,
+    functionName: 'balanceOf',
     args: address ? [address] : undefined,
     query: {
       enabled: Boolean(address)
