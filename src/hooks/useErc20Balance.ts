@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { erc20Abi, formatUnits } from 'viem';
 import { useAccount, useReadContract } from 'wagmi';
 
-import { COMP_ADDRESS, COMP_USD_PRICE_FEED, COMPOUND_DECIMALS } from '@/consts/consts';
-import { aggregatorV3InterfaceABI } from '@/shared/abis/chainlinkAggregatorV3';
+import { COMP_ADDRESS, COMP_USD_PRICE_FEED, COMPOUND_DECIMALS } from '@/consts/common';
+import { aggregatorV3InterfaceABI } from '@/shared/abis/chainlinkAggregatorV3.abi';
 
 export function useErc20Balance() {
   const { address } = useAccount();

@@ -2,7 +2,7 @@ import { createConfig, http, injected } from 'wagmi';
 import { mainnet, sepolia } from 'wagmi/chains';
 import { coinbaseWallet, metaMask, walletConnect } from 'wagmi/connectors';
 
-import { WALLET_CONNECT_PROJECT_ID } from '@/consts/consts';
+import { WALLET_CONNECT_PROJECT_ID } from '@/consts/common';
 
 export const config = createConfig({
   chains: [mainnet, sepolia],

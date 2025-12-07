@@ -1,4 +1,4 @@
-import { units } from '@/consts/consts';
+import { units } from '@/consts/common';
 import type { CurrencyType } from '@/shared/types/common';
 
 export function calculateRoundedUnit(tokenDecimals: number, value: bigint, formatPrecision: number) {

@@ -1,5 +1,5 @@
 import { ThemeSwitcher } from '@/components/common/ThemeSwitcher';
-import { TALLY_GOV_URL, TERMS_URL } from '@/consts/consts';
+import { TALLY_GOV_URL, TERMS_URL } from '@/consts/common';
 
 export function Footer() {
   return (

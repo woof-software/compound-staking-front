@@ -1,10 +1,12 @@
+import { lazy } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
 import { ConnectedButton } from '@/components/common/connect-wallet/ConnectedButton';
-import { ConnectorsModal } from '@/components/common/connect-wallet/ConnectorsModal';
 import { Button } from '@/components/ui/Button';
 import { useSwitch } from '@/hooks/useSwitch';
+
+const LazyConnectorsModal = lazy(() => import('../connect-wallet/ConnectorsModal'));
 
 export function WalletButton() {
   const { address } = useAccount();
@@ -24,7 +26,7 @@ export function WalletButton() {
       <Condition if={Boolean(address)}>
         <ConnectedButton onChangeWallet={onOpen} />
       </Condition>
-      <ConnectorsModal
+      <LazyConnectorsModal
         isOpen={isOpen}
         onClose={onClose}
       />

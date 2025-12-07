@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { DEFAULT_STORAGE_KEY } from '@/consts/consts';
+import { DEFAULT_STORAGE_KEY } from '@/consts/common';
 
 export type Theme = 'light' | 'dark' | 'system';
 

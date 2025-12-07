@@ -32,3 +32,8 @@ export const units = [
   { value: 1e6, symbol: 'M' },
   { value: 1e3, symbol: 'K' }
 ];
+
+/* CONTRACTS  */
+export const BASE_TOKEN_DECIMALS = 18;
+export const MOCK_STAKING_VAULT_ADDRESS = '0x993f58396E489352f7B0Fc9aa824E4d53cbD44C1';
+export const BASE_TOKEN_ADDRESS = '0xe357a464D9e37a50A1BdD71560B5c69a333d301E';
