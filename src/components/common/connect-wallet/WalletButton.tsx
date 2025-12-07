@@ -1,4 +1,4 @@
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
 import { ConnectedButton } from '@/components/common/connect-wallet/ConnectedButton';
@@ -10,10 +10,6 @@ export function WalletButton() {
   const { address } = useAccount();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
-
-  const chainId = useChainId();
-
-  console.log('chainId=>', chainId);
 
   return (
     <>

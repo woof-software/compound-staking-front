@@ -11,9 +11,11 @@ import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 import { useErc20Balance } from '@/hooks/useErc20Balance';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
+import { useWalletStore } from '@/hooks/useWallet';
 import { sliceAddress } from '@/lib/utils/common';
 
 import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
+import Spinner from '@/assets/spinner.svg';
 
 export type ConnectedButtonProps = {
   onChangeWallet: () => void;
@@ -25,6 +27,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
   const { compWalletBalance } = useErc20Balance();
+  const { isPending } = useWalletStore();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
@@ -83,38 +86,42 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             </Condition>
           </Text>
         </HStack>
-        <HStack
-          align='center'
-          justify='center'
-          gap={8}
-          className='bg-color-4 rounded-64 h-11 min-w-[118px] shadow-20 max-w-[118px] py-2 px-3'
-        >
-          <div className='size-2 rounded-full bg-color-7' />
-          <Text
-            size='11'
-            weight='500'
-            lineHeight='16'
-            className='text-color-2'
+        <Condition if={!isPending}>
+          <HStack
+            align='center'
+            justify='center'
+            gap={8}
+            className='bg-color-4 rounded-64 h-11 min-w-[118px] shadow-20 max-w-[118px] py-2 px-3'
           >
-            {sliceAddress(address as string)}
-          </Text>
-        </HStack>
-        {/*<HStack*/}
-        {/*  gap={8}*/}
-        {/*  align='center'*/}
-        {/*  justify='center'*/}
-        {/*  className='min-w-[100px] h-11 bg-color-7 rounded-64'*/}
-        {/*>*/}
-        {/*  <Spinner className='animate-spin size-4 flex-shrink-0' />*/}
-        {/*  <Text*/}
-        {/*    size='11'*/}
-        {/*    weight='500'*/}
-        {/*    lineHeight='16'*/}
-        {/*    className='text-white'*/}
-        {/*  >*/}
-        {/*    1 Pending*/}
-        {/*  </Text>*/}
-        {/*</HStack>*/}
+            <div className='size-2 rounded-full bg-color-7' />
+            <Text
+              size='11'
+              weight='500'
+              lineHeight='16'
+              className='text-color-2'
+            >
+              {sliceAddress(address as string)}
+            </Text>
+          </HStack>
+        </Condition>
+        <Condition if={isPending}>
+          <HStack
+            gap={8}
+            align='center'
+            justify='center'
+            className='min-w-[100px] h-11 bg-color-7 rounded-64'
+          >
+            <Spinner className='animate-spin size-4 flex-shrink-0' />
+            <Text
+              size='11'
+              weight='500'
+              lineHeight='16'
+              className='text-white'
+            >
+              1 Pending
+            </Text>
+          </HStack>
+        </Condition>
       </HStack>
       <Condition if={isOpen}>
         <VStack
