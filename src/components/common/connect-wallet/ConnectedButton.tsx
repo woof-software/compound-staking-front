@@ -13,6 +13,7 @@ import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useWalletStore } from '@/hooks/useWallet';
 import { sliceAddress } from '@/lib/utils/common';
+import { formatUnits } from '@/lib/utils/numbers';
 
 import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
 import Spinner from '@/assets/spinner.svg';
@@ -33,7 +34,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   const [, onAddressTextCopy] = useCopyToClipboard();
 
-  const walletBalance = compWalletBalance.toString().split('.');
+  const walletBalance = formatUnits(compWalletBalance).split('.');
 
   const onDisconnect = () => {
     onClose();
