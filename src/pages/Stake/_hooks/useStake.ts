@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { erc20Abi, parseUnits } from 'viem';
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 
@@ -10,14 +11,11 @@ import {
 import { MockStakingVaultAbi } from '@/shared/abis/MockStakingVault.abi';
 import { StakedBaseTokenAbi } from '@/shared/abis/StakedBaseToken.abi';
 
-type StakeParams = {
-  amount: bigint;
-  claimedRewardsAmount: bigint;
-  startTime: bigint;
-  duration: bigint;
+type UseStakeDevArgs = {
+  onIsPendingToggle?: (value: boolean) => void;
 };
 
-export function useStakeDev() {
+export function useStakeDev({ onIsPendingToggle }: UseStakeDevArgs) {
   const { address } = useAccount();
 
   // approve
@@ -44,6 +42,21 @@ export function useStakeDev() {
     hash: stakeHash
   });
 
+  const { data: rawStakeBalance, refetch: refetchStake } = useReadContract({
+    address: STAKED_TOKEN_ADDRESS,
+    abi: StakedBaseTokenAbi,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    query: {
+      enabled: Boolean(address)
+    }
+  });
+
+  const stakedBalance = (rawStakeBalance ?? 0n) as bigint;
+  const showWarning = stakedBalance > 0n;
+
+  const isLoading = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
+
   const stakeDev = (delegatee: `0x${string}`, amount: string) => {
     if (!address) throw new Error('Connect wallet first');
 
@@ -66,23 +79,11 @@ export function useStakeDev() {
     });
   };
 
-  const { data: rawStake, refetch: refetchStake } = useReadContract({
-    address: STAKED_TOKEN_ADDRESS,
-    abi: StakedBaseTokenAbi,
-    functionName: 'balanceOf',
-    args: address ? [address] : undefined,
-    query: {
-      enabled: Boolean(address)
-    }
-  });
+  useEffect(() => {
+    onIsPendingToggle?.(isLoading);
+  }, [isLoading, onIsPendingToggle]);
 
-  const stake = rawStake as StakeParams | undefined;
-
-  const showWarning = stake ? stake.amount > 0n : false;
-
-  const isLoading = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
-
-  console.log('rawStake=>', rawStake);
+  console.log('rawStakeBalance=>', rawStakeBalance);
 
   return {
     stakeDev,

@@ -3,6 +3,7 @@ import { useAccount } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Card } from '@/components/common/stake/Card';
+import { useWalletStore } from '@/hooks/useWallet';
 
 import { useStakeDev } from '../../_hooks/useStake';
 
@@ -10,6 +11,8 @@ import { useStakeDev } from '../../_hooks/useStake';
 
 export function StakeFlowBlock() {
   const { address } = useAccount();
+  const { onIsPendingToggle } = useWalletStore();
+
   const [amount, setAmount] = useState('');
 
   const {
@@ -23,7 +26,9 @@ export function StakeFlowBlock() {
     isLoading,
     refetchStake,
     showWarning
-  } = useStakeDev();
+  } = useStakeDev({
+    onIsPendingToggle
+  });
 
   const onStakeClick = (e: FormEvent) => {
     e.preventDefault();
