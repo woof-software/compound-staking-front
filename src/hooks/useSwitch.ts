@@ -34,7 +34,7 @@ export function useSwitch(initial?: boolean): UseSwitchRet {
   }, []);
 
   return {
-    isEnabled: isEnabled,
+    isEnabled,
     ...actions
   };
 }
