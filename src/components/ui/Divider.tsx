@@ -9,7 +9,7 @@ export type DividerProps = {
 export function Divider({ orientation = 'horizontal', thickness = 1, className = '' }: DividerProps) {
   const style =
     orientation === 'vertical'
-      ? { width: `${thickness}px`, height: '100%', display: 'inline-block' }
+      ? { width: `${thickness}px`, height: '100%', display: 'inline-block', minHeight: '-webkit-fill-available' }
       : { height: `${thickness}px`, width: '100%' };
 
   return (

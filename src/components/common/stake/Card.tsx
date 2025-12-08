@@ -4,14 +4,16 @@ import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Text } from '@/components/ui/Text';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { cn } from '@/lib/utils/cn';
+import type { ClassNames } from '@/shared/types/common';
 
 export interface CardProps extends PropsWithChildren {
   title: string;
-
   tooltip?: string;
+  classNames?: ClassNames;
 }
 
-export function Card({ title, tooltip, children }: CardProps) {
+export function Card({ title, tooltip, classNames, children }: CardProps) {
   return (
     <section className='rounded-lg bg-color-4 w-full'>
       <div className='flex items-center bg-color-11 rounded-lg rounded-b-none gap-3 py-3.5 px-10'>
@@ -29,7 +31,7 @@ export function Card({ title, tooltip, children }: CardProps) {
           </Tooltip>
         </Condition>
       </div>
-      <div className='p-10'>{children}</div>
+      <div className={cn('p-10', classNames?.content)}>{children}</div>
     </section>
   );
 }

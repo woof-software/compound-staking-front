@@ -154,13 +154,13 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
           <VStack gap={8}>
             <Button
               onClick={onDisconnect}
-              className='text-[11px] bg-color-16 font-medium leading-4 h-8'
+              className='text-11 bg-color-16 font-medium leading-4 h-8'
             >
               Disconnect
             </Button>
             <Button
               onClick={onChangeWallet}
-              className='text-[11px] bg-color-16 font-medium leading-4 h-8'
+              className='text-11 bg-color-16 font-medium leading-4 h-8'
             >
               Change Wallet
             </Button>

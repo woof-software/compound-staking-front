@@ -7,7 +7,7 @@ export function Footer() {
       <div className='flex py-5 items-center justify-between border-t border-border-1'>
         <div className='basis-1/2 flex items-center gap-x-[22px]'>
           <a
-            className='text-[11px] font-medium text-color-24 hover:text-color-7'
+            className='text-11 font-medium text-color-24 hover:text-color-7'
             href={TALLY_GOV_URL}
             target='_blank'
             rel='noreferrer'
@@ -15,7 +15,7 @@ export function Footer() {
             Governance
           </a>
           <a
-            className='text-[11px] font-medium text-color-24 hover:text-color-7'
+            className='text-11 font-medium text-color-24 hover:text-color-7'
             href={TERMS_URL}
             target='_blank'
             rel='noreferrer'

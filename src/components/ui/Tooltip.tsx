@@ -55,7 +55,7 @@ export function Tooltip(props: TooltipProps) {
           }
         )}
       >
-        <div className='relative text-[11px] font-medium leading-4'>{content}</div>
+        <div className='relative text-11 font-medium leading-4'>{content}</div>
       </div>
     </div>
   );

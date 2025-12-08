@@ -53,7 +53,7 @@ const UnStakeFlowBlock = () => {
               </Text>
             </div>
           </div>
-          <Button className='max-w-[130px] text-[11px] font-medium'>Request unstake</Button>
+          <Button className='max-w-[130px] text-11 font-medium'>Request unstake</Button>
         </div>
       </Card>
       <HStack

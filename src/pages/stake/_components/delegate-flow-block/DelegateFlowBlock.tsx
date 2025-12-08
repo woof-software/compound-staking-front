@@ -61,7 +61,7 @@ export function DelegateFlowBlock() {
             </Text>
           </VStack>
         </HStack>
-        <Button className='max-w-[130px] text-[11px] font-medium'>Delegate</Button>
+        <Button className='max-w-[130px] text-11 font-medium'>Delegate</Button>
       </HStack>
     </Card>
   );

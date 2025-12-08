@@ -17,7 +17,7 @@ export function WalletButton() {
     <>
       <Condition if={!address}>
         <Button
-          className='border-2 bg-color-10 rounded-64 text-color-7 border-color-7 max-w-[112px] text-[11px] font-medium'
+          className='border-2 bg-color-10 rounded-64 text-color-7 border-color-7 max-w-[112px] text-11 font-medium'
           onClick={onOpen}
         >
           Connect Wallet
