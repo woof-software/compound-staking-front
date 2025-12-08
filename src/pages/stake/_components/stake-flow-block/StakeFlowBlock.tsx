@@ -7,8 +7,6 @@ import { useWalletStore } from '@/hooks/useWallet';
 
 import { useStakeDev } from '../../_hooks/useStake';
 
-// const LazyConnectorsModal = lazy(() => import('../connect-wallet/ConnectorsModal'));
-
 export function StakeFlowBlock() {
   const { address } = useAccount();
   const { onIsPendingToggle } = useWalletStore();
