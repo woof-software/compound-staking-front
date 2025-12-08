@@ -58,7 +58,7 @@ export function Modal(props: ModalProps) {
                 weight='500'
                 lineHeight='20'
                 align='center'
-                className='text-color-2 w-full'
+                className='w-full'
               >
                 {title}
               </Text>

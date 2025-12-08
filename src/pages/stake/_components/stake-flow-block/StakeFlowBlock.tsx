@@ -58,7 +58,6 @@ export function StakeFlowBlock() {
           <Text
             size='17'
             weight='500'
-            className='text-color-2'
           >
             0.0000 COMP
           </Text>
@@ -73,7 +72,6 @@ export function StakeFlowBlock() {
           <Text
             size='17'
             weight='500'
-            className='text-color-2'
           >
             0.0000 COMP
           </Text>
@@ -88,7 +86,6 @@ export function StakeFlowBlock() {
           <Text
             size='17'
             weight='500'
-            className='text-color-2'
           >
             1x
           </Text>
@@ -103,7 +100,6 @@ export function StakeFlowBlock() {
           <Text
             size='17'
             weight='500'
-            className='text-color-2'
           >
             0.0000 COMP
           </Text>
@@ -118,7 +114,6 @@ export function StakeFlowBlock() {
           <Text
             size='17'
             weight='500'
-            className='text-color-2'
           >
             0.00%
           </Text>

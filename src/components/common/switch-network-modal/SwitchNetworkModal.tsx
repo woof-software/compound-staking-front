@@ -40,7 +40,7 @@ export function SwitchNetworkModal({ isOpen }: SwitchNetworkModalProps) {
         size='13'
         align='center'
         lineHeight='18'
-        className='text-color-2 mt-5 max-w-[300px]'
+        className='mt-5 max-w-[300px]'
       >
         Your wallet is currently connected to the Arbitrum network. Please switch your wallet to Ethereum to complete
         the transaction,

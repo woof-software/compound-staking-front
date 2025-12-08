@@ -25,16 +25,10 @@ const UnStakeFlowBlock = () => {
                 size='17'
                 weight='500'
                 lineHeight='17'
-                className='text-color-2'
               >
                 10.0000 COMP
               </Text>
-              <Text
-                size='11'
-                className='text-color-2'
-              >
-                $400.00
-              </Text>
+              <Text size='11'>$400.00</Text>
             </div>
             <div className='flex flex-col gap-3'>
               <Text
@@ -47,7 +41,6 @@ const UnStakeFlowBlock = () => {
                 size='17'
                 weight='500'
                 lineHeight='17'
-                className='text-color-2'
               >
                 00d 00h
               </Text>

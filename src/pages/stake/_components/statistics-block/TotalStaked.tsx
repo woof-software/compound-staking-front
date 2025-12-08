@@ -24,7 +24,6 @@ export function TotalStaked() {
         <Text
           size='40'
           weight='500'
-          className='text-color-2'
         >
           {totalStakedValue}
           <Text

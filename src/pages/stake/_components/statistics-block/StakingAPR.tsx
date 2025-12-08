@@ -21,7 +21,6 @@ export function StakingAPR() {
       <Text
         size='40'
         weight='500'
-        className='text-color-2'
       >
         {stakingAprValue}
         <Text

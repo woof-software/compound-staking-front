@@ -4,11 +4,13 @@ import { type ChangeEvent, type InputHTMLAttributes } from 'react';
 import { COMPOUND_DECIMALS, DEFAULT_INTEGER_PART_LENGTH } from '@/consts/common';
 import { useAutoFocus } from '@/hooks/useAutoFocus';
 import { useFontSizeFitting } from '@/hooks/useFontSizeFitting';
+import { cn } from '@/lib/utils/cn';
 import { spawnFloatRegex } from '@/lib/utils/regex';
 
 export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
   integerPartLength?: number;
   decimals?: number;
+  allowText?: boolean;
   value: string;
   onChange: (value: string) => void;
 };
@@ -21,6 +23,7 @@ export function Input(props: InputProps) {
     className,
     onChange: _onChange,
     autoFocus,
+    allowText = false,
     ...rest
   } = props;
 
@@ -36,8 +39,12 @@ export function Input(props: InputProps) {
     (event: ChangeEvent<HTMLInputElement>) => {
       let value = event.target.value;
 
-      const regex = spawnFloatRegex(integerPartLength, decimals);
+      if (allowText) {
+        _onChange(value);
+        return;
+      }
 
+      const regex = spawnFloatRegex(integerPartLength, decimals);
       const m = regex.exec(value);
 
       if (m === null || m[0] !== value) {
@@ -54,7 +61,7 @@ export function Input(props: InputProps) {
 
       _onChange(value);
     },
-    [_onChange, decimals, integerPartLength]
+    [_onChange, allowText, decimals, integerPartLength]
   );
 
   useEffect(() => {
@@ -72,7 +79,10 @@ export function Input(props: InputProps) {
   return (
     <input
       style={{ fontSize: `${adjustedFontSize}px` }}
-      className={className}
+      className={cn(
+        'focus-visible:outline-none focus:outline-none focus-visible:border-none focus:border-none',
+        className
+      )}
       placeholder='0'
       value={value}
       onChange={onChange}

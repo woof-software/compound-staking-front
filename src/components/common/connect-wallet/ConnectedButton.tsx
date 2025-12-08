@@ -71,7 +71,6 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             size='11'
             weight='500'
             lineHeight='16'
-            className='text-color-2'
           >
             {walletBalance[0]}
             <Condition if={Boolean(walletBalance[1])}>
@@ -99,7 +98,6 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
               size='11'
               weight='500'
               lineHeight='16'
-              className='text-color-2'
             >
               {sliceAddress(address as string)}
             </Text>
@@ -141,7 +139,6 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
                 size='13'
                 weight='500'
                 lineHeight='18'
-                className='text-color-2'
               >
                 {sliceAddress(address as string)}
               </Text>

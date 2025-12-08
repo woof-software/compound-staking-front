@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 export type HeaderTagType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span';
 
-const text = cva('text-primary-11', {
+const text = cva('text-color-2', {
   variants: {
     size: {
       '11': 'text-[11px]',
