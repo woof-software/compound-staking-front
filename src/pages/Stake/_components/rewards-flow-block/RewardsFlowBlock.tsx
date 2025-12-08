@@ -14,11 +14,13 @@ import NoPositionYet from '@/assets/no-position-yet.svg';
 import NoPositionYetLight from '@/assets/no-position-yet-light.svg';
 
 const LazyVestingModal = lazy(() => import('@/components/common/stake/VestingModal'));
+const LazyClaimModal = lazy(() => import('@/components/common/stake/ClaimModal'));
 
 export function RewardsFlowBlock() {
   const { theme } = useThemeStore();
 
   const { isEnabled: isVestingOpen, enable: onVestingOpen, disable: onVestingClose } = useSwitch();
+  const { isEnabled: isClaimOpen, enable: onClaimOpen, disable: onClaimClose } = useSwitch();
 
   return (
     <>
@@ -62,7 +64,12 @@ export function RewardsFlowBlock() {
                 0.0000 COMP
               </Text>
             </VStack>
-            <Button className='max-w-[130px] text-11 font-medium'>Claim</Button>
+            <Button
+              onClick={onClaimOpen}
+              className='max-w-[130px] text-11 font-medium'
+            >
+              Claim
+            </Button>
           </HStack>
           <Divider
             orientation='vertical'
@@ -131,6 +138,10 @@ export function RewardsFlowBlock() {
       <LazyVestingModal
         isOpen={isVestingOpen}
         onClose={onVestingClose}
+      />
+      <LazyClaimModal
+        isOpen={isClaimOpen}
+        onClose={onClaimClose}
       />
     </>
   );

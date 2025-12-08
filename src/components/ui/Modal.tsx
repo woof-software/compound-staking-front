@@ -48,7 +48,7 @@ export function Modal(props: ModalProps) {
         />
         <VStack
           align='center'
-          className='relative z-[1] rounded-lg p-10 bg-color-5 min-w-[420px] max-w-[430px] w-[90%] modal-content-in'
+          className='relative z-[1] rounded-lg p-10 bg-color-4 min-w-[420px] max-w-[430px] w-[90%] modal-content-in'
           onClick={(e) => e.stopPropagation()}
         >
           <HStack justify='end'>

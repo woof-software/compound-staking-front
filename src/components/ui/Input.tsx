@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { type ChangeEvent, type InputHTMLAttributes } from 'react';
 
 import { COMPOUND_DECIMALS, DEFAULT_INTEGER_PART_LENGTH } from '@/consts/common';
@@ -6,11 +6,14 @@ import { useAutoFocus } from '@/hooks/useAutoFocus';
 import { useFontSizeFitting } from '@/hooks/useFontSizeFitting';
 import { cn } from '@/lib/utils/cn';
 import { spawnFloatRegex } from '@/lib/utils/regex';
+import type { ClassNames } from '@/shared/types/common';
 
 export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
   integerPartLength?: number;
   decimals?: number;
   allowText?: boolean;
+  addonRight?: ReactNode;
+  classNames?: ClassNames;
   value: string;
   onChange: (value: string) => void;
 };
@@ -20,10 +23,11 @@ export function Input(props: InputProps) {
     integerPartLength = DEFAULT_INTEGER_PART_LENGTH,
     decimals = COMPOUND_DECIMALS,
     value,
-    className,
     onChange: _onChange,
     autoFocus,
     allowText = false,
+    addonRight,
+    classNames,
     ...rest
   } = props;
 
@@ -77,19 +81,22 @@ export function Input(props: InputProps) {
   useAutoFocus(ref, autoFocus);
 
   return (
-    <input
-      style={{ fontSize: `${adjustedFontSize}px` }}
-      className={cn(
-        'focus-visible:outline-none focus:outline-none focus-visible:border-none focus:border-none',
-        className
-      )}
-      placeholder='0'
-      value={value}
-      onChange={onChange}
-      autoComplete='off'
-      autoFocus={autoFocus}
-      ref={ref}
-      {...rest}
-    />
+    <div className={cn('relative w-full', classNames?.wrapper)}>
+      <input
+        style={{ fontSize: `${adjustedFontSize}px` }}
+        className={cn(
+          'focus-visible:outline-none focus:outline-none focus-visible:border-none focus:border-none',
+          classNames?.input
+        )}
+        placeholder='0'
+        value={value}
+        onChange={onChange}
+        autoComplete='off'
+        autoFocus={autoFocus}
+        ref={ref}
+        {...rest}
+      />
+      {addonRight}
+    </div>
   );
 }

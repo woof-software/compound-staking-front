@@ -4,7 +4,10 @@ import type { Currency } from '@/consts/common';
 
 export type ClassNames = {
   wrapper?: string;
+  input?: string;
   content?: string;
+  icon?: string;
+  button?: string;
 };
 
 export type CurrencyType = ValueOf<typeof Currency>;

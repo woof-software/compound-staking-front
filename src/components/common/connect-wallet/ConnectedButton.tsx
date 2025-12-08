@@ -7,7 +7,7 @@ import { HStack } from '@/components/common/HStack';
 import { VStack } from '@/components/common/VStack';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
-import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
+import { useClipboard } from '@/hooks/useCopyToClipboard';
 import { useErc20Balance } from '@/hooks/useErc20Balance';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
@@ -32,7 +32,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const [, onAddressTextCopy] = useCopyToClipboard();
+  const { copy: onAddressTextCopy } = useClipboard();
 
   const walletBalance = formatUnits(compWalletBalance).split('.');
 
