@@ -8,7 +8,7 @@ export function TotalStaked() {
   const { totalStaked } = useStatisticTotalStaked();
 
   const totalStakedFormatted = parseFloat(Format.token(Number(totalStaked), 'compact'));
-  const { 2: unit } = FormatUnits.parse(totalStaked);
+  const unit = FormatUnits.parse(Number(totalStaked));
 
   return (
     <div className='flex flex-col items-start gap-1.5'>

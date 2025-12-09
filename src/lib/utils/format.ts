@@ -95,12 +95,12 @@ export namespace FormatUnits {
     33: 'D'
   };
 
-  export type Parsed = [number, Group, Unit];
-
-  export function parse(str: bigint): Parsed {
-    const asStr = str.toString();
+  export function parse(value: number): Unit | undefined {
+    const asStr = Math.trunc(value).toString();
 
     const exp = asStr.length - 1 || 0;
+
+    if (exp < FormatUnits.min) return;
 
     const min = FormatUnits.min;
     const max = FormatUnits.max;
@@ -109,6 +109,6 @@ export namespace FormatUnits {
 
     const unit = UNITS[expGroup];
 
-    return [exp, expGroup, unit];
+    return unit;
   }
 }
