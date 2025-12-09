@@ -1,19 +1,17 @@
 import { InfoIcon } from '@/assets/svg';
-import { HStack } from '@/components/common/HStack';
 import { Card } from '@/components/common/stake/Card';
-import { VStack } from '@/components/common/VStack';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 
 const UnStakeFlowBlock = () => {
   return (
-    <VStack gap={5}>
+    <div className='flex gap-1.5 flex-col'>
       <Card
         title='Unstake'
         tooltip='Cooldown period for unstaking process is 18d 00h 00m 00s'
       >
         <div className='flex items-start justify-between'>
-          <div className='flex gap-[60px]'>
+          <div className='flex gap-15'>
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
@@ -46,13 +44,10 @@ const UnStakeFlowBlock = () => {
               </Text>
             </div>
           </div>
-          <Button className='max-w-[130px] text-11 font-medium'>Request unstake</Button>
+          <Button className='max-w-32 text-11 font-medium'>Request unstake</Button>
         </div>
       </Card>
-      <HStack
-        align='center'
-        className='p-2.5 pl-5 w-full rounded-lg bg-color-26 gap-2.5'
-      >
+      <div className='flex items-center p-2.5 pl-5 w-full rounded-lg bg-color-26 gap-2.5'>
         <InfoIcon className='text-color-7 size-4' />
         <Text
           size='11'
@@ -61,8 +56,8 @@ const UnStakeFlowBlock = () => {
         >
           Your funds are ready to be unstaked
         </Text>
-      </HStack>
-    </VStack>
+      </div>
+    </div>
   );
 };
 

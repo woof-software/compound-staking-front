@@ -6,7 +6,7 @@ import { ConnectedButton } from '@/components/common/connect-wallet/ConnectedBut
 import { Button } from '@/components/ui/Button';
 import { useSwitch } from '@/hooks/useSwitch';
 
-const LazyConnectorsModal = lazy(() => import('../connect-wallet/ConnectorsModal'));
+const LazyConnectorsModal = lazy(() => import('@/components/common/connect-wallet/ConnectorsModal'));
 
 export function WalletButton() {
   const { address } = useAccount();
@@ -17,13 +17,13 @@ export function WalletButton() {
     <>
       <Condition if={!address}>
         <Button
-          className='border-2 bg-color-10 rounded-64 text-color-7 border-color-7 max-w-[112px] text-11 font-medium'
+          className='border-2 bg-color-10 rounded-64 text-color-7 border-color-7 max-w-28 text-11 font-medium'
           onClick={onOpen}
         >
           Connect Wallet
         </Button>
       </Condition>
-      <Condition if={Boolean(address)}>
+      <Condition if={address}>
         <ConnectedButton onChangeWallet={onOpen} />
       </Condition>
       <LazyConnectorsModal

@@ -3,17 +3,12 @@ import { useAccount, useDisconnect } from 'wagmi';
 
 import { CopyIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
-import { HStack } from '@/components/common/HStack';
-import { VStack } from '@/components/common/VStack';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
-import { useClipboard } from '@/hooks/useCopyToClipboard';
-import { useErc20Balance } from '@/hooks/useErc20Balance';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useWalletStore } from '@/hooks/useWallet';
 import { sliceAddress } from '@/lib/utils/common';
-import { formatUnits } from '@/lib/utils/numbers';
 
 import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
 import Spinner from '@/assets/spinner.svg';
@@ -23,18 +18,13 @@ export type ConnectedButtonProps = {
 };
 
 export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedButtonProps) {
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
-  const { compWalletBalance } = useErc20Balance();
   const { isPending } = useWalletStore();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
-
-  const { copy: onAddressTextCopy } = useClipboard();
-
-  const walletBalance = formatUnits(compWalletBalance).split('.');
 
   const onDisconnect = () => {
     onClose();
@@ -48,68 +38,46 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   const onAddressCopy = async () => {
     onClose();
-    await onAddressTextCopy(address!);
+
+    try {
+      await navigator.clipboard.writeText(address!);
+    } catch (error) {
+      console.warn('Copy failed', error);
+    }
   };
 
   useOnClickOutside(ref, onClose);
 
   return (
     <div className='relative'>
-      <HStack
+      <div
         onClick={onOpen}
-        justify='end'
-        className='h-11 cursor-pointer rounded-64 bg-color-11 max-w-fit shadow-20'
+        className='h-11 flex justify-end cursor-pointer rounded-64 bg-color-11 max-w-fit shadow-20'
       >
-        <HStack
-          align='center'
-          justify='center'
-          gap={8}
-          className='bg-color-11 rounded-64 h-11 max-w-[118px] py-2 px-3'
-        >
+        <div className='bg-color-11 gap-2 flex items-center justify-center rounded-64 h-11 max-w-29.5 py-2 px-3'>
           <CompoundWalletIcon className='size-4 flex-shrink-0' />
           <Text
             size='11'
             weight='500'
             lineHeight='16'
           >
-            {walletBalance[0]}
-            <Condition if={Boolean(walletBalance[1])}>
-              <Text
-                tag='span'
-                size='11'
-                weight='500'
-                lineHeight='16'
-                className='text-color-24'
-              >
-                .{walletBalance[1]}
-              </Text>
-            </Condition>
+            0.0000
           </Text>
-        </HStack>
+        </div>
         <Condition if={!isPending}>
-          <HStack
-            align='center'
-            justify='center'
-            gap={8}
-            className='bg-color-4 rounded-64 h-11 min-w-[118px] shadow-20 max-w-[118px] py-2 px-3'
-          >
+          <div className='bg-color-4 flex justify-center items-center gap-2 rounded-64 h-11 w-29.5 shadow-20 py-2 px-3'>
             <div className='size-2 rounded-full bg-color-7' />
             <Text
               size='11'
               weight='500'
               lineHeight='16'
             >
-              {sliceAddress(address as string)}
+              {sliceAddress(address!)}
             </Text>
-          </HStack>
+          </div>
         </Condition>
         <Condition if={isPending}>
-          <HStack
-            gap={8}
-            align='center'
-            justify='center'
-            className='min-w-[100px] h-11 bg-color-7 rounded-64'
-          >
+          <div className='min-w-25 flex flex-col justify-center items-center gap-2 h-11 bg-color-7 rounded-64'>
             <Spinner className='animate-spin size-4 flex-shrink-0' />
             <Text
               size='11'
@@ -119,36 +87,31 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             >
               1 Pending
             </Text>
-          </HStack>
+          </div>
         </Condition>
-      </HStack>
+      </div>
       <Condition if={isOpen}>
-        <VStack
+        <div
           ref={ref}
-          gap={12}
-          className='absolute min-w-[256px] top-12 right-0 h-auto bg-color-10 rounded-2xl p-5'
+          className='absolute flex flex-col gap-3 min-w-64 top-12 right-0 h-auto bg-color-10 rounded-2xl p-5'
         >
-          <HStack gap={8}>
-            <HStack
-              align='center'
-              justify='start'
-              gap={8}
-            >
+          <div className='flex gap-2 justify-between items-center'>
+            <div className='items-center justify-start gap-2 flex'>
               <div className='size-2 rounded-full bg-color-7' />
               <Text
                 size='13'
                 weight='500'
                 lineHeight='18'
               >
-                {sliceAddress(address as string)}
+                {sliceAddress(address!)}
               </Text>
-            </HStack>
+            </div>
             <CopyIcon
               onClick={onAddressCopy}
               className='text-color-2 size-4 cursor-pointer hover:brightness-90 hover:text-color-7 transition-all duration-200'
             />
-          </HStack>
-          <VStack gap={8}>
+          </div>
+          <div className='flex flex-col gap-2'>
             <Button
               onClick={onDisconnect}
               className='text-11 bg-color-16 font-medium leading-4 h-8'
@@ -161,8 +124,8 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             >
               Change Wallet
             </Button>
-          </VStack>
-        </VStack>
+          </div>
+        </div>
       </Condition>
     </div>
   );

@@ -1,8 +1,6 @@
 import { useState } from 'react';
 
 import { InfoIcon } from '@/assets/svg';
-import { HStack } from '@/components/common/HStack';
-import { VStack } from '@/components/common/VStack';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Input } from '@/components/ui/Input';
@@ -27,12 +25,9 @@ export default function VestingModal({ isOpen, onClose }: VestingModalProps) {
       open={isOpen}
       onClose={onClose}
     >
-      <VStack
-        gap={32}
-        className='mt-8'
-      >
+      <div className='mt-8 flex gap-8 flex-col'>
         <Divider />
-        <HStack>
+        <div className='flex'>
           <Text
             size='15'
             lineHeight='20'
@@ -40,7 +35,7 @@ export default function VestingModal({ isOpen, onClose }: VestingModalProps) {
           >
             Amount to be vested
           </Text>
-          <VStack align='end'>
+          <div className='flex flex-col items-end'>
             <Text
               size='15'
               weight='500'
@@ -55,8 +50,8 @@ export default function VestingModal({ isOpen, onClose }: VestingModalProps) {
             >
               $40.00
             </Text>
-          </VStack>
-        </HStack>
+          </div>
+        </div>
         <Input
           allowText
           classNames={{
@@ -67,10 +62,7 @@ export default function VestingModal({ isOpen, onClose }: VestingModalProps) {
           value={delegateNameOrAddress}
           onChange={onDelegateNameOrAddressChange}
         />
-        <HStack
-          align='center'
-          className='p-5 w-full rounded-lg bg-color-26 gap-2.5'
-        >
+        <div className='p-5 flex items-center w-full rounded-lg bg-color-26 gap-2.5'>
           <InfoIcon className='text-color-7 size-4' />
           <Text
             size='11'
@@ -79,9 +71,9 @@ export default function VestingModal({ isOpen, onClose }: VestingModalProps) {
           >
             The whole amount will be added to your Claim balance
           </Text>
-        </HStack>
+        </div>
         <Button className='h-14 rounded-100 text-13 leading-[18px] font-medium'>Confirm</Button>
-      </VStack>
+      </div>
     </Modal>
   );
 }

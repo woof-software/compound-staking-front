@@ -1,38 +1,26 @@
-import type { HTMLAttributes, ReactNode } from 'react';
-import { useId, useRef, useState } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
+import { useId } from 'react';
 
+import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 
-type DivProps = Omit<HTMLAttributes<HTMLDivElement>, 'content'>;
-
-export interface TooltipProps extends DivProps {
+export interface TooltipProps extends PropsWithChildren {
   content: ReactNode;
   className?: string;
-  children: ReactNode;
 }
 
 export function Tooltip(props: TooltipProps) {
-  const { content, className, children, ...rest } = props;
+  const { content, className, children } = props;
 
   const tooltipId = useId();
 
-  const [visible, setVisible] = useState(false);
-
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
-
-  const show = () => setVisible(true);
-
-  const hide = () => setVisible(false);
+  const { isEnabled: visible, enable: show, disable: hide } = useSwitch();
 
   return (
     <div
-      ref={wrapperRef}
       className={cn('relative inline-flex', className)}
       onMouseEnter={show}
       onMouseLeave={hide}
-      onFocus={show}
-      onBlur={hide}
-      {...rest}
     >
       <span
         aria-describedby={visible ? tooltipId : undefined}
@@ -45,7 +33,7 @@ export function Tooltip(props: TooltipProps) {
         id={tooltipId}
         role='tooltip'
         className={cn(
-          'absolute z-50 p-4 rounded-lg w-full max-w-[216px] min-w-[216px]',
+          'absolute z-50 p-4 rounded-lg w-full max-w-54 min-w-54',
           'bg-color-4 text-color-24 shadow-md',
           'transition-opacity duration-200',
           'opacity-0 pointer-events-auto',

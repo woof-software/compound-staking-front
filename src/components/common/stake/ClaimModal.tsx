@@ -1,16 +1,13 @@
 import { useState } from 'react';
 
 import { Condition } from '@/components/common/Condition';
-import { HStack } from '@/components/common/HStack';
 import { PasteInputButton } from '@/components/common/PasteInputButton';
-import { VStack } from '@/components/common/VStack';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Switch } from '@/components/ui/Switch';
 import { Text } from '@/components/ui/Text';
-import { useClipboard } from '@/hooks/useCopyToClipboard';
 
 export type ClaimModalProps = {
   isOpen: boolean;
@@ -22,31 +19,20 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
 
   const [isChangeWallet, setIsChangeWallet] = useState<boolean>(false);
 
-  const { pastedText, paste, clearPasted } = useClipboard();
-
   const onDelegateNameOrAddressChange = (value: string) => {
     setDelegateNameOrAddress(value);
-
-    if (value.length === 0) {
-      clearPasted();
-    }
   };
 
   const onClear = () => {
     setDelegateNameOrAddress('');
-    clearPasted();
   };
 
   const onSwitchChange = () => {
     setIsChangeWallet(!isChangeWallet);
     setDelegateNameOrAddress('');
-    clearPasted();
   };
 
   const onPaste = async () => {
-    const ok = await paste();
-    if (!ok) return;
-
     try {
       const text = await navigator.clipboard.readText();
       setDelegateNameOrAddress(text ?? '');
@@ -61,12 +47,9 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
       open={isOpen}
       onClose={onClose}
     >
-      <VStack
-        gap={32}
-        className='mt-8'
-      >
+      <div className='mt-8 flex flex-col gap-8'>
         <Divider />
-        <HStack>
+        <div className='flex'>
           <Text
             size='15'
             lineHeight='20'
@@ -74,7 +57,7 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
           >
             Amount to be claimed
           </Text>
-          <VStack align='end'>
+          <div className='flex items-end'>
             <Text
               size='15'
               weight='500'
@@ -89,13 +72,9 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
             >
               $40.00
             </Text>
-          </VStack>
-        </HStack>
-        <HStack
-          gap={12}
-          align='center'
-          justify='center'
-        >
+          </div>
+        </div>
+        <div className='items-center justify-center gap-3 flex'>
           <Text
             size='11'
             weight='500'
@@ -107,7 +86,7 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
             checked={isChangeWallet}
             onChange={onSwitchChange}
           />
-        </HStack>
+        </div>
         <Condition if={isChangeWallet}>
           <Input
             allowText
@@ -118,7 +97,7 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
             placeholder='Delegatee name or address'
             addonRight={
               <PasteInputButton
-                isPasted={Boolean(pastedText)}
+                isPasted={Boolean(delegateNameOrAddress.length)}
                 onPaste={onPaste}
                 onClear={onClear}
               />
@@ -128,7 +107,7 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
           />
         </Condition>
         <Button className='h-14 rounded-100 text-13 leading-[18px] font-medium'>Confirm</Button>
-      </VStack>
+      </div>
     </Modal>
   );
 }

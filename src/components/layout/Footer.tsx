@@ -5,7 +5,7 @@ export function Footer() {
   return (
     <footer className='bg-transparent mt-auto'>
       <div className='flex py-5 items-center justify-between border-t border-border-1'>
-        <div className='basis-1/2 flex items-center gap-x-[22px]'>
+        <div className='basis-1/2 flex items-center gap-x-5.5'>
           <a
             className='text-11 font-medium text-color-24 hover:text-color-7'
             href={TALLY_GOV_URL}

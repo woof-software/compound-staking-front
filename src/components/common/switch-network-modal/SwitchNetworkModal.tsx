@@ -1,7 +1,6 @@
 import { useAccount, useSwitchChain } from 'wagmi';
 import { mainnet } from 'wagmi/chains';
 
-import { HStack } from '@/components/common/HStack';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Text } from '@/components/ui/Text';
@@ -26,16 +25,11 @@ export function SwitchNetworkModal({ isOpen }: SwitchNetworkModalProps) {
       title='Confirm Network Switch'
       open={isOpen}
     >
-      <HStack
-        gap={10}
-        align='center'
-        justify='center'
-        className='mt-10 mb-5'
-      >
+      <div className='mt-10 mb-5 items-center justify-center gap-2.5 flex'>
         {getChainIcon(chainId, 'size-16 rounded-full').icon}
         <div className='chain-slide shrink-0 inline-block size-6' />
         {getChainIcon(mainnet.id, 'size-16 rounded-full').icon}
-      </HStack>
+      </div>
       <Text
         size='13'
         align='center'

@@ -1,9 +1,7 @@
 import { lazy } from 'react';
 
 import { Condition } from '@/components/common/Condition';
-import { HStack } from '@/components/common/HStack';
 import { Card } from '@/components/common/stake/Card';
-import { VStack } from '@/components/common/VStack';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
@@ -31,12 +29,9 @@ export function RewardsFlowBlock() {
           content: 'px-0'
         }}
       >
-        <HStack
-          justify='between'
-          className='border-b border-color-8 px-10 pb-5'
-        >
-          <HStack>
-            <VStack gap={12}>
+        <div className='border-b flex justify-between border-color-8 px-10 pb-5'>
+          <div className='flex w-full justify-between'>
+            <div className='flex flex-col gap-3'>
               <Text
                 size='11'
                 className='text-color-24'
@@ -49,8 +44,8 @@ export function RewardsFlowBlock() {
               >
                 0.0000 COMP
               </Text>
-            </VStack>
-            <VStack gap={12}>
+            </div>
+            <div className='flex flex-col gap-3'>
               <Text
                 size='11'
                 className='text-color-24'
@@ -63,27 +58,27 @@ export function RewardsFlowBlock() {
               >
                 0.0000 COMP
               </Text>
-            </VStack>
+            </div>
             <Button
               onClick={onClaimOpen}
               className='max-w-[130px] text-11 font-medium'
             >
               Claim
             </Button>
-          </HStack>
+          </div>
           <Divider
             orientation='vertical'
             className='max-h-10 !min-h-10 mx-12'
           />
-          <HStack>
-            <VStack gap={12}>
+          <div className='flex w-full justify-between'>
+            <div className='flex flex-col gap-3'>
               <Text
                 size='11'
                 className='text-color-24'
               >
                 Available Rewards
               </Text>
-              <VStack gap={7}>
+              <div className='flex flex-col gap-2'>
                 <Text
                   size='17'
                   weight='500'
@@ -96,21 +91,18 @@ export function RewardsFlowBlock() {
                 >
                   $40.00
                 </Text>
-              </VStack>
-            </VStack>
+              </div>
+            </div>
             <Button
               onClick={onVestingOpen}
               className='max-w-[130px] text-11 font-medium'
             >
               Vest
             </Button>
-          </HStack>
-        </HStack>
-        <HStack className='p-10'>
-          <VStack
-            gap={20}
-            className='mx-auto items-center w-auto'
-          >
+          </div>
+        </div>
+        <div className='p-10 flex'>
+          <div className='mx-auto items-center w-auto flex flex-col gap-5'>
             <Condition if={theme === 'dark'}>
               <NoPositionYet className='w-[176px] h-20' />
             </Condition>
@@ -132,8 +124,8 @@ export function RewardsFlowBlock() {
             >
               No vested rewards yet
             </Text>
-          </VStack>
-        </HStack>
+          </div>
+        </div>
       </Card>
       <LazyVestingModal
         isOpen={isVestingOpen}
