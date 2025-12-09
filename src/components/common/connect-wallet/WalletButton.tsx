@@ -6,7 +6,9 @@ import { ConnectedButton } from '@/components/common/connect-wallet/ConnectedBut
 import { Button } from '@/components/ui/Button';
 import { useSwitch } from '@/hooks/useSwitch';
 
-const LazyConnectorsModal = lazy(() => import('../connect-wallet/ConnectorsModal'));
+const LazyConnectorsModal = lazy(() =>
+  import('../connect-wallet/ConnectorsModal').then((mod) => ({ default: mod.ConnectorsModal }))
+);
 
 export function WalletButton() {
   const { address } = useAccount();
