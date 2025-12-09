@@ -19,7 +19,7 @@ export type ConnectedButtonProps = {
 };
 
 export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedButtonProps) {
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
