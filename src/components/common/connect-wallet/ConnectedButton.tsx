@@ -5,7 +5,6 @@ import { CopyIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
-import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useWalletStore } from '@/hooks/useWallet';
@@ -27,8 +26,6 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const [, onAddressTextCopy] = useCopyToClipboard();
-
   const onDisconnect = () => {
     onClose();
     disconnect();
@@ -41,7 +38,12 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   const onAddressCopy = async () => {
     onClose();
-    await onAddressTextCopy(address!);
+
+    try {
+      await navigator.clipboard.writeText(address!);
+    } catch (error) {
+      console.warn('Copy failed', error);
+    }
   };
 
   useOnClickOutside(ref, onClose);
