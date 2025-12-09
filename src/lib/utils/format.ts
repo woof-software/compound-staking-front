@@ -71,13 +71,12 @@ export namespace Format {
 }
 
 export namespace FormatUnits {
-  export function parse(value: number): string {
-    if (Number.isNaN(value) || !Number.isFinite(value) || value < 1000) return '';
+  export function parse(value: number): string | undefined {
+    if (Number.isNaN(value) || !Number.isFinite(value) || value < 1000) return;
 
     if (value < 1_000_000) return 'K';
     if (value < 1_000_000_000) return 'M';
     if (value < 1_000_000_000_000) return 'B';
-
-    return 'T';
+    if (value < 1_000_000_000_000_000) return 'T';
   }
 }
