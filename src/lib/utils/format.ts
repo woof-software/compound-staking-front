@@ -66,6 +66,49 @@ export namespace Format {
     return `${value.toLocaleString('en-US', {
       maximumFractionDigits: 2,
       minimumFractionDigits: 2
-    })}%`;
+    })}`;
+  }
+}
+
+export namespace FormatUnits {
+  export type Group = 3 | 6 | 9 | 12 | 15 | 18 | 21 | 24 | 27 | 30 | 33;
+  export type Unit = 'K' | 'M' | 'B' | 'T' | 'Q' | 'Qi' | 'Sx' | 'Sp' | 'Oc' | 'N' | 'D';
+
+  export const min: Group = 3;
+  export const max: Group = 33;
+
+  export type UnitsMap = {
+    [key in Group]: Unit;
+  };
+
+  const UNITS: UnitsMap = {
+    3: 'K',
+    6: 'M',
+    9: 'B',
+    12: 'T',
+    15: 'Q',
+    18: 'Qi',
+    21: 'Sx',
+    24: 'Sp',
+    27: 'Oc',
+    30: 'N',
+    33: 'D'
+  };
+
+  export type Parsed = [number, Group, Unit];
+
+  export function parse(str: bigint): Parsed {
+    const asStr = str.toString();
+
+    const exp = asStr.length - 1 || 0;
+
+    const min = FormatUnits.min;
+    const max = FormatUnits.max;
+
+    const expGroup = Math.max(Math.min(Math.floor(exp / min) * min, max), min) as Group;
+
+    const unit = UNITS[expGroup];
+
+    return [exp, expGroup, unit];
   }
 }
