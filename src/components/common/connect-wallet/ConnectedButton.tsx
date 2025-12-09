@@ -3,8 +3,6 @@ import { useAccount, useDisconnect } from 'wagmi';
 
 import { CopyIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
-import { HStack } from '@/components/common/HStack';
-import { VStack } from '@/components/common/VStack';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
@@ -13,7 +11,7 @@ import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useWalletStore } from '@/hooks/useWallet';
 import { sliceAddress } from '@/lib/utils/common';
-import { formatUnits } from '@/lib/utils/numbers';
+import { Format } from '@/lib/utils/format';
 
 import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
 import Spinner from '@/assets/spinner.svg';
@@ -34,7 +32,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   const [, onAddressTextCopy] = useCopyToClipboard();
 
-  const walletBalance = formatUnits(compWalletBalance).split('.');
+  const walletBalance = Format.token(compWalletBalance).split('.');
 
   const onDisconnect = () => {
     onClose();
@@ -55,17 +53,11 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   return (
     <div className='relative'>
-      <HStack
+      <div
         onClick={onOpen}
-        justify='end'
-        className='h-11 cursor-pointer rounded-64 bg-color-11 max-w-fit shadow-20'
+        className='h-11 flex flex-col justify-end cursor-pointer rounded-64 bg-color-11 max-w-fit shadow-20'
       >
-        <HStack
-          align='center'
-          justify='center'
-          gap={8}
-          className='bg-color-11 rounded-64 h-11 max-w-[118px] py-2 px-3'
-        >
+        <div className='bg-color-11 gap-2 flex flex-col items-center justify-center rounded-64 h-11 max-w-29.5 py-2 px-3'>
           <CompoundWalletIcon className='size-4 flex-shrink-0' />
           <Text
             size='11'
@@ -86,14 +78,9 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
               </Text>
             </Condition>
           </Text>
-        </HStack>
+        </div>
         <Condition if={!isPending}>
-          <HStack
-            align='center'
-            justify='center'
-            gap={8}
-            className='bg-color-4 rounded-64 h-11 min-w-[118px] shadow-20 max-w-[118px] py-2 px-3'
-          >
+          <div className='bg-color-4 flex flex-col justify-center items-center gap-2 rounded-64 h-11 w-29.5 shadow-20 py-2 px-3'>
             <div className='size-2 rounded-full bg-color-7' />
             <Text
               size='11'
@@ -101,17 +88,12 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
               lineHeight='16'
               className='text-color-2'
             >
-              {sliceAddress(address as string)}
+              {sliceAddress(address!)}
             </Text>
-          </HStack>
+          </div>
         </Condition>
         <Condition if={isPending}>
-          <HStack
-            gap={8}
-            align='center'
-            justify='center'
-            className='min-w-[100px] h-11 bg-color-7 rounded-64'
-          >
+          <div className='min-w-25 flex flex-col justify-center items-center gap-2 h-11 bg-color-7 rounded-64'>
             <Spinner className='animate-spin size-4 flex-shrink-0' />
             <Text
               size='11'
@@ -121,21 +103,16 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             >
               1 Pending
             </Text>
-          </HStack>
+          </div>
         </Condition>
-      </HStack>
+      </div>
       <Condition if={isOpen}>
-        <VStack
+        <div
           ref={ref}
-          gap={12}
-          className='absolute min-w-[256px] top-12 right-0 h-auto bg-color-10 rounded-2xl p-5'
+          className='absolute flex gap-3 min-w-64 top-12 right-0 h-auto bg-color-10 rounded-2xl p-5'
         >
-          <HStack gap={8}>
-            <HStack
-              align='center'
-              justify='start'
-              gap={8}
-            >
+          <div className='flex flex-col gap-2'>
+            <div className='items-center justify-start gap-2 flex'>
               <div className='size-2 rounded-full bg-color-7' />
               <Text
                 size='13'
@@ -143,15 +120,15 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
                 lineHeight='18'
                 className='text-color-2'
               >
-                {sliceAddress(address as string)}
+                {sliceAddress(address!)}
               </Text>
-            </HStack>
+            </div>
             <CopyIcon
               onClick={onAddressCopy}
               className='text-color-2 size-4 cursor-pointer hover:brightness-90 hover:text-color-7 transition-all duration-200'
             />
-          </HStack>
-          <VStack gap={8}>
+          </div>
+          <div className='gap-2 flex'>
             <Button
               onClick={onDisconnect}
               className='text-[11px] bg-color-16 font-medium leading-4 h-8'
@@ -164,8 +141,8 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             >
               Change Wallet
             </Button>
-          </VStack>
-        </VStack>
+          </div>
+        </div>
       </Condition>
     </div>
   );
