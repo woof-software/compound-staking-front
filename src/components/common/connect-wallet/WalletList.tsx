@@ -39,7 +39,7 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
   };
 
   return (
-    <div className='flex flex-col mt-10'>
+    <div className='flex flex-col mt-10 w-full'>
       {CONNECTORS.map(({ id, title, description, Icon }) => {
         const connector = connectors.find((c) => c.id === id);
 
@@ -71,7 +71,7 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
                 </Text>
               </Condition>
             </div>
-            <ArrowIcon className='text-color-25 size-6 flex-shrink-0 group-hover:text-color-7' />
+            <ArrowIcon className='text-color-25 size-6 flex-shrink-0 ml-auto group-hover:text-color-7' />
           </div>
         );
       })}

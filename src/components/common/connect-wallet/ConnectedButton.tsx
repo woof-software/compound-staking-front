@@ -95,9 +95,9 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
       <Condition if={isOpen}>
         <div
           ref={ref}
-          className='absolute flex gap-3 min-w-64 top-12 right-0 h-auto bg-color-10 rounded-2xl p-5'
+          className='absolute flex flex-col gap-3 min-w-64 top-12 right-0 h-auto bg-color-10 rounded-2xl p-5'
         >
-          <div className='flex flex-col gap-2'>
+          <div className='flex gap-2 justify-between items-center'>
             <div className='items-center justify-start gap-2 flex'>
               <div className='size-2 rounded-full bg-color-7' />
               <Text
@@ -114,7 +114,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
               className='text-color-2 size-4 cursor-pointer hover:brightness-90 hover:text-color-7 transition-all duration-200'
             />
           </div>
-          <div className='gap-2 flex'>
+          <div className='flex flex-col gap-2'>
             <Button
               onClick={onDisconnect}
               className='text-[11px] bg-color-16 font-medium leading-4 h-8'

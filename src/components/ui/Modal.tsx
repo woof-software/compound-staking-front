@@ -35,7 +35,7 @@ export function Modal(props: ModalProps) {
           className='relative flex flex-col items-center rounded-lg p-10 bg-color-5 min-w-105 max-w-108 w-[90%] modal-content-in'
           onClick={(e) => e.stopPropagation()}
         >
-          <div className='flex justify-center'>
+          <div className='flex justify-end w-full'>
             <Condition if={title}>
               <Text
                 size='17'
@@ -49,7 +49,7 @@ export function Modal(props: ModalProps) {
             </Condition>
             <Button
               onClick={onClose}
-              className='bg-transparent p-0'
+              className='bg-transparent p-0 h-auto'
               tabIndex={0}
               aria-label='Close modal'
             >
