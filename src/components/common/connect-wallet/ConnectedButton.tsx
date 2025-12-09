@@ -52,9 +52,9 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
     <div className='relative'>
       <div
         onClick={onOpen}
-        className='h-11 flex flex-col justify-end cursor-pointer rounded-64 bg-color-11 max-w-fit shadow-20'
+        className='h-11 flex justify-end cursor-pointer rounded-64 bg-color-11 max-w-fit shadow-20'
       >
-        <div className='bg-color-11 gap-2 flex flex-col items-center justify-center rounded-64 h-11 max-w-29.5 py-2 px-3'>
+        <div className='bg-color-11 gap-2 flex items-center justify-center rounded-64 h-11 max-w-29.5 py-2 px-3'>
           <CompoundWalletIcon className='size-4 flex-shrink-0' />
           <Text
             size='11'
@@ -66,7 +66,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
           </Text>
         </div>
         <Condition if={!isPending}>
-          <div className='bg-color-4 flex flex-col justify-center items-center gap-2 rounded-64 h-11 w-29.5 shadow-20 py-2 px-3'>
+          <div className='bg-color-4 flex justify-center items-center gap-2 rounded-64 h-11 w-29.5 shadow-20 py-2 px-3'>
             <div className='size-2 rounded-full bg-color-7' />
             <Text
               size='11'
