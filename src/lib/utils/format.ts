@@ -51,25 +51,21 @@ export namespace Format {
   /**
    * Formats a fractional numeric value as a percentage string.
    *
-   * @param value - Fractional numeric value (e.g., `0.1234` for `12.34%`).
-   * @param maximumFractionDigits - Maximum fraction digits to display (default: 2).
-   * @param minimumFractionDigits - Minimum fraction digits to display (default: 2).
+   * @param value - Fractional numeric value (e.g., `12.34` for `12.34%`).
    * @returns Localized percentage string, e.g. `12.35%`.
    *
    * @example
    * // default formatting
-   * rate(0.123456) // -> "12.35%"
+   * rate(12.35) // -> "12.35%"
    *
    * @example
    * // custom fraction digits
-   * rate(0.1, 1, 1) // -> "10.0%"
+   * rate(10) // -> "10.00%"
    */
-  export function rate(value: number, maximumFractionDigits = 2, minimumFractionDigits = 2): string {
-    const rate = value * 100;
-
-    return `${rate.toLocaleString('en-US', {
-      maximumFractionDigits,
-      minimumFractionDigits
+  export function rate(value: number): string {
+    return `${value.toLocaleString('en-US', {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2
     })}%`;
   }
 }
