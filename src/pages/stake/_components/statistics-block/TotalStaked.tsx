@@ -1,5 +1,6 @@
 import { Text } from '@/components/ui/Text';
-import { formatUnits, splitNumberUnit } from '@/lib/utils/numbers';
+import { Format } from '@/lib/utils/format';
+import { splitNumberUnit } from '@/lib/utils/numbers';
 import { useStatisticTotalStaked } from '@/pages/stake/_hooks/useStatisticTotalStaked';
 
 import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
@@ -7,7 +8,7 @@ import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 export function TotalStaked() {
   const { totalStaked } = useStatisticTotalStaked();
 
-  const totalStakedFormatted = formatUnits(totalStaked);
+  const totalStakedFormatted = Format.token(totalStaked, 'compact');
   const [totalStakedValue, totalStakedUnit] = splitNumberUnit(totalStakedFormatted);
 
   return (
