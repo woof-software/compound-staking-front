@@ -1,30 +1,34 @@
-import { useEffect } from 'react';
-import { type MutableRefObject } from 'react';
+import { type RefObject, useEffect } from 'react';
 
-/*
-useOnClickOutside is a hook that takes a ref and a callback function and calls
-the callback whenever the user clicks outside the component. e.g.:
+export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
+  target?: RefObject<T | null> | (() => T | null),
+  callback?: (event?: Event) => void
+): void {
+  const currentNode = typeof target === 'function' ? undefined : ((target as RefObject<T | null>)?.current ?? null);
 
-function MyComponent() {
-  const ref = useRef(null);
-  useOnClickOutside(ref, () => alert("clicked outside"));
+  const getNode = (): T | null => {
+    if (typeof target === 'function') return target() ?? null;
+    return (target as RefObject<T | null>)?.current ?? null;
+  };
 
-  return (
-    <div ref={ref}>
-      Some content
-    </div>
-  );
-}
-*/
-
-export function useOnClickOutside(ref: MutableRefObject<any>, callback: () => void) {
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target)) {
-        callback();
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [ref, callback]);
+    if (typeof document === 'undefined') return;
+
+    const handleCheck = (event: Event) => {
+      const node = getNode();
+      if (!node) return;
+      const eventTarget = event.target as Node | null;
+      if (!eventTarget) return;
+      if (node === eventTarget || node.contains(eventTarget)) return;
+      callback?.(event);
+    };
+
+    document.addEventListener('mousedown', handleCheck);
+    document.addEventListener('touchstart', handleCheck);
+
+    return () => {
+      document.removeEventListener('mousedown', handleCheck);
+      document.removeEventListener('touchstart', handleCheck);
+    };
+  }, [currentNode, target, callback]);
 }

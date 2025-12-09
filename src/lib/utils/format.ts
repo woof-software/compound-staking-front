@@ -47,4 +47,36 @@ export namespace Format {
     const formattedNumber = new Intl.NumberFormat(locale, options).format(numberValue);
     return tokenSymbol ? `${formattedNumber} ${tokenSymbol}` : formattedNumber;
   }
+
+  /**
+   * Formats a fractional numeric value as a percentage string.
+   *
+   * @param value - Fractional numeric value (e.g., `12.34` for `12.34%`).
+   * @returns Localized percentage string, e.g. `12.35%`.
+   *
+   * @example
+   * // default formatting
+   * rate(12.35) // -> "12.35%"
+   *
+   * @example
+   * // custom fraction digits
+   * rate(10) // -> "10.00%"
+   */
+  export function rate(value: number): string {
+    return `${value.toLocaleString('en-US', {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2
+    })}`;
+  }
+}
+
+export namespace FormatUnits {
+  export function parse(value: number): string | undefined {
+    if (Number.isNaN(value) || !Number.isFinite(value) || value < 1000) return;
+
+    if (value < 1_000_000) return 'K';
+    if (value < 1_000_000_000) return 'M';
+    if (value < 1_000_000_000_000) return 'B';
+    if (value < 1_000_000_000_000_000) return 'T';
+  }
 }
