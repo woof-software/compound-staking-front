@@ -6,12 +6,10 @@ import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
-import { useErc20Balance } from '@/hooks/useErc20Balance';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useWalletStore } from '@/hooks/useWallet';
 import { sliceAddress } from '@/lib/utils/common';
-import { Format } from '@/lib/utils/format';
 
 import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
 import Spinner from '@/assets/spinner.svg';
@@ -25,14 +23,11 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
-  const { compWalletBalance } = useErc20Balance();
   const { isPending } = useWalletStore();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
   const [, onAddressTextCopy] = useCopyToClipboard();
-
-  const walletBalance = Format.token(compWalletBalance).split('.');
 
   const onDisconnect = () => {
     onClose();
@@ -65,18 +60,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             lineHeight='16'
             className='text-color-2'
           >
-            {walletBalance[0]}
-            <Condition if={Boolean(walletBalance[1])}>
-              <Text
-                tag='span'
-                size='11'
-                weight='500'
-                lineHeight='16'
-                className='text-color-24'
-              >
-                .{walletBalance[1]}
-              </Text>
-            </Condition>
+            0.0000
           </Text>
         </div>
         <Condition if={!isPending}>

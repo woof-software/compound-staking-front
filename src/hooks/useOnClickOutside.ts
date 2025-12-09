@@ -1,20 +1,20 @@
 import { useEffect } from 'react';
 import { type MutableRefObject } from 'react';
 
-/*
-useOnClickOutside is a hook that takes a ref and a callback function and calls
-the callback whenever the user clicks outside the component. e.g.:
+/**
+  * useOnClickOutside is a hook that takes a ref and a callback function and calls
+  * the callback whenever the user clicks outside the component. e.g.:
+  * @example
+    function MyComponent() {
+      const ref = useRef(null);
+      useOnClickOutside(ref, () => alert("clicked outside"));
 
-function MyComponent() {
-  const ref = useRef(null);
-  useOnClickOutside(ref, () => alert("clicked outside"));
-
-  return (
-    <div ref={ref}>
-      Some content
-    </div>
-  );
-}
+      return (
+        <div ref={ref}>
+          Some content
+        </div>
+      );
+    }
 */
 
 export function useOnClickOutside(ref: MutableRefObject<any>, callback: () => void) {
