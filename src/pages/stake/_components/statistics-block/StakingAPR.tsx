@@ -1,12 +1,13 @@
 import { Text } from '@/components/ui/Text';
-import { formatRate, splitNumberUnit } from '@/lib/utils/numbers';
+import { Format } from '@/lib/utils/format';
+import { splitNumberUnit } from '@/lib/utils/numbers';
 
 import { useStatisticStakingAPR } from '../../_hooks/useStatisticStakingAPR';
 
 export function StakingAPR() {
   const { stakingAPR } = useStatisticStakingAPR();
 
-  const stakingAprFormatted = formatRate(stakingAPR / 100);
+  const stakingAprFormatted = Format.rate(stakingAPR / 100);
   const [stakingAprValue, stakingAprUnit] = splitNumberUnit(stakingAprFormatted);
 
   return (

@@ -26,17 +26,6 @@ export function Modal(props: ModalProps) {
     };
   }, [open]);
 
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [onClose]);
-
   if (!open) return null;
 
   return (
