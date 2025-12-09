@@ -7,11 +7,12 @@ import { Tooltip } from '@/components/ui/Tooltip';
 
 export interface CardProps extends PropsWithChildren {
   title: string;
-
   tooltip?: string;
 }
 
-export function Card({ title, tooltip, children }: CardProps) {
+export function Card(props: CardProps) {
+  const { title, tooltip, children } = props;
+
   return (
     <section className='rounded-lg bg-color-4 w-full'>
       <div className='flex items-center bg-color-11 rounded-lg rounded-b-none gap-3 py-3.5 px-10'>
@@ -23,7 +24,7 @@ export function Card({ title, tooltip, children }: CardProps) {
         >
           {title}
         </Text>
-        <Condition if={Boolean(tooltip)}>
+        <Condition if={tooltip}>
           <Tooltip content={tooltip}>
             <InfoIcon className='text-color-18 size-4 cursor-pointer' />
           </Tooltip>

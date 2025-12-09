@@ -1,10 +1,9 @@
 import { type Connector, type CreateConnectorFn, useConnect, useConnectors } from 'wagmi';
 
 import { ArrowIcon } from '@/assets/svg';
+import { Condition } from '@/components/common/Condition';
 
 import { Text } from '../../ui/Text';
-import { HStack } from '../HStack';
-import { VStack } from '../VStack';
 
 import CoinbaseIcon from '@/assets/coinbase.svg';
 import MetaMaskAndBrowsers from '@/assets/metamask-and-browsers.svg';
@@ -40,22 +39,20 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
   };
 
   return (
-    <VStack className='mt-10'>
+    <div className='flex flex-col mt-10 w-full'>
       {CONNECTORS.map(({ id, title, description, Icon }) => {
         const connector = connectors.find((c) => c.id === id);
 
         if (!connector) return null;
 
         return (
-          <HStack
+          <div
             key={id}
-            gap={20}
-            align='center'
-            className='py-4 px-5 rounded-lg group cursor-pointer hover:bg-color-4 opacity-100 data-[disabled=true]:opacity-60'
+            className='flex gap-5 items-center py-4 px-5 rounded-lg group cursor-pointer hover:bg-color-4 opacity-100 data-[disabled=true]:opacity-60'
             onClick={() => onConnectorSelect(connector)}
           >
             <Icon className='size-8 flex-shrink-0' />
-            <VStack>
+            <div className='flex flex-col'>
               <Text
                 size='17'
                 weight='600'
@@ -64,7 +61,7 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
               >
                 {title}
               </Text>
-              {description && (
+              <Condition if={description}>
                 <Text
                   size='11'
                   lineHeight='16'
@@ -72,12 +69,12 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
                 >
                   {description}
                 </Text>
-              )}
-            </VStack>
-            <ArrowIcon className='text-color-25 size-6 flex-shrink-0 group-hover:text-color-7' />
-          </HStack>
+              </Condition>
+            </div>
+            <ArrowIcon className='text-color-25 size-6 flex-shrink-0 ml-auto group-hover:text-color-7' />
+          </div>
         );
       })}
-    </VStack>
+    </div>
   );
 };
