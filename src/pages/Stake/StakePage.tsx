@@ -14,7 +14,7 @@ export function StakePage() {
         lineHeight='54'
         weight='500'
         align='center'
-        className='p-2.5 text-color-2 max-w-[653px] mx-auto'
+        className='p-2.5 text-color-2 max-w-164 mx-auto'
       >
         Stake your{' '}
         <Text

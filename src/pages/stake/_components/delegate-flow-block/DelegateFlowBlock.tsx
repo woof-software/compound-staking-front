@@ -1,7 +1,5 @@
 import { ExternalLinkIcon } from '@/assets/svg';
-import { HStack } from '@/components/common/HStack';
 import { Card } from '@/components/common/stake/Card';
-import { VStack } from '@/components/common/VStack';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { sliceAddress } from '@/lib/utils/common';
@@ -12,12 +10,9 @@ export function DelegateFlowBlock() {
       title='Delegation'
       tooltip='Cooldown period for redelegation process is 01d 00h 00m 00s'
     >
-      <HStack justify='between'>
-        <HStack gap={60}>
-          <VStack
-            fullWidth={false}
-            gap={12}
-          >
+      <div className='flex justify-between'>
+        <div className='flex gap-15'>
+          <div className='flex flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -25,8 +20,7 @@ export function DelegateFlowBlock() {
               Wallet address of Delegatee
             </Text>
             <a
-              className='flex items-start gap-[3px] cursor-pointer'
-              // href={getBlockExplorerUrlForTransaction('0x09fd7d573a4318f1dd34cab8000928d7270ce8e7')}
+              className='flex items-start gap-1 cursor-pointer'
               target='_blank'
               rel='noreferrer'
             >
@@ -40,11 +34,8 @@ export function DelegateFlowBlock() {
               </Text>
               <ExternalLinkIcon className='text-color-24' />
             </a>
-          </VStack>
-          <VStack
-            fullWidth={false}
-            gap={12}
-          >
+          </div>
+          <div className='flex flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -59,10 +50,10 @@ export function DelegateFlowBlock() {
             >
               00d 00h
             </Text>
-          </VStack>
-        </HStack>
-        <Button className='max-w-[130px] text-[11px] font-medium'>Delegate</Button>
-      </HStack>
+          </div>
+        </div>
+        <Button className='max-w-32.5 text-[11px] font-medium'>Delegate</Button>
+      </div>
     </Card>
   );
 }

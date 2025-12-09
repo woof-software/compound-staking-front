@@ -5,7 +5,7 @@ import { TotalStaked } from './TotalStaked';
 
 export function StatisticsBlock() {
   return (
-    <section className='flex justify-center items-start gap-[100px]'>
+    <section className='flex justify-center items-start gap-25'>
       <StakingAPR />
       <Divider
         orientation='vertical'
