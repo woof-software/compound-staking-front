@@ -74,7 +74,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
               lineHeight='16'
               className='text-color-2'
             >
-              {sliceAddress(address!)}
+              {sliceAddress(address ?? '')}
             </Text>
           </div>
         </Condition>
@@ -106,7 +106,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
                 lineHeight='18'
                 className='text-color-2'
               >
-                {sliceAddress(address!)}
+                {sliceAddress(address ?? '')}
               </Text>
             </div>
             <CopyIcon
