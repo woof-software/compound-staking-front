@@ -1,10 +1,17 @@
+import { useAccount } from 'wagmi';
+
 import { ExternalLinkIcon } from '@/assets/svg';
+import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
-import { sliceAddress } from '@/lib/utils/common';
+import { cn } from '@/lib/utils/cn';
 
 export function DelegateFlowBlock() {
+  const { isConnected } = useAccount();
+
+  const isDelegateButtonDisabled = !isConnected;
+
   return (
     <Card
       title='Delegation'
@@ -28,10 +35,15 @@ export function DelegateFlowBlock() {
                 size='17'
                 weight='500'
                 lineHeight='17'
+                className={cn('text-color-2 max-w-36 truncate', {
+                  'text-color-6': !isConnected
+                })}
               >
-                {sliceAddress('0x09fd7d573a4318f1dd34cab8000928d7270ce8e7')}
+                {isConnected ? 'Compound Foundation' : '-'}
               </Text>
-              <ExternalLinkIcon className='text-color-24' />
+              <Condition if={isConnected}>
+                <ExternalLinkIcon className='text-color-24' />
+              </Condition>
             </a>
           </div>
           <div className='flex flex-col gap-3'>
@@ -45,12 +57,38 @@ export function DelegateFlowBlock() {
               size='17'
               weight='500'
               lineHeight='17'
+              className={cn('text-color-2', {
+                'text-color-6': !isConnected
+              })}
             >
-              00d 00h
+              {isConnected ? '00d 00h' : '-'}
+            </Text>
+          </div>
+          <div className='flex flex-col gap-3'>
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              End Date
+            </Text>
+            <Text
+              size='17'
+              weight='500'
+              lineHeight='17'
+              className={cn('text-color-2', {
+                'text-color-6': !isConnected
+              })}
+            >
+              {isConnected ? 'July 24, 2025' : '-'}
             </Text>
           </div>
         </div>
-        <Button className='max-w-32.5 text-11 font-medium'>Delegate</Button>
+        <Button
+          disabled={isDelegateButtonDisabled}
+          className='max-w-32.5 text-11 font-medium'
+        >
+          Delegate
+        </Button>
       </div>
     </Card>
   );

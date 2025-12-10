@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import { useAccount } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
@@ -7,6 +8,7 @@ import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useThemeStore } from '@/hooks/useTheme';
+import { cn } from '@/lib/utils/cn';
 
 import NoPositionYet from '@/assets/no-position-yet.svg';
 import NoPositionYetLight from '@/assets/no-position-yet-light.svg';
@@ -16,9 +18,13 @@ const LazyClaimModal = lazy(() => import('@/components/common/stake/ClaimModal')
 
 export function RewardsFlowBlock() {
   const { theme } = useThemeStore();
+  const { isConnected } = useAccount();
 
   const { isEnabled: isVestingOpen, enable: onVestingOpen, disable: onVestingClose } = useSwitch();
   const { isEnabled: isClaimOpen, enable: onClaimOpen, disable: onClaimClose } = useSwitch();
+
+  const isClaimButtonDisabled = !isConnected;
+  const isVestingButtonDisabled = !isConnected;
 
   return (
     <>
@@ -30,7 +36,7 @@ export function RewardsFlowBlock() {
         }}
       >
         <div className='border-b flex justify-between border-color-8 px-10 pb-5'>
-          <div className='flex w-full justify-between'>
+          <div className='flex w-full justify-between max-w-120'>
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
@@ -41,8 +47,11 @@ export function RewardsFlowBlock() {
               <Text
                 size='17'
                 weight='500'
+                className={cn('text-color-2', {
+                  'text-color-6': !isConnected
+                })}
               >
-                0.0000 COMP
+                {isConnected ? '0.0000' : '0.0000'} COMP
               </Text>
             </div>
             <div className='flex flex-col gap-3'>
@@ -55,11 +64,15 @@ export function RewardsFlowBlock() {
               <Text
                 size='17'
                 weight='500'
+                className={cn('text-color-2', {
+                  'text-color-6': !isConnected
+                })}
               >
-                0.0000 COMP
+                {isConnected ? '0.0000' : '0.0000'} COMP
               </Text>
             </div>
             <Button
+              disabled={isClaimButtonDisabled}
               onClick={onClaimOpen}
               className='max-w-[130px] text-11 font-medium'
             >
@@ -70,7 +83,7 @@ export function RewardsFlowBlock() {
             orientation='vertical'
             className='max-h-10 !min-h-10 mx-12'
           />
-          <div className='flex w-full justify-between'>
+          <div className='flex w-full justify-between max-w-75'>
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
@@ -82,18 +95,24 @@ export function RewardsFlowBlock() {
                 <Text
                   size='17'
                   weight='500'
+                  className={cn('text-color-2', {
+                    'text-color-6': !isConnected
+                  })}
                 >
-                  0.0000 COMP
+                  {isConnected ? '0.0000' : '0.0000'} COMP
                 </Text>
-                <Text
-                  size='11'
-                  className='text-color-24'
-                >
-                  $40.00
-                </Text>
+                <Condition if={isConnected}>
+                  <Text
+                    size='11'
+                    className='text-color-24'
+                  >
+                    $40.00
+                  </Text>
+                </Condition>
               </div>
             </div>
             <Button
+              disabled={isVestingButtonDisabled}
               onClick={onVestingOpen}
               className='max-w-[130px] text-11 font-medium'
             >
