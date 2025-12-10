@@ -57,7 +57,6 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
                 size='17'
                 weight='600'
                 lineHeight='20'
-                className='text-color-2'
               >
                 {title}
               </Text>

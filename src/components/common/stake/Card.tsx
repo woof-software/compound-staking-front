@@ -23,7 +23,6 @@ export function Card(props: CardProps) {
           size='13'
           weight='500'
           lineHeight='27'
-          className='text-color-2'
         >
           {title}
         </Text>

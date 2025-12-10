@@ -194,6 +194,10 @@
   animation: pulseOpacity 1.2s ease-in-out infinite alternate;
 }
 
+.transition-width {
+  transition: width 0.1s linear;
+}
+
 html, body {
   -ms-overflow-style: none;      /* IE и Edge */
   scrollbar-width: none;         /* Firefox */

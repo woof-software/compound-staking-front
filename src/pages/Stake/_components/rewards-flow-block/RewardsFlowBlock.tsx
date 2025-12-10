@@ -3,9 +3,11 @@ import { useAccount } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
+import { RewardRow } from '@/components/common/stake/RewardRow';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Table } from '@/components/ui/Table';
 import { Text } from '@/components/ui/Text';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useThemeStore } from '@/hooks/useTheme';
@@ -154,6 +156,46 @@ export function RewardsFlowBlock() {
             </Text>
           </div>
         </div>
+        <Table
+          data={[
+            {
+              id: 1,
+              vestingAmount: '1.5000',
+              toClaim: '0.1000',
+              startDate: '2022-01-01',
+              endDate: '2022-01-31',
+              claimedAmount: '0.5000',
+              vestingStartDate: '2022-05-01',
+              vestingEndDate: '2022-01-31',
+              percents: 15
+            },
+            {
+              id: 2,
+              vestingAmount: '1.0000',
+              toClaim: '1.1000',
+              startDate: '2022-02-01',
+              endDate: '2022-03-31',
+              claimedAmount: '1.8900',
+              vestingStartDate: '2022-06-01',
+              vestingEndDate: '2022-07-31',
+              percents: 75
+            }
+          ]}
+          columns={[
+            { accessorKey: 'vestingAmount', header: 'Vesting Amount', sortType: 'number' },
+            { accessorKey: 'toClaim', header: 'To claim', sortType: 'number' },
+            { accessorKey: 'startDate', header: 'Start Date', sortType: 'date' },
+            { accessorKey: 'endDate', header: 'End Date', sortType: 'date' },
+            { accessorKey: 'claimedAmount', header: 'Claimed Amount', sortType: 'number' }
+          ]}
+        >
+          {(row) => (
+            <RewardRow
+              key={row.id}
+              row={row}
+            />
+          )}
+        </Table>
       </Card>
       <LazyVestingModal
         isOpen={isVestingOpen}
