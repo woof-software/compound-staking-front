@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 
 .eslintcache
+tsconfig.tsbuildinfo
 
 # Environment files
 .env

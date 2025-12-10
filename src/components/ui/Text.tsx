@@ -11,7 +11,9 @@ const text = cva('text-primary-11', {
       '15': 'text-[15px]',
       '16': 'text-[16px]',
       '17': 'text-[17px]',
-      '40': 'text-[40px]'
+      '32': 'text-[32px]',
+      '40': 'text-[40px]',
+      '45': 'text-[45px]'
     },
     weight: {
       '400': 'font-normal',
@@ -25,6 +27,7 @@ const text = cva('text-primary-11', {
       '17': 'leading-[17px]',
       '20': 'leading-[20px]',
       '27': 'leading-[27px]',
+      '38': 'leading-[38px]',
       '44': 'leading-[44px]',
       '54': 'leading-[54px]',
       '100': 'leading-[100%]'
