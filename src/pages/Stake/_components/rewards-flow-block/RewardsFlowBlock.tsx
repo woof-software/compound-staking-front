@@ -5,6 +5,7 @@ import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useThemeStore } from '@/hooks/useTheme';
@@ -44,15 +45,17 @@ export function RewardsFlowBlock() {
               >
                 Available Rewards
               </Text>
-              <Text
-                size='17'
-                weight='500'
-                className={cn('text-color-2', {
-                  'text-color-6': !isConnected
-                })}
-              >
-                {isConnected ? '0.0000' : '0.0000'} COMP
-              </Text>
+              <Skeleton loading={false}>
+                <Text
+                  size='17'
+                  weight='500'
+                  className={cn('text-color-2', {
+                    'text-color-6': !isConnected
+                  })}
+                >
+                  {isConnected ? '0.0000' : '0.0000'} COMP
+                </Text>
+              </Skeleton>
             </div>
             <div className='flex flex-col gap-3'>
               <Text
@@ -61,15 +64,17 @@ export function RewardsFlowBlock() {
               >
                 Total to claim
               </Text>
-              <Text
-                size='17'
-                weight='500'
-                className={cn('text-color-2', {
-                  'text-color-6': !isConnected
-                })}
-              >
-                {isConnected ? '0.0000' : '0.0000'} COMP
-              </Text>
+              <Skeleton loading={false}>
+                <Text
+                  size='17'
+                  weight='500'
+                  className={cn('text-color-2', {
+                    'text-color-6': !isConnected
+                  })}
+                >
+                  {isConnected ? '0.0000' : '0.0000'} COMP
+                </Text>
+              </Skeleton>
             </div>
             <Button
               disabled={isClaimButtonDisabled}
@@ -92,22 +97,26 @@ export function RewardsFlowBlock() {
                 Available Rewards
               </Text>
               <div className='flex flex-col gap-2'>
-                <Text
-                  size='17'
-                  weight='500'
-                  className={cn('text-color-2', {
-                    'text-color-6': !isConnected
-                  })}
-                >
-                  {isConnected ? '0.0000' : '0.0000'} COMP
-                </Text>
-                <Condition if={isConnected}>
+                <Skeleton loading={false}>
                   <Text
-                    size='11'
-                    className='text-color-24'
+                    size='17'
+                    weight='500'
+                    className={cn('text-color-2', {
+                      'text-color-6': !isConnected
+                    })}
                   >
-                    $40.00
+                    {isConnected ? '0.0000' : '0.0000'} COMP
                   </Text>
+                </Skeleton>
+                <Condition if={isConnected}>
+                  <Skeleton loading={false}>
+                    <Text
+                      size='11'
+                      className='text-color-24'
+                    >
+                      $40.00
+                    </Text>
+                  </Skeleton>
                 </Condition>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import { useAccount } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { Format, FormatUnits } from '@/lib/utils/format';
 import { useStatisticTotalStaked } from '@/pages/stake/_hooks/useStatisticTotalStaked';
@@ -23,26 +24,28 @@ export function TotalStaked() {
       >
         Total staked
       </Text>
-      <div className='flex items-start gap-3'>
-        <CompoundBlackCircle className='mt-1 size-10 text-compound-icon-bg' />
-        <Text
-          size='40'
-          weight='500'
-        >
-          {isConnected ? totalStakedFormatted : '0.00'}
-          <Condition if={isConnected}>
-            <Text
-              tag='span'
-              size='40'
-              weight='700'
-              lineHeight='38'
-              className='text-color-25'
-            >
-              {unit}
-            </Text>
-          </Condition>
-        </Text>
-      </div>
+      <Skeleton loading={false}>
+        <div className='flex items-start gap-3'>
+          <CompoundBlackCircle className='mt-1 size-10 text-compound-icon-bg' />
+          <Text
+            size='40'
+            weight='500'
+          >
+            {isConnected ? totalStakedFormatted : '0.00'}
+            <Condition if={isConnected}>
+              <Text
+                tag='span'
+                size='40'
+                weight='700'
+                lineHeight='38'
+                className='text-color-25'
+              >
+                {unit}
+              </Text>
+            </Condition>
+          </Text>
+        </div>
+      </Skeleton>
     </div>
   );
 }

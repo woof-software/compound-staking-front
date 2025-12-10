@@ -2,6 +2,7 @@ import { useAccount } from 'wagmi';
 
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { cn } from '@/lib/utils/cn';
 
@@ -23,15 +24,17 @@ export function StakeFlowBlock() {
           >
             Staked
           </Text>
-          <Text
-            size='17'
-            weight='500'
-            className={cn('text-color-2', {
-              'text-color-6': !isConnected
-            })}
-          >
-            {isConnected ? '0.0000' : '0.0000'} COMP
-          </Text>
+          <Skeleton loading={false}>
+            <Text
+              size='17'
+              weight='500'
+              className={cn('text-color-2', {
+                'text-color-6': !isConnected
+              })}
+            >
+              {isConnected ? '0.0000' : '0.0000'} COMP
+            </Text>
+          </Skeleton>
         </div>
         <div className='gap-3 flex flex-col'>
           <Text
@@ -40,15 +43,17 @@ export function StakeFlowBlock() {
           >
             stCOMP balance
           </Text>
-          <Text
-            size='17'
-            weight='500'
-            className={cn('text-color-2', {
-              'text-color-6': !isConnected
-            })}
-          >
-            {isConnected ? '0.0000' : '0.0000'} stCOMP
-          </Text>
+          <Skeleton loading={false}>
+            <Text
+              size='17'
+              weight='500'
+              className={cn('text-color-2', {
+                'text-color-6': !isConnected
+              })}
+            >
+              {isConnected ? '0.0000' : '0.0000'} stCOMP
+            </Text>
+          </Skeleton>
         </div>
         <div className='gap-3 flex flex-col'>
           <Text
@@ -57,15 +62,17 @@ export function StakeFlowBlock() {
           >
             Multiplier
           </Text>
-          <Text
-            size='17'
-            weight='500'
-            className={cn('text-color-2', {
-              'text-color-6': !isConnected
-            })}
-          >
-            {isConnected ? '1x' : '-'}
-          </Text>
+          <Skeleton loading={false}>
+            <Text
+              size='17'
+              weight='500'
+              className={cn('text-color-2', {
+                'text-color-6': !isConnected
+              })}
+            >
+              {isConnected ? '1x' : '-'}
+            </Text>
+          </Skeleton>
         </div>
         <div className='gap-3 flex flex-col'>
           <Text
@@ -74,15 +81,17 @@ export function StakeFlowBlock() {
           >
             Available Rewards
           </Text>
-          <Text
-            size='17'
-            weight='500'
-            className={cn('text-color-2', {
-              'text-color-6': !isConnected
-            })}
-          >
-            {isConnected ? '0.0000' : '0.0000'} COMP
-          </Text>
+          <Skeleton loading={false}>
+            <Text
+              size='17'
+              weight='500'
+              className={cn('text-color-2', {
+                'text-color-6': !isConnected
+              })}
+            >
+              {isConnected ? '0.0000' : '0.0000'} COMP
+            </Text>
+          </Skeleton>
         </div>
         <div className='gap-3 flex flex-col'>
           <Text
@@ -91,15 +100,17 @@ export function StakeFlowBlock() {
           >
             APR
           </Text>
-          <Text
-            size='17'
-            weight='500'
-            className={cn('text-color-2', {
-              'text-color-6': !isConnected
-            })}
-          >
-            {isConnected ? '0.00' : '0.00'}%
-          </Text>
+          <Skeleton loading={false}>
+            <Text
+              size='17'
+              weight='500'
+              className={cn('text-color-2', {
+                'text-color-6': !isConnected
+              })}
+            >
+              {isConnected ? '0.00' : '0.00'}%
+            </Text>
+          </Skeleton>
         </div>
         <Button
           disabled={isStakeButtonDisabled}
