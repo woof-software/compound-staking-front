@@ -28,6 +28,7 @@ export function DelegateFlowBlock() {
                 size='17'
                 weight='500'
                 lineHeight='17'
+                className='text-color-2'
               >
                 {sliceAddress('0x09fd7d573a4318f1dd34cab8000928d7270ce8e7')}
               </Text>
@@ -45,6 +46,7 @@ export function DelegateFlowBlock() {
               size='17'
               weight='500'
               lineHeight='17'
+              className='text-color-2'
             >
               00d 00h
             </Text>

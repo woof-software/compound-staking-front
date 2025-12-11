@@ -23,6 +23,7 @@ const UnStakeFlowBlock = () => {
                 size='17'
                 weight='500'
                 lineHeight='17'
+                className='text-color-2'
               >
                 10.0000 COMP
               </Text>

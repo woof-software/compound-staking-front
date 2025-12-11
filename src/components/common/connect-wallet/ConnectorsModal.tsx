@@ -11,7 +11,7 @@ export type ConnectorsModalProps = {
   onClose?: () => void;
 };
 
-export default function ConnectorsModal(props: ConnectorsModalProps) {
+export function ConnectorsModal(props: ConnectorsModalProps) {
   const { isOpen = false, onClose = noop } = props;
 
   return (

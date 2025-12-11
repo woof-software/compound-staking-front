@@ -1,7 +1,6 @@
 import { Text } from '@/components/ui/Text';
 
 import { DelegateFlowBlock } from './_components/delegate-flow-block/DelegateFlowBlock';
-import { RewardsFlowBlock } from './_components/rewards-flow-block/RewardsFlowBlock';
 import { StakeFlowBlock } from './_components/stake-flow-block/StakeFlowBlock';
 import { StatisticsBlock } from './_components/statistics-block/StatisticsBlock';
 import { UnStakeFlowBlock } from './_components/unstake-flow-block/UnStakeFlowBlock';
@@ -33,7 +32,6 @@ export function StakePage() {
       <StakeFlowBlock />
       <UnStakeFlowBlock />
       <DelegateFlowBlock />
-      <RewardsFlowBlock />
     </main>
   );
 }
