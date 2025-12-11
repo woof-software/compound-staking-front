@@ -4,6 +4,8 @@ export const V2_URL = 'https://v2-app.compound.finance';
 export const TERMS_URL = `${V2_URL}/#terms`;
 export const TALLY_GOV_URL = 'https://www.tally.xyz/gov/compound';
 
+export const APPLICATION_ETHEREUM_CHAIN = 1;
+
 export const DEFAULT_INTEGER_PART_LENGTH = 16;
 export const COMPOUND_DECIMALS = 18;
 
