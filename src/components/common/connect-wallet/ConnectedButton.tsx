@@ -5,7 +5,7 @@ import { CopyIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
-import { useOnClickOutside } from '@/hooks/useOnClickOutside';
+import { useOutsideClick } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useWalletStore } from '@/hooks/useWallet';
 import { sliceAddress } from '@/lib/utils/common';
@@ -46,7 +46,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
     }
   };
 
-  useOnClickOutside(ref, onClose);
+  useOutsideClick(() => ref.current, onClose);
 
   return (
     <div className='relative'>
@@ -74,7 +74,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
               lineHeight='16'
               className='text-color-2'
             >
-              {sliceAddress(address!)}
+              {sliceAddress(address ?? '')}
             </Text>
           </div>
         </Condition>
@@ -106,7 +106,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
                 lineHeight='18'
                 className='text-color-2'
               >
-                {sliceAddress(address!)}
+                {sliceAddress(address ?? '')}
               </Text>
             </div>
             <CopyIcon
