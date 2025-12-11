@@ -29,7 +29,6 @@ export function getChainName(chainId: number) {
     case 534352:
       return 'Scroll';
     default:
-      //TODO: add fallback text
-      return '';
+      return 'Unknown';
   }
 }

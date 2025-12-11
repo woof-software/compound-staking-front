@@ -30,9 +30,10 @@ export function SwitchNetworkModal() {
         size='13'
         align='center'
         lineHeight='18'
-        className='text-color-2 mt-5 max-w-[300px]'
+        className='text-color-2 mt-5 max-w-75'
       >
-        Your wallet is currently connected to the {getChainName(chainId)} network. Please switch your wallet to Ethereum
+        Your wallet is currently connected to the {getChainName(chainId)} network. Please switch your wallet to{' '}
+        {getChainName(1)}
         to complete.
       </Text>
       <Button className='rounded-100 h-14 mt-15 bg-color-16 font-medium text-13'>Switch Network</Button>
