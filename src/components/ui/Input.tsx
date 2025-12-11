@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { type ChangeEvent, type InputHTMLAttributes } from 'react';
 
-import { COMPOUND_DECIMALS, DEFAULT_INTEGER_PART_LENGTH } from '@/consts/common';
 import { useAutoFocus } from '@/hooks/useAutoFocus';
 import { useFontSizeFitting } from '@/hooks/useFontSizeFitting';
 import { spawnFloatRegex } from '@/lib/utils/regex';
@@ -14,15 +13,7 @@ export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | '
 };
 
 export function Input(props: InputProps) {
-  const {
-    integerPartLength = DEFAULT_INTEGER_PART_LENGTH,
-    decimals = COMPOUND_DECIMALS,
-    value,
-    className,
-    onChange: _onChange,
-    autoFocus,
-    ...rest
-  } = props;
+  const { integerPartLength = 16, decimals = 18, value, className, onChange: _onChange, autoFocus, ...rest } = props;
 
   const ref = useRef<HTMLInputElement>(null);
 
