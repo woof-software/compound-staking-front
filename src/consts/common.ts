@@ -7,9 +7,6 @@ export const TALLY_GOV_URL = 'https://www.tally.xyz/gov/compound';
 export const DEFAULT_INTEGER_PART_LENGTH = 16;
 export const COMPOUND_DECIMALS = 18;
 
-export const COMP_ADDRESS = '0xc00e94cb662c3520282e6f5717214004a7f26888';
-export const COMP_USD_PRICE_FEED = '0xdbd020caef83efd542f4de03e3cf0c28a4428bd5';
-
 export const BASE_TOKEN_DECIMALS = 18;
 export const BASE_TOKEN_ADDRESS = '0xe357a464D9e37a50A1BdD71560B5c69a333d301E';
 
