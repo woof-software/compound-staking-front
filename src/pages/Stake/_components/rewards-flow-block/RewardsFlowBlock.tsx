@@ -1,7 +1,7 @@
-import { lazy } from 'react';
-
 import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
+import ClaimModal from '@/components/common/stake/ClaimModal';
+import VestingModal from '@/components/common/stake/VestingModal';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
@@ -10,9 +10,6 @@ import { useThemeStore } from '@/hooks/useTheme';
 
 import NoPositionYet from '@/assets/no-position-yet.svg';
 import NoPositionYetLight from '@/assets/no-position-yet-light.svg';
-
-const LazyVestingModal = lazy(() => import('@/components/common/stake/VestingModal'));
-const LazyClaimModal = lazy(() => import('@/components/common/stake/ClaimModal'));
 
 export function RewardsFlowBlock() {
   const { theme } = useThemeStore();
@@ -127,11 +124,11 @@ export function RewardsFlowBlock() {
           </div>
         </div>
       </Card>
-      <LazyVestingModal
+      <VestingModal
         isOpen={isVestingOpen}
         onClose={onVestingClose}
       />
-      <LazyClaimModal
+      <ClaimModal
         isOpen={isClaimOpen}
         onClose={onClaimClose}
       />

@@ -89,7 +89,6 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
         </div>
         <Condition if={isChangeWallet}>
           <Input
-            allowText
             classNames={{
               input:
                 'rounded-lg w-full py-[17px] px-5 pr-[70px] bg-color-10 !border !border-solid h-[52px] !border-color-8 !text-13 font-medium leading-[18px]'
