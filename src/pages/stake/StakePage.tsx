@@ -1,3 +1,4 @@
+import { SwitchNetworkModal } from '@/components/common/switch-network-modal/SwitchNetworkModal';
 import { Text } from '@/components/ui/Text';
 
 import { DelegateFlowBlock } from './_components/delegate-flow-block/DelegateFlowBlock';
@@ -32,6 +33,7 @@ export function StakePage() {
       <StakeFlowBlock />
       <UnStakeFlowBlock />
       <DelegateFlowBlock />
+      <SwitchNetworkModal />
     </main>
   );
 }
