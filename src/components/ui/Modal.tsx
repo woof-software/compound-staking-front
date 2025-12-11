@@ -10,7 +10,7 @@ import { Portal } from '../common/Portal';
 export interface ModalProps extends PropsWithChildren {
   open: boolean;
   title?: string;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export function Modal(props: ModalProps) {
@@ -47,14 +47,16 @@ export function Modal(props: ModalProps) {
                 {title}
               </Text>
             </Condition>
-            <Button
-              onClick={onClose}
-              className='bg-transparent p-0 h-auto'
-              tabIndex={0}
-              aria-label='Close modal'
-            >
-              <CloseIcon className='text-color-18 ml-auto cursor-pointer' />
-            </Button>
+            <Condition if={onClose}>
+              <Button
+                onClick={onClose}
+                className='bg-transparent h-auto p-0'
+                tabIndex={0}
+                aria-label='Close modal'
+              >
+                <CloseIcon className='text-color-18 ml-auto cursor-pointer' />
+              </Button>
+            </Condition>
           </div>
           {children}
         </div>

@@ -136,6 +136,10 @@
   --shadow-20: 0 0 0 0.5px #f9fafb26;
 
   --radius-64: 64px;
+  --radius-100: 100px;
+
+  --text-11: 11px;
+  --text-13: 13px;
 }
 
 @layer base {
@@ -179,6 +183,13 @@
   animation: modal-content-in 300ms ease-out forwards;
 }
 
+.chain-slide {
+  animation: chain-slide 1s linear infinite;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
 html, body {
   -ms-overflow-style: none;      /* IE и Edge */
   scrollbar-width: none;         /* Firefox */
@@ -206,5 +217,26 @@ body::-webkit-scrollbar {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes chain-slide {
+  0% {
+    background-image: url('./assets/network_switch_1.svg');
+  }
+  20% {
+    background-image: url('./assets/network_switch_2.svg');
+  }
+  40% {
+    background-image: url('./assets/network_switch_3.svg');
+  }
+  60% {
+    background-image: url('./assets/network_switch_4.svg');
+  }
+  80% {
+    background-image: url('./assets/network_switch_5.svg');
+  }
+  100% {
+    background-image: url('./assets/network_switch_1.svg');
   }
 }

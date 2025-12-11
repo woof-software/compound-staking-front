@@ -1,7 +1,7 @@
 import { WalletList } from '@/components/common/connect-wallet/WalletList';
 import { Modal } from '@/components/ui/Modal';
 import { Text } from '@/components/ui/Text';
-import { TERMS_URL } from '@/consts/consts';
+import { TERMS_URL } from '@/consts/common';
 import { noop } from '@/lib/utils/common';
 
 import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
