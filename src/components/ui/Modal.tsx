@@ -1,6 +1,7 @@
 import { type PropsWithChildren, useEffect } from 'react';
 
 import { CloseIcon } from '@/assets/svg';
+import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 
@@ -8,7 +9,7 @@ import { Portal } from '../common/Portal';
 
 export interface ModalProps extends PropsWithChildren {
   open: boolean;
-  title: string;
+  title?: string;
   onClose: () => void;
 }
 
@@ -34,19 +35,21 @@ export function Modal(props: ModalProps) {
           className='relative flex flex-col items-center rounded-lg p-10 bg-color-5 min-w-105 max-w-108 w-[90%] modal-content-in'
           onClick={(e) => e.stopPropagation()}
         >
-          <div className='flex justify-center'>
-            <Text
-              size='17'
-              weight='500'
-              lineHeight='20'
-              align='center'
-              className='text-color-2 w-full'
-            >
-              {title}
-            </Text>
+          <div className='flex justify-end w-full'>
+            <Condition if={title}>
+              <Text
+                size='17'
+                weight='500'
+                lineHeight='20'
+                align='center'
+                className='text-color-2 w-full'
+              >
+                {title}
+              </Text>
+            </Condition>
             <Button
               onClick={onClose}
-              className='bg-transparent p-0'
+              className='bg-transparent p-0 h-auto'
               tabIndex={0}
               aria-label='Close modal'
             >

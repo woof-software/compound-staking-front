@@ -11,6 +11,7 @@ const text = cva('text-primary-11', {
       '15': 'text-[15px]',
       '16': 'text-[16px]',
       '17': 'text-[17px]',
+      '21': 'text-[21px]',
       '32': 'text-[32px]',
       '40': 'text-[40px]',
       '45': 'text-[45px]'
@@ -25,7 +26,9 @@ const text = cva('text-primary-11', {
       '14': 'leading-[14px]',
       '16': 'leading-[16px]',
       '17': 'leading-[17px]',
+      '18': 'leading-[18px]',
       '20': 'leading-[20px]',
+      '24': 'leading-[24px]',
       '27': 'leading-[27px]',
       '38': 'leading-[38px]',
       '44': 'leading-[44px]',
