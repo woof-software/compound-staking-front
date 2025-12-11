@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { erc20Abi, parseUnits } from 'viem';
+import { type Address, erc20Abi, parseUnits } from 'viem';
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 
 import {
@@ -57,7 +57,7 @@ export function useStakeDev({ onIsPendingToggle }: UseStakeDevArgs) {
 
   const isLoading = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
 
-  const stakeDev = (delegatee: `0x${string}`, amount: string) => {
+  const stakeDev = (delegatee: Address, amount: string) => {
     if (!address) throw new Error('Connect wallet first');
 
     const parsedAmount = parseUnits(amount, BASE_TOKEN_DECIMALS);
