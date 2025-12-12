@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isAddress } from 'viem';
 
 import { InfoIcon } from '@/assets/svg';
 import { Button } from '@/components/ui/Button';
@@ -13,8 +14,10 @@ export type VestingModalProps = {
   onClose?: () => void;
 };
 
-export default function VestingModal({ isOpen = false, onClose = noop }: VestingModalProps) {
+export function VestingModal({ isOpen = false, onClose = noop }: VestingModalProps) {
   const [delegateNameOrAddress, setDelegateNameOrAddress] = useState<string>('');
+
+  const isValidAddress = isAddress(delegateNameOrAddress);
 
   const onDelegateNameOrAddressChange = (value: string) => {
     setDelegateNameOrAddress(value);
@@ -68,7 +71,12 @@ export default function VestingModal({ isOpen = false, onClose = noop }: Vesting
             The whole amount will be added to your Claim balance
           </Text>
         </div>
-        <Button className='h-14 rounded-100 text-[13px] leading-[18px] font-medium'>Confirm</Button>
+        <Button
+          disabled={!isValidAddress}
+          className='h-14 rounded-100 text-[13px] leading-[18px] font-medium'
+        >
+          Confirm
+        </Button>
       </div>
     </Modal>
   );

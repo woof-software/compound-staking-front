@@ -1,6 +1,6 @@
 import { Card } from '@/components/common/stake/Card';
-import ClaimModal from '@/components/common/stake/ClaimModal';
-import VestingModal from '@/components/common/stake/VestingModal';
+import { ClaimModal } from '@/components/common/stake/ClaimModal';
+import { VestingModal } from '@/components/common/stake/VestingModal';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
