@@ -26,56 +26,8 @@ export function RewardsFlowBlock() {
         title='Stake'
         tooltip='Stake your COMP tokens to earn yield every second!'
       >
-        <div className='py-3.5'>
-          <div className='border-b flex justify-between border-color-8 px-10 pb-5 '>
-            <div className='flex w-full justify-between max-w-120'>
-              <div className='flex flex-col gap-3'>
-                <Text
-                  size='11'
-                  className='text-color-24'
-                >
-                  Available Rewards
-                </Text>
-                <Skeleton loading={false}>
-                  <Text
-                    size='17'
-                    weight='500'
-                    className={cn('text-color-2', {
-                      'text-color-6': !isConnected
-                    })}
-                  >
-                    {isConnected ? '0.0000' : '0.0000'} COMP
-                  </Text>
-                </Skeleton>
-              </div>
-              <div className='flex flex-col gap-3'>
-                <Text
-                  size='11'
-                  className='text-color-24'
-                >
-                  Total to claim
-                </Text>
-                <Skeleton loading={false}>
-                  <Text
-                    size='17'
-                    weight='500'
-                    className={cn('text-color-2', {
-                      'text-color-6': !isConnected
-                    })}
-                  >
-                    {isConnected ? '0.0000' : '0.0000'} COMP
-                  </Text>
-                </Skeleton>
-              </div>
-              <Button
-                disabled={isClaimButtonDisabled}
-                onClick={onClaimOpen}
-                className='max-w-32.5 text-[11px] font-medium'
-              >
-                Claim
-              </Button>
-            </div>
-            <Divider orientation='vertical' />
+        <div className='border-b flex justify-between border-color-8 p-10'>
+          <div className='flex w-full justify-between max-w-120'>
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
@@ -83,38 +35,84 @@ export function RewardsFlowBlock() {
               >
                 Available Rewards
               </Text>
-              <div className='flex flex-col gap-2'>
-                <Skeleton loading={false}>
-                  <Text
-                    size='17'
-                    weight='500'
-                    className={cn('text-color-2', {
-                      'text-color-6': !isConnected
-                    })}
-                  >
-                    {isConnected ? '0.0000' : '0.0000'} COMP
-                  </Text>
-                </Skeleton>
-                <Condition if={isConnected}>
-                  <Skeleton loading={false}>
-                    <Text
-                      size='11'
-                      className='text-color-24'
-                    >
-                      $40.00
-                    </Text>
-                  </Skeleton>
-                </Condition>
-              </div>
+              <Skeleton loading={false}>
+                <Text
+                  size='17'
+                  weight='500'
+                  className={cn('text-color-2', {
+                    'text-color-6': !isConnected
+                  })}
+                >
+                  {isConnected ? '0.0000' : '0.0000'} COMP
+                </Text>
+              </Skeleton>
+            </div>
+            <div className='flex flex-col gap-3'>
+              <Text
+                size='11'
+                className='text-color-24'
+              >
+                Total to claim
+              </Text>
+              <Skeleton loading={false}>
+                <Text
+                  size='17'
+                  weight='500'
+                  className={cn('text-color-2', {
+                    'text-color-6': !isConnected
+                  })}
+                >
+                  {isConnected ? '0.0000' : '0.0000'} COMP
+                </Text>
+              </Skeleton>
             </div>
             <Button
-              disabled={isVestingButtonDisabled}
-              onClick={onVestingOpen}
+              disabled={isClaimButtonDisabled}
+              onClick={onClaimOpen}
               className='max-w-32.5 text-[11px] font-medium'
             >
-              Vest
+              Claim
             </Button>
           </div>
+          <Divider orientation='vertical' />
+          <div className='flex flex-col gap-3'>
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              Available Rewards
+            </Text>
+            <div className='flex flex-col gap-2'>
+              <Skeleton loading={false}>
+                <Text
+                  size='17'
+                  weight='500'
+                  className={cn('text-color-2', {
+                    'text-color-6': !isConnected
+                  })}
+                >
+                  {isConnected ? '0.0000' : '0.0000'} COMP
+                </Text>
+              </Skeleton>
+              <Condition if={isConnected}>
+                <Skeleton loading={false}>
+                  <Text
+                    size='11'
+                    className='text-color-24'
+                  >
+                    $40.00
+                  </Text>
+                </Skeleton>
+              </Condition>
+            </div>
+          </div>
+          <Button
+            disabled={isVestingButtonDisabled}
+            onClick={onVestingOpen}
+            className='max-w-32.5 text-[11px] font-medium'
+          >
+            Vest
+          </Button>
         </div>
         <div className='p-10 flex'>
           <div className='mx-auto items-center w-auto flex flex-col gap-5'>
