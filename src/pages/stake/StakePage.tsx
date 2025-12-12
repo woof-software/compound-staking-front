@@ -1,3 +1,4 @@
+import ClaimModal from '@/components/common/stake/ClaimModal';
 import { Text } from '@/components/ui/Text';
 
 import { DelegateFlowBlock } from './_components/delegate-flow-block/DelegateFlowBlock';
@@ -32,6 +33,10 @@ export function StakePage() {
       <StakeFlowBlock />
       <UnStakeFlowBlock />
       <DelegateFlowBlock />
+      <ClaimModal
+        isOpen={true}
+        onClose={() => {}}
+      />
     </main>
   );
 }

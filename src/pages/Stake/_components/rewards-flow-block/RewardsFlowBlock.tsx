@@ -22,105 +22,104 @@ export function RewardsFlowBlock() {
       <Card
         title='Stake'
         tooltip='Stake your COMP tokens to earn yield every second!'
-        classNames={{
-          content: 'px-0'
-        }}
       >
-        <div className='border-b flex justify-between border-color-8 px-10 pb-5'>
-          <div className='flex w-full justify-between'>
-            <div className='flex flex-col gap-3'>
-              <Text
-                size='11'
-                className='text-color-24'
-              >
-                Available Rewards
-              </Text>
-              <Text
-                size='17'
-                weight='500'
-              >
-                0.0000 COMP
-              </Text>
-            </div>
-            <div className='flex flex-col gap-3'>
-              <Text
-                size='11'
-                className='text-color-24'
-              >
-                Total to claim
-              </Text>
-              <Text
-                size='17'
-                weight='500'
-              >
-                0.0000 COMP
-              </Text>
-            </div>
-            <Button
-              onClick={onClaimOpen}
-              className='max-w-[130px] text-11 font-medium'
-            >
-              Claim
-            </Button>
-          </div>
-          <Divider
-            orientation='vertical'
-            className='max-h-10 !min-h-10 mx-12'
-          />
-          <div className='flex w-full justify-between'>
-            <div className='flex flex-col gap-3'>
-              <Text
-                size='11'
-                className='text-color-24'
-              >
-                Available Rewards
-              </Text>
-              <div className='flex flex-col gap-2'>
+        <div className='py-3.5'>
+          <div className='border-b flex justify-between border-color-8 px-10 pb-5 '>
+            <div className='flex w-full justify-between'>
+              <div className='flex flex-col gap-3'>
+                <Text
+                  size='11'
+                  className='text-color-24'
+                >
+                  Available Rewards
+                </Text>
                 <Text
                   size='17'
                   weight='500'
                 >
                   0.0000 COMP
                 </Text>
+              </div>
+              <div className='flex flex-col gap-3'>
                 <Text
                   size='11'
                   className='text-color-24'
                 >
-                  $40.00
+                  Total to claim
+                </Text>
+                <Text
+                  size='17'
+                  weight='500'
+                >
+                  0.0000 COMP
                 </Text>
               </div>
+              <Button
+                onClick={onClaimOpen}
+                className='max-w-32.5 text-11 font-medium'
+              >
+                Claim
+              </Button>
             </div>
-            <Button
-              onClick={onVestingOpen}
-              className='max-w-[130px] text-11 font-medium'
-            >
-              Vest
-            </Button>
+            <Divider
+              orientation='vertical'
+              className='max-h-10 min-h-10 mx-12'
+            />
+            <div className='flex w-full justify-between'>
+              <div className='flex flex-col gap-3'>
+                <Text
+                  size='11'
+                  className='text-color-24'
+                >
+                  Available Rewards
+                </Text>
+                <div className='flex flex-col gap-2'>
+                  <Text
+                    size='17'
+                    weight='500'
+                  >
+                    0.0000 COMP
+                  </Text>
+                  <Text
+                    size='11'
+                    className='text-color-24'
+                  >
+                    $40.00
+                  </Text>
+                </div>
+              </div>
+              <Button
+                onClick={onVestingOpen}
+                className='max-w-32.5 text-11 font-medium'
+              >
+                Vest
+              </Button>
+            </div>
           </div>
-        </div>
-        <div className='p-10 flex'>
-          <div className='mx-auto items-center w-auto flex flex-col gap-5'>
-            <Condition if={theme === 'dark'}>
-              <NoPositionYet className='w-[176px] h-20' />
-            </Condition>
-            <Condition if={theme === 'light'}>
-              <NoPositionYetLight className='w-[176px] h-20' />
-            </Condition>
-            <Text
-              size='15'
-              weight='500'
-              lineHeight='16'
-            >
-              No Positions Yet
-            </Text>
-            <Text
-              size='15'
-              weight='500'
-              lineHeight='21'
-              className='text-color-24'
-            >
-              No vested rewards yet
-            </Text>
+          <div className='p-10 flex'>
+            <div className='mx-auto items-center w-auto flex flex-col gap-5'>
+              <Condition if={theme === 'dark'}>
+                <NoPositionYet className='w-44 h-20' />
+              </Condition>
+              <Condition if={theme === 'light'}>
+                <NoPositionYetLight className='w-44 h-20' />
+              </Condition>
+              <Text
+                size='15'
+                weight='500'
+                lineHeight='16'
+              >
+                No Positions Yet
+              </Text>
+              <Text
+                size='15'
+                weight='500'
+                lineHeight='21'
+                className='text-color-24'
+              >
+                No vested rewards yet
+              </Text>
+            </div>
           </div>
         </div>
       </Card>

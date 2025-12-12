@@ -47,7 +47,7 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
       open={isOpen}
       onClose={onClose}
     >
-      <div className='mt-8 flex flex-col gap-8'>
+      <div className='w-full mt-8 flex flex-col gap-8'>
         <Divider />
         <div className='flex'>
           <Text
@@ -57,7 +57,7 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
           >
             Amount to be claimed
           </Text>
-          <div className='flex items-end'>
+          <div className='flex flex-col shrink-0 items-end'>
             <Text
               size='15'
               weight='500'
@@ -89,11 +89,9 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
         </div>
         <Condition if={isChangeWallet}>
           <Input
-            classNames={{
-              input:
-                'rounded-lg w-full py-[17px] px-5 pr-[70px] bg-color-10 !border !border-solid h-[52px] !border-color-8 !text-13 font-medium leading-[18px]'
-            }}
             placeholder='Delegatee name or address'
+            value={delegateNameOrAddress}
+            onChange={onDelegateNameOrAddressChange}
             addonRight={
               <PasteInputButton
                 isPasted={Boolean(delegateNameOrAddress.length)}
@@ -101,8 +99,6 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
                 onClear={onClear}
               />
             }
-            value={delegateNameOrAddress}
-            onChange={onDelegateNameOrAddressChange}
           />
         </Condition>
         <Button className='h-14 rounded-100 text-13 leading-[18px] font-medium'>Confirm</Button>

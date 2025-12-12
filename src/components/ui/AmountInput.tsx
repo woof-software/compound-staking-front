@@ -14,7 +14,7 @@ export type AmountInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'valu
 };
 
 export function AmountInput(props: AmountInputProps) {
-  const { integerPartLength = 16, decimals = 18, value, className, onChange: _onChange, autoFocus, ...rest } = props;
+  const { integerPartLength = 16, decimals = 18, value, className, onChange, autoFocus, ...rest } = props;
 
   const ref = useRef<HTMLInputElement>(null);
 
@@ -24,7 +24,7 @@ export function AmountInput(props: AmountInputProps) {
     border: 0.85
   });
 
-  const onChange = useCallback(
+  const _onChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       let value = event.target.value;
 
@@ -43,9 +43,9 @@ export function AmountInput(props: AmountInputProps) {
         }
       }
 
-      _onChange(value);
+      onChange(value);
     },
-    [_onChange, decimals, integerPartLength]
+    [onChange, decimals, integerPartLength]
   );
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export function AmountInput(props: AmountInputProps) {
       )}
       placeholder='0'
       value={value}
-      onChange={onChange}
+      onChange={_onChange}
       autoComplete='off'
       autoFocus={autoFocus}
       ref={ref}

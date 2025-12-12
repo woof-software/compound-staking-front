@@ -53,10 +53,6 @@ export default function VestingModal({ isOpen, onClose }: VestingModalProps) {
           </div>
         </div>
         <Input
-          classNames={{
-            input:
-              'rounded-lg w-full py-[17px] px-5 bg-color-10 !border !border-solid h-[52px] !border-color-8 !text-13 font-medium leading-[18px]'
-          }}
           placeholder='Delegatee name or address'
           value={delegateNameOrAddress}
           onChange={onDelegateNameOrAddressChange}
