@@ -6,13 +6,14 @@ import { Divider } from '@/components/ui/Divider';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Text } from '@/components/ui/Text';
+import { noop } from '@/lib/utils/common';
 
 export type VestingModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 };
 
-export default function VestingModal({ isOpen, onClose }: VestingModalProps) {
+export default function VestingModal({ isOpen = false, onClose = noop }: VestingModalProps) {
   const [delegateNameOrAddress, setDelegateNameOrAddress] = useState<string>('');
 
   const onDelegateNameOrAddressChange = (value: string) => {

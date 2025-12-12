@@ -27,7 +27,7 @@ export function Switch(props: SwitchProps) {
               className={cn(
                 'absolute top-0.5 left-0.5 flex items-center justify-center size-5 transition-all rounded-full bg-color-16',
                 {
-                  'translate-x-1 bg-white': checked
+                  'translate-x-full bg-white': checked
                 }
               )}
             />

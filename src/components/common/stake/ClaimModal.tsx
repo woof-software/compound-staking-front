@@ -1,20 +1,21 @@
 import { useState } from 'react';
 
+import { CrossIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
-import { PasteInputButton } from '@/components/common/PasteInputButton';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Switch } from '@/components/ui/Switch';
 import { Text } from '@/components/ui/Text';
+import { noop } from '@/lib/utils/common';
 
 export type ClaimModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 };
 
-export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
+export default function ClaimModal({ isOpen = false, onClose = noop }: ClaimModalProps) {
   const [delegateNameOrAddress, setDelegateNameOrAddress] = useState<string>('');
 
   const [isChangeWallet, setIsChangeWallet] = useState<boolean>(false);
@@ -89,11 +90,22 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
             value={delegateNameOrAddress}
             onChange={onDelegateNameOrAddressChange}
             addonRight={
-              <PasteInputButton
-                isPasted={Boolean(delegateNameOrAddress.length)}
-                onPaste={onPaste}
-                onClear={onClear}
-              />
+              <>
+                <Condition if={!!delegateNameOrAddress.length}>
+                  <CrossIcon
+                    onClick={onClear}
+                    className='size-4 shrink-0 text-color-25 cursor-pointer'
+                  />
+                </Condition>
+                <Condition if={!delegateNameOrAddress.length}>
+                  <Button
+                    onClick={onPaste}
+                    className='bg-color-9 rounded-4xl w-13 h-8 !text-color-24 text-11 font-medium'
+                  >
+                    Paste
+                  </Button>
+                </Condition>
+              </>
             }
           />
         </Condition>
