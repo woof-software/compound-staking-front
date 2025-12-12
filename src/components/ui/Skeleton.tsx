@@ -7,28 +7,25 @@ interface SkeletonProps extends ComponentProps<'div'> {
 }
 
 export function Skeleton(props: SkeletonProps) {
-  const { className, loading, children, ...rest } = props;
+  const { className, children, ...rest } = props;
 
-  const skeletonClasses =
-    'bg-color-24 opacity-10 text-transparent bg-clip-padding shrink-0 pointer-events-none select-none pulse-animation rounded-lg';
-
-  if (loading) {
-    return (
-      <div
-        className={cn(skeletonClasses, className)}
-        {...rest}
-      >
-        <div className='invisible'>{children}</div>
-      </div>
-    );
-  }
+  const loading = true;
 
   return (
     <div
-      className={cn(className)}
+      className={cn(className, {
+        'bg-color-24 opacity-10 text-transparent bg-clip-padding shrink-0 pointer-events-none select-none pulse-animation rounded-lg':
+          loading
+      })}
       {...rest}
     >
-      {children}
+      <div
+        className={cn({
+          invisible: loading
+        })}
+      >
+        {children}
+      </div>
     </div>
   );
 }
