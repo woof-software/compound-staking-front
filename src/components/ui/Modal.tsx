@@ -32,7 +32,7 @@ export function Modal(props: ModalProps) {
     <Portal>
       <div className='fixed inset-0 z-50 flex items-center justify-center modal-fade-in bg-modal-bg'>
         <div
-          className='relative flex flex-col items-center rounded-lg p-10 bg-color-5 min-w-105 max-w-108 w-[90%] modal-content-in'
+          className='relative flex flex-col items-center rounded-lg p-10 bg-color-4 w-full max-w-108 modal-content-in'
           onClick={(e) => e.stopPropagation()}
         >
           <div className='flex justify-end w-full'>
@@ -42,7 +42,7 @@ export function Modal(props: ModalProps) {
                 weight='500'
                 lineHeight='20'
                 align='center'
-                className='text-color-2 w-full'
+                className='w-full'
               >
                 {title}
               </Text>
@@ -50,9 +50,7 @@ export function Modal(props: ModalProps) {
             <Condition if={onClose}>
               <Button
                 onClick={onClose}
-                className='bg-transparent h-auto p-0'
-                tabIndex={0}
-                aria-label='Close modal'
+                className='bg-transparent size-auto p-0'
               >
                 <CloseIcon className='text-color-18 ml-auto cursor-pointer' />
               </Button>

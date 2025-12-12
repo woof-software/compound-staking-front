@@ -15,7 +15,7 @@ export function Card(props: CardProps) {
 
   return (
     <section className='rounded-lg bg-color-4 w-full'>
-      <div className='flex items-center bg-color-11 rounded-lg rounded-b-none gap-3 py-3.5 px-10'>
+      <div className='flex items-center bg-color-11 py-3.5 p-10 rounded-lg rounded-b-none gap-3'>
         <Text
           size='13'
           weight='500'
@@ -30,7 +30,7 @@ export function Card(props: CardProps) {
           </Tooltip>
         </Condition>
       </div>
-      <div className='p-10'>{children}</div>
+      {children}
     </section>
   );
 }
