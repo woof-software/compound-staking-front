@@ -1,96 +1,48 @@
-import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useRef } from 'react';
 import { type ChangeEvent, type InputHTMLAttributes } from 'react';
 
-import { COMPOUND_DECIMALS, DEFAULT_INTEGER_PART_LENGTH } from '@/consts/common';
 import { useAutoFocus } from '@/hooks/useAutoFocus';
-import { useFontSizeFitting } from '@/hooks/useFontSizeFitting';
 import { cn } from '@/lib/utils/cn';
-import { spawnFloatRegex } from '@/lib/utils/regex';
-import type { ClassNames } from '@/shared/types/common';
+import { addressRegex } from '@/lib/utils/regex';
 
 export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
-  integerPartLength?: number;
-  decimals?: number;
-  allowText?: boolean;
   addonRight?: ReactNode;
-  classNames?: ClassNames;
   value: string;
   onChange: (value: string) => void;
 };
 
 export function Input(props: InputProps) {
-  const {
-    integerPartLength = DEFAULT_INTEGER_PART_LENGTH,
-    decimals = COMPOUND_DECIMALS,
-    value,
-    onChange: _onChange,
-    autoFocus,
-    allowText = false,
-    addonRight,
-    classNames,
-    ...rest
-  } = props;
+  const { value, className, addonRight, onChange, autoFocus, ...rest } = props;
 
   const ref = useRef<HTMLInputElement>(null);
 
-  const [adjustedFontSize, setAdjustedFontSize] = useState<number>();
-
-  const getInputFontSize = useFontSizeFitting({
-    border: 0.85
-  });
-
-  const onChange = useCallback(
+  const _onChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      let value = event.target.value;
+      const value = event.target.value;
 
-      if (allowText) {
-        _onChange(value);
-        return;
-      }
+      const m = addressRegex.exec(value);
 
-      const regex = spawnFloatRegex(integerPartLength, decimals);
-      const m = regex.exec(value);
+      if (m === null || m[0] !== value) return;
 
-      if (m === null || m[0] !== value) {
-        const secondChar = value[1] || '';
-
-        if (value.startsWith('0') && !Number.isNaN(+secondChar)) {
-          value = secondChar;
-        } else {
-          event.preventDefault();
-          event.stopPropagation();
-          return;
-        }
-      }
-
-      _onChange(value);
+      onChange(value);
     },
-    [_onChange, allowText, decimals, integerPartLength]
+    [onChange]
   );
-
-  useEffect(() => {
-    const input = ref?.current;
-
-    if (!input) return;
-
-    const fontSize = getInputFontSize(input);
-
-    setAdjustedFontSize(fontSize);
-  }, [value, getInputFontSize, ref]);
 
   useAutoFocus(ref, autoFocus);
 
   return (
-    <div className={cn('relative w-full', classNames?.wrapper)}>
+    <div
+      className={cn(
+        'w-full flex items-center gap-5 justify-between rounded-lg py-2.5 pr-2.5 pl-5 bg-color-10 border border-solid h-13 border-color-8 text-[13px] font-medium leading-4.5',
+        className
+      )}
+    >
       <input
-        style={{ fontSize: `${adjustedFontSize}px` }}
-        className={cn(
-          'focus-visible:outline-none focus:outline-none focus-visible:border-none focus:border-none',
-          classNames?.input
-        )}
+        className='focus-visible:outline-none w-full focus:outline-none focus-visible:border-none focus:border-none'
         placeholder='0'
         value={value}
-        onChange={onChange}
+        onChange={_onChange}
         autoComplete='off'
         autoFocus={autoFocus}
         ref={ref}

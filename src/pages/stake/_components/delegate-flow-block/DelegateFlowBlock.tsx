@@ -17,7 +17,7 @@ export function DelegateFlowBlock() {
       title='Delegation'
       tooltip='Cooldown period for redelegation process is 01d 00h 00m 00s'
     >
-      <div className='flex justify-between'>
+      <div className='flex justify-between p-10'>
         <div className='flex gap-15'>
           <div className='flex flex-col gap-3'>
             <Text
@@ -29,7 +29,6 @@ export function DelegateFlowBlock() {
             <a
               className='flex items-start gap-1 cursor-pointer'
               target='_blank'
-              rel='noreferrer'
             >
               <Text
                 size='17'
