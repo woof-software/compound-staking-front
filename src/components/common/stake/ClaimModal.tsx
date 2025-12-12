@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isAddress } from 'viem';
 
 import { CrossIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -9,6 +10,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Switch } from '@/components/ui/Switch';
 import { Text } from '@/components/ui/Text';
 import { noop } from '@/lib/utils/common';
+import { addressRegex } from '@/lib/utils/regex';
 
 export type ClaimModalProps = {
   isOpen?: boolean;
@@ -19,6 +21,8 @@ export default function ClaimModal({ isOpen = false, onClose = noop }: ClaimModa
   const [delegateNameOrAddress, setDelegateNameOrAddress] = useState<string>('');
 
   const [isChangeWallet, setIsChangeWallet] = useState<boolean>(false);
+
+  const isValidAddress = !isChangeWallet || isAddress(delegateNameOrAddress);
 
   const onDelegateNameOrAddressChange = (value: string) => {
     setDelegateNameOrAddress(value);
@@ -35,6 +39,11 @@ export default function ClaimModal({ isOpen = false, onClose = noop }: ClaimModa
 
   const onPaste = async () => {
     const text = await navigator.clipboard.readText();
+
+    const m = addressRegex.exec(text);
+
+    if (m === null || m[0] !== text) return;
+
     setDelegateNameOrAddress(text ?? '');
   };
 
@@ -109,7 +118,12 @@ export default function ClaimModal({ isOpen = false, onClose = noop }: ClaimModa
             }
           />
         </Condition>
-        <Button className='h-14 rounded-100 text-13 leading-[18px] font-medium'>Confirm</Button>
+        <Button
+          disabled={isValidAddress}
+          className='h-14 rounded-100 text-13 leading-[18px] font-medium'
+        >
+          Confirm
+        </Button>
       </div>
     </Modal>
   );

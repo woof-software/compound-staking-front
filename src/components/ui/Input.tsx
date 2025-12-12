@@ -3,6 +3,7 @@ import { type ChangeEvent, type InputHTMLAttributes } from 'react';
 
 import { useAutoFocus } from '@/hooks/useAutoFocus';
 import { cn } from '@/lib/utils/cn';
+import { addressRegex } from '@/lib/utils/regex';
 
 export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
   addonRight?: ReactNode;
@@ -17,7 +18,13 @@ export function Input(props: InputProps) {
 
   const _onChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      onChange(event.target.value);
+      const value = event.target.value;
+
+      const m = addressRegex.exec(value);
+
+      if (m === null || m[0] !== value) return;
+
+      onChange(value);
     },
     [onChange]
   );

@@ -32,7 +32,7 @@ export function Modal(props: ModalProps) {
     <Portal>
       <div className='fixed inset-0 z-50 flex items-center justify-center modal-fade-in bg-modal-bg'>
         <div
-          className='relative flex flex-col items-center rounded-lg p-10 bg-color-4 min-w-105 max-w-108 w-[90%] modal-content-in'
+          className='relative flex flex-col items-center rounded-lg p-10 bg-color-4 w-full max-w-108 modal-content-in'
           onClick={(e) => e.stopPropagation()}
         >
           <div className='flex justify-end w-full'>
