@@ -53,7 +53,7 @@ export default function VestingModal({ isOpen, onClose }: VestingModalProps) {
           </div>
         </div>
         <Input
-          placeholder='Delegatee name or address'
+          placeholder='Delegator name or address'
           value={delegateNameOrAddress}
           onChange={onDelegateNameOrAddressChange}
         />

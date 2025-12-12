@@ -33,12 +33,8 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
   };
 
   const onPaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      setDelegateNameOrAddress(text ?? '');
-    } catch (err) {
-      console.log(err);
-    }
+    const text = await navigator.clipboard.readText();
+    setDelegateNameOrAddress(text ?? '');
   };
 
   return (
@@ -89,7 +85,7 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
         </div>
         <Condition if={isChangeWallet}>
           <Input
-            placeholder='Delegatee name or address'
+            placeholder='Delegator name or address'
             value={delegateNameOrAddress}
             onChange={onDelegateNameOrAddressChange}
             addonRight={
