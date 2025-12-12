@@ -5,7 +5,7 @@ import { CopyIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
-import { useOnClickOutside } from '@/hooks/useOnClickOutside';
+import { useOutsideClick } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useWalletStore } from '@/hooks/useWallet';
 import { sliceAddress } from '@/lib/utils/common';
@@ -46,7 +46,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
     }
   };
 
-  useOnClickOutside(ref, onClose);
+  useOutsideClick(() => ref.current, onClose);
 
   return (
     <div className='relative'>
@@ -60,6 +60,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             size='11'
             weight='500'
             lineHeight='16'
+            className='text-color-2'
           >
             0.0000
           </Text>
@@ -71,8 +72,9 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
               size='11'
               weight='500'
               lineHeight='16'
+              className='text-color-2'
             >
-              {sliceAddress(address!)}
+              {sliceAddress(address ?? '')}
             </Text>
           </div>
         </Condition>
@@ -102,8 +104,9 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
                 size='13'
                 weight='500'
                 lineHeight='18'
+                className='text-color-2'
               >
-                {sliceAddress(address!)}
+                {sliceAddress(address ?? '')}
               </Text>
             </div>
             <CopyIcon
@@ -114,13 +117,13 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
           <div className='flex flex-col gap-2'>
             <Button
               onClick={onDisconnect}
-              className='text-11 bg-color-16 font-medium leading-4 h-8'
+              className='text-[11px] bg-color-16 font-medium leading-4 h-8'
             >
               Disconnect
             </Button>
             <Button
               onClick={onChangeWallet}
-              className='text-11 bg-color-16 font-medium leading-4 h-8'
+              className='text-[11px] bg-color-16 font-medium leading-4 h-8'
             >
               Change Wallet
             </Button>

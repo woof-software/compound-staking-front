@@ -10,7 +10,6 @@ export function Footer() {
             className='text-11 font-medium text-color-24 hover:text-color-7'
             href={TALLY_GOV_URL}
             target='_blank'
-            rel='noreferrer'
           >
             Governance
           </a>
@@ -18,7 +17,6 @@ export function Footer() {
             className='text-11 font-medium text-color-24 hover:text-color-7'
             href={TERMS_URL}
             target='_blank'
-            rel='noreferrer'
           >
             Terms
           </a>
