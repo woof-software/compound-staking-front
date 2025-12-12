@@ -190,6 +190,16 @@
   background-size: contain;
 }
 
+.no-position-yet {
+  background-image: url('./assets/no-position-yet-light.svg');
+}
+
+.dark {
+  .no-position-yet {
+    background-image: url('./assets/no-position-yet.svg');
+  }
+}
+
 html, body {
   -ms-overflow-style: none;      /* IE и Edge */
   scrollbar-width: none;         /* Firefox */

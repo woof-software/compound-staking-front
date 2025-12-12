@@ -1,4 +1,3 @@
-import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
 import ClaimModal from '@/components/common/stake/ClaimModal';
 import VestingModal from '@/components/common/stake/VestingModal';
@@ -6,14 +5,8 @@ import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
 import { useSwitch } from '@/hooks/useSwitch';
-import { useThemeStore } from '@/hooks/useTheme';
-
-import NoPositionYet from '@/assets/no-position-yet.svg';
-import NoPositionYetLight from '@/assets/no-position-yet-light.svg';
 
 export function RewardsFlowBlock() {
-  const { theme } = useThemeStore();
-
   const { isEnabled: isVestingOpen, enable: onVestingOpen, disable: onVestingClose } = useSwitch();
   const { isEnabled: isClaimOpen, enable: onClaimOpen, disable: onClaimClose } = useSwitch();
 
@@ -98,12 +91,7 @@ export function RewardsFlowBlock() {
           </div>
           <div className='p-10 flex'>
             <div className='mx-auto items-center w-auto flex flex-col gap-5'>
-              <Condition if={theme === 'dark'}>
-                <NoPositionYet className='w-44 h-20' />
-              </Condition>
-              <Condition if={theme === 'light'}>
-                <NoPositionYetLight className='w-44 h-20' />
-              </Condition>
+              <div className='w-44 h-20 no-position-yet' />
               <Text
                 size='15'
                 weight='500'

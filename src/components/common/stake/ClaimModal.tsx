@@ -9,6 +9,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Switch } from '@/components/ui/Switch';
 import { Text } from '@/components/ui/Text';
 import { noop } from '@/lib/utils/common';
+import { addressRegex } from '@/lib/utils/regex';
 
 export type ClaimModalProps = {
   isOpen?: boolean;
@@ -35,6 +36,11 @@ export default function ClaimModal({ isOpen = false, onClose = noop }: ClaimModa
 
   const onPaste = async () => {
     const text = await navigator.clipboard.readText();
+
+    const m = addressRegex.exec(text);
+
+    if (m === null || m[0] !== text) return;
+
     setDelegateNameOrAddress(text ?? '');
   };
 
