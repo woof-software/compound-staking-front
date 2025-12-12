@@ -34,7 +34,7 @@ export function Input(props: InputProps) {
   return (
     <div
       className={cn(
-        'w-full flex items-center gap-5 justify-between rounded-lg py-[9.5px] pr-2.5 pl-5 bg-color-10 !border !border-solid h-13 !border-color-8 !text-[13px] font-medium leading-4.5',
+        'w-full flex items-center gap-5 justify-between rounded-lg py-[9.5px] pr-2.5 pl-5 bg-color-10 border border-solid h-13 border-color-8 text-[13px] font-medium leading-4.5',
         className
       )}
     >
