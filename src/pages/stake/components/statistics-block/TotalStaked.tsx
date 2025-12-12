@@ -4,7 +4,7 @@ import { Condition } from '@/components/common/Condition';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { Format, FormatUnits } from '@/lib/utils/format';
-import { useStatisticTotalStaked } from '@/pages/stake/_hooks/useStatisticTotalStaked';
+import { useStatisticTotalStaked } from '@/pages/stake/hooks/useStatisticTotalStaked';
 
 import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
