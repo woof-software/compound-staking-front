@@ -43,32 +43,32 @@ const columns: Column<RewardRowProps>[] = [
   }
 ];
 
+const data = [
+  {
+    vestingAmount: 5000,
+    claimedAmount: 3500,
+    toClaim: 1500,
+    startDate: Date.parse('2025-01-01T00:00:00Z'),
+    endDate: Date.parse('2025-02-01T00:00:00Z'),
+    vestingStartDate: Date.parse('2024-12-01T00:00:00Z'),
+    vestingEndDate: Date.parse('2025-06-01T00:00:00Z'),
+    percents: 30
+  },
+  {
+    vestingAmount: 10000,
+    claimedAmount: 2500,
+    toClaim: 7500,
+    startDate: Date.parse('2024-11-15T12:00:00Z'),
+    endDate: Date.parse('2025-05-15T12:00:00Z'),
+    vestingStartDate: Date.parse('2024-11-01T00:00:00Z'),
+    vestingEndDate: Date.parse('2026-11-01T00:00:00Z'),
+    percents: 25
+  }
+];
+
 export function RewardsTable() {
   const [sortBy, setSortBy] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-
-  const data = [
-    {
-      vestingAmount: 5000,
-      claimedAmount: 3500,
-      toClaim: 1500,
-      startDate: Date.parse('2025-01-01T00:00:00Z'),
-      endDate: Date.parse('2025-02-01T00:00:00Z'),
-      vestingStartDate: Date.parse('2024-12-01T00:00:00Z'),
-      vestingEndDate: Date.parse('2025-06-01T00:00:00Z'),
-      percents: 30
-    },
-    {
-      vestingAmount: 10000,
-      claimedAmount: 2500,
-      toClaim: 7500,
-      startDate: Date.parse('2024-11-15T12:00:00Z'),
-      endDate: Date.parse('2025-05-15T12:00:00Z'),
-      vestingStartDate: Date.parse('2024-11-01T00:00:00Z'),
-      vestingEndDate: Date.parse('2026-11-01T00:00:00Z'),
-      percents: 25
-    }
-  ];
 
   const sortedData = useMemo(() => {
     if (!sortBy) return data;
