@@ -1,4 +1,4 @@
-import type { SortType } from '@/components/ui/Table';
+import type { SortType } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 
 /**
  * A no-operation function that performs no actions and returns undefined.

@@ -1,4 +1,5 @@
 import { Text } from '@/components/ui/Text';
+import { clamp } from '@/lib/utils/numeric';
 
 export type RewardRowData = {
   id: number;
@@ -84,7 +85,7 @@ export function RewardRow(props: RewardRowProps) {
         <div className='flex items-center gap-1 w-full'>
           <div
             className='bg-color-7 w-full h-1 rounded-xs transition-width'
-            style={{ width: `${row.percents}%` }}
+            style={{ width: `${clamp(row.percents, 0, 100)}%` }}
           />
           <Text
             size='11'
@@ -96,7 +97,7 @@ export function RewardRow(props: RewardRowProps) {
           </Text>
           <div
             className='bg-color-9 w-full h-1 rounded-xs transition-width'
-            style={{ width: `${vestingDuration}%` }}
+            style={{ width: `${clamp(vestingDuration, 0, 100)}%` }}
           />
           <Text
             size='11'

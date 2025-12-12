@@ -3,15 +3,14 @@ import { useAccount } from 'wagmi';
 import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
 import { ClaimModal } from '@/components/common/stake/ClaimModal';
-import { RewardRow } from '@/components/common/stake/RewardRow';
 import { VestingModal } from '@/components/common/stake/VestingModal';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { Table } from '@/components/ui/Table';
 import { Text } from '@/components/ui/Text';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
+import { RewardsTable } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 
 export function RewardsFlowBlock() {
   const { isConnected } = useAccount();
@@ -116,66 +115,63 @@ export function RewardsFlowBlock() {
             Vest
           </Button>
         </div>
-        {/*<div className='p-10 flex'>*/}
-        {/*  <div className='mx-auto items-center w-auto flex flex-col gap-5'>*/}
-        {/*    <div className='w-44 h-20 no-position-yet' />*/}
-        {/*    <Text*/}
-        {/*      size='15'*/}
-        {/*      weight='500'*/}
-        {/*      lineHeight='16'*/}
-        {/*    >*/}
-        {/*      No Positions Yet*/}
-        {/*    </Text>*/}
-        {/*    <Text*/}
-        {/*      size='15'*/}
-        {/*      weight='500'*/}
-        {/*      lineHeight='21'*/}
-        {/*      className='text-color-24'*/}
-        {/*    >*/}
-        {/*      No vested rewards yet*/}
-        {/*    </Text>*/}
-        {/*  </div>*/}
-        {/*</div>*/}
-        <Table
-          data={[
-            {
-              id: 1,
-              vestingAmount: '1.5000',
-              toClaim: '0.1000',
-              startDate: '2022-01-01',
-              endDate: '2022-01-31',
-              claimedAmount: '0.5000',
-              vestingStartDate: '2022-05-01',
-              vestingEndDate: '2022-01-31',
-              percents: 15
-            },
-            {
-              id: 2,
-              vestingAmount: '1.0000',
-              toClaim: '1.1000',
-              startDate: '2022-02-01',
-              endDate: '2022-03-31',
-              claimedAmount: '1.8900',
-              vestingStartDate: '2022-06-01',
-              vestingEndDate: '2022-07-31',
-              percents: 75
-            }
-          ]}
-          columns={[
-            { accessorKey: 'vestingAmount', header: 'Vesting Amount', sortType: 'number' },
-            { accessorKey: 'toClaim', header: 'To claim', sortType: 'number' },
-            { accessorKey: 'startDate', header: 'Start Date', sortType: 'date' },
-            { accessorKey: 'endDate', header: 'End Date', sortType: 'date' },
-            { accessorKey: 'claimedAmount', header: 'Claimed Amount', sortType: 'number' }
-          ]}
-        >
-          {(row) => (
-            <RewardRow
-              key={row.id}
-              row={row}
-            />
-          )}
-        </Table>
+        <Condition if={!isConnected}>
+          <div className='p-10 flex'>
+            <div className='mx-auto items-center w-auto flex flex-col gap-5'>
+              <div className='w-44 h-20 no-position-yet' />
+              <Text
+                size='15'
+                weight='500'
+                lineHeight='16'
+              >
+                No Positions Yet
+              </Text>
+              <Text
+                size='15'
+                weight='500'
+                lineHeight='21'
+                className='text-color-24'
+              >
+                No vested rewards yet
+              </Text>
+            </div>
+          </div>
+        </Condition>
+        <Condition if={isConnected}>
+          <RewardsTable
+            data={[
+              {
+                id: 1,
+                vestingAmount: '1.5000',
+                toClaim: '0.1000',
+                startDate: '2022-01-01',
+                endDate: '2022-01-31',
+                claimedAmount: '0.5000',
+                vestingStartDate: '2022-05-01',
+                vestingEndDate: '2022-01-31',
+                percents: 15
+              },
+              {
+                id: 2,
+                vestingAmount: '1.0000',
+                toClaim: '1.1000',
+                startDate: '2022-02-01',
+                endDate: '2022-03-31',
+                claimedAmount: '1.8900',
+                vestingStartDate: '2022-06-01',
+                vestingEndDate: '2022-07-31',
+                percents: 75
+              }
+            ]}
+            columns={[
+              { accessorKey: 'vestingAmount', header: 'Vesting Amount', sortType: 'number' },
+              { accessorKey: 'toClaim', header: 'To claim', sortType: 'number' },
+              { accessorKey: 'startDate', header: 'Start Date', sortType: 'date' },
+              { accessorKey: 'endDate', header: 'End Date', sortType: 'date' },
+              { accessorKey: 'claimedAmount', header: 'Claimed Amount', sortType: 'number' }
+            ]}
+          />
+        </Condition>
       </Card>
       <VestingModal
         isOpen={isVestingOpen}

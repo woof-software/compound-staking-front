@@ -1,6 +1,7 @@
-import { type ReactNode, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { SortArrowIcon } from '@/assets/svg';
+import { RewardRow } from '@/components/common/stake/RewardRow';
 import { Text } from '@/components/ui/Text';
 import { cn } from '@/lib/utils/cn';
 import { getComparable } from '@/lib/utils/common';
@@ -9,14 +10,23 @@ export type SortType = 'string' | 'number' | 'date';
 
 export type Column = { accessorKey: string; header: string; sortType?: SortType };
 
-export interface TableProps<T> {
-  data: T[];
+export interface RewardsTableProps {
+  data: {
+    id: number;
+    toClaim: string;
+    vestingAmount: string;
+    startDate: string;
+    endDate: string;
+    claimedAmount: string;
+    vestingStartDate: string;
+    vestingEndDate: string;
+    percents: number;
+  }[];
   columns: Column[];
-  children: (row: T) => ReactNode;
 }
 
-export function Table<T extends Record<string, any>>(props: TableProps<T>) {
-  const { data, columns, children } = props;
+export function RewardsTable(props: RewardsTableProps) {
+  const { data, columns } = props;
 
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
@@ -93,7 +103,14 @@ export function Table<T extends Record<string, any>>(props: TableProps<T>) {
           );
         })}
       </div>
-      <div className='m-2'>{sortedData.map((el) => children(el))}</div>
+      <div className='m-2'>
+        {sortedData.map((row) => (
+          <RewardRow
+            key={row.id}
+            row={row}
+          />
+        ))}
+      </div>
     </div>
   );
 }

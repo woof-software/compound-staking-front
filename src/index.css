@@ -192,7 +192,7 @@
 }
 
 .transition-width {
-  transition: width 0.1s linear;
+  transition: width .1s linear;
 }
 
 .no-position-yet {
