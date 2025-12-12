@@ -1,0 +1,30 @@
+import { ThemeSwitcher } from '@/components/common/ThemeSwitcher';
+import { TALLY_GOV_URL, TERMS_URL } from '@/consts/common';
+
+export function Footer() {
+  return (
+    <footer className='bg-transparent mt-auto'>
+      <div className='flex py-5 items-center justify-between border-t border-border-1'>
+        <div className='basis-1/2 flex items-center gap-x-5.5'>
+          <a
+            className='text-[11px] font-medium text-color-24 hover:text-color-7'
+            href={TALLY_GOV_URL}
+            target='_blank'
+          >
+            Governance
+          </a>
+          <a
+            className='text-[11px] font-medium text-color-24 hover:text-color-7'
+            href={TERMS_URL}
+            target='_blank'
+          >
+            Terms
+          </a>
+        </div>
+        <div className='flex justify-end'>
+          <ThemeSwitcher />
+        </div>
+      </div>
+    </footer>
+  );
+}

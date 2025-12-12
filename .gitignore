@@ -7,7 +7,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependencies
 node_modules
 dist
 dist-ssr
@@ -24,10 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 
+.eslintcache
+tsconfig.tsbuildinfo
+
 # Environment files
 .env
 .env.*
 !.env.example
-
-# Testing
-coverage
