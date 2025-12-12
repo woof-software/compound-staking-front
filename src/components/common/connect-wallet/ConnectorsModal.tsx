@@ -26,7 +26,6 @@ export function ConnectorsModal(props: ConnectorsModalProps) {
             size='21'
             weight='600'
             lineHeight='24'
-            className='text-color-2'
           >
             Connect Wallet
           </Text>

@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
+import { RewardsTable } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 
 export function RewardsFlowBlock() {
   const { isConnected } = useAccount();
@@ -26,7 +27,7 @@ export function RewardsFlowBlock() {
         title='Stake'
         tooltip='Stake your COMP tokens to earn yield every second!'
       >
-        <div className='border-b flex justify-between border-color-8 p-10'>
+        <div className='flex justify-between p-10'>
           <div className='flex w-full justify-between max-w-120'>
             <div className='flex flex-col gap-3'>
               <Text
@@ -114,26 +115,31 @@ export function RewardsFlowBlock() {
             Vest
           </Button>
         </div>
-        <div className='p-10 flex'>
-          <div className='mx-auto items-center w-auto flex flex-col gap-5'>
-            <div className='w-44 h-20 no-position-yet' />
-            <Text
-              size='15'
-              weight='500'
-              lineHeight='16'
-            >
-              No Positions Yet
-            </Text>
-            <Text
-              size='15'
-              weight='500'
-              lineHeight='21'
-              className='text-color-24'
-            >
-              No vested rewards yet
-            </Text>
+        <Condition if={!isConnected}>
+          <div className='p-10 flex'>
+            <div className='mx-auto items-center w-auto flex flex-col gap-5'>
+              <div className='w-44 h-20 no-position-yet' />
+              <Text
+                size='15'
+                weight='500'
+                lineHeight='16'
+              >
+                No Positions Yet
+              </Text>
+              <Text
+                size='15'
+                weight='500'
+                lineHeight='21'
+                className='text-color-24'
+              >
+                No vested rewards yet
+              </Text>
+            </div>
           </div>
-        </div>
+        </Condition>
+        <Condition if={isConnected}>
+          <RewardsTable />
+        </Condition>
       </Card>
       <VestingModal
         isOpen={isVestingOpen}

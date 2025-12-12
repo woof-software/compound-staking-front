@@ -191,6 +191,10 @@
   animation: pulseOpacity 1.2s ease-in-out infinite alternate;
 }
 
+.transition-width {
+  transition: width .1s linear;
+}
+
 .no-position-yet {
   background-image: url('./assets/no-position-yet-light.svg');
 }
