@@ -7,7 +7,6 @@ export type SwitchProps = {
 
 export function Switch(props: SwitchProps) {
   const { checked, onChange } = props;
-
   return (
     <div className='flex items-center'>
       <span className='inline-block h-6 leading-6 max-w-full whitespace-nowrap outline-none'>

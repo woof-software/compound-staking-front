@@ -1,8 +1,15 @@
+import { useAccount } from 'wagmi';
+
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
+import { cn } from '@/lib/utils/cn';
 
 export function StakeFlowBlock() {
+  const { isConnected } = useAccount();
+
+  const isStakeButtonDisabled = !isConnected;
+
   return (
     <Card
       title='Stake'
@@ -19,9 +26,11 @@ export function StakeFlowBlock() {
           <Text
             size='17'
             weight='500'
-            className='text-color-2'
+            className={cn('text-color-2', {
+              'text-color-6': !isConnected
+            })}
           >
-            0.0000 COMP
+            {isConnected ? '0.0000' : '0.0000'} COMP
           </Text>
         </div>
         <div className='gap-3 flex flex-col'>
@@ -34,9 +43,11 @@ export function StakeFlowBlock() {
           <Text
             size='17'
             weight='500'
-            className='text-color-2'
+            className={cn('text-color-2', {
+              'text-color-6': !isConnected
+            })}
           >
-            0.0000 COMP
+            {isConnected ? '0.0000' : '0.0000'} stCOMP
           </Text>
         </div>
         <div className='gap-3 flex flex-col'>
@@ -49,9 +60,11 @@ export function StakeFlowBlock() {
           <Text
             size='17'
             weight='500'
-            className='text-color-2'
+            className={cn('text-color-2', {
+              'text-color-6': !isConnected
+            })}
           >
-            1x
+            {isConnected ? '1x' : '-'}
           </Text>
         </div>
         <div className='gap-3 flex flex-col'>
@@ -64,9 +77,11 @@ export function StakeFlowBlock() {
           <Text
             size='17'
             weight='500'
-            className='text-color-2'
+            className={cn('text-color-2', {
+              'text-color-6': !isConnected
+            })}
           >
-            0.0000 COMP
+            {isConnected ? '0.0000' : '0.0000'} COMP
           </Text>
         </div>
         <div className='gap-3 flex flex-col'>
@@ -79,12 +94,19 @@ export function StakeFlowBlock() {
           <Text
             size='17'
             weight='500'
-            className='text-color-2'
+            className={cn('text-color-2', {
+              'text-color-6': !isConnected
+            })}
           >
-            0.00%
+            {isConnected ? '0.00' : '0.00'}%
           </Text>
         </div>
-        <Button className='max-w-32.5 text-[11px] font-medium'>Stake</Button>
+        <Button
+          disabled={isStakeButtonDisabled}
+          className='max-w-32.5 text-[11px] font-medium'
+        >
+          Stake
+        </Button>
       </div>
     </Card>
   );

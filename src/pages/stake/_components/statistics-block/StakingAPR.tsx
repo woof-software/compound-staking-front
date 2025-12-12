@@ -1,8 +1,11 @@
+import { useAccount } from 'wagmi';
+
 import { Text } from '@/components/ui/Text';
 
 import { useStatisticStakingAPR } from '../../_hooks/useStatisticStakingAPR';
 
 export function StakingAPR() {
+  const { isConnected } = useAccount();
   const { stakingAPR } = useStatisticStakingAPR();
 
   return (
@@ -17,9 +20,8 @@ export function StakingAPR() {
       <Text
         size='40'
         weight='500'
-        className='text-color-2'
       >
-        {stakingAPR}
+        {isConnected ? stakingAPR : '0.00'}
         <Text
           tag='span'
           size='40'

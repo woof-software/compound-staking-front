@@ -1,3 +1,6 @@
+import { useAccount } from 'wagmi';
+
+import { Condition } from '@/components/common/Condition';
 import { Text } from '@/components/ui/Text';
 import { Format, FormatUnits } from '@/lib/utils/format';
 import { useStatisticTotalStaked } from '@/pages/stake/_hooks/useStatisticTotalStaked';
@@ -5,6 +8,7 @@ import { useStatisticTotalStaked } from '@/pages/stake/_hooks/useStatisticTotalS
 import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
 export function TotalStaked() {
+  const { isConnected } = useAccount();
   const { totalStaked } = useStatisticTotalStaked();
 
   const totalStakedFormatted = parseFloat(Format.token(Number(totalStaked), 'compact'));
@@ -24,18 +28,19 @@ export function TotalStaked() {
         <Text
           size='40'
           weight='500'
-          className='text-color-2'
         >
-          {totalStakedFormatted}
-          <Text
-            tag='span'
-            size='40'
-            weight='700'
-            lineHeight='38'
-            className='text-color-25'
-          >
-            {unit}
-          </Text>
+          {isConnected ? totalStakedFormatted : '0.00'}
+          <Condition if={isConnected}>
+            <Text
+              tag='span'
+              size='40'
+              weight='700'
+              lineHeight='38'
+              className='text-color-25'
+            >
+              {unit}
+            </Text>
+          </Condition>
         </Text>
       </div>
     </div>
