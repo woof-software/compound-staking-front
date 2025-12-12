@@ -21,19 +21,3 @@ export function noop() {}
 export function sliceAddress(address: string, limit = 4) {
   return `${address.slice(0, limit + 2)}...${address.slice(limit * -1)}`;
 }
-
-export function numericSort<T extends Record<string, any>>(key: keyof T) {
-  return function (a: T, b: T): number {
-    const av = Number(a[key]);
-    const bv = Number(b[key]);
-    return av - bv;
-  };
-}
-
-export function dateSort<T extends Record<string, any>>(key: keyof T) {
-  return function (a: T, b: T): number {
-    const av = Date.parse(String(a[key]));
-    const bv = Date.parse(String(b[key]));
-    return av - bv;
-  };
-}

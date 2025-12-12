@@ -2,14 +2,13 @@ import { Text } from '@/components/ui/Text';
 import { clamp } from '@/lib/utils/numeric';
 
 export type RewardRowProps = {
-  id: number;
-  vestingAmount: string;
-  toClaim: string;
-  startDate: string;
-  endDate: string;
-  claimedAmount: string;
-  vestingStartDate: string;
-  vestingEndDate: string;
+  vestingAmount: number;
+  toClaim: number;
+  startDate: number;
+  endDate: number;
+  claimedAmount: number;
+  vestingStartDate: number;
+  vestingEndDate: number;
   percents: number;
 };
 

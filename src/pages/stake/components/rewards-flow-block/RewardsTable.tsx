@@ -10,31 +10,83 @@ type SortKey = keyof RewardRowProps;
 export type Column<Row> = {
   accessorKey: keyof Row;
   header: string;
-  sort?: (a: RewardRowProps, b: RewardRowProps) => number;
+  sort?: (a: RewardRowProps, b: RewardRowProps, direction: 'asc' | 'desc') => number;
 };
 
-export interface RewardsTableProps {
-  data: RewardRowProps[];
-  columns: Column<RewardRowProps>[];
-}
+const columns: Column<RewardRowProps>[] = [
+  {
+    accessorKey: 'vestingAmount',
+    header: 'Vesting Amount',
+    sort: (a, b, direction) =>
+      direction === 'asc'
+        ? Number(a.vestingAmount > b.vestingAmount) - Number(a.vestingAmount < b.vestingAmount)
+        : Number(b.vestingAmount > a.vestingAmount) - Number(b.vestingAmount < a.vestingAmount)
+  },
+  {
+    accessorKey: 'toClaim',
+    header: 'To claim',
+    sort: (a, b, direction) =>
+      direction === 'asc'
+        ? Number(a.toClaim > b.toClaim) - Number(a.toClaim < b.toClaim)
+        : Number(b.toClaim > a.toClaim) - Number(b.toClaim < a.toClaim)
+  },
+  {
+    accessorKey: 'startDate',
+    header: 'Start Date',
+    sort: (a, b, direction) => (direction === 'asc' ? a.startDate - b.startDate : b.startDate - a.startDate)
+  },
+  {
+    accessorKey: 'endDate',
+    header: 'End Date',
+    sort: (a, b, direction) => (direction === 'asc' ? a.endDate - b.endDate : b.endDate - a.endDate)
+  },
+  {
+    accessorKey: 'claimedAmount',
+    header: 'Claimed Amount',
+    sort: (a, b, direction) =>
+      direction === 'asc'
+        ? Number(a.claimedAmount > b.claimedAmount) - Number(a.claimedAmount < b.claimedAmount)
+        : Number(b.claimedAmount > a.claimedAmount) - Number(b.claimedAmount < a.claimedAmount)
+  }
+];
 
-export function RewardsTable(props: RewardsTableProps) {
-  const { data, columns } = props;
-
+export function RewardsTable() {
   const [sortBy, setSortBy] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const data = [
+    {
+      vestingAmount: 5000,
+      claimedAmount: 3500,
+      toClaim: 1500,
+      startDate: Date.parse('2025-01-01T00:00:00Z'),
+      endDate: Date.parse('2025-02-01T00:00:00Z'),
+      vestingStartDate: Date.parse('2024-12-01T00:00:00Z'),
+      vestingEndDate: Date.parse('2025-06-01T00:00:00Z'),
+      percents: 30
+    },
+    {
+      vestingAmount: 10000,
+      claimedAmount: 2500,
+      toClaim: 7500,
+      startDate: Date.parse('2024-11-15T12:00:00Z'),
+      endDate: Date.parse('2025-05-15T12:00:00Z'),
+      vestingStartDate: Date.parse('2024-11-01T00:00:00Z'),
+      vestingEndDate: Date.parse('2026-11-01T00:00:00Z'),
+      percents: 25
+    }
+  ];
 
   const sortedData = useMemo(() => {
     if (!sortBy) return data;
 
     const col = columns.find((c) => c.accessorKey === sortBy);
-
     if (!col || !col.sort) return data;
 
-    const sorted = [...data].sort(col.sort);
+    const sort = col.sort;
 
-    return sortDir === 'asc' ? sorted : sorted.reverse();
-  }, [data, columns, sortBy, sortDir]);
+    return [...data].sort((a, b) => sort(a, b, sortDir));
+  }, [data, sortBy, sortDir]);
 
   const onHeaderClick = (accessorKey: SortKey) => {
     if (sortBy === accessorKey) {
@@ -53,7 +105,7 @@ export function RewardsTable(props: RewardsTableProps) {
 
           return (
             <div
-              key={String(accessorKey)}
+              key={accessorKey}
               role='button'
               tabIndex={0}
               className='flex items-center cursor-pointer'
@@ -85,9 +137,9 @@ export function RewardsTable(props: RewardsTableProps) {
         })}
       </div>
       <div className='m-2'>
-        {sortedData.map((row) => (
+        {sortedData.map((row, index) => (
           <RewardRow
-            key={row.id}
+            key={index}
             {...row}
           />
         ))}

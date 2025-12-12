@@ -10,7 +10,6 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
-import { dateSort, numericSort } from '@/lib/utils/common';
 import { RewardsTable } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 
 export function RewardsFlowBlock() {
@@ -139,59 +138,7 @@ export function RewardsFlowBlock() {
           </div>
         </Condition>
         <Condition if={isConnected}>
-          <RewardsTable
-            data={[
-              {
-                id: 1,
-                vestingAmount: '1.5000',
-                toClaim: '0.1000',
-                startDate: '2022-01-01',
-                endDate: '2022-01-31',
-                claimedAmount: '0.5000',
-                vestingStartDate: '2022-05-01',
-                vestingEndDate: '2022-01-31',
-                percents: 15
-              },
-              {
-                id: 2,
-                vestingAmount: '1.0000',
-                toClaim: '1.1000',
-                startDate: '2022-02-01',
-                endDate: '2022-03-31',
-                claimedAmount: '1.8900',
-                vestingStartDate: '2022-06-01',
-                vestingEndDate: '2022-07-31',
-                percents: 75
-              }
-            ]}
-            columns={[
-              {
-                accessorKey: 'vestingAmount',
-                header: 'Vesting Amount',
-                sort: numericSort('vestingAmount')
-              },
-              {
-                accessorKey: 'toClaim',
-                header: 'To claim',
-                sort: numericSort('toClaim')
-              },
-              {
-                accessorKey: 'startDate',
-                header: 'Start Date',
-                sort: dateSort('startDate')
-              },
-              {
-                accessorKey: 'endDate',
-                header: 'End Date',
-                sort: dateSort('endDate')
-              },
-              {
-                accessorKey: 'claimedAmount',
-                header: 'Claimed Amount',
-                sort: numericSort('claimedAmount')
-              }
-            ]}
-          />
+          <RewardsTable />
         </Condition>
       </Card>
       <VestingModal
