@@ -15,7 +15,6 @@ export function Skeleton(props: SkeletonProps) {
   if (loading) {
     return (
       <div
-        data-slot='skeleton'
         className={cn(skeletonClasses, className)}
         {...rest}
       >
@@ -26,7 +25,6 @@ export function Skeleton(props: SkeletonProps) {
 
   return (
     <div
-      data-slot='skeleton'
       className={cn(className)}
       {...rest}
     >
