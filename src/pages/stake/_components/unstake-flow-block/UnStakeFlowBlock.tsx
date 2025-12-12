@@ -19,7 +19,7 @@ export function UnStakeFlowBlock() {
         title='Unstake'
         tooltip='Cooldown period for unstaking process is 18d 00h 00m 00s'
       >
-        <div className='flex items-start justify-between'>
+        <div className='flex p-10 items-start justify-between'>
           <div className='flex gap-15'>
             <div className='flex flex-col gap-3'>
               <Text
@@ -74,7 +74,7 @@ export function UnStakeFlowBlock() {
           </div>
           <Button
             disabled={isUnStakeButtonDisabled}
-            className='max-w-32 text-11 font-medium'
+            className='max-w-32.5 text-[11px] font-medium'
           >
             Request unstake
           </Button>

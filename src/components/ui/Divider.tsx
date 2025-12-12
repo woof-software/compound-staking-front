@@ -11,7 +11,7 @@ export function Divider(props: DividerProps) {
 
   const style =
     orientation === 'vertical'
-      ? { width: `${thickness}px`, height: '100%', display: 'inline-block', minHeight: '-webkit-fill-available' }
+      ? { width: `${thickness}px`, height: '100%', display: 'inline-block' }
       : { height: `${thickness}px`, width: '100%' };
 
   return (

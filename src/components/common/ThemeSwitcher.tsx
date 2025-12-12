@@ -17,7 +17,7 @@ export function ThemeSwitcher() {
             />
             <span
               className={cn(
-                'absolute shadow-10 top-[-3px] flex items-center justify-center size-7.5 transition-all rounded-[50%] bg-color-4',
+                'absolute shadow-10 top-[-3px] flex items-center justify-center size-7.5 transition-all rounded-full bg-color-4',
                 {
                   'translate-x-[calc(100%-2px)]': theme === 'dark'
                 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isAddress } from 'viem';
 
 import { InfoIcon } from '@/assets/svg';
 import { Button } from '@/components/ui/Button';
@@ -6,14 +7,17 @@ import { Divider } from '@/components/ui/Divider';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Text } from '@/components/ui/Text';
+import { noop } from '@/lib/utils/common';
 
 export type VestingModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 };
 
-export default function VestingModal({ isOpen, onClose }: VestingModalProps) {
+export function VestingModal({ isOpen = false, onClose = noop }: VestingModalProps) {
   const [delegateNameOrAddress, setDelegateNameOrAddress] = useState<string>('');
+
+  const isValidAddress = isAddress(delegateNameOrAddress);
 
   const onDelegateNameOrAddressChange = (value: string) => {
     setDelegateNameOrAddress(value);
@@ -53,12 +57,7 @@ export default function VestingModal({ isOpen, onClose }: VestingModalProps) {
           </div>
         </div>
         <Input
-          allowText
-          classNames={{
-            input:
-              'rounded-lg w-full py-[17px] px-5 bg-color-10 !border !border-solid h-[52px] !border-color-8 !text-13 font-medium leading-[18px]'
-          }}
-          placeholder='Delegatee name or address'
+          placeholder='Delegator name or address'
           value={delegateNameOrAddress}
           onChange={onDelegateNameOrAddressChange}
         />
@@ -72,7 +71,12 @@ export default function VestingModal({ isOpen, onClose }: VestingModalProps) {
             The whole amount will be added to your Claim balance
           </Text>
         </div>
-        <Button className='h-14 rounded-100 text-13 leading-[18px] font-medium'>Confirm</Button>
+        <Button
+          disabled={!isValidAddress}
+          className='h-14 rounded-100 text-[13px] leading-[18px] font-medium'
+        >
+          Confirm
+        </Button>
       </div>
     </Modal>
   );

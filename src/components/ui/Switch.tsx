@@ -1,11 +1,12 @@
 import { cn } from '@/lib/utils/cn';
 
 export type SwitchProps = {
-  checked: boolean;
-  onChange: () => void;
+  checked?: boolean;
+  onChange?: () => void;
 };
 
-export function Switch({ checked, onChange }: SwitchProps) {
+export function Switch(props: SwitchProps) {
+  const { checked, onChange } = props;
   return (
     <div className='flex items-center'>
       <span className='inline-block h-6 leading-6 max-w-full whitespace-nowrap outline-none'>
@@ -19,13 +20,13 @@ export function Switch({ checked, onChange }: SwitchProps) {
               className='outline-none border-none w-0 h-0 overflow-hidden absolute whitespace-nowrap p-0 m-[-1px]'
               type='checkbox'
               checked={checked}
-              onChange={() => onChange()}
+              onChange={() => onChange?.()}
             />
             <span
               className={cn(
-                'absolute top-0.5 left-0.5 flex items-center justify-center size-5 transition-all rounded-[50%] bg-color-16',
+                'absolute top-0.5 left-0.5 flex items-center justify-center size-5 transition-all rounded-full bg-color-16',
                 {
-                  'translate-x-[calc(100%)] bg-white': checked
+                  'translate-x-full bg-white': checked
                 }
               )}
             />
