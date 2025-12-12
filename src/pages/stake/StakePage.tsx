@@ -1,7 +1,7 @@
 import { Text } from '@/components/ui/Text';
-import { RewardsFlowBlock } from '@/pages/stake/_components/rewards-flow-block/RewardsFlowBlock';
 
 import { DelegateFlowBlock } from './_components/delegate-flow-block/DelegateFlowBlock';
+import { RewardsFlowBlock } from './_components/rewards-flow-block/RewardsFlowBlock';
 import { StakeFlowBlock } from './_components/stake-flow-block/StakeFlowBlock';
 import { StatisticsBlock } from './_components/statistics-block/StatisticsBlock';
 import { UnStakeFlowBlock } from './_components/unstake-flow-block/UnStakeFlowBlock';
