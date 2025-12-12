@@ -4,6 +4,7 @@ import { ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { cn } from '@/lib/utils/cn';
 
@@ -26,24 +27,26 @@ export function DelegateFlowBlock() {
             >
               Wallet address of Delegatee
             </Text>
-            <a
-              className='flex items-start gap-1 cursor-pointer'
-              target='_blank'
-            >
-              <Text
-                size='17'
-                weight='500'
-                lineHeight='17'
-                className={cn('text-color-2 max-w-36 truncate', {
-                  'text-color-6': !isConnected
-                })}
+            <Skeleton loading={false}>
+              <a
+                className='flex items-start gap-1 cursor-pointer'
+                target='_blank'
               >
-                {isConnected ? 'Compound Foundation' : '-'}
-              </Text>
-              <Condition if={isConnected}>
-                <ExternalLinkIcon className='text-color-24' />
-              </Condition>
-            </a>
+                <Text
+                  size='17'
+                  weight='500'
+                  lineHeight='17'
+                  className={cn('text-color-2 max-w-36 truncate', {
+                    'text-color-6': !isConnected
+                  })}
+                >
+                  {isConnected ? 'Compound Foundation' : '-'}
+                </Text>
+                <Condition if={isConnected}>
+                  <ExternalLinkIcon className='text-color-24' />
+                </Condition>
+              </a>
+            </Skeleton>
           </div>
           <div className='flex flex-col gap-3'>
             <Text
@@ -52,16 +55,18 @@ export function DelegateFlowBlock() {
             >
               Cooldown
             </Text>
-            <Text
-              size='17'
-              weight='500'
-              lineHeight='17'
-              className={cn('text-color-2', {
-                'text-color-6': !isConnected
-              })}
-            >
-              {isConnected ? '00d 00h' : '-'}
-            </Text>
+            <Skeleton loading={false}>
+              <Text
+                size='17'
+                weight='500'
+                lineHeight='17'
+                className={cn('text-color-2', {
+                  'text-color-6': !isConnected
+                })}
+              >
+                {isConnected ? '00d 00h' : '-'}
+              </Text>
+            </Skeleton>
           </div>
           <div className='flex flex-col gap-3'>
             <Text
@@ -70,16 +75,18 @@ export function DelegateFlowBlock() {
             >
               End Date
             </Text>
-            <Text
-              size='17'
-              weight='500'
-              lineHeight='17'
-              className={cn('text-color-2', {
-                'text-color-6': !isConnected
-              })}
-            >
-              {isConnected ? 'July 24, 2025' : '-'}
-            </Text>
+            <Skeleton loading={false}>
+              <Text
+                size='17'
+                weight='500'
+                lineHeight='17'
+                className={cn('text-color-2', {
+                  'text-color-6': !isConnected
+                })}
+              >
+                {isConnected ? 'July 24, 2025' : '-'}
+              </Text>
+            </Skeleton>
           </div>
         </div>
         <Button

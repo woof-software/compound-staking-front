@@ -187,6 +187,10 @@
   background-size: contain;
 }
 
+.pulse-animation {
+  animation: pulseOpacity 1.2s ease-in-out infinite alternate;
+}
+
 .no-position-yet {
   background-image: url('./assets/no-position-yet-light.svg');
 }
@@ -246,4 +250,9 @@ body::-webkit-scrollbar {
   100% {
     background-image: url('./assets/network_switch_1.svg');
   }
+}
+
+@keyframes pulseOpacity {
+  from { opacity: 0.10; }
+  to   { opacity: 0.25; }
 }

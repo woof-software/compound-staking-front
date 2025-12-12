@@ -4,6 +4,7 @@ import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { cn } from '@/lib/utils/cn';
 
@@ -27,23 +28,27 @@ export function UnStakeFlowBlock() {
               >
                 Unstake
               </Text>
-              <Text
-                size='17'
-                weight='500'
-                lineHeight='17'
-                className={cn('text-color-2', {
-                  'text-color-6': !isConnected
-                })}
-              >
-                {isConnected ? '10.0000' : '0.0000'} COMP
-              </Text>
-              <Condition if={isConnected}>
+              <Skeleton loading={false}>
                 <Text
-                  size='11'
-                  className='text-color-24'
+                  size='17'
+                  weight='500'
+                  lineHeight='17'
+                  className={cn('text-color-2', {
+                    'text-color-6': !isConnected
+                  })}
                 >
-                  $400.00
+                  {isConnected ? '10.0000' : '0.0000'} COMP
                 </Text>
+              </Skeleton>
+              <Condition if={isConnected}>
+                <Skeleton loading={false}>
+                  <Text
+                    size='11'
+                    className='text-color-24'
+                  >
+                    $400.00
+                  </Text>
+                </Skeleton>
               </Condition>
             </div>
             <div className='flex flex-col gap-3'>
@@ -53,16 +58,18 @@ export function UnStakeFlowBlock() {
               >
                 Cooldown
               </Text>
-              <Text
-                size='17'
-                weight='500'
-                lineHeight='17'
-                className={cn('text-color-2', {
-                  'text-color-6': !isConnected
-                })}
-              >
-                {isConnected ? '00d 00h' : '-'}
-              </Text>
+              <Skeleton loading={false}>
+                <Text
+                  size='17'
+                  weight='500'
+                  lineHeight='17'
+                  className={cn('text-color-2', {
+                    'text-color-6': !isConnected
+                  })}
+                >
+                  {isConnected ? '00d 00h' : '-'}
+                </Text>
+              </Skeleton>
             </div>
           </div>
           <Button
