@@ -2,23 +2,21 @@ import { Text } from '@/components/ui/Text';
 import { clamp } from '@/lib/utils/numeric';
 
 export type RewardRowProps = {
-  row: {
-    id: number;
-    vestingAmount: string;
-    toClaim: string;
-    startDate: string;
-    endDate: string;
-    claimedAmount: string;
-    vestingStartDate: string;
-    vestingEndDate: string;
-    percents: number;
-  };
+  id: number;
+  vestingAmount: string;
+  toClaim: string;
+  startDate: string;
+  endDate: string;
+  claimedAmount: string;
+  vestingStartDate: string;
+  vestingEndDate: string;
+  percents: number;
 };
 
 export function RewardRow(props: RewardRowProps) {
-  const { row } = props;
+  const { vestingAmount, toClaim, startDate, endDate, claimedAmount, percents } = props;
 
-  const vestingDuration = 100 - row.percents;
+  const vestingDuration = 100 - percents;
 
   return (
     <div className='py-6 flex flex-col gap-5 px-8 even:bg-color-5 rounded-sm'>
@@ -28,7 +26,7 @@ export function RewardRow(props: RewardRowProps) {
             size='15'
             lineHeight='20'
           >
-            {row.vestingAmount} COMP
+            {vestingAmount} COMP
           </Text>
           <Text
             size='11'
@@ -43,7 +41,7 @@ export function RewardRow(props: RewardRowProps) {
             size='15'
             lineHeight='20'
           >
-            {row.toClaim} COMP
+            {toClaim} COMP
           </Text>
         </div>
         <div>
@@ -51,7 +49,7 @@ export function RewardRow(props: RewardRowProps) {
             size='15'
             lineHeight='20'
           >
-            {row.startDate}
+            {startDate}
           </Text>
         </div>
         <div>
@@ -59,7 +57,7 @@ export function RewardRow(props: RewardRowProps) {
             size='15'
             lineHeight='20'
           >
-            {row.endDate}
+            {endDate}
           </Text>
         </div>
         <div>
@@ -67,7 +65,7 @@ export function RewardRow(props: RewardRowProps) {
             size='15'
             lineHeight='20'
           >
-            {row.claimedAmount}
+            {claimedAmount}
           </Text>
         </div>
       </div>
@@ -83,7 +81,7 @@ export function RewardRow(props: RewardRowProps) {
         <div className='flex items-center gap-1 w-full'>
           <div
             className='bg-color-7 w-full h-1 rounded-xs transition-width'
-            style={{ width: `${clamp(row.percents, 0, 100)}%` }}
+            style={{ width: `${clamp(percents, 0, 100)}%` }}
           />
           <Text
             size='11'

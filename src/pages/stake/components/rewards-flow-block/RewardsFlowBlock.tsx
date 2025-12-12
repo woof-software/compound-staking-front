@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
+import { dateSort, numericSort } from '@/lib/utils/common';
 import { RewardsTable } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 
 export function RewardsFlowBlock() {
@@ -164,11 +165,31 @@ export function RewardsFlowBlock() {
               }
             ]}
             columns={[
-              { accessorKey: 'vestingAmount', header: 'Vesting Amount', sortType: 'number' },
-              { accessorKey: 'toClaim', header: 'To claim', sortType: 'number' },
-              { accessorKey: 'startDate', header: 'Start Date', sortType: 'date' },
-              { accessorKey: 'endDate', header: 'End Date', sortType: 'date' },
-              { accessorKey: 'claimedAmount', header: 'Claimed Amount', sortType: 'number' }
+              {
+                accessorKey: 'vestingAmount',
+                header: 'Vesting Amount',
+                sort: numericSort('vestingAmount')
+              },
+              {
+                accessorKey: 'toClaim',
+                header: 'To claim',
+                sort: numericSort('toClaim')
+              },
+              {
+                accessorKey: 'startDate',
+                header: 'Start Date',
+                sort: dateSort('startDate')
+              },
+              {
+                accessorKey: 'endDate',
+                header: 'End Date',
+                sort: dateSort('endDate')
+              },
+              {
+                accessorKey: 'claimedAmount',
+                header: 'Claimed Amount',
+                sort: numericSort('claimedAmount')
+              }
             ]}
           />
         </Condition>

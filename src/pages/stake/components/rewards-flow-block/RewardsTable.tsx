@@ -1,61 +1,42 @@
 import { useMemo, useState } from 'react';
 
 import { SortArrowIcon } from '@/assets/svg';
-import { RewardRow } from '@/components/common/stake/RewardRow';
+import { RewardRow, type RewardRowProps } from '@/components/common/stake/RewardRow';
 import { Text } from '@/components/ui/Text';
 import { cn } from '@/lib/utils/cn';
-import { getComparable } from '@/lib/utils/common';
 
-export type SortType = 'string' | 'number' | 'date';
+type SortKey = keyof RewardRowProps;
 
-export type Column = { accessorKey: string; header: string; sortType?: SortType };
+export type Column<Row> = {
+  accessorKey: keyof Row;
+  header: string;
+  sort?: (a: RewardRowProps, b: RewardRowProps) => number;
+};
 
 export interface RewardsTableProps {
-  data: {
-    id: number;
-    toClaim: string;
-    vestingAmount: string;
-    startDate: string;
-    endDate: string;
-    claimedAmount: string;
-    vestingStartDate: string;
-    vestingEndDate: string;
-    percents: number;
-  }[];
-  columns: Column[];
+  data: RewardRowProps[];
+  columns: Column<RewardRowProps>[];
 }
 
 export function RewardsTable(props: RewardsTableProps) {
   const { data, columns } = props;
 
-  const [sortBy, setSortBy] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const sortedData = useMemo(() => {
     if (!sortBy) return data;
 
     const col = columns.find((c) => c.accessorKey === sortBy);
-    const type = col?.sortType ?? 'string';
 
-    const sorted = [...data].sort((a, b) => {
-      const firstVal = getComparable(a, sortBy, type);
-      const secondVal = getComparable(b, sortBy, type);
+    if (!col || !col.sort) return data;
 
-      if (typeof firstVal === 'number' && typeof secondVal === 'number') {
-        return firstVal - secondVal;
-      }
-
-      if (typeof firstVal === 'string' && typeof secondVal === 'string') {
-        return firstVal.localeCompare(secondVal);
-      }
-
-      return 0;
-    });
+    const sorted = [...data].sort(col.sort);
 
     return sortDir === 'asc' ? sorted : sorted.reverse();
   }, [data, columns, sortBy, sortDir]);
 
-  const onHeaderClick = (accessorKey: string) => {
+  const onHeaderClick = (accessorKey: SortKey) => {
     if (sortBy === accessorKey) {
       setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -72,7 +53,7 @@ export function RewardsTable(props: RewardsTableProps) {
 
           return (
             <div
-              key={accessorKey}
+              key={String(accessorKey)}
               role='button'
               tabIndex={0}
               className='flex items-center cursor-pointer'
@@ -107,7 +88,7 @@ export function RewardsTable(props: RewardsTableProps) {
         {sortedData.map((row) => (
           <RewardRow
             key={row.id}
-            row={row}
+            {...row}
           />
         ))}
       </div>
