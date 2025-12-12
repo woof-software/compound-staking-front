@@ -67,7 +67,7 @@ export function UnStakeFlowBlock() {
           </div>
           <Button
             disabled={isUnStakeButtonDisabled}
-            className='max-w-32.5 text-11 font-medium'
+            className='max-w-32.5 text-[11px] font-medium'
           >
             Request unstake
           </Button>

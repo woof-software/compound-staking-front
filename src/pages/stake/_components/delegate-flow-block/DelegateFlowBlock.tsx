@@ -84,7 +84,7 @@ export function DelegateFlowBlock() {
         </div>
         <Button
           disabled={isDelegateButtonDisabled}
-          className='max-w-32.5 text-11 font-medium'
+          className='max-w-32.5 text-[11px] font-medium'
         >
           Delegate
         </Button>

@@ -103,7 +103,7 @@ export function StakeFlowBlock() {
         </div>
         <Button
           disabled={isStakeButtonDisabled}
-          className='max-w-32.5 text-11 font-medium'
+          className='max-w-32.5 text-[11px] font-medium'
         >
           Stake
         </Button>
