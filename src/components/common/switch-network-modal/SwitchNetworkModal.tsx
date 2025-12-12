@@ -36,7 +36,7 @@ export function SwitchNetworkModal() {
         {getChainName(1)}
         to complete.
       </Text>
-      <Button className='rounded-100 h-14 mt-15 bg-color-16 font-medium text-13'>Switch Network</Button>
+      <Button className='rounded-100 h-14 mt-15 bg-color-16 font-medium text-[13px]'>Switch Network</Button>
     </Modal>
   );
 }

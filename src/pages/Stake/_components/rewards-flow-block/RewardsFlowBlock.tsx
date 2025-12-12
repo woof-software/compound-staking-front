@@ -49,7 +49,7 @@ export function RewardsFlowBlock() {
               </div>
               <Button
                 onClick={onClaimOpen}
-                className='max-w-32.5 text-11 font-medium'
+                className='max-w-32.5 text-[11px] font-medium'
               >
                 Claim
               </Button>
@@ -83,7 +83,7 @@ export function RewardsFlowBlock() {
               </div>
               <Button
                 onClick={onVestingOpen}
-                className='max-w-32.5 text-11 font-medium'
+                className='max-w-32.5 text-[11px] font-medium'
               >
                 Vest
               </Button>

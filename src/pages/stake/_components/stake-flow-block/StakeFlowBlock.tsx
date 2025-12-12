@@ -84,7 +84,7 @@ export function StakeFlowBlock() {
             0.00%
           </Text>
         </div>
-        <Button className='max-w-32.5 text-11 font-medium'>Stake</Button>
+        <Button className='max-w-32.5 text-[11px] font-medium'>Stake</Button>
       </div>
     </Card>
   );

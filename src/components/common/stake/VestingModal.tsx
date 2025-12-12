@@ -68,7 +68,7 @@ export default function VestingModal({ isOpen = false, onClose = noop }: Vesting
             The whole amount will be added to your Claim balance
           </Text>
         </div>
-        <Button className='h-14 rounded-100 text-13 leading-[18px] font-medium'>Confirm</Button>
+        <Button className='h-14 rounded-100 text-[13px] leading-[18px] font-medium'>Confirm</Button>
       </div>
     </Modal>
   );

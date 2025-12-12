@@ -48,7 +48,7 @@ export function ConnectorsModal(props: ConnectorsModalProps) {
       >
         By connecting, I accept Compound’s{' '}
         <a
-          className='text-11 font-medium text-color-7 hover:brightness-90'
+          className='text-[11px] font-medium text-color-7 hover:brightness-90'
           href={TERMS_URL}
           target='_blank'
         >

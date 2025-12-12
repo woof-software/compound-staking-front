@@ -45,7 +45,7 @@ const UnStakeFlowBlock = () => {
               </Text>
             </div>
           </div>
-          <Button className='max-w-32.5 text-11 font-medium'>Request unstake</Button>
+          <Button className='max-w-32.5 text-[11px] font-medium'>Request unstake</Button>
         </div>
       </Card>
       <div className='flex items-center p-2.5 pl-5 w-full rounded-lg bg-color-26 gap-2.5'>

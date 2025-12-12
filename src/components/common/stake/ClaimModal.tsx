@@ -109,7 +109,7 @@ export default function ClaimModal({ isOpen = false, onClose = noop }: ClaimModa
                 <Condition if={!delegateNameOrAddress.length}>
                   <Button
                     onClick={onPaste}
-                    className='bg-color-9 rounded-4xl w-13 h-8 !text-color-24 text-11 font-medium'
+                    className='bg-color-9 rounded-4xl w-13 h-8 !text-color-24 text-[11px] font-medium'
                   >
                     Paste
                   </Button>
@@ -119,8 +119,8 @@ export default function ClaimModal({ isOpen = false, onClose = noop }: ClaimModa
           />
         </Condition>
         <Button
-          disabled={isValidAddress}
-          className='h-14 rounded-100 text-13 leading-[18px] font-medium'
+          disabled={!isValidAddress}
+          className='h-14 rounded-100 text-[13px] fs leading-[18px] font-medium'
         >
           Confirm
         </Button>

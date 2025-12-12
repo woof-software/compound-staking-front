@@ -51,7 +51,7 @@ export function DelegateFlowBlock() {
             </Text>
           </div>
         </div>
-        <Button className='max-w-32.5 text-11 font-medium'>Delegate</Button>
+        <Button className='max-w-32.5 text-[11px] font-medium'>Delegate</Button>
       </div>
     </Card>
   );
