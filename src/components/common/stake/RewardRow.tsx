@@ -1,20 +1,18 @@
 import { Text } from '@/components/ui/Text';
 import { clamp } from '@/lib/utils/numeric';
 
-export type RewardRowData = {
-  id: number;
-  vestingAmount: string;
-  toClaim: string;
-  startDate: string;
-  endDate: string;
-  claimedAmount: string;
-  vestingStartDate: string;
-  vestingEndDate: string;
-  percents: number;
-};
-
 export type RewardRowProps = {
-  row: RewardRowData;
+  row: {
+    id: number;
+    vestingAmount: string;
+    toClaim: string;
+    startDate: string;
+    endDate: string;
+    claimedAmount: string;
+    vestingStartDate: string;
+    vestingEndDate: string;
+    percents: number;
+  };
 };
 
 export function RewardRow(props: RewardRowProps) {
