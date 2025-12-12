@@ -137,9 +137,6 @@
 
   --radius-64: 64px;
   --radius-100: 100px;
-
-  --text-11: 11px;
-  --text-13: 13px;
 }
 
 @layer base {
@@ -192,6 +189,16 @@
 
 .pulse-animation {
   animation: pulseOpacity 1.2s ease-in-out infinite alternate;
+}
+
+.no-position-yet {
+  background-image: url('./assets/no-position-yet-light.svg');
+}
+
+.dark {
+  .no-position-yet {
+    background-image: url('./assets/no-position-yet.svg');
+  }
 }
 
 html, body {

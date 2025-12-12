@@ -1,23 +1,27 @@
 import { useState } from 'react';
+import { isAddress } from 'viem';
 
+import { CrossIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
-import { PasteInputButton } from '@/components/common/PasteInputButton';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Switch } from '@/components/ui/Switch';
 import { Text } from '@/components/ui/Text';
+import { noop } from '@/lib/utils/common';
 
 export type ClaimModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 };
 
-export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
+export function ClaimModal({ isOpen = false, onClose = noop }: ClaimModalProps) {
   const [delegateNameOrAddress, setDelegateNameOrAddress] = useState<string>('');
 
   const [isChangeWallet, setIsChangeWallet] = useState<boolean>(false);
+
+  const isValidAddress = !isChangeWallet || isAddress(delegateNameOrAddress);
 
   const onDelegateNameOrAddressChange = (value: string) => {
     setDelegateNameOrAddress(value);
@@ -33,12 +37,11 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
   };
 
   const onPaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      setDelegateNameOrAddress(text ?? '');
-    } catch (err) {
-      console.log(err);
-    }
+    const text = await navigator.clipboard.readText();
+
+    if (isAddress(text)) return;
+
+    setDelegateNameOrAddress(text ?? '');
   };
 
   return (
@@ -47,7 +50,7 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
       open={isOpen}
       onClose={onClose}
     >
-      <div className='mt-8 flex flex-col gap-8'>
+      <div className='w-full mt-8 flex flex-col gap-8'>
         <Divider />
         <div className='flex'>
           <Text
@@ -57,7 +60,7 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
           >
             Amount to be claimed
           </Text>
-          <div className='flex items-end'>
+          <div className='flex flex-col shrink-0 items-end'>
             <Text
               size='15'
               weight='500'
@@ -89,24 +92,35 @@ export default function ClaimModal({ isOpen, onClose }: ClaimModalProps) {
         </div>
         <Condition if={isChangeWallet}>
           <Input
-            allowText
-            classNames={{
-              input:
-                'rounded-lg w-full py-[17px] px-5 pr-[70px] bg-color-10 !border !border-solid h-[52px] !border-color-8 !text-13 font-medium leading-[18px]'
-            }}
-            placeholder='Delegatee name or address'
-            addonRight={
-              <PasteInputButton
-                isPasted={Boolean(delegateNameOrAddress.length)}
-                onPaste={onPaste}
-                onClear={onClear}
-              />
-            }
+            placeholder='Delegator name or address'
             value={delegateNameOrAddress}
             onChange={onDelegateNameOrAddressChange}
+            addonRight={
+              <>
+                <Condition if={!!delegateNameOrAddress.length}>
+                  <CrossIcon
+                    onClick={onClear}
+                    className='size-4 shrink-0 text-color-25 cursor-pointer'
+                  />
+                </Condition>
+                <Condition if={!delegateNameOrAddress.length}>
+                  <Button
+                    onClick={onPaste}
+                    className='bg-color-9 rounded-4xl w-13 h-8 !text-color-24 text-[11px] font-medium'
+                  >
+                    Paste
+                  </Button>
+                </Condition>
+              </>
+            }
           />
         </Condition>
-        <Button className='h-14 rounded-100 text-13 leading-[18px] font-medium'>Confirm</Button>
+        <Button
+          disabled={!isValidAddress}
+          className='h-14 rounded-100 text-[13px] fs leading-[18px] font-medium'
+        >
+          Confirm
+        </Button>
       </div>
     </Modal>
   );

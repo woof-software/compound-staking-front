@@ -16,7 +16,7 @@ export function StakeFlowBlock() {
       title='Stake'
       tooltip='Stake your COMP tokens to earn yield every second!'
     >
-      <div className='justify-between flex'>
+      <div className='justify-between flex p-10'>
         <div className='flex flex-col gap-3'>
           <Text
             size='11'
@@ -114,7 +114,7 @@ export function StakeFlowBlock() {
         </div>
         <Button
           disabled={isStakeButtonDisabled}
-          className='max-w-32.5 text-11 font-medium'
+          className='max-w-32.5 text-[11px] font-medium'
         >
           Stake
         </Button>
