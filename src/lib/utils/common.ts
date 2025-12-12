@@ -1,3 +1,5 @@
+import { addressRegex } from '@/lib/utils/regex';
+
 /**
  * A no-operation function that performs no actions and returns undefined.
  * Typically used as a placeholder or default callback.
@@ -20,4 +22,12 @@ export function noop() {}
  */
 export function sliceAddress(address: string, limit = 4) {
   return `${address.slice(0, limit + 2)}...${address.slice(limit * -1)}`;
+}
+
+export function addressValidate(value: string) {
+  const m = addressRegex.exec(value);
+
+  if (m === null || m[0] !== value) return;
+
+  return value;
 }

@@ -4,12 +4,20 @@ import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
+import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 
 export function StakeFlowBlock() {
   const { isConnected } = useAccount();
 
+  const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
+
   const isStakeButtonDisabled = !isConnected;
+
+  const onStakeButtonClick = () => {
+    onOpen();
+  };
 
   return (
     <Card
@@ -115,10 +123,15 @@ export function StakeFlowBlock() {
         <Button
           disabled={isStakeButtonDisabled}
           className='max-w-32.5 text-[11px] font-medium'
+          onClick={onStakeButtonClick}
         >
           Stake
         </Button>
       </div>
+      <StakeModal
+        isOpen={isOpen}
+        onClose={onClose}
+      />
     </Card>
   );
 }

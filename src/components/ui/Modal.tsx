@@ -30,7 +30,10 @@ export function Modal(props: ModalProps) {
 
   return (
     <Portal>
-      <div className='fixed inset-0 z-50 flex items-center justify-center modal-fade-in bg-modal-bg'>
+      <div
+        className='fixed inset-0 z-50 flex items-center justify-center modal-fade-in bg-modal-bg'
+        onClick={onClose}
+      >
         <div
           className='relative flex flex-col items-center rounded-lg p-10 bg-color-4 w-full max-w-108 modal-content-in'
           onClick={(e) => e.stopPropagation()}

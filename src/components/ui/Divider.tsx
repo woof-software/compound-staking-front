@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils/cn';
 
 export type DividerProps = {
-  orientation?: 'horizontal' | 'vertical';
+  orientation: 'horizontal' | 'vertical';
   thickness?: number;
   className?: string;
 };

@@ -30,7 +30,7 @@ export function VestingModal({ isOpen = false, onClose = noop }: VestingModalPro
       onClose={onClose}
     >
       <div className='mt-8 flex gap-8 flex-col'>
-        <Divider />
+        <Divider orientation='horizontal' />
         <div className='flex'>
           <Text
             size='15'
