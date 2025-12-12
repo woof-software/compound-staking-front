@@ -116,6 +116,47 @@ export function RewardsFlowBlock() {
             Vest
           </Button>
         </div>
+        <div className='p-10 flex'>
+          <div className='mx-auto items-center w-auto flex flex-col gap-5'>
+            <div className='w-44 h-20 no-position-yet' />
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              Available Rewards
+            </Text>
+            <div className='flex flex-col gap-2'>
+              <Skeleton loading={false}>
+                <Text
+                  size='17'
+                  weight='500'
+                  className={cn('text-color-2', {
+                    'text-color-6': !isConnected
+                  })}
+                >
+                  {isConnected ? '0.0000' : '0.0000'} COMP
+                </Text>
+              </Skeleton>
+              <Condition if={isConnected}>
+                <Skeleton loading={false}>
+                  <Text
+                    size='11'
+                    className='text-color-24'
+                  >
+                    $40.00
+                  </Text>
+                </Skeleton>
+              </Condition>
+            </div>
+          </div>
+          <Button
+            disabled={isVestingButtonDisabled}
+            onClick={onVestingOpen}
+            className='max-w-32.5 text-[11px] font-medium'
+          >
+            Vest
+          </Button>
+        </div>
         {/*<div className='p-10 flex'>*/}
         {/*  <div className='mx-auto items-center w-auto flex flex-col gap-5'>*/}
         {/*    <div className='w-44 h-20 no-position-yet' />*/}
