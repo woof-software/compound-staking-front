@@ -18,17 +18,12 @@ const columns: Column<RewardRowProps>[] = [
     accessorKey: 'vestingAmount',
     header: 'Vesting Amount',
     sort: (a, b, direction) =>
-      direction === 'asc'
-        ? Number(a.vestingAmount > b.vestingAmount) - Number(a.vestingAmount < b.vestingAmount)
-        : Number(b.vestingAmount > a.vestingAmount) - Number(b.vestingAmount < a.vestingAmount)
+      direction === 'asc' ? a.vestingAmount - b.vestingAmount : b.vestingAmount - a.vestingAmount
   },
   {
     accessorKey: 'toClaim',
     header: 'To claim',
-    sort: (a, b, direction) =>
-      direction === 'asc'
-        ? Number(a.toClaim > b.toClaim) - Number(a.toClaim < b.toClaim)
-        : Number(b.toClaim > a.toClaim) - Number(b.toClaim < a.toClaim)
+    sort: (a, b, direction) => (direction === 'asc' ? a.toClaim - b.toClaim : b.toClaim - a.toClaim)
   },
   {
     accessorKey: 'startDate',
@@ -44,9 +39,7 @@ const columns: Column<RewardRowProps>[] = [
     accessorKey: 'claimedAmount',
     header: 'Claimed Amount',
     sort: (a, b, direction) =>
-      direction === 'asc'
-        ? Number(a.claimedAmount > b.claimedAmount) - Number(a.claimedAmount < b.claimedAmount)
-        : Number(b.claimedAmount > a.claimedAmount) - Number(b.claimedAmount < a.claimedAmount)
+      direction === 'asc' ? a.claimedAmount - b.claimedAmount : b.claimedAmount - a.claimedAmount
   }
 ];
 
