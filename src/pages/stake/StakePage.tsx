@@ -1,10 +1,9 @@
 import { Text } from '@/components/ui/Text';
-
-import { DelegateFlowBlock } from './_components/delegate-flow-block/DelegateFlowBlock';
-import { RewardsFlowBlock } from './_components/rewards-flow-block/RewardsFlowBlock';
-import { StakeFlowBlock } from './_components/stake-flow-block/StakeFlowBlock';
-import { StatisticsBlock } from './_components/statistics-block/StatisticsBlock';
-import { UnStakeFlowBlock } from './_components/unstake-flow-block/UnStakeFlowBlock';
+import { DelegateFlowBlock } from '@/pages/stake/components/delegate-flow-block/DelegateFlowBlock';
+import { RewardsFlowBlock } from '@/pages/stake/components/rewards-flow-block/RewardsFlowBlock';
+import { StakeFlowBlock } from '@/pages/stake/components/stake-flow-block/StakeFlowBlock';
+import { StatisticsBlock } from '@/pages/stake/components/statistics-block/StatisticsBlock';
+import { UnStakeFlowBlock } from '@/pages/stake/components/unstake-flow-block/UnStakeFlowBlock';
 
 export function StakePage() {
   return (

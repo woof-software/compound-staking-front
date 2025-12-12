@@ -2,8 +2,7 @@ import { useAccount } from 'wagmi';
 
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-
-import { useStatisticStakingAPR } from '../../_hooks/useStatisticStakingAPR';
+import { useStatisticStakingAPR } from '@/pages/stake/hooks/useStatisticStakingAPR';
 
 export function StakingAPR() {
   const { isConnected } = useAccount();
