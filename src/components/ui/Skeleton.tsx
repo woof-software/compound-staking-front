@@ -7,9 +7,7 @@ interface SkeletonProps extends ComponentProps<'div'> {
 }
 
 export function Skeleton(props: SkeletonProps) {
-  const { className, children, ...rest } = props;
-
-  const loading = true;
+  const { className, loading, children, ...rest } = props;
 
   return (
     <div
