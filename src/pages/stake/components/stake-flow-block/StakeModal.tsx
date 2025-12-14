@@ -153,7 +153,6 @@ export function StakeModal(props: StakeModalProps) {
         </div>
       </Condition>
       <div className='flex flex-col gap-2.5'>
-        {/* Step 1: Approve */}
         <Button
           className={cn('flex-col h-14', {
             'bg-color-7': isApprovePending
@@ -181,7 +180,6 @@ export function StakeModal(props: StakeModalProps) {
             Step 1
           </Text>
         </Button>
-        {/* Step 2: Confirm */}
         <Button
           className='flex-col h-14'
           disabled={isConfirmDisabled}
