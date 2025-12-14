@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useAccount, useDisconnect } from 'wagmi';
+import { useConnection, useDisconnect } from 'wagmi';
 
 import { CopyIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -20,7 +20,7 @@ export type ConnectedButtonProps = {
 export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedButtonProps) {
   const ref = useRef<HTMLDivElement>(null);
 
-  const { address } = useAccount();
+  const { address } = useConnection();
   const { disconnect } = useDisconnect();
   const { isPending } = useWalletStore();
 
@@ -79,7 +79,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
           </div>
         </Condition>
         <Condition if={isPending}>
-          <div className='min-w-25 flex flex-col justify-center items-center gap-2 h-11 bg-color-7 rounded-64'>
+          <div className='min-w-25 flex justify-center items-center gap-2 h-11 bg-color-7 rounded-64'>
             <Spinner className='animate-spin size-4 flex-shrink-0' />
             <Text
               size='11'

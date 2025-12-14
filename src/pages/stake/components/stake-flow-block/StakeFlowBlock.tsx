@@ -1,19 +1,27 @@
-import { useAccount } from 'wagmi';
+import { formatUnits } from 'viem';
+import { useConnection } from 'wagmi';
 
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { STAKED_TOKEN_DECIMALS } from '@/consts/common';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
+import { useStakeTransaction } from '@/pages/stake/hooks/useStakeTransaction';
 
 export function StakeFlowBlock() {
-  const { isConnected } = useAccount();
+  const { isConnected } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const isStakeButtonDisabled = !isConnected;
+  const { isLoading, isStakedCOMPBalanceFetching, stakedCOMPBalance } = useStakeTransaction();
+
+  const isLoadingData = isLoading || isStakedCOMPBalanceFetching;
+
+  const isStakeButtonDisabled = !isConnected || isLoadingData;
 
   const onStakeButtonClick = () => {
     onOpen();
@@ -32,7 +40,7 @@ export function StakeFlowBlock() {
           >
             Staked
           </Text>
-          <Skeleton loading={false}>
+          <Skeleton loading={isLoadingData}>
             <Text
               size='17'
               weight='500'
@@ -40,7 +48,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? '0.0000' : '0.0000'} COMP
+              {isConnected ? formatUnits(stakedCOMPBalance, STAKED_TOKEN_DECIMALS) : '0.0000'} COMP
             </Text>
           </Skeleton>
         </div>
@@ -51,7 +59,7 @@ export function StakeFlowBlock() {
           >
             stCOMP balance
           </Text>
-          <Skeleton loading={false}>
+          <Skeleton loading={isLoadingData}>
             <Text
               size='17'
               weight='500'
@@ -59,7 +67,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? '0.0000' : '0.0000'} stCOMP
+              {isConnected ? formatUnits(stakedCOMPBalance, STAKED_TOKEN_DECIMALS) : '0.0000'} stCOMP
             </Text>
           </Skeleton>
         </div>
@@ -70,7 +78,7 @@ export function StakeFlowBlock() {
           >
             Multiplier
           </Text>
-          <Skeleton loading={false}>
+          <Skeleton loading={isLoadingData}>
             <Text
               size='17'
               weight='500'
@@ -89,7 +97,7 @@ export function StakeFlowBlock() {
           >
             Available Rewards
           </Text>
-          <Skeleton loading={false}>
+          <Skeleton loading={isLoadingData}>
             <Text
               size='17'
               weight='500'
@@ -108,7 +116,7 @@ export function StakeFlowBlock() {
           >
             APR
           </Text>
-          <Skeleton loading={false}>
+          <Skeleton loading={isLoadingData}>
             <Text
               size='17'
               weight='500'
@@ -128,10 +136,13 @@ export function StakeFlowBlock() {
           Stake
         </Button>
       </div>
-      <StakeModal
-        isOpen={isOpen}
+      <Modal
+        title='Stake COMP tokens'
+        open={isOpen}
         onClose={onClose}
-      />
+      >
+        <StakeModal onClose={onClose} />
+      </Modal>
     </Card>
   );
 }

@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import type { Address } from 'viem';
 
 import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -11,13 +12,13 @@ import { cn } from '@/lib/utils/cn';
 import { sliceAddress } from '@/lib/utils/common';
 
 export type DelegateSelectorProps = {
-  selectedAddressDelegate: { name: string; address: string } | null;
-
-  onSelect: (addressDelegate: { name: string; address: string } | null) => void;
+  disabled: boolean;
+  selectedAddressDelegate: { name: string; address: Address } | null;
+  onSelect: (addressDelegate: { name: string; address: Address } | null) => void;
 };
 
 export function DelegateSelector(props: DelegateSelectorProps) {
-  const { selectedAddressDelegate, onSelect } = props;
+  const { disabled, selectedAddressDelegate, onSelect } = props;
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -35,7 +36,14 @@ export function DelegateSelector(props: DelegateSelectorProps) {
       el.address.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  useOutsideClick(() => ref.current, onClose);
+  useOutsideClick(
+    () => ref.current,
+    () => {
+      if (disabled) return;
+
+      onClose();
+    }
+  );
 
   return (
     <div
