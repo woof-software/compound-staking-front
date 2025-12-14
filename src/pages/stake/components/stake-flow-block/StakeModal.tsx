@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Address } from 'viem';
+import { type Address, parseUnits } from 'viem';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -8,6 +8,7 @@ import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
+import { BASE_TOKEN_DECIMALS } from '@/consts/common';
 import { useCompBalance } from '@/hooks/useCOMPBalance';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
@@ -40,18 +41,30 @@ export function StakeModal(props: StakeModalProps) {
     isStakeConfirming,
     stake,
 
-    stakedCOMPBalance
+    stakedCOMPBalance,
+    allowance
   } = useStakeTransaction();
 
-  const inputValueInCOMP = Number(amountValue) * compPriceUsd;
-  const balance = Format.price(inputValueInCOMP, 'standard');
+  const parsedAmount = Number(amountValue) > 0 ? parseUnits(amountValue, BASE_TOKEN_DECIMALS) : 0n;
+
+  const hasEnoughAllowance = allowance >= parsedAmount;
+  const needsApprove = parsedAmount > 0n && !hasEnoughAllowance;
 
   const showWarningForAdditionalStake = (stakedCOMPBalance as bigint) > 0n;
 
-  const isApproveDisabled = !selectedAddressDelegate?.address || Number(amountValue) === 0 || isApproveSuccess;
-  const isConfirmDisabled = !isApproveSuccess;
+  const noDelegate = !selectedAddressDelegate?.address;
+  const noAmount = parsedAmount === 0n;
 
-  const disabledInputAndSelector = isApprovePending || isApproveConfirming || isApproveSuccess;
+  const isApproveDisabled = noDelegate || noAmount || !needsApprove || isApproveSuccess;
+
+  const isConfirmDisabled =
+    noDelegate || noAmount || isStakePending || isStakeConfirming || (needsApprove && !isApproveSuccess);
+
+  const disabledInputAndSelector = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
+
+  // Calculate input value in USD
+  const inputValueInCOMP = Number(amountValue) * compPriceUsd;
+  const balance = Format.price(inputValueInCOMP, 'standard');
 
   const onInputChange = (value: string) => {
     setAmountValue(value);
@@ -66,11 +79,13 @@ export function StakeModal(props: StakeModalProps) {
   };
 
   const onApprove = async () => {
+    if (noAmount || !needsApprove) return;
+
     await approve(amountValue);
   };
 
   const onConfirm = async () => {
-    if (!selectedAddressDelegate?.address) return;
+    if (noDelegate || noAmount) return;
 
     await stake(selectedAddressDelegate?.address, amountValue);
   };
@@ -138,11 +153,12 @@ export function StakeModal(props: StakeModalProps) {
         </div>
       </Condition>
       <div className='flex flex-col gap-2.5'>
+        {/* Step 1: Approve */}
         <Button
           className={cn('flex-col h-14', {
             'bg-color-7': isApprovePending
           })}
-          disabled={isApproveDisabled || isApprovePending}
+          disabled={isApproveDisabled}
           onClick={onApprove}
         >
           <Text
@@ -165,8 +181,9 @@ export function StakeModal(props: StakeModalProps) {
             Step 1
           </Text>
         </Button>
+        {/* Step 2: Confirm */}
         <Button
-          className={cn('flex-col h-14')}
+          className='flex-col h-14'
           disabled={isConfirmDisabled}
           onClick={onConfirm}
         >

@@ -26,24 +26,23 @@ export function DelegateSelector(props: DelegateSelectorProps) {
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const onSearchChange = (value: string) => {
-    setSearchValue(value);
-  };
-
   const filteredDelegates = DELEGATES.filter(
     (el) =>
       el.name.toLowerCase().includes(searchValue.toLowerCase()) ||
       el.address.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  useOutsideClick(
-    () => ref.current,
-    () => {
-      if (disabled) return;
+  const onSelectorOpen = () => {
+    if (disabled) return;
 
-      onClose();
-    }
-  );
+    onOpen();
+  };
+
+  const onSearchChange = (value: string) => {
+    setSearchValue(value);
+  };
+
+  useOutsideClick(() => ref.current, onClose);
 
   return (
     <div
@@ -52,7 +51,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
     >
       <div
         className='rounded-2xl flex h-12 gap-5 cursor-pointer items-center justify-between w-full max-w-88 border border-solid border-color-6 p-3'
-        onClick={onOpen}
+        onClick={onSelectorOpen}
       >
         <Condition if={!selectedAddressDelegate}>
           <Text

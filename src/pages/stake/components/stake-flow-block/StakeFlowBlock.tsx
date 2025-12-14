@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-import { STAKED_TOKEN_DECIMALS } from '@/consts/common';
+import { COMP_DECIMALS, STAKED_TOKEN_DECIMALS } from '@/consts/common';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
@@ -17,7 +17,7 @@ export function StakeFlowBlock() {
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { isLoading, isStakedCOMPBalanceFetching, stakedCOMPBalance } = useStakeTransaction();
+  const { isLoading, isStakedCOMPBalanceFetching, COMPBalance, stakedCOMPBalance } = useStakeTransaction();
 
   const isLoadingData = isLoading || isStakedCOMPBalanceFetching;
 
@@ -48,7 +48,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? formatUnits(stakedCOMPBalance, STAKED_TOKEN_DECIMALS) : '0.0000'} COMP
+              {isConnected ? formatUnits(COMPBalance.amount, COMP_DECIMALS) : '0.0000'} COMP
             </Text>
           </Skeleton>
         </div>

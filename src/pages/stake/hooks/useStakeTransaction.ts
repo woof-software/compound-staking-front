@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { encodeFunctionData, parseUnits } from 'viem';
+import { type Address, encodeFunctionData, parseUnits } from 'viem';
 import { useConnection, useReadContract, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 
 import { BASE_TOKEN_ADDRESS, BASE_TOKEN_DECIMALS, STAKED_TOKEN_ADDRESS, STAKING_VAULT_ADDRESS } from '@/consts/common';
@@ -7,6 +7,13 @@ import { useWalletStore } from '@/hooks/useWallet';
 import { BaseTokenAbi } from '@/shared/abis/BaseTokenAbi';
 import { StakedTokenAbi } from '@/shared/abis/StakedTokenAbi';
 import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
+
+type COMPBalanceType = {
+  amount: bigint;
+  claimedRewardsAmount: bigint;
+  startTime: bigint;
+  duration: bigint;
+};
 
 export function useStakeTransaction() {
   const { onIsPendingToggle } = useWalletStore();
@@ -23,6 +30,37 @@ export function useStakeTransaction() {
     hash: stakeHash
   });
 
+  const { data: allowanceData, refetch: refetchAllowance } = useReadContract({
+    address: BASE_TOKEN_ADDRESS,
+    abi: BaseTokenAbi,
+    functionName: 'allowance',
+    args: address ? [address, STAKING_VAULT_ADDRESS] : undefined,
+    query: { enabled: !!address }
+  });
+
+  const allowance = (allowanceData ?? 0n) as bigint;
+
+  // COMP balance
+  const {
+    data: COMPBalanceData,
+    isFetching: isCOMPBalanceFetching,
+    refetch: refetchCOMPBalance
+  } = useReadContract({
+    address: STAKING_VAULT_ADDRESS,
+    abi: StakingVaultAbi,
+    functionName: 'getUserStake',
+    args: address ? [address] : undefined,
+    query: { enabled: !!address }
+  });
+
+  const COMPBalance = (COMPBalanceData as COMPBalanceType) ?? {
+    amount: 0n,
+    claimedRewardsAmount: 0n,
+    startTime: 0n,
+    duration: 0n
+  };
+
+  // stCOMP balance
   const {
     data: stakedCOMPBalanceData,
     isFetching: isStakedCOMPBalanceFetching,
@@ -50,14 +88,16 @@ export function useStakeTransaction() {
       args: [STAKING_VAULT_ADDRESS, parsedAmount]
     });
 
-    return sendApproveTx({
+    await sendApproveTx({
       to: BASE_TOKEN_ADDRESS,
       data: approveData
     });
+
+    await refetchAllowance();
   };
 
-  const stake = async (delegatee: `0x${string}`, amount: string) => {
-    if (!address) throw new Error('Connect wallet first');
+  const stake = async (delegatee: Address, amount: string) => {
+    if (!address) return;
 
     const parsedAmount = parseUnits(amount, BASE_TOKEN_DECIMALS);
 
@@ -67,7 +107,7 @@ export function useStakeTransaction() {
       args: [delegatee, parsedAmount]
     });
 
-    return sendStakeTx({
+    await sendStakeTx({
       to: STAKING_VAULT_ADDRESS,
       data: stakeData
     });
@@ -75,9 +115,10 @@ export function useStakeTransaction() {
 
   useEffect(() => {
     if (isStakeSuccess) {
+      refetchCOMPBalance();
       refetchStakedCOMPBalance();
     }
-  }, [isStakeSuccess, refetchStakedCOMPBalance]);
+  }, [isStakeSuccess, refetchCOMPBalance, refetchStakedCOMPBalance]);
 
   useEffect(() => {
     onIsPendingToggle(isLoading);
@@ -94,9 +135,13 @@ export function useStakeTransaction() {
     isStakeConfirming,
     isStakeSuccess,
 
+    COMPBalance,
+    isCOMPBalanceFetching,
+
     stakedCOMPBalance,
     isStakedCOMPBalanceFetching,
 
+    allowance,
     isLoading
   };
 }
