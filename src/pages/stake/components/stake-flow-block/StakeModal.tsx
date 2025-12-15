@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { type Address, parseUnits } from 'viem';
 
-import { InfoIcon } from '@/assets/svg';
-import { Condition } from '@/components/common/Condition';
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
@@ -41,7 +39,6 @@ export function StakeModal(props: StakeModalProps) {
     isStakeConfirming,
     stake,
 
-    stakedCOMPBalance,
     allowance
   } = useStakeTransaction();
 
@@ -50,15 +47,12 @@ export function StakeModal(props: StakeModalProps) {
   const hasEnoughAllowance = allowance >= parsedAmount;
   const needsApprove = parsedAmount > 0n && !hasEnoughAllowance;
 
-  const showWarningForAdditionalStake = (stakedCOMPBalance as bigint) > 0n;
-
   const noDelegate = !selectedAddressDelegate?.address;
   const noAmount = parsedAmount === 0n;
 
   const isApproveDisabled = noDelegate || noAmount || !needsApprove || isApproveSuccess;
 
-  const isConfirmDisabled =
-    noDelegate || noAmount || isStakePending || isStakeConfirming || (needsApprove && !isApproveSuccess);
+  const isConfirmDisabled = noDelegate || noAmount || (needsApprove && !isApproveSuccess);
 
   const disabledInputAndSelector = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
 
@@ -85,7 +79,7 @@ export function StakeModal(props: StakeModalProps) {
   };
 
   const onConfirm = async () => {
-    if (noDelegate || noAmount) return;
+    if (noDelegate || noAmount || isStakePending || isStakeConfirming) return;
 
     await stake(selectedAddressDelegate?.address, amountValue);
   };
@@ -97,14 +91,14 @@ export function StakeModal(props: StakeModalProps) {
   }, [isStakeSuccess, onClose]);
 
   return (
-    <div className='mt-8 w-full flex flex-col gap-8'>
+    <div className='mt-8 flex w-full flex-col gap-8'>
       <Divider orientation='horizontal' />
       <div className='flex flex-col gap-1'>
         <div className='flex items-center justify-between gap-5'>
-          <div className='flex items-center gap-2 max-w-72'>
+          <div className='flex max-w-72 items-center gap-2'>
             <COMP className='size-6.75 shrink-0' />
             <AmountInput
-              className='max-w-60 min-h-12'
+              className='min-h-12 max-w-60'
               disabled={disabledInputAndSelector}
               value={amountValue}
               onChange={onInputChange}
@@ -112,7 +106,7 @@ export function StakeModal(props: StakeModalProps) {
           </div>
           <Button
             disabled={disabledInputAndSelector}
-            className='bg-color-16 h-8 text-[11px] font-medium w-14'
+            className='bg-color-16 h-8 w-14 text-[11px] font-medium'
             onClick={onMaxButtonClick}
           >
             Max
@@ -140,21 +134,21 @@ export function StakeModal(props: StakeModalProps) {
         selectedAddressDelegate={selectedAddressDelegate}
         onSelect={onDelegateSelect}
       />
-      <Condition if={showWarningForAdditionalStake}>
-        <div className='bg-color-21 rounded-lg p-5 flex items-center gap-2.5'>
-          <InfoIcon className='size-4 text-color-22' />
-          <Text
-            size='11'
-            lineHeight='16'
-            className='text-color-22'
-          >
-            Multiplier reverts to 1x after staking more COMP. All available rewards get vested.
-          </Text>
-        </div>
-      </Condition>
+      {/*<Condition if={showWarningForAdditionalStake}>*/}
+      {/*  <div className='bg-color-21 rounded-lg p-5 flex items-center gap-2.5'>*/}
+      {/*    <InfoIcon className='size-4 text-color-22' />*/}
+      {/*    <Text*/}
+      {/*      size='11'*/}
+      {/*      lineHeight='16'*/}
+      {/*      className='text-color-22'*/}
+      {/*    >*/}
+      {/*      Multiplier reverts to 1x after staking more COMP. All available rewards get vested.*/}
+      {/*    </Text>*/}
+      {/*  </div>*/}
+      {/*</Condition>*/}
       <div className='flex flex-col gap-2.5'>
         <Button
-          className={cn('flex-col h-14', {
+          className={cn('h-14 flex-col', {
             'bg-color-7': isApprovePending
           })}
           disabled={isApproveDisabled}
@@ -181,8 +175,10 @@ export function StakeModal(props: StakeModalProps) {
           </Text>
         </Button>
         <Button
-          className='flex-col h-14'
-          disabled={isConfirmDisabled}
+          className={cn('h-14 flex-col', {
+            'bg-color-7': isStakePending
+          })}
+          disabled={isConfirmDisabled || isStakePending || isStakeConfirming}
           onClick={onConfirm}
         >
           <Text

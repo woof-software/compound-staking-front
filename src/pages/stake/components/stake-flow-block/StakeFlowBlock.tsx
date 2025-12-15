@@ -9,6 +9,7 @@ import { Text } from '@/components/ui/Text';
 import { COMP_DECIMALS, STAKED_TOKEN_DECIMALS } from '@/consts/common';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
+import { Format } from '@/lib/utils/format';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 import { useStakeTransaction } from '@/pages/stake/hooks/useStakeTransaction';
 
@@ -23,6 +24,11 @@ export function StakeFlowBlock() {
 
   const isStakeButtonDisabled = !isConnected || isLoadingData;
 
+  const COMPBalanceFormatted = formatUnits(COMPBalance.amount, COMP_DECIMALS);
+  const stCOMPBalanceFormatted = formatUnits(stakedCOMPBalance, STAKED_TOKEN_DECIMALS);
+
+  const multiplier = Number(COMPBalanceFormatted) / Number(stCOMPBalanceFormatted || '1');
+
   const onStakeButtonClick = () => {
     onOpen();
   };
@@ -32,7 +38,7 @@ export function StakeFlowBlock() {
       title='Stake'
       tooltip='Stake your COMP tokens to earn yield every second!'
     >
-      <div className='justify-between flex p-10'>
+      <div className='flex justify-between p-10'>
         <div className='flex flex-col gap-3'>
           <Text
             size='11'
@@ -48,11 +54,11 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? formatUnits(COMPBalance.amount, COMP_DECIMALS) : '0.0000'} COMP
+              {isConnected ? COMPBalanceFormatted : '0.0000'} COMP
             </Text>
           </Skeleton>
         </div>
-        <div className='gap-3 flex flex-col'>
+        <div className='flex flex-col gap-3'>
           <Text
             size='11'
             className='text-color-24'
@@ -67,11 +73,11 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? formatUnits(stakedCOMPBalance, STAKED_TOKEN_DECIMALS) : '0.0000'} stCOMP
+              {isConnected ? stCOMPBalanceFormatted : '0.0000'} stCOMP
             </Text>
           </Skeleton>
         </div>
-        <div className='gap-3 flex flex-col'>
+        <div className='flex flex-col gap-3'>
           <Text
             size='11'
             className='text-color-24'
@@ -86,11 +92,11 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? '1x' : '-'}
+              {isConnected ? `${Format.rate(multiplier)}x` : '-'}
             </Text>
           </Skeleton>
         </div>
-        <div className='gap-3 flex flex-col'>
+        <div className='flex flex-col gap-3'>
           <Text
             size='11'
             className='text-color-24'
@@ -109,7 +115,7 @@ export function StakeFlowBlock() {
             </Text>
           </Skeleton>
         </div>
-        <div className='gap-3 flex flex-col'>
+        <div className='flex flex-col gap-3'>
           <Text
             size='11'
             className='text-color-24'
