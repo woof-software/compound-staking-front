@@ -15,10 +15,6 @@ export function StakeFlowBlock() {
 
   const isStakeButtonDisabled = !isConnected;
 
-  const onStakeButtonClick = () => {
-    onOpen();
-  };
-
   return (
     <Card
       title='Stake'
@@ -123,7 +119,7 @@ export function StakeFlowBlock() {
         <Button
           disabled={isStakeButtonDisabled}
           className='max-w-32.5 text-[11px] font-medium'
-          onClick={onStakeButtonClick}
+          onClick={onOpen}
         >
           Stake
         </Button>

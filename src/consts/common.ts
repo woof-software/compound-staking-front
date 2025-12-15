@@ -14,7 +14,6 @@ export const COMP_DECIMALS = 18;
 export const COMP_PRICE_FEED_DECIMALS = 8;
 
 /* CONTRACTS  */
-export const BASE_TOKEN_DECIMALS = 18;
 export const BASE_TOKEN_ADDRESS = '0xe357a464D9e37a50A1BdD71560B5c69a333d301E';
 
 export const STAKED_TOKEN_DECIMALS = 18;

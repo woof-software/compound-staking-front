@@ -22,5 +22,3 @@ export function spawnFloatRegex(integerPartLength: number, decimalPartLength: nu
     `^(0((\\.)([0-9]{0,${decimalPartLength}})|))|([0-9]{1,${integerPartLength}}|([0-9]{1,${integerPartLength}}(\\.)([0-9]{0,${decimalPartLength}})|))$`
   );
 }
-
-export const addressRegex = /^(0|(0x[0-9a-fA-F]{0,40})|0x)?$/;

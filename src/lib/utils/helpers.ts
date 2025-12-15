@@ -1,3 +1,5 @@
+import { ETHERSCAN_TX_URL } from '@/consts/common';
+
 export function getChainLogo(chainId: number) {
   //TODO: add fallback
   if (![1, 10, 130, 137, 2020, 5000, 8453, 42161, 43114, 59144, 534352].includes(chainId)) return;
@@ -31,4 +33,8 @@ export function getChainName(chainId: number) {
     default:
       return 'Unknown';
   }
+}
+
+export function etherScanUrl(url: string) {
+  return `${ETHERSCAN_TX_URL}${url}`;
 }

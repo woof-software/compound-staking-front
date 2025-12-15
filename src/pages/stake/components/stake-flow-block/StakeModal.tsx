@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { formatUnits, parseUnits } from 'viem';
+import { useConnection } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -8,48 +10,52 @@ import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Modal } from '@/components/ui/Modal';
 import { Text } from '@/components/ui/Text';
-import { useCompBalance } from '@/hooks/useCOMPBalance';
+import { COMP_ADDRESS, COMP_DECIMALS, COMP_PRICE_FEED_DECIMALS, COMP_USD_PRICE_FEED } from '@/consts/common';
+import { useTokenBalance } from '@/hooks/useTokenBalance';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
+import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 
 import COMP from '@/assets/comp.svg';
 
-type StakeModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
+export type StakeModalProps = {
+  isOpen?: boolean;
+  onClose?: () => void;
 };
 
-export function StakeModal({ isOpen, onClose }: StakeModalProps) {
+export function StakeModal(props: StakeModalProps) {
+  const { isOpen = false, onClose = noop } = props;
+
+  const { address } = useConnection();
+
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<{ name: string; address: string } | null>(
     null
   );
 
-  const { compPriceUsd, compWalletBalance } = useCompBalance();
+  const { data: compPriceUsdData } = useTokenPrice({ priceFeedAddress: COMP_USD_PRICE_FEED });
+  const { data: compWalletBalanceData } = useTokenBalance({ address: address, tokenAddress: COMP_ADDRESS });
 
-  const inputValueInCOMP = Number(amountValue) * compPriceUsd;
+  const parseAmountValue = useMemo(() => {
+    if (!amountValue) return 0n;
+
+    return parseUnits(amountValue, COMP_DECIMALS);
+  }, [amountValue]);
+
+  const inputValueInCOMP = formatUnits(parseAmountValue * compPriceUsdData, COMP_DECIMALS + COMP_PRICE_FEED_DECIMALS);
+  const compWalletBalance = formatUnits(compWalletBalanceData, COMP_DECIMALS);
+
   const balance = Format.price(inputValueInCOMP, 'standard');
 
   const isAdditionalStake = false; //Variable for additional stake condition
 
-  const onInputChange = (value: string) => {
-    setAmountValue(value);
-  };
-
   const onMaxButtonClick = () => {
-    setAmountValue(compWalletBalance.toString());
+    setAmountValue(compWalletBalance);
   };
 
   const onDelegateSelect = (address: { name: string; address: string } | null) => {
     setSelectedAddressDelegate(address);
-  };
-
-  const onApprove = () => {
-    console.log('Approve clicked');
-  };
-
-  const onConfirm = () => {
-    console.log('Confirm clicked');
   };
 
   return (
@@ -67,7 +73,7 @@ export function StakeModal({ isOpen, onClose }: StakeModalProps) {
               <AmountInput
                 className='max-w-60 min-h-12'
                 value={amountValue}
-                onChange={onInputChange}
+                onChange={setAmountValue}
               />
             </div>
             <Button
@@ -114,7 +120,6 @@ export function StakeModal({ isOpen, onClose }: StakeModalProps) {
           <Button
             className={cn('flex-col h-14')}
             disabled={true}
-            onClick={onApprove}
           >
             <Text
               size='13'
@@ -139,7 +144,6 @@ export function StakeModal({ isOpen, onClose }: StakeModalProps) {
           <Button
             className={cn('flex-col h-14')}
             disabled={true}
-            onClick={onConfirm}
           >
             <Text
               size='13'
