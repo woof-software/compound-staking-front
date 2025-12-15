@@ -1,50 +1,33 @@
-import { useRef, useState } from 'react';
-import type { Address } from 'viem';
-
 import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/Text';
-import { DELEGATES, ETHERSCAN_TX_URL } from '@/consts/common';
+import { DELEGATES } from '@/consts/common';
+import { useDelegateSelector } from '@/hooks/useDelegateSelector';
 import { useOutsideClick } from '@/hooks/useOnClickOutside';
-import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
-import { sliceAddress } from '@/lib/utils/common';
+import { noop, sliceAddress } from '@/lib/utils/common';
+import { etherScanUrl } from '@/lib/utils/helpers';
 
 export type DelegateSelectorProps = {
   disabled: boolean;
-  selectedAddressDelegate: { name: string; address: Address } | null;
-  onSelect: (addressDelegate: { name: string; address: Address } | null) => void;
+  selectedAddressDelegate: { name: string; address: string } | null;
+  onSelect?: (addressDelegate: { name: string; address: string } | null) => void;
 };
 
 export function DelegateSelector(props: DelegateSelectorProps) {
-  const { disabled, selectedAddressDelegate, onSelect } = props;
+  const { disabled, selectedAddressDelegate, onSelect = noop } = props;
 
-  const ref = useRef<HTMLDivElement>(null);
-
-  const [searchValue, setSearchValue] = useState<string>('');
-
-  const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
-
-  const filteredDelegates = DELEGATES.filter(
-    (el) =>
-      el.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      el.address.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  const { ref, searchValue, filteredDelegates, isOpen, open, onClose, onDelegateSelect, setSearchValue } =
+    useDelegateSelector({
+      delegates: DELEGATES,
+      onSelect
+    });
 
   const onSelectorOpen = () => {
     if (disabled) return;
 
-    onOpen();
-  };
-
-  const onSearchChange = (value: string) => {
-    setSearchValue(value);
-  };
-
-  const onSelectDelegate = (delegate: { name: string; address: Address }) => {
-    onSelect(delegate);
-    onClose();
+    open();
   };
 
   useOutsideClick(() => ref.current, onClose);
@@ -58,7 +41,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
         className='border-color-6 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-2xl border border-solid p-3'
         onClick={onSelectorOpen}
       >
-        <Condition if={!selectedAddressDelegate}>
+        {!selectedAddressDelegate ? (
           <Text
             size='13'
             weight='500'
@@ -67,8 +50,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
           >
             Choose delegatee
           </Text>
-        </Condition>
-        <Condition if={selectedAddressDelegate && selectedAddressDelegate.name}>
+        ) : (
           <div className='flex w-full items-center justify-between'>
             <div className='flex items-center gap-1.5'>
               <Text
@@ -83,7 +65,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             <a
               className='flex items-center gap-1.5'
               target='_blank'
-              href={`${ETHERSCAN_TX_URL}${selectedAddressDelegate?.address}`}
+              href={etherScanUrl(selectedAddressDelegate?.address || '')}
               onClick={(e) => e.stopPropagation()}
             >
               <Text
@@ -97,25 +79,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
               <ExternalLinkIcon className='text-color-24' />
             </a>
           </div>
-        </Condition>
-        <Condition if={selectedAddressDelegate && !selectedAddressDelegate.name}>
-          <div className='flex w-full items-center justify-between'>
-            <a
-              className='flex items-center gap-1.5'
-              target='_blank'
-              href={`${ETHERSCAN_TX_URL}${selectedAddressDelegate?.address}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Text
-                size='13'
-                weight='500'
-                lineHeight='120'
-              >
-                {sliceAddress(selectedAddressDelegate?.address ?? '', 18)}
-              </Text>
-            </a>
-          </div>
-        </Condition>
+        )}
         <ChevronIcon
           className={cn('text-color-6 size-4 rotate-180 transition-transform', {
             'rotate-0': isOpen
@@ -129,7 +93,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             className='min-h-13'
             placeholder='Delegatee name or address'
             value={searchValue}
-            onChange={onSearchChange}
+            onChange={setSearchValue}
           />
           <div className='hide-scrollbar max-h-392 overflow-y-auto'>
             {filteredDelegates.map((el, index) => (
@@ -138,7 +102,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 className={cn('flex cursor-pointer items-center justify-between rounded-lg px-3 py-4', {
                   'bg-color-5': selectedAddressDelegate?.address === el.address
                 })}
-                onClick={() => onSelectDelegate(el)}
+                onClick={() => onDelegateSelect(el)}
               >
                 <div className='flex items-center gap-1.5'>
                   {selectedAddressDelegate?.address === el.address && (
@@ -156,7 +120,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 <a
                   className='flex items-center gap-1.5'
                   target='_blank'
-                  href={`${ETHERSCAN_TX_URL}${selectedAddressDelegate?.address}`}
+                  href={etherScanUrl(selectedAddressDelegate?.address || '')}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Text

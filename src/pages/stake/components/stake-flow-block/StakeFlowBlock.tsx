@@ -29,10 +29,6 @@ export function StakeFlowBlock() {
 
   const multiplier = Number(COMPBalanceFormatted) / Number(stCOMPBalanceFormatted || '1');
 
-  const onStakeButtonClick = () => {
-    onOpen();
-  };
-
   return (
     <Card
       title='Stake'
@@ -137,7 +133,7 @@ export function StakeFlowBlock() {
         <Button
           disabled={isStakeButtonDisabled}
           className='max-w-32.5 text-[11px] font-medium'
-          onClick={onStakeButtonClick}
+          onClick={onOpen}
         >
           Stake
         </Button>

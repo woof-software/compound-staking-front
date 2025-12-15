@@ -1,32 +1,38 @@
-import { useEffect, useState } from 'react';
-import { type Address, parseUnits } from 'viem';
+import { useEffect, useMemo, useState } from 'react';
+import { type Address, formatUnits, parseUnits } from 'viem';
+import { useConnection } from 'wagmi';
 
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
-import { BASE_TOKEN_DECIMALS } from '@/consts/common';
-import { useCompBalance } from '@/hooks/useCOMPBalance';
+import { COMP_ADDRESS, COMP_DECIMALS, COMP_PRICE_FEED_DECIMALS, COMP_USD_PRICE_FEED } from '@/consts/common';
+import { useTokenBalance } from '@/hooks/useTokenBalance';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
+import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 import { useStakeTransaction } from '@/pages/stake/hooks/useStakeTransaction';
 
 import COMP from '@/assets/comp.svg';
 
-type StakeModalProps = {
-  onClose: () => void;
+export type StakeModalProps = {
+  onClose?: () => void;
 };
 
 export function StakeModal(props: StakeModalProps) {
-  const { onClose } = props;
+  const { onClose = noop } = props;
 
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<{ name: string; address: Address } | null>(
     null
   );
 
-  const { compPriceUsd, compWalletBalance } = useCompBalance();
+  const { address } = useConnection();
+
+  const { data: compPriceUsdData } = useTokenPrice({ priceFeedAddress: COMP_USD_PRICE_FEED });
+  const { data: compWalletBalanceData } = useTokenBalance({ address: address, tokenAddress: COMP_ADDRESS });
 
   const {
     isApproveSuccess,
@@ -42,7 +48,7 @@ export function StakeModal(props: StakeModalProps) {
     allowance
   } = useStakeTransaction();
 
-  const parsedAmount = Number(amountValue) > 0 ? parseUnits(amountValue, BASE_TOKEN_DECIMALS) : 0n;
+  const parsedAmount = Number(amountValue) > 0 ? parseUnits(amountValue, COMP_DECIMALS) : 0n;
 
   const hasEnoughAllowance = allowance >= parsedAmount;
   const needsApprove = parsedAmount > 0n && !hasEnoughAllowance;
@@ -57,15 +63,20 @@ export function StakeModal(props: StakeModalProps) {
   const disabledInputAndSelector = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
 
   // Calculate input value in USD
-  const inputValueInCOMP = Number(amountValue) * compPriceUsd;
+
+  const parseAmountValue = useMemo(() => {
+    if (!amountValue) return 0n;
+
+    return parseUnits(amountValue, COMP_DECIMALS);
+  }, [amountValue]);
+
+  const inputValueInCOMP = formatUnits(parseAmountValue * compPriceUsdData, COMP_DECIMALS + COMP_PRICE_FEED_DECIMALS);
+  const compWalletBalance = formatUnits(compWalletBalanceData, COMP_DECIMALS);
+
   const balance = Format.price(inputValueInCOMP, 'standard');
 
-  const onInputChange = (value: string) => {
-    setAmountValue(value);
-  };
-
   const onMaxButtonClick = () => {
-    setAmountValue(compWalletBalance.toString());
+    setAmountValue(compWalletBalance);
   };
 
   const onDelegateSelect = (address: { name: string; address: Address } | null) => {
@@ -101,7 +112,7 @@ export function StakeModal(props: StakeModalProps) {
               className='min-h-12 max-w-60'
               disabled={disabledInputAndSelector}
               value={amountValue}
-              onChange={onInputChange}
+              onChange={setAmountValue}
             />
           </div>
           <Button
@@ -167,8 +178,8 @@ export function StakeModal(props: StakeModalProps) {
           <Text
             size='11'
             lineHeight='16'
-            className={cn('text-white', {
-              'text-color-6': isApproveDisabled
+            className={cn('text-color-6', {
+              'text-white': false //disabled state
             })}
           >
             Step 1
@@ -194,8 +205,8 @@ export function StakeModal(props: StakeModalProps) {
           <Text
             size='11'
             lineHeight='16'
-            className={cn('text-white', {
-              'text-color-6': isConfirmDisabled
+            className={cn('text-color-6', {
+              'text-white': false //disabled state
             })}
           >
             Step 2
