@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { type Address, formatUnits, parseUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
 import { COMP_ADDRESS, COMP_DECIMALS, COMP_PRICE_FEED_DECIMALS, COMP_USD_PRICE_FEED } from '@/consts/common';
+import type { Delegate } from '@/hooks/useDelegateSelector';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
@@ -25,9 +26,7 @@ export function StakeModal(props: StakeModalProps) {
   const { onClose = noop } = props;
 
   const [amountValue, setAmountValue] = useState<string>('');
-  const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<{ name: string; address: Address } | null>(
-    null
-  );
+  const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
 
   const { address } = useConnection();
 
@@ -79,7 +78,7 @@ export function StakeModal(props: StakeModalProps) {
     setAmountValue(compWalletBalance);
   };
 
-  const onDelegateSelect = (address: { name: string; address: Address } | null) => {
+  const onDelegateSelect = (address: Delegate | null) => {
     setSelectedAddressDelegate(address);
   };
 
@@ -160,7 +159,7 @@ export function StakeModal(props: StakeModalProps) {
       <div className='flex flex-col gap-2.5'>
         <Button
           className={cn('h-14 flex-col', {
-            'bg-color-7': isApprovePending
+            'bg-color-7': isApprovePending || isApproveConfirming
           })}
           disabled={isApproveDisabled}
           onClick={onApprove}
@@ -178,8 +177,8 @@ export function StakeModal(props: StakeModalProps) {
           <Text
             size='11'
             lineHeight='16'
-            className={cn('text-color-6', {
-              'text-white': false //disabled state
+            className={cn('text-white', {
+              'text-color-6': isApproveDisabled
             })}
           >
             Step 1
@@ -187,7 +186,7 @@ export function StakeModal(props: StakeModalProps) {
         </Button>
         <Button
           className={cn('h-14 flex-col', {
-            'bg-color-7': isStakePending
+            'bg-color-7': isStakePending || isStakeConfirming
           })}
           disabled={isConfirmDisabled || isStakePending || isStakeConfirming}
           onClick={onConfirm}
@@ -205,8 +204,8 @@ export function StakeModal(props: StakeModalProps) {
           <Text
             size='11'
             lineHeight='16'
-            className={cn('text-color-6', {
-              'text-white': false //disabled state
+            className={cn('text-white', {
+              'text-color-6': isConfirmDisabled
             })}
           >
             Step 2

@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
+import type { Address } from 'viem';
 
 import { useSwitch } from '@/hooks/useSwitch';
 
-export type Delegate = { name: string; address: string };
+export type Delegate = { name: string; address: Address };
 
 type UseDelegateSelectorArgs = {
   delegates: Delegate[];
