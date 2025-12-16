@@ -46,11 +46,11 @@ function requiredAddress(key: string): `0x${string}` {
 export const ENV = {
   BASE_TOKEN_ADDRESS: requiredAddress('VITE_BASE_TOKEN_ADDRESS'),
   BASE_TOKEN_PRICE_FEED_ADDRESS: requiredAddress('VITE_BASE_TOKEN_PRICE_FEED_ADDRESS'),
-  BASE_TOKEN_DECIMALS: requiredInt('VITE_BASE_TOKEN_DECIMALS', { min: 0, max: 18 }),
-  BASE_TOKEN_PRICE_FEED_DECIMALS: requiredInt('VITE_BASE_TOKEN_PRICE_FEED_DECIMALS', { min: 0, max: 18 }),
+  BASE_TOKEN_DECIMALS: requiredInt('VITE_BASE_TOKEN_DECIMALS', { min: 1, max: 18 }),
+  BASE_TOKEN_PRICE_FEED_DECIMALS: requiredInt('VITE_BASE_TOKEN_PRICE_FEED_DECIMALS', { min: 1, max: 18 }),
 
   STAKED_TOKEN_ADDRESS: requiredAddress('VITE_STAKED_TOKEN_ADDRESS'),
-  STAKED_TOKEN_DECIMALS: requiredInt('VITE_STAKED_TOKEN_DECIMALS', { min: 0, max: 18 }),
+  STAKED_TOKEN_DECIMALS: requiredInt('VITE_STAKED_TOKEN_DECIMALS', { min: 1, max: 18 }),
 
   STAKING_VAULT_ADDRESS: requiredAddress('VITE_STAKING_VAULT_ADDRESS')
 };
