@@ -1,27 +1,18 @@
-import { useMemo } from 'react';
 import type { Address } from 'viem';
 import { useReadContract } from 'wagmi';
 
-import { COMPPriceFeedAbi } from '@/shared/abis/COMPPriceFeedAbi';
+import { ChainLinkPriceFeedAbi } from '@/shared/abis/chainLinkPriceFeedAbi';
 
-export type UseTokenPriceProps = {
-  priceFeedAddress: Address;
-};
-
-export function useTokenPrice(props: UseTokenPriceProps) {
-  const { priceFeedAddress } = props;
-
-  const { data: latestRoundData } = useReadContract({
+export function useTokenPrice(priceFeedAddress?: Address) {
+  const { data: latestRoundData, ...query } = useReadContract({
     address: priceFeedAddress,
-    abi: COMPPriceFeedAbi,
+    abi: ChainLinkPriceFeedAbi,
     functionName: 'latestRoundData'
   });
 
-  console.log('latestRoundData=>', latestRoundData);
+  let result;
 
-  const data = useMemo(() => {
-    if (!latestRoundData) return BigInt(0);
-
+  if (latestRoundData) {
     const [, answer] = latestRoundData as readonly [
       bigint, // roundId
       bigint, // answer
@@ -30,12 +21,11 @@ export function useTokenPrice(props: UseTokenPriceProps) {
       bigint // answeredInRound
     ];
 
-    return answer;
-  }, [latestRoundData]);
-
-  console.log('data=>', data);
+    result = answer;
+  }
 
   return {
-    data
+    data: result,
+    ...query
   };
 }

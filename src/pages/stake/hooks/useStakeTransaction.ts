@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { type Address, encodeFunctionData, parseUnits } from 'viem';
 import { useConnection, useReadContract, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 
-import { BASE_TOKEN_ADDRESS, COMP_DECIMALS, STAKED_TOKEN_ADDRESS, STAKING_VAULT_ADDRESS } from '@/consts/common';
+import { BASE_TOKEN_ADDRESS, BASE_TOKEN_DECIMALS, STAKED_TOKEN_ADDRESS, STAKING_VAULT_ADDRESS } from '@/consts/common';
 import { useWalletStore } from '@/hooks/useWallet';
 import { BaseTokenAbi } from '@/shared/abis/BaseTokenAbi';
 import { StakedTokenAbi } from '@/shared/abis/StakedTokenAbi';
@@ -80,7 +80,7 @@ export function useStakeTransaction() {
   const approve = async (amount: string) => {
     if (!address) return;
 
-    const parsedAmount = parseUnits(amount, COMP_DECIMALS);
+    const parsedAmount = parseUnits(amount, BASE_TOKEN_DECIMALS);
 
     const approveData = encodeFunctionData({
       abi: BaseTokenAbi,
@@ -99,7 +99,7 @@ export function useStakeTransaction() {
   const stake = async (delegatee: Address, amount: string) => {
     if (!address) return;
 
-    const parsedAmount = parseUnits(amount, COMP_DECIMALS);
+    const parsedAmount = parseUnits(amount, BASE_TOKEN_DECIMALS);
 
     const stakeData = encodeFunctionData({
       abi: StakingVaultAbi,

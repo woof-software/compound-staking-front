@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatUnits, parseUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
@@ -7,8 +7,13 @@ import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
-import { COMP_ADDRESS, COMP_DECIMALS, COMP_PRICE_FEED_DECIMALS, COMP_USD_PRICE_FEED } from '@/consts/common';
-import type { Delegate } from '@/hooks/useDelegateSelector';
+import {
+  BASE_TOKEN_ADDRESS,
+  BASE_TOKEN_DECIMALS,
+  BASE_TOKEN_PRICE_FEED_ADDRESS,
+  BASE_TOKEN_PRICE_FEED_DECIMALS,
+  type Delegate
+} from '@/consts/common';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
@@ -30,8 +35,8 @@ export function StakeModal(props: StakeModalProps) {
 
   const { address } = useConnection();
 
-  const { data: compPriceUsdData } = useTokenPrice({ priceFeedAddress: COMP_USD_PRICE_FEED });
-  const { data: compWalletBalanceData } = useTokenBalance({ address: address, tokenAddress: COMP_ADDRESS });
+  const { data: compPriceUsdData } = useTokenPrice(BASE_TOKEN_PRICE_FEED_ADDRESS);
+  const { data: compWalletBalanceData } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
 
   const {
     isApproveSuccess,
@@ -47,7 +52,7 @@ export function StakeModal(props: StakeModalProps) {
     allowance
   } = useStakeTransaction();
 
-  const parsedAmount = Number(amountValue) > 0 ? parseUnits(amountValue, COMP_DECIMALS) : 0n;
+  const parsedAmount = Number(amountValue) > 0 ? parseUnits(amountValue, BASE_TOKEN_DECIMALS) : 0n;
 
   const hasEnoughAllowance = allowance >= parsedAmount;
   const needsApprove = parsedAmount > 0n && !hasEnoughAllowance;
@@ -62,16 +67,19 @@ export function StakeModal(props: StakeModalProps) {
   const disabledInputAndSelector = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
 
   // Calculate input value in USD
-  const parseAmountValue = useMemo(() => {
-    if (!amountValue) return 0n;
+  const compPriceUsdValue = compPriceUsdData ?? 0n;
+  const compWalletBalanceValue = compWalletBalanceData ?? 0n;
 
-    return parseUnits(amountValue, COMP_DECIMALS);
-  }, [amountValue]);
+  const parseAmountValue = parseUnits(amountValue, BASE_TOKEN_DECIMALS);
 
-  const inputValueInCOMP = formatUnits(parseAmountValue * compPriceUsdData, COMP_DECIMALS + COMP_PRICE_FEED_DECIMALS);
-  const compWalletBalance = formatUnits(compWalletBalanceData, COMP_DECIMALS);
+  const inputValueInCOMP = formatUnits(
+    parseAmountValue * compPriceUsdValue,
+    BASE_TOKEN_DECIMALS + BASE_TOKEN_PRICE_FEED_DECIMALS
+  );
+  const compWalletBalance = formatUnits(compWalletBalanceValue, BASE_TOKEN_DECIMALS);
 
-  const balance = Format.price(inputValueInCOMP, 'standard');
+  const formatCOMPPrice = Format.price(inputValueInCOMP, 'standard');
+  const formatCOMPWalletBalance = Format.token(compWalletBalance, 'standard');
 
   const onMaxButtonClick = () => {
     setAmountValue(compWalletBalance);
@@ -127,14 +135,14 @@ export function StakeModal(props: StakeModalProps) {
             lineHeight='16'
             className='text-color-24'
           >
-            {balance}
+            {formatCOMPPrice}
           </Text>
           <Text
             size='11'
             lineHeight='16'
             className='text-color-24'
           >
-            {compWalletBalance} COMP
+            {formatCOMPWalletBalance} COMP
           </Text>
         </div>
       </div>
