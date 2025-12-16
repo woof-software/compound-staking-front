@@ -79,7 +79,7 @@ export function RewardsTable() {
     const sort = col.sort;
 
     return [...data].sort((a, b) => sort(a, b, sortDir));
-  }, [data, sortBy, sortDir]);
+  }, [sortBy, sortDir]);
 
   const onHeaderClick = (accessorKey: SortKey) => {
     if (sortBy === accessorKey) {

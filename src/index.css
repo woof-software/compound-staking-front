@@ -63,6 +63,7 @@
   --color-24: #7A8A99;
   --color-25: #516070;
   --color-26: rgba(0, 211, 149, 0.10);
+  --color-27: #11D976;
 
   --color-border-1: rgba(13, 19, 26, 0.15);
 }
@@ -95,6 +96,7 @@
   --color-24: #7A8A99;
   --color-25: #516070;
   --color-26: rgba(0, 211, 149, 0.10);
+  --color-27: #11D976;
 
   --color-border-1: rgba(249, 250, 251, 0.15);
 }
@@ -126,6 +128,7 @@
   --color-color-24: var(--color-24);
   --color-color-25: var(--color-25);
   --color-color-26: var(--color-26);
+  --color-color-27: var(--color-27);
 
   --color-border-1: var(--color-border-1);
   --color-modal-bg: #0f171f99;

@@ -51,7 +51,7 @@ export function ClaimModal({ isOpen = false, onClose = noop }: ClaimModalProps) 
       onClose={onClose}
     >
       <div className='w-full mt-8 flex flex-col gap-8'>
-        <Divider />
+        <Divider orientation='horizontal' />
         <div className='flex'>
           <Text
             size='15'

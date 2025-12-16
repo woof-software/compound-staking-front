@@ -64,7 +64,7 @@ export function AmountInput(props: AmountInputProps) {
     <input
       style={{ fontSize: `${adjustedFontSize}px` }}
       className={cn(
-        'focus-visible:outline-none focus:outline-none focus-visible:border-none focus:border-none',
+        'focus-visible:outline-none font-medium focus:outline-none focus-visible:border-none focus:border-none',
         className
       )}
       placeholder='0'

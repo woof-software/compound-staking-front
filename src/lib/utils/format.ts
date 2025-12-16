@@ -12,7 +12,6 @@ export namespace Format {
     const locale = 'en-US';
 
     if (isNaN(numberValue) || !isFinite(numberValue)) {
-      console.warn('Value is not');
       numberValue = 0;
     }
 
@@ -36,7 +35,6 @@ export namespace Format {
     const locale = 'en-US';
 
     if (isNaN(numberValue) || !isFinite(numberValue)) {
-      console.warn('Value is not');
       numberValue = 0;
     }
 
