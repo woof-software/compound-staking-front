@@ -3,29 +3,16 @@ import { useReadContract } from 'wagmi';
 
 import { ChainLinkPriceFeedAbi } from '@/shared/abis/chainLinkPriceFeedAbi';
 
+type LatestRoundData = readonly [bigint, bigint, bigint, bigint, bigint];
+
 export function useTokenPrice(priceFeedAddress?: Address) {
-  const { data: latestRoundData, ...query } = useReadContract({
+  return useReadContract({
     address: priceFeedAddress,
     abi: ChainLinkPriceFeedAbi,
-    functionName: 'latestRoundData'
+    functionName: 'latestRoundData',
+    query: {
+      enabled: !!priceFeedAddress,
+      select: (d) => (d as LatestRoundData)[1]
+    }
   });
-
-  let result;
-
-  if (latestRoundData) {
-    const [, answer] = latestRoundData as readonly [
-      bigint, // roundId
-      bigint, // answer
-      bigint, // startedAt
-      bigint, // updatedAt
-      bigint // answeredInRound
-    ];
-
-    result = answer;
-  }
-
-  return {
-    data: result,
-    ...query
-  };
 }

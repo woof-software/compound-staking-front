@@ -10,13 +10,8 @@ import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Modal } from '@/components/ui/Modal';
 import { Text } from '@/components/ui/Text';
-import {
-  BASE_TOKEN_ADDRESS,
-  BASE_TOKEN_DECIMALS,
-  BASE_TOKEN_PRICE_FEED_ADDRESS,
-  BASE_TOKEN_PRICE_FEED_DECIMALS,
-  type Delegate
-} from '@/consts/common';
+import { type Delegate } from '@/consts/common';
+import { ENV } from '@/consts/env';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
@@ -38,19 +33,19 @@ export function StakeModal(props: StakeModalProps) {
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
 
-  const { data: compPriceUsdData } = useTokenPrice(BASE_TOKEN_PRICE_FEED_ADDRESS);
-  const { data: compWalletBalanceData } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
+  const { data: compPriceUsdData } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
+  const { data: compWalletBalanceData } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
 
   const compPriceUsdValue = compPriceUsdData ?? 0n;
   const compWalletBalanceValue = compWalletBalanceData ?? 0n;
 
-  const parseAmountValue = parseUnits(amountValue, BASE_TOKEN_DECIMALS);
+  const parseAmountValue = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
 
   const inputValueInCOMP = formatUnits(
     parseAmountValue * compPriceUsdValue,
-    BASE_TOKEN_DECIMALS + BASE_TOKEN_PRICE_FEED_DECIMALS
+    ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
-  const compWalletBalance = formatUnits(compWalletBalanceValue, BASE_TOKEN_DECIMALS);
+  const compWalletBalance = formatUnits(compWalletBalanceValue, ENV.BASE_TOKEN_DECIMALS);
 
   const formatCOMPPrice = Format.price(inputValueInCOMP, 'standard');
   const formatCOMPWalletBalance = Format.token(compWalletBalance, 'standard');
