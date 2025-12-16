@@ -17,6 +17,8 @@ export function useTokenPrice(props: UseTokenPriceProps) {
     functionName: 'latestRoundData'
   });
 
+  console.log('latestRoundData=>', latestRoundData);
+
   const data = useMemo(() => {
     if (!latestRoundData) return BigInt(0);
 
@@ -30,6 +32,8 @@ export function useTokenPrice(props: UseTokenPriceProps) {
 
     return answer;
   }, [latestRoundData]);
+
+  console.log('data=>', data);
 
   return {
     data

@@ -62,7 +62,6 @@ export function StakeModal(props: StakeModalProps) {
   const disabledInputAndSelector = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
 
   // Calculate input value in USD
-
   const parseAmountValue = useMemo(() => {
     if (!amountValue) return 0n;
 
