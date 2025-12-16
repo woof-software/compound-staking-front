@@ -7,13 +7,8 @@ import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
-import {
-  BASE_TOKEN_ADDRESS,
-  BASE_TOKEN_DECIMALS,
-  BASE_TOKEN_PRICE_FEED_ADDRESS,
-  BASE_TOKEN_PRICE_FEED_DECIMALS,
-  type Delegate
-} from '@/consts/common';
+import { type Delegate } from '@/consts/common';
+import { ENV } from '@/consts/env';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
@@ -24,6 +19,7 @@ import { useStakeTransaction } from '@/pages/stake/hooks/useStakeTransaction';
 import COMP from '@/assets/comp.svg';
 
 export type StakeModalProps = {
+  isOpen?: boolean;
   onClose?: () => void;
 };
 
@@ -35,8 +31,8 @@ export function StakeModal(props: StakeModalProps) {
 
   const { address } = useConnection();
 
-  const { data: compPriceUsdData } = useTokenPrice(BASE_TOKEN_PRICE_FEED_ADDRESS);
-  const { data: compWalletBalanceData } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
+  const { data: compPriceUsdData } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
+  const { data: compWalletBalanceData } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
 
   const {
     isApproveSuccess,
@@ -52,7 +48,7 @@ export function StakeModal(props: StakeModalProps) {
     allowance
   } = useStakeTransaction();
 
-  const parsedAmount = Number(amountValue) > 0 ? parseUnits(amountValue, BASE_TOKEN_DECIMALS) : 0n;
+  const parsedAmount = Number(amountValue) > 0 ? parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS) : 0n;
 
   const hasEnoughAllowance = allowance >= parsedAmount;
   const needsApprove = parsedAmount > 0n && !hasEnoughAllowance;
@@ -70,13 +66,13 @@ export function StakeModal(props: StakeModalProps) {
   const compPriceUsdValue = compPriceUsdData ?? 0n;
   const compWalletBalanceValue = compWalletBalanceData ?? 0n;
 
-  const parseAmountValue = parseUnits(amountValue, BASE_TOKEN_DECIMALS);
+  const parseAmountValue = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
 
   const inputValueInCOMP = formatUnits(
     parseAmountValue * compPriceUsdValue,
-    BASE_TOKEN_DECIMALS + BASE_TOKEN_PRICE_FEED_DECIMALS
+    ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
-  const compWalletBalance = formatUnits(compWalletBalanceValue, BASE_TOKEN_DECIMALS);
+  const compWalletBalance = formatUnits(compWalletBalanceValue, ENV.BASE_TOKEN_DECIMALS);
 
   const formatCOMPPrice = Format.price(inputValueInCOMP, 'standard');
   const formatCOMPWalletBalance = Format.token(compWalletBalance, 'standard');

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-import { BASE_TOKEN_DECIMALS, STAKED_TOKEN_DECIMALS } from '@/consts/common';
+import { ENV } from '@/consts/env';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
@@ -24,8 +24,8 @@ export function StakeFlowBlock() {
 
   const isStakeButtonDisabled = !isConnected || isLoadingData;
 
-  const COMPBalanceFormatted = formatUnits(COMPBalance.principal, BASE_TOKEN_DECIMALS);
-  const stCOMPBalanceFormatted = formatUnits(stakedCOMPBalance, STAKED_TOKEN_DECIMALS);
+  const COMPBalanceFormatted = formatUnits(COMPBalance.principal, ENV.BASE_TOKEN_DECIMALS);
+  const stCOMPBalanceFormatted = formatUnits(stakedCOMPBalance, ENV.STAKED_TOKEN_DECIMALS);
 
   const multiplier = Number(COMPBalanceFormatted) / Number(stCOMPBalanceFormatted || '1');
 

@@ -14,8 +14,8 @@ export function useTokenBalance(address?: Address, tokenAddress?: Address) {
 
   let result;
 
-  if (balanceData) {
-    result = balanceData as bigint;
+  if (typeof balanceData === 'bigint') {
+    result = balanceData;
   }
 
   return {
