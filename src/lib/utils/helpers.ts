@@ -36,5 +36,5 @@ export function getChainName(chainId: number) {
 }
 
 export function getExplorerTxUrl(hash?: Hex) {
-  return `${import.meta.env.WALLET_CONNECT_PROJECT_ID}/tx/${hash}`;
+  return `${import.meta.env.VITE_ETHERSCAN_TX_URL}/tx/${hash}`;
 }

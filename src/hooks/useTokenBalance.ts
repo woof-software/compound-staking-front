@@ -1,12 +1,10 @@
-import { type Address } from 'viem';
+import { type Address, erc20Abi } from 'viem';
 import { useReadContract } from 'wagmi';
-
-import { COMPAbi } from '@/shared/abis/COMPAbi';
 
 export function useTokenBalance(address?: Address, tokenAddress?: Address) {
   const { data: balanceData, ...query } = useReadContract({
     address: tokenAddress,
-    abi: COMPAbi,
+    abi: erc20Abi,
     functionName: 'balanceOf',
     args: address ? [address] : undefined,
     query: {
@@ -16,8 +14,8 @@ export function useTokenBalance(address?: Address, tokenAddress?: Address) {
 
   let result;
 
-  if (balanceData) {
-    result = balanceData as bigint;
+  if (typeof balanceData === 'bigint') {
+    result = balanceData;
   }
 
   return {
