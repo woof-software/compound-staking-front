@@ -7,22 +7,42 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { useStakeStore } from '@/hooks/useStakeStore';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 import { useStakeTransaction } from '@/pages/stake/hooks/useStakeTransaction';
+import { useUnStakeTransaction } from '@/pages/stake/hooks/useUnStakeTransaction';
 
 export function StakeFlowBlock() {
   const { isConnected } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
+  const { isStakeFlowDisabled } = useStakeStore();
+
   const { isLoading, isStakedCOMPBalanceFetching, COMPBalance, stakedCOMPBalance } = useStakeTransaction();
+
+  const {
+    isUnstakeRequestConfirming,
+    isUnlockRequestPending,
+    isUnstakeRequestPending,
+    isUnlockRequestConfirming,
+    hasActiveLock
+  } = useUnStakeTransaction();
 
   const isLoadingData = isLoading || isStakedCOMPBalanceFetching;
 
-  const isStakeButtonDisabled = !isConnected || isLoadingData;
+  const stakeBlockedByUnstakeFlow =
+    isStakeFlowDisabled ||
+    isUnstakeRequestPending ||
+    isUnlockRequestPending ||
+    isUnlockRequestConfirming ||
+    isUnstakeRequestConfirming ||
+    hasActiveLock;
+
+  const isStakeButtonDisabled = !isConnected || isLoadingData || stakeBlockedByUnstakeFlow;
 
   const COMPBalanceFormatted = formatUnits(COMPBalance.principal, ENV.BASE_TOKEN_DECIMALS);
   const stCOMPBalanceFormatted = formatUnits(stakedCOMPBalance, ENV.STAKED_TOKEN_DECIMALS);
@@ -50,7 +70,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? COMPBalanceFormatted : '0.0000'} COMP
+              {isConnected ? Format.token(COMPBalanceFormatted, 'standard') : '0.0000'} COMP
             </Text>
           </Skeleton>
         </div>
@@ -69,7 +89,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? stCOMPBalanceFormatted : '0.0000'} stCOMP
+              {isConnected ? Format.token(stCOMPBalanceFormatted, 'standard') : '0.0000'} stCOMP
             </Text>
           </Skeleton>
         </div>

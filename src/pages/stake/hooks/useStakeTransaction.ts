@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { type Address, encodeFunctionData, parseUnits } from 'viem';
 import { useConnection, useReadContract, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 
@@ -75,6 +75,11 @@ export function useStakeTransaction() {
 
   const isLoading = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
 
+  const refetchStakeData = useCallback(() => {
+    refetchCOMPBalance();
+    refetchStakedCOMPBalance();
+  }, [refetchCOMPBalance, refetchStakedCOMPBalance]);
+
   const approve = async (amount: string) => {
     if (!address) return;
 
@@ -113,10 +118,9 @@ export function useStakeTransaction() {
 
   useEffect(() => {
     if (isStakeSuccess) {
-      refetchCOMPBalance();
-      refetchStakedCOMPBalance();
+      refetchStakeData();
     }
-  }, [isStakeSuccess, refetchCOMPBalance, refetchStakedCOMPBalance]);
+  }, [isStakeSuccess, refetchStakeData]);
 
   useEffect(() => {
     onIsPendingToggle(isLoading);
@@ -140,6 +144,8 @@ export function useStakeTransaction() {
     isStakedCOMPBalanceFetching,
 
     allowance,
-    isLoading
+    isLoading,
+
+    refetchStakeData
   };
 }

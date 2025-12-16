@@ -1,3 +1,8 @@
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
+
 export namespace Format {
   export type FormatView = 'standard' | 'compact';
   /**
@@ -69,6 +74,20 @@ export namespace Format {
 }
 
 export namespace FormatUnits {
+  /**
+   * Parses a numeric value and returns an appropriate short unit suffix
+   * for large values, such as `"K"`, `"M"`, `"B"`, or `"T"`.
+   *
+   * Returns `undefined` for values smaller than 1000 or invalid inputs.
+   *
+   * @param value - Numeric value to inspect.
+   * @returns A unit suffix (`"K"`, `"M"`, `"B"`, `"T"`) or `undefined` if no unit applies.
+   *
+   * @example
+   * FormatUnits.parse(999);      // -> undefined
+   * FormatUnits.parse(12_300);   // -> "K"
+   * FormatUnits.parse(5_000_000); // -> "M"
+   */
   export function parse(value: number): string | undefined {
     if (Number.isNaN(value) || !Number.isFinite(value) || value < 1000) return;
 
@@ -76,5 +95,84 @@ export namespace FormatUnits {
     if (value < 1_000_000_000) return 'M';
     if (value < 1_000_000_000_000) return 'B';
     if (value < 1_000_000_000_000_000) return 'T';
+  }
+}
+
+export namespace FormatTime {
+  export function durationTime(totalSeconds: number) {
+    const dur = dayjs.duration(totalSeconds, 'seconds');
+
+    const days = Math.floor(dur.asDays());
+    const hours = dur.hours();
+    const minutes = dur.minutes();
+    const seconds = dur.seconds();
+
+    return {
+      days,
+      hours,
+      minutes,
+      seconds
+    };
+  }
+  /**
+   * Formats a duration (in seconds) into a compact string.
+   *
+   * Rules:
+   * - If totalSeconds <= 0 → "00d 00h"
+   * - If there are days     → "DDd HHh"
+   * - Else if there are hrs → "HHh MMm"
+   * - Else                  → "MMm SSs"
+   *
+   * @param totalSeconds - Duration in seconds (e.g. remaining cooldown or lock time).
+   * @returns A string like "06d 23h", "03h 15m" or "05m 20s".
+   */
+  export function cooldownFromSeconds(totalSeconds: number): string {
+    if (!totalSeconds || totalSeconds <= 0) {
+      return '00d 00h';
+    }
+
+    const { days, hours, minutes, seconds } = durationTime(totalSeconds);
+
+    const pad = (n: number) => n.toString().padStart(2, '0');
+
+    if (days > 0) {
+      return `${pad(days)}d ${pad(hours)}h`;
+    }
+
+    if (hours > 0) {
+      return `${pad(hours)}h ${pad(minutes)}m`;
+    }
+
+    return `${pad(minutes)}m ${pad(seconds)}s`;
+  }
+
+  export function lockInfo(startTimeSec: number, durationSec: number) {
+    if (!startTimeSec || !durationSec) {
+      return {
+        isUnlocked: false,
+        unlockTimestampSec: 0,
+        unlockDateLabel: '-',
+        countdownLabel: '00d 00h'
+      };
+    }
+
+    const unlockTimestampSec = startTimeSec + durationSec;
+
+    const unlockDate = dayjs.unix(unlockTimestampSec);
+    const now = dayjs();
+
+    const diffSec = Math.max(0, unlockDate.diff(now, 'second'));
+
+    const unlockDateLabel = unlockDate.format('MMMM D, YYYY');
+    const countdownLabel = cooldownFromSeconds(diffSec);
+
+    const isUnlocked = diffSec <= 0;
+
+    return {
+      isUnlocked,
+      unlockTimestampSec,
+      unlockDateLabel,
+      countdownLabel
+    };
   }
 }

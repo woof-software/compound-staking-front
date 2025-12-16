@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils/cn';
 export function DelegateFlowBlock() {
   const { isConnected } = useConnection();
 
-  const isDelegateButtonDisabled = !isConnected;
+  // const isDelegateButtonDisabled = !isConnected;
 
   return (
     <Card
@@ -29,7 +29,7 @@ export function DelegateFlowBlock() {
             </Text>
             <Skeleton loading={false}>
               <a
-                className='flex items-start gap-1 cursor-pointer'
+                className='flex cursor-pointer items-start gap-1'
                 target='_blank'
               >
                 <Text
@@ -90,7 +90,7 @@ export function DelegateFlowBlock() {
           </div>
         </div>
         <Button
-          disabled={isDelegateButtonDisabled}
+          disabled={true}
           className='max-w-32.5 text-[11px] font-medium'
         >
           Delegate
