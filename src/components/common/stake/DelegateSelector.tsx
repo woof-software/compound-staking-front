@@ -76,13 +76,13 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 lineHeight='16'
                 className='text-color-2'
               >
-                {selectedAddressDelegate?.name}
+                {selectedAddressDelegate.name}
               </Text>
             </div>
             <a
               className='flex items-center gap-1.5'
               target='_blank'
-              href={getExplorerTxUrl(selectedAddressDelegate?.address || '')}
+              href={getExplorerTxUrl(selectedAddressDelegate.address)}
               onClick={(e) => e.stopPropagation()}
             >
               <Text
