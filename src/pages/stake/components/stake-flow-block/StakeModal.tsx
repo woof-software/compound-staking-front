@@ -19,6 +19,7 @@ import { useStakeTransaction } from '@/pages/stake/hooks/useStakeTransaction';
 import COMP from '@/assets/comp.svg';
 
 export type StakeModalProps = {
+  isOpen?: boolean;
   onClose?: () => void;
 };
 
