@@ -1,5 +1,7 @@
 import type { Hex } from 'viem';
 
+import { ENV } from '@/consts/env';
+
 export function getChainLogo(chainId: number) {
   //TODO: add fallback
   if (![1, 10, 130, 137, 2020, 5000, 8453, 42161, 43114, 59144, 534352].includes(chainId)) return;
@@ -36,5 +38,5 @@ export function getChainName(chainId: number) {
 }
 
 export function getExplorerTxUrl(hash?: Hex) {
-  return `${import.meta.env.VITE_ETHERSCAN_TX_URL}/tx/${hash}`;
+  return `${ENV.ETHERSCAN_TX_URL}/tx/${hash}`;
 }
