@@ -63,7 +63,10 @@ function buildEnvOrThrow() {
     STAKED_TOKEN_ADDRESS: requiredAddress('VITE_STAKED_TOKEN_ADDRESS'),
     STAKED_TOKEN_DECIMALS: requiredInt('VITE_STAKED_TOKEN_DECIMALS', { min: 0, max: 255 }),
 
-    STAKING_VAULT_ADDRESS: requiredAddress('VITE_STAKING_VAULT_ADDRESS')
+    STAKING_VAULT_ADDRESS: requiredAddress('VITE_STAKING_VAULT_ADDRESS'),
+
+    WALLET_CONNECT_PROJECT_ID: requiredString('VITE_WALLET_CONNECT_PROJECT_ID'),
+    ETHERSCAN_TX_URL: requiredAddress('VITE_ETHERSCAN_TX_URL')
   };
 
   if (issues.length) {
