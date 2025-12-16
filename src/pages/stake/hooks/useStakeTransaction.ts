@@ -9,10 +9,9 @@ import { StakedTokenAbi } from '@/shared/abis/StakedTokenAbi';
 import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
 
 type COMPBalanceType = {
-  amount: bigint;
-  claimedRewardsAmount: bigint;
-  startTime: bigint;
-  duration: bigint;
+  principal: bigint;
+  stakeTimestamp: number;
+  lastClaimTime: number;
 };
 
 export function useStakeTransaction() {
@@ -53,11 +52,12 @@ export function useStakeTransaction() {
     query: { enabled: !!address }
   });
 
+  console.log('COMPBalanceData=>', COMPBalanceData);
+
   const COMPBalance = (COMPBalanceData as COMPBalanceType) ?? {
-    amount: 0n,
-    claimedRewardsAmount: 0n,
-    startTime: 0n,
-    duration: 0n
+    principal: 0n,
+    stakeTimestamp: 0,
+    lastClaimTime: 0
   };
 
   // stCOMP balance

@@ -5,12 +5,11 @@ export const StakingVaultAbi = [
     outputs: [
       {
         components: [
-          { internalType: 'uint256', name: 'amount', type: 'uint256' },
-          { internalType: 'uint256', name: 'claimedRewardsAmount', type: 'uint256' },
-          { internalType: 'uint40', name: 'startTime', type: 'uint40' },
-          { internalType: 'uint40', name: 'duration', type: 'uint40' }
+          { internalType: 'uint256', name: 'principal', type: 'uint256' },
+          { internalType: 'uint40', name: 'stakeTimestamp', type: 'uint40' },
+          { internalType: 'uint40', name: 'lastClaimTime', type: 'uint40' }
         ],
-        internalType: 'struct MockStakingVault.StakeParams',
+        internalType: 'struct IStakingVaultTypes.StakeInfo',
         name: '',
         type: 'tuple'
       }

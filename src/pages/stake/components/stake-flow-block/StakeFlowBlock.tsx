@@ -24,7 +24,7 @@ export function StakeFlowBlock() {
 
   const isStakeButtonDisabled = !isConnected || isLoadingData;
 
-  const COMPBalanceFormatted = formatUnits(COMPBalance.amount, COMP_DECIMALS);
+  const COMPBalanceFormatted = formatUnits(COMPBalance.principal, COMP_DECIMALS);
   const stCOMPBalanceFormatted = formatUnits(stakedCOMPBalance, STAKED_TOKEN_DECIMALS);
 
   const multiplier = Number(COMPBalanceFormatted) / Number(stCOMPBalanceFormatted || '1');
@@ -88,7 +88,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? `${Format.rate(multiplier)}x` : '-'}
+              {isConnected ? (multiplier ? `${Format.rate(multiplier)}x` : '1x') : '-'}
             </Text>
           </Skeleton>
         </div>
