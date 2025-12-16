@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { formatUnits, parseUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
@@ -10,7 +10,13 @@ import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Modal } from '@/components/ui/Modal';
 import { Text } from '@/components/ui/Text';
-import { COMP_ADDRESS, COMP_DECIMALS, COMP_PRICE_FEED_DECIMALS, COMP_USD_PRICE_FEED } from '@/consts/common';
+import {
+  BASE_TOKEN_ADDRESS,
+  BASE_TOKEN_DECIMALS,
+  BASE_TOKEN_PRICE_FEED_ADDRESS,
+  BASE_TOKEN_PRICE_FEED_DECIMALS,
+  type Delegate
+} from '@/consts/common';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
@@ -30,23 +36,24 @@ export function StakeModal(props: StakeModalProps) {
   const { address } = useConnection();
 
   const [amountValue, setAmountValue] = useState<string>('');
-  const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<{ name: string; address: string } | null>(
-    null
+  const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
+
+  const { data: compPriceUsdData } = useTokenPrice(BASE_TOKEN_PRICE_FEED_ADDRESS);
+  const { data: compWalletBalanceData } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
+
+  const compPriceUsdValue = compPriceUsdData ?? 0n;
+  const compWalletBalanceValue = compWalletBalanceData ?? 0n;
+
+  const parseAmountValue = parseUnits(amountValue, BASE_TOKEN_DECIMALS);
+
+  const inputValueInCOMP = formatUnits(
+    parseAmountValue * compPriceUsdValue,
+    BASE_TOKEN_DECIMALS + BASE_TOKEN_PRICE_FEED_DECIMALS
   );
+  const compWalletBalance = formatUnits(compWalletBalanceValue, BASE_TOKEN_DECIMALS);
 
-  const { data: compPriceUsdData } = useTokenPrice({ priceFeedAddress: COMP_USD_PRICE_FEED });
-  const { data: compWalletBalanceData } = useTokenBalance({ address: address, tokenAddress: COMP_ADDRESS });
-
-  const parseAmountValue = useMemo(() => {
-    if (!amountValue) return 0n;
-
-    return parseUnits(amountValue, COMP_DECIMALS);
-  }, [amountValue]);
-
-  const inputValueInCOMP = formatUnits(parseAmountValue * compPriceUsdData, COMP_DECIMALS + COMP_PRICE_FEED_DECIMALS);
-  const compWalletBalance = formatUnits(compWalletBalanceData, COMP_DECIMALS);
-
-  const balance = Format.price(inputValueInCOMP, 'standard');
+  const formatCOMPPrice = Format.price(inputValueInCOMP, 'standard');
+  const formatCOMPWalletBalance = Format.token(compWalletBalance, 'standard');
 
   const isAdditionalStake = false; //Variable for additional stake condition
 
@@ -54,7 +61,7 @@ export function StakeModal(props: StakeModalProps) {
     setAmountValue(compWalletBalance);
   };
 
-  const onDelegateSelect = (address: { name: string; address: string } | null) => {
+  const onDelegateSelect = (address: Delegate | null) => {
     setSelectedAddressDelegate(address);
   };
 
@@ -89,14 +96,14 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='16'
               className='text-color-24'
             >
-              {balance}
+              {formatCOMPPrice}
             </Text>
             <Text
               size='11'
               lineHeight='16'
               className='text-color-24'
             >
-              {compWalletBalance} COMP
+              {formatCOMPWalletBalance} COMP
             </Text>
           </div>
         </div>

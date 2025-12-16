@@ -1,27 +1,44 @@
+import { useCallback, useRef, useState } from 'react';
+
 import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/Text';
-import { DELEGATES } from '@/consts/common';
+import type { Delegate } from '@/consts/common';
 import { useDelegateSelector } from '@/hooks/useDelegateSelector';
 import { useOutsideClick } from '@/hooks/useOnClickOutside';
+import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { noop, sliceAddress } from '@/lib/utils/common';
-import { etherScanUrl } from '@/lib/utils/helpers';
+import { getExplorerTxUrl } from '@/lib/utils/helpers';
 
 export type DelegateSelectorProps = {
-  selectedAddressDelegate: { name: string; address: string } | null;
-  onSelect?: (addressDelegate: { name: string; address: string } | null) => void;
+  selectedAddressDelegate: Delegate | null;
+  onSelect?: (addressDelegate: Delegate | null) => void;
 };
 
 export function DelegateSelector(props: DelegateSelectorProps) {
   const { selectedAddressDelegate, onSelect = noop } = props;
 
-  const { ref, searchValue, filteredDelegates, isOpen, open, onClose, onDelegateSelect, setSearchValue } =
-    useDelegateSelector({
-      delegates: DELEGATES,
-      onSelect
-    });
+  const ref = useRef<HTMLDivElement>(null);
+  const [searchValue, setSearchValue] = useState('');
+
+  const { isEnabled: isOpen, enable: open, disable: close } = useSwitch();
+
+  const filteredDelegates = useDelegateSelector(searchValue);
+
+  const onClose = useCallback(() => {
+    close();
+    setSearchValue('');
+  }, [close]);
+
+  const onDelegateSelect = useCallback(
+    (delegate: Delegate) => {
+      onSelect(delegate);
+      onClose();
+    },
+    [onSelect, onClose]
+  );
 
   useOutsideClick(() => ref.current, onClose);
 
@@ -58,7 +75,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             <a
               className='flex items-center gap-1.5'
               target='_blank'
-              href={etherScanUrl(selectedAddressDelegate?.address || '')}
+              href={getExplorerTxUrl(selectedAddressDelegate?.address || '')}
               onClick={(e) => e.stopPropagation()}
             >
               <Text
@@ -113,7 +130,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 <a
                   className='flex items-center gap-1.5'
                   target='_blank'
-                  href={etherScanUrl(selectedAddressDelegate?.address || '')}
+                  href={getExplorerTxUrl(selectedAddressDelegate?.address)}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Text

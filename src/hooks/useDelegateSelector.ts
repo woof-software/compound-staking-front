@@ -1,50 +1,15 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 
-import { useSwitch } from '@/hooks/useSwitch';
+import { DELEGATES } from '@/consts/common';
 
-export type Delegate = { name: string; address: string };
+export function useDelegateSelector(search?: string) {
+  return useMemo(() => {
+    if (!search) return DELEGATES;
 
-type UseDelegateSelectorArgs = {
-  delegates: Delegate[];
-  onSelect: (delegate: Delegate | null) => void;
-};
+    const pattern = search.toLowerCase();
 
-export function useDelegateSelector({ delegates, onSelect }: UseDelegateSelectorArgs) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [searchValue, setSearchValue] = useState('');
-
-  const { isEnabled: isOpen, enable: open, disable: close } = useSwitch();
-
-  const filteredDelegates = useMemo(() => {
-    const searchTarget = searchValue.trim().toLowerCase();
-    if (!searchTarget) return delegates;
-
-    return delegates.filter(
-      (el) => el.name.toLowerCase().includes(searchTarget) || el.address.toLowerCase().includes(searchTarget)
-    );
-  }, [delegates, searchValue]);
-
-  const onClose = useCallback(() => {
-    close();
-    setSearchValue('');
-  }, [close]);
-
-  const onDelegateSelect = useCallback(
-    (delegate: Delegate) => {
-      onSelect(delegate);
-      onClose();
-    },
-    [onSelect, onClose]
-  );
-
-  return {
-    ref,
-    isOpen,
-    searchValue,
-    filteredDelegates,
-    open,
-    onClose,
-    setSearchValue,
-    onDelegateSelect
-  };
+    return DELEGATES.filter(({ name, address }) => {
+      return name.toLowerCase().includes(pattern) || address.toLowerCase().includes(pattern);
+    });
+  }, [search]);
 }

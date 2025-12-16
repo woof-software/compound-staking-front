@@ -1,4 +1,4 @@
-export const COMPPriceFeedAbi = [
+export const ChainLinkPriceFeedAbi = [
   {
     inputs: [],
     name: 'latestRoundData',

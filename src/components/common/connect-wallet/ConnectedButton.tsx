@@ -39,11 +39,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
   const onAddressCopy = async () => {
     onClose();
 
-    try {
-      await navigator.clipboard.writeText(address!);
-    } catch (error) {
-      console.warn('Copy failed', error);
-    }
+    await navigator.clipboard.writeText(address!);
   };
 
   useOutsideClick(() => ref.current, onClose);

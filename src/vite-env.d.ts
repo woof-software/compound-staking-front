@@ -8,6 +8,7 @@ declare module '*.svg' {
 
 interface ImportMetaEnv {
   readonly WALLET_CONNECT_PROJECT_ID: string;
+  readonly ETHERSCAN_TX_URL: string;
 }
 
 interface ImportMeta {

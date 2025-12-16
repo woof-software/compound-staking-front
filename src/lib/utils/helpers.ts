@@ -1,4 +1,4 @@
-import { ETHERSCAN_TX_URL } from '@/consts/common';
+import type { Hex } from 'viem';
 
 export function getChainLogo(chainId: number) {
   //TODO: add fallback
@@ -35,6 +35,6 @@ export function getChainName(chainId: number) {
   }
 }
 
-export function etherScanUrl(url: string) {
-  return `${ETHERSCAN_TX_URL}${url}`;
+export function getExplorerTxUrl(hash?: Hex) {
+  return `${import.meta.env.WALLET_CONNECT_PROJECT_ID}/tx/${hash}`;
 }
