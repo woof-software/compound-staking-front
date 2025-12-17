@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
@@ -7,48 +8,76 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
-import { useStakeStore } from '@/hooks/useStakeStore';
 import { useSwitch } from '@/hooks/useSwitch';
+import { useTokenBalance } from '@/hooks/useTokenBalance';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
-import { useStakeTransaction } from '@/pages/stake/hooks/useStakeTransaction';
-import { useUnStakeTransaction } from '@/pages/stake/hooks/useUnStakeTransaction';
+import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
+import { useStakedVirtualBalance } from '@/pages/stake/hooks/useStakedVirtualBalance';
+import { useTokenStake } from '@/pages/stake/hooks/useTokenStake';
 
 export function StakeFlowBlock() {
-  const { isConnected } = useConnection();
+  const { isConnected, address } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { isStakeFlowDisabled } = useStakeStore();
+  // const { isStakeFlowDisabled } = useStakeStore();
 
-  const { isLoading, isStakedCOMPBalanceFetching, COMPBalance, stakedCOMPBalance } = useStakeTransaction();
+  const { isSuccess: isStakeSuccess } = useTokenStake();
 
   const {
-    isUnstakeRequestConfirming,
-    isUnlockRequestPending,
-    isUnstakeRequestPending,
-    isUnlockRequestConfirming,
-    hasActiveLock
-  } = useUnStakeTransaction();
+    data: COMPBalance,
+    isFetching: isStakedCOMPBalanceFetching,
+    refetch: refetchCOMPBalance
+  } = useStakedBalance(address);
+  const { data: stakedCOMPBalance, refetch: refetchStakedCOMPBalance } = useStakedVirtualBalance(address);
 
-  const isLoadingData = isLoading || isStakedCOMPBalanceFetching;
+  const { data: baseTokenPriceUsdData, isFetching: isBaseTokenPriceUsdFetching } = useTokenPrice(
+    ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
+  );
+  const { data: baseTokenWalletBalanceData, isFetching: isBaseTokenWalletBalanceFetching } = useTokenBalance(
+    address,
+    ENV.BASE_TOKEN_ADDRESS
+  );
 
-  const stakeBlockedByUnstakeFlow =
-    isStakeFlowDisabled ||
-    isUnstakeRequestPending ||
-    isUnlockRequestPending ||
-    isUnlockRequestConfirming ||
-    isUnstakeRequestConfirming ||
-    hasActiveLock;
+  // const {
+  //   isUnstakeRequestConfirming,
+  //   isUnlockRequestPending,
+  //   isUnstakeRequestPending,
+  //   isUnlockRequestConfirming,
+  //   hasActiveLock
+  // } = useUnStakeTransaction();
 
-  const isStakeButtonDisabled =
-    !isConnected || isLoadingData || isUnstakeRequestConfirming || isUnlockRequestPending || stakeBlockedByUnstakeFlow;
+  // const isLoadingData = isLoading || isStakedCOMPBalanceFetching;
 
-  const COMPBalanceFormatted = formatUnits(COMPBalance.principal, ENV.BASE_TOKEN_DECIMALS);
-  const stCOMPBalanceFormatted = formatUnits(stakedCOMPBalance, ENV.STAKED_TOKEN_DECIMALS);
+  const isPriceOrBalanceLoading = isBaseTokenPriceUsdFetching || isBaseTokenWalletBalanceFetching;
 
-  const multiplier = Number(COMPBalanceFormatted) / Number(stCOMPBalanceFormatted || '1');
+  // const stakeBlockedByUnstakeFlow =
+  //   isStakeFlowDisabled ||
+  //   isUnstakeRequestPending ||
+  //   isUnlockRequestPending ||
+  //   isUnlockRequestConfirming ||
+  //   isUnstakeRequestConfirming ||
+  //   hasActiveLock;
+
+  // const isStakeButtonDisabled =
+  //   !isConnected || isLoadingData || isUnstakeRequestConfirming || isUnlockRequestPending || stakeBlockedByUnstakeFlow;
+
+  const isStakeButtonDisabled = !isConnected || isOpen || isPriceOrBalanceLoading;
+
+  const baseTokenBalanceFormatted = formatUnits(BigInt(COMPBalance?.principal ?? 0), ENV.BASE_TOKEN_DECIMALS);
+  const stakedTokenBalanceFormatted = formatUnits(stakedCOMPBalance, ENV.STAKED_TOKEN_DECIMALS);
+
+  const multiplier = +(stakedTokenBalanceFormatted || '1') / +baseTokenBalanceFormatted;
+
+  useEffect(() => {
+    if (isStakeSuccess) {
+      refetchCOMPBalance();
+      refetchStakedCOMPBalance();
+    }
+  }, [isStakeSuccess]);
 
   return (
     <Card
@@ -63,7 +92,7 @@ export function StakeFlowBlock() {
           >
             Staked
           </Text>
-          <Skeleton loading={isLoadingData}>
+          <Skeleton loading={isStakedCOMPBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -71,7 +100,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? Format.token(COMPBalanceFormatted, 'standard') : '0.0000'} COMP
+              {isConnected ? Format.token(baseTokenBalanceFormatted, 'compact') : '0.0000'} COMP
             </Text>
           </Skeleton>
         </div>
@@ -82,7 +111,7 @@ export function StakeFlowBlock() {
           >
             stCOMP balance
           </Text>
-          <Skeleton loading={isLoadingData}>
+          <Skeleton loading={isStakedCOMPBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -90,7 +119,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? Format.token(stCOMPBalanceFormatted, 'standard') : '0.0000'} stCOMP
+              {isConnected ? Format.token(stakedTokenBalanceFormatted, 'compact') : '0.0000'} stCOMP
             </Text>
           </Skeleton>
         </div>
@@ -101,7 +130,7 @@ export function StakeFlowBlock() {
           >
             Multiplier
           </Text>
-          <Skeleton loading={isLoadingData}>
+          <Skeleton loading={isStakedCOMPBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -120,7 +149,7 @@ export function StakeFlowBlock() {
           >
             Available Rewards
           </Text>
-          <Skeleton loading={isLoadingData}>
+          <Skeleton loading={isStakedCOMPBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -139,7 +168,7 @@ export function StakeFlowBlock() {
           >
             APR
           </Text>
-          <Skeleton loading={isLoadingData}>
+          <Skeleton loading={isStakedCOMPBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -164,7 +193,10 @@ export function StakeFlowBlock() {
         open={isOpen}
         onClose={onClose}
       >
-        <StakeModal onClose={onClose} />
+        <StakeModal
+          baseTokenPriceUsdData={baseTokenPriceUsdData}
+          baseTokenWalletBalanceData={baseTokenWalletBalanceData}
+        />
       </Modal>
     </Card>
   );

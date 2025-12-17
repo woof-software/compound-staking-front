@@ -13,7 +13,7 @@ import { noop, sliceAddress } from '@/lib/utils/common';
 import { getExplorerTxUrl } from '@/lib/utils/helpers';
 
 export type DelegateSelectorProps = {
-  disabled: boolean;
+  disabled?: boolean;
   selectedAddressDelegate: Delegate | null;
   onSelect?: (addressDelegate: Delegate | null) => void;
 };
@@ -113,9 +113,9 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             onChange={setSearchValue}
           />
           <div className='hide-scrollbar max-h-392 overflow-y-auto'>
-            {filteredDelegates.map((el, index) => (
+            {filteredDelegates.map((el) => (
               <div
-                key={`${el.address}-${index}`}
+                key={el.address}
                 className={cn('flex cursor-pointer items-center justify-between rounded-lg px-3 py-4', {
                   'bg-color-5': selectedAddressDelegate?.address === el.address
                 })}

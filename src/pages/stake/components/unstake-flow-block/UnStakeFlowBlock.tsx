@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { formatUnits } from 'viem';
-import { useConnection } from 'wagmi';
+import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -12,39 +12,76 @@ import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { cn } from '@/lib/utils/cn';
 import { Format, FormatTime } from '@/lib/utils/format';
-import { useStakeTransaction } from '@/pages/stake/hooks/useStakeTransaction';
-import { useUnStakeTransaction } from '@/pages/stake/hooks/useUnStakeTransaction';
+import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
+import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
+import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
+import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
 
 export function UnStakeFlowBlock() {
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
 
-  const { isConnected } = useConnection();
+  // const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { COMPBalance } = useStakeTransaction();
+  // const { onIsStakeFlowDisabledToggle } = useStakeStore();
+
+  const { isConnected, address } = useConnection();
+
+  const { data: baseTokenBalance } = useStakedBalance(address);
+  const { data: lockedTokenBalance, isFetching: isLockedTokenBalanceFetching } = useLockedBalance(address);
+
+  const { remainingSeconds } = FormatTime.lockInfo(
+    lockedTokenBalance?.startTime ?? 0,
+    lockedTokenBalance?.duration ?? 0
+  );
+  const lockedCOMPBalanceFormatted = formatUnits(BigInt(lockedTokenBalance?.amount ?? 0), ENV.BASE_TOKEN_DECIMALS);
 
   const {
-    isLockedCOMPBalanceFetching,
-    isUnstakeRequestPending,
-    isUnstakeRequestConfirming,
-    isUnlockRequestPending,
-    isUnlockRequestConfirming,
-    lockedCOMPData,
-    hasActiveLock,
-    onUnstake
-  } = useUnStakeTransaction();
+    // sendTransactionAsync: unstakeRequest,
+    data: unstakeRequestHash,
+    isPending: isUnstakePending
+  } = useUnstakeRequest();
+  const { isLoading: isUnstakeRequestConfirming } = useWaitForTransactionReceipt({
+    hash: unstakeRequestHash
+  });
 
-  const lockedCOMPBalanceFormatted = formatUnits(lockedCOMPData.amount, ENV.BASE_TOKEN_DECIMALS);
-  const { remainingSeconds } = FormatTime.lockInfo(lockedCOMPData.startTime, lockedCOMPData.duration);
+  const {
+    sendTransactionAsync: unlockRequest,
+    data: unlockRequestHash,
+    isPending: inUnlockPending
+  } = useUnlockRequest();
+  const { isLoading: isUnlockRequestConfirming } = useWaitForTransactionReceipt({
+    hash: unlockRequestHash
+  });
 
+  const hasActiveLock = BigInt(lockedTokenBalance?.amount ?? 0) > 0n;
+  const isInfoVisible = isConnected && isUnlocked;
+
+  // const onUnstakeRequest = async () => {
+  //   onIsStakeFlowDisabledToggle(true);
+  //
+  //   try {
+  //     await unstakeRequest(ENV.STAKING_VAULT_ADDRESS);
+  //   } finally {
+  //     onIsStakeFlowDisabledToggle(false);
+  //   }
+  // };
+
+  const onButtonClick = async () => {
+    if (hasActiveLock) {
+      // onOpen();
+    } else {
+      await unlockRequest(ENV.LOCK_MANAGER_ADDRESS);
+    }
+  };
+
+  ////////////////
   const isUnStakeButtonDisabled =
     !isConnected ||
-    isUnstakeRequestPending ||
-    isUnlockRequestPending ||
+    isUnstakePending ||
+    inUnlockPending ||
     isUnstakeRequestConfirming ||
     isUnlockRequestConfirming ||
-    (Number(COMPBalance.principal) === 0 && !isUnlocked);
-
-  const isInfoVisible = isConnected && isUnlocked;
+    (BigInt(baseTokenBalance?.principal ?? 0) === 0n && !isUnlocked);
 
   return (
     <div className='flex flex-col gap-1.5'>
@@ -61,7 +98,7 @@ export function UnStakeFlowBlock() {
               >
                 Unstake
               </Text>
-              <Skeleton loading={isLockedCOMPBalanceFetching}>
+              <Skeleton loading={isLockedTokenBalanceFetching}>
                 <Text
                   size='17'
                   weight='500'
@@ -81,12 +118,12 @@ export function UnStakeFlowBlock() {
               >
                 Cooldown
               </Text>
-              <Skeleton loading={isLockedCOMPBalanceFetching}>
+              <Skeleton loading={isLockedTokenBalanceFetching}>
                 <CoolDown
                   totalSeconds={remainingSeconds}
-                  isDisabled={isConnected && !!lockedCOMPData.startTime}
+                  isDisabled={isConnected && !!lockedTokenBalance?.startTime}
                   className={cn('text-color-2', {
-                    'text-color-6': !isConnected || !lockedCOMPData.startTime
+                    'text-color-6': !isConnected || !lockedTokenBalance?.startTime
                   })}
                   onStateChange={(isUnlocked) => setIsUnlocked(isUnlocked)}
                 />
@@ -96,7 +133,7 @@ export function UnStakeFlowBlock() {
           <Button
             disabled={isUnStakeButtonDisabled}
             className='max-w-32.5 text-[11px] font-medium'
-            onClick={onUnstake}
+            onClick={onButtonClick}
           >
             {hasActiveLock ? 'Unstake' : 'Request unstake'}
           </Button>
