@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { formatUnits, parseUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
@@ -9,12 +9,14 @@ import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
 import { type Delegate } from '@/consts/common';
 import { ENV } from '@/consts/env';
+import { useTokenAllowance } from '@/hooks/useTokenAllowance';
+import { useTokenApprove } from '@/hooks/useTokenApprove';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
+import { useTokenStake } from '@/hooks/useTokenStake';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
-import { useStakeTransaction } from '@/pages/stake/hooks/useStakeTransaction';
 
 import COMP from '@/assets/comp.svg';
 
@@ -35,22 +37,17 @@ export function StakeModal(props: StakeModalProps) {
   const { data: compWalletBalanceData } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
 
   const {
-    isApproveSuccess,
-    isApprovePending,
-    isApproveConfirming,
-    approve,
+    data: allowance,
+    isPending: isApprovePending,
+    isSuccess: isApproveSuccess
+  } = useTokenAllowance(ENV.BASE_TOKEN_ADDRESS, address, ENV.STAKING_VAULT_ADDRESS);
 
-    isStakeSuccess,
-    isStakePending,
-    isStakeConfirming,
-    stake,
-
-    allowance
-  } = useStakeTransaction();
+  const { approve } = useTokenApprove();
+  const { stake, isPending: isStakePending, isSuccess: isStakeSuccess } = useTokenStake();
 
   const parsedAmount = Number(amountValue) > 0 ? parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS) : 0n;
 
-  const hasEnoughAllowance = allowance >= parsedAmount;
+  const hasEnoughAllowance = (allowance ?? 0n) >= parsedAmount;
   const needsApprove = parsedAmount > 0n && !hasEnoughAllowance;
 
   const noDelegate = !selectedAddressDelegate?.address;
@@ -60,7 +57,7 @@ export function StakeModal(props: StakeModalProps) {
 
   const isConfirmDisabled = noDelegate || noAmount || (needsApprove && !isApproveSuccess);
 
-  const disabledInputAndSelector = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
+  const disabledInputAndSelector = isApprovePending || isStakePending;
 
   // Calculate input value in USD
   const compPriceUsdValue = compPriceUsdData ?? 0n;
@@ -73,9 +70,6 @@ export function StakeModal(props: StakeModalProps) {
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
   const compWalletBalance = formatUnits(compWalletBalanceValue, ENV.BASE_TOKEN_DECIMALS);
-
-  const formatCOMPPrice = Format.price(inputValueInCOMP, 'standard');
-  const formatCOMPWalletBalance = Format.token(compWalletBalance, 'standard');
 
   const onMaxButtonClick = () => {
     setAmountValue(compWalletBalance);
@@ -92,16 +86,16 @@ export function StakeModal(props: StakeModalProps) {
   };
 
   const onConfirm = async () => {
-    if (noDelegate || noAmount || isStakePending || isStakeConfirming) return;
+    const delegateAddress = selectedAddressDelegate?.address;
 
-    await stake(selectedAddressDelegate?.address, amountValue);
+    if (!delegateAddress || noAmount || isStakePending) return;
+
+    await stake(delegateAddress, amountValue);
   };
 
-  useEffect(() => {
-    if (isStakeSuccess) {
-      onClose();
-    }
-  }, [isStakeSuccess, onClose]);
+  if (isStakeSuccess) {
+    onClose();
+  }
 
   return (
     <div className='mt-8 flex w-full flex-col gap-8'>
@@ -131,14 +125,14 @@ export function StakeModal(props: StakeModalProps) {
             lineHeight='16'
             className='text-color-24'
           >
-            {formatCOMPPrice}
+            {Format.price(inputValueInCOMP, 'standard')}
           </Text>
           <Text
             size='11'
             lineHeight='16'
             className='text-color-24'
           >
-            {formatCOMPWalletBalance} COMP
+            {Format.token(compWalletBalance, 'standard')} COMP
           </Text>
         </div>
       </div>
@@ -147,6 +141,7 @@ export function StakeModal(props: StakeModalProps) {
         selectedAddressDelegate={selectedAddressDelegate}
         onSelect={onDelegateSelect}
       />
+      {/*TODO: add warning for additional stake */}
       {/*<Condition if={showWarningForAdditionalStake}>*/}
       {/*  <div className='bg-color-21 rounded-lg p-5 flex items-center gap-2.5'>*/}
       {/*    <InfoIcon className='size-4 text-color-22' />*/}
@@ -162,7 +157,7 @@ export function StakeModal(props: StakeModalProps) {
       <div className='flex flex-col gap-2.5'>
         <Button
           className={cn('h-14 flex-col', {
-            'bg-color-7': isApprovePending || isApproveConfirming
+            'bg-color-7': isApprovePending
           })}
           disabled={isApproveDisabled}
           onClick={onApprove}
@@ -175,7 +170,7 @@ export function StakeModal(props: StakeModalProps) {
               'text-color-6': isApproveDisabled
             })}
           >
-            {isApproveConfirming || isApprovePending ? 'Pending...' : 'Approve'}
+            {isApprovePending ? 'Pending...' : 'Approve'}
           </Text>
           <Text
             size='11'
@@ -189,9 +184,9 @@ export function StakeModal(props: StakeModalProps) {
         </Button>
         <Button
           className={cn('h-14 flex-col', {
-            'bg-color-7': isStakePending || isStakeConfirming
+            'bg-color-7': isStakePending
           })}
-          disabled={isConfirmDisabled || isStakePending || isStakeConfirming}
+          disabled={isConfirmDisabled || isStakePending}
           onClick={onConfirm}
         >
           <Text
@@ -202,7 +197,7 @@ export function StakeModal(props: StakeModalProps) {
               'text-color-6': isConfirmDisabled
             })}
           >
-            {isStakeConfirming || isStakePending ? 'Pending...' : 'Confirm'}
+            {isStakePending ? 'Pending...' : 'Confirm'}
           </Text>
           <Text
             size='11'

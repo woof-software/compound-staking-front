@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
@@ -7,27 +8,57 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { useStakedBalance } from '@/hooks/useStakedBalance';
 import { useSwitch } from '@/hooks/useSwitch';
+import { useTokenApprove } from '@/hooks/useTokenApprove';
+import { useTokenBalance } from '@/hooks/useTokenBalance';
+import { useTokenStake } from '@/hooks/useTokenStake';
+import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
-import { useStakeTransaction } from '@/pages/stake/hooks/useStakeTransaction';
 
 export function StakeFlowBlock() {
-  const { isConnected } = useConnection();
+  const { onIsPendingToggle } = useWalletStore();
+
+  const { isConnected, address } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { isLoading, isStakedCOMPBalanceFetching, COMPBalance, stakedCOMPBalance } = useStakeTransaction();
+  const { isPending: isApprovePending } = useTokenApprove();
+  const { isPending: isStakePending, isSuccess: isStakeSuccess } = useTokenStake();
 
-  const isLoadingData = isLoading || isStakedCOMPBalanceFetching;
+  const {
+    data: COMPBalance,
+    isFetching: isStakedCOMPBalanceFetching,
+    refetch: refetchCOMPBalance
+  } = useStakedBalance(address);
+  const { data: stakedCOMPBalance, refetch: refetchStakedCOMPBalance } = useTokenBalance(
+    address,
+    ENV.STAKED_TOKEN_ADDRESS
+  );
+
+  const isLoadingTransaction = isApprovePending || isStakePending;
+
+  const isLoadingData = isLoadingTransaction || isStakedCOMPBalanceFetching;
 
   const isStakeButtonDisabled = !isConnected || isLoadingData;
 
   const COMPBalanceFormatted = formatUnits(COMPBalance.principal, ENV.BASE_TOKEN_DECIMALS);
   const stCOMPBalanceFormatted = formatUnits(stakedCOMPBalance, ENV.STAKED_TOKEN_DECIMALS);
 
-  const multiplier = Number(COMPBalanceFormatted) / Number(stCOMPBalanceFormatted || '1');
+  const multiplier = +COMPBalanceFormatted / +(stCOMPBalanceFormatted || '1');
+
+  if (isLoadingTransaction) {
+    onIsPendingToggle(isLoadingTransaction);
+  }
+
+  useEffect(() => {
+    if (isStakeSuccess) {
+      refetchCOMPBalance();
+      refetchStakedCOMPBalance();
+    }
+  }, [isStakeSuccess]);
 
   return (
     <Card
