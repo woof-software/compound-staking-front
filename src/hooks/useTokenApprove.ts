@@ -1,38 +1,34 @@
-import { encodeFunctionData, erc20Abi, parseUnits } from 'viem';
-import { useConnection, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
+import { useCallback } from 'react';
+import { type Address, encodeFunctionData, erc20Abi } from 'viem';
+import { useSendTransaction } from 'wagmi';
 
-import { ENV } from '@/consts/env';
+type SendApproveArgs = {
+  token: Address;
+  spender: Address;
+  value: bigint;
+};
 
 export function useTokenApprove() {
-  const { address } = useConnection();
+  const { sendTransactionAsync, ...query } = useSendTransaction();
 
-  const { sendTransactionAsync: sendTx, data: hash, isPending: isTransactionPending, ...query } = useSendTransaction();
-
-  const { isLoading: isTransactionConfirming, isSuccess: isTransactionSuccess } = useWaitForTransactionReceipt({
-    hash: hash
-  });
-
-  const approve = async (amount: string) => {
-    if (!address) return;
-
-    const parsedAmount = parseUnits(amount, ENV.BASE_TOKEN_DECIMALS);
+  const _sendTransactionAsync = useCallback(async (args: SendApproveArgs) => {
+    const { token, spender, value } = args;
 
     const approveData = encodeFunctionData({
       abi: erc20Abi,
       functionName: 'approve',
-      args: [ENV.STAKING_VAULT_ADDRESS, parsedAmount]
+      args: [spender, value]
     });
 
-    await sendTx({
-      to: ENV.BASE_TOKEN_ADDRESS,
+    return sendTransactionAsync({
+      to: token,
       data: approveData
     });
-  };
+  }, []);
 
   return {
-    approve,
-    isPending: isTransactionPending || isTransactionConfirming,
-    isApproveSuccess: isTransactionSuccess,
-    ...query
+    sendTransactionAsync: _sendTransactionAsync,
+    ...query,
+    sendTransaction: undefined
   };
 }

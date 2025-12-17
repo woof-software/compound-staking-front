@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { formatUnits, parseUnits } from 'viem';
-import { useConnection } from 'wagmi';
+import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { AmountInput } from '@/components/ui/AmountInput';
@@ -9,25 +9,22 @@ import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
 import { type Delegate } from '@/consts/common';
 import { ENV } from '@/consts/env';
-import { useTokenAllowance } from '@/hooks/useTokenAllowance';
+import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
 import { useTokenApprove } from '@/hooks/useTokenApprove';
-import { useTokenBalance } from '@/hooks/useTokenBalance';
-import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useTokenStake } from '@/hooks/useTokenStake';
 import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
-import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 
 import COMP from '@/assets/comp.svg';
 
 export type StakeModalProps = {
-  isOpen?: boolean;
-  onClose?: () => void;
+  baseTokenPriceUsdData?: bigint | undefined;
+  baseTokenWalletBalanceData?: bigint | undefined;
 };
 
 export function StakeModal(props: StakeModalProps) {
-  const { onClose = noop } = props;
+  const { baseTokenPriceUsdData, baseTokenWalletBalanceData } = props;
 
   const { onIsPendingToggle } = useWalletStore();
 
@@ -36,46 +33,46 @@ export function StakeModal(props: StakeModalProps) {
 
   const { address } = useConnection();
 
-  const { data: compPriceUsdData } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
-  const { data: compWalletBalanceData } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
+  const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(address);
 
-  const { data: allowance, refetch: refetchAllowance } = useTokenAllowance(
-    ENV.BASE_TOKEN_ADDRESS,
-    address,
-    ENV.STAKING_VAULT_ADDRESS
-  );
+  const { sendTransactionAsync: approve, data: approveHash, isPending: isApprovePending } = useTokenApprove();
+  const { isLoading: isApproveConfirming, isSuccess: isApproveSuccess } = useWaitForTransactionReceipt({
+    hash: approveHash
+  });
 
-  const { approve, isPending: isApprovePending, isApproveSuccess } = useTokenApprove();
-  const { stake, isPending: isStakePending, isStakeSuccess } = useTokenStake();
+  const { sendTransactionAsync: stake, data: stakeHash, isPending: isStakePending } = useTokenStake();
+  const { isLoading: isStakeConfirming, isSuccess: isStakeSuccess } = useWaitForTransactionReceipt({
+    hash: stakeHash
+  });
 
-  const parsedAmount = Number(amountValue) > 0 ? parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS) : 0n;
+  const parseAmount = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
+  const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
+  const needsApprove = parseAmount > 0n && !hasEnoughAllowance;
+  const noDelegate = !selectedAddressDelegate;
+  const noAmount = parseAmount === 0n;
+  const isAmountExceedsBalance = parseAmount <= BigInt(baseTokenWalletBalanceData ?? 0);
 
-  const hasEnoughAllowance = allowance ? allowance >= parsedAmount : false;
+  /* Loading */
+  const isApproveLoading = isApprovePending || isApproveConfirming;
+  const isStakeLoading = isStakePending || isStakeConfirming;
+  const isLoadingTransaction = isApproveLoading || isStakeLoading;
 
-  const needsApprove = parsedAmount > 0n && !hasEnoughAllowance;
+  /* Disabled */
+  const isApproveDisabled = noDelegate || noAmount || !needsApprove || !isAmountExceedsBalance;
+  const isConfirmDisabled = noDelegate || noAmount || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
 
-  const noDelegate = !selectedAddressDelegate?.address;
-  const noAmount = parsedAmount === 0n;
+  /* Calculate input value in USD */
+  const baseTokenPriceUsdValue = baseTokenPriceUsdData ?? 0n;
+  const baseTokenWalletBalanceValue = baseTokenWalletBalanceData ?? 0n;
 
-  const isLoadingTransaction = isApprovePending || isStakePending;
-
-  const isApproveDisabled = noDelegate || noAmount || !needsApprove;
-  const isConfirmDisabled = noDelegate || noAmount || needsApprove || isLoadingTransaction;
-
-  // Calculate input value in USD
-  const compPriceUsdValue = compPriceUsdData ?? 0n;
-  const compWalletBalanceValue = compWalletBalanceData ?? 0n;
-
-  const parseAmountValue = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
-
-  const inputValueInCOMP = formatUnits(
-    parseAmountValue * compPriceUsdValue,
+  const baseTokenPriceFormatted = formatUnits(
+    parseAmount * baseTokenPriceUsdValue,
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
-  const compWalletBalance = formatUnits(compWalletBalanceValue, ENV.BASE_TOKEN_DECIMALS);
+  const baseTokenWalletBalance = formatUnits(baseTokenWalletBalanceValue, ENV.BASE_TOKEN_DECIMALS);
 
   const onMaxButtonClick = () => {
-    setAmountValue(compWalletBalance);
+    setAmountValue(baseTokenWalletBalance);
   };
 
   const onDelegateSelect = (address: Delegate | null) => {
@@ -83,24 +80,25 @@ export function StakeModal(props: StakeModalProps) {
   };
 
   const onApprove = async () => {
-    if (noAmount || !needsApprove) return;
+    if (isApproveDisabled) return;
 
-    await approve(amountValue);
-
-    await refetchAllowance();
+    await approve({ token: ENV.BASE_TOKEN_ADDRESS, spender: ENV.STAKING_VAULT_ADDRESS, value: parseAmount });
   };
 
   const onConfirm = async () => {
     const delegateAddress = selectedAddressDelegate?.address;
 
-    if (!delegateAddress || noAmount || isStakePending) return;
+    if (!delegateAddress || isConfirmDisabled) return;
 
-    await stake(delegateAddress, amountValue);
+    await stake(delegateAddress, parseAmount);
   };
 
-  if (isStakeSuccess) {
-    onClose();
-  }
+  useEffect(() => {
+    if (isStakeSuccess) {
+      setAmountValue('');
+      setSelectedAddressDelegate(null);
+    }
+  }, [isStakeSuccess]);
 
   useEffect(() => {
     onIsPendingToggle(isLoadingTransaction);
@@ -140,14 +138,14 @@ export function StakeModal(props: StakeModalProps) {
             lineHeight='16'
             className='text-color-24'
           >
-            {Format.price(inputValueInCOMP, 'standard')}
+            {Format.price(baseTokenPriceFormatted, 'standard')}
           </Text>
           <Text
             size='11'
             lineHeight='16'
             className='text-color-24'
           >
-            {Format.token(compWalletBalance, 'standard')} COMP
+            {Format.token(baseTokenWalletBalance, 'standard')} COMP
           </Text>
         </div>
       </div>
@@ -172,7 +170,7 @@ export function StakeModal(props: StakeModalProps) {
       <div className='flex flex-col gap-2.5'>
         <Button
           className={cn('h-14 flex-col', {
-            'bg-color-7': isApprovePending
+            'bg-color-7': isApproveLoading
           })}
           disabled={isApproveDisabled}
           onClick={onApprove}
@@ -183,17 +181,17 @@ export function StakeModal(props: StakeModalProps) {
             lineHeight='18'
             className={cn('text-white', {
               'text-color-6': isApproveDisabled,
-              'text-white': isApprovePending
+              'text-white': isApproveLoading
             })}
           >
-            {isApprovePending ? 'Pending...' : 'Approve'}
+            {isApproveLoading ? 'Pending...' : 'Approve'}
           </Text>
           <Text
             size='11'
             lineHeight='16'
             className={cn('text-white', {
               'text-color-6': isApproveDisabled,
-              'text-white': isApprovePending
+              'text-white': isApproveLoading
             })}
           >
             Step 1
@@ -201,9 +199,9 @@ export function StakeModal(props: StakeModalProps) {
         </Button>
         <Button
           className={cn('h-14 flex-col', {
-            'bg-color-7': isStakePending
+            'bg-color-7': isStakeLoading
           })}
-          disabled={isConfirmDisabled || isStakePending}
+          disabled={isConfirmDisabled || isStakeLoading}
           onClick={onConfirm}
         >
           <Text
@@ -212,17 +210,17 @@ export function StakeModal(props: StakeModalProps) {
             lineHeight='18'
             className={cn('text-white', {
               'text-color-6': isConfirmDisabled,
-              'text-white': isStakePending
+              'text-white': isApproveLoading
             })}
           >
-            {isStakePending ? 'Pending...' : 'Confirm'}
+            {isApproveLoading ? 'Pending...' : 'Confirm'}
           </Text>
           <Text
             size='11'
             lineHeight='16'
             className={cn('text-white', {
               'text-color-6': isConfirmDisabled,
-              'text-white': isStakePending
+              'text-white': isApproveLoading
             })}
           >
             Step 2

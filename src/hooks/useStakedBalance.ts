@@ -1,14 +1,17 @@
 import type { Address } from 'viem';
 import { useReadContract } from 'wagmi';
+import { z } from 'zod';
 
 import { ENV } from '@/consts/env';
 import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
 
-type COMPBalanceType = {
-  principal: bigint;
-  stakeTimestamp: number;
-  lastClaimTime: number;
-};
+const COMPBalanceSchema = z.object({
+  principal: z.bigint(),
+  stakeTimestamp: z.number().int().nonnegative(),
+  lastClaimTime: z.number().int().nonnegative()
+});
+
+export type COMPBalanceType = z.infer<typeof COMPBalanceSchema>;
 
 export function useStakedBalance(address?: Address) {
   const { data: balanceData, ...query } = useReadContract({
@@ -19,11 +22,15 @@ export function useStakedBalance(address?: Address) {
     query: { enabled: !!address }
   });
 
-  const balance = (balanceData as COMPBalanceType) ?? {
-    principal: 0n,
-    stakeTimestamp: 0,
-    lastClaimTime: 0
-  };
+  let balance: COMPBalanceType | undefined = undefined;
+
+  if (balanceData) {
+    const parsed = COMPBalanceSchema.safeParse(balanceData);
+
+    if (parsed.success) {
+      balance = parsed.data;
+    }
+  }
 
   return {
     data: balance,
