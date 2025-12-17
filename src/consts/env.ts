@@ -68,7 +68,7 @@ function buildEnvOrThrow() {
     LOCK_MANAGER_ADDRESS: requiredAddress('VITE_LOCK_MANAGER_ADDRESS'),
 
     WALLET_CONNECT_PROJECT_ID: requiredString('VITE_WALLET_CONNECT_PROJECT_ID'),
-    ETHERSCAN_TX_URL: requiredString('VITE_ETHERSCAN_TX_URL')
+    ETHERSCAN_URL: requiredString('VITE_ETHERSCAN_URL')
   };
 
   if (issues.length) {

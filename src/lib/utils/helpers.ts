@@ -38,5 +38,5 @@ export function getChainName(chainId: number) {
 }
 
 export function getExplorerTxUrl(hash?: Hex) {
-  return `${ENV.ETHERSCAN_TX_URL}/tx/${hash}`;
+  return `${ENV.ETHERSCAN_URL}/tx/${hash}`;
 }
