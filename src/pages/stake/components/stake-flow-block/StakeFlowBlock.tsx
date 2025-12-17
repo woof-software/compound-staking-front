@@ -10,23 +10,18 @@ import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { useStakedBalance } from '@/hooks/useStakedBalance';
 import { useSwitch } from '@/hooks/useSwitch';
-import { useTokenApprove } from '@/hooks/useTokenApprove';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenStake } from '@/hooks/useTokenStake';
-import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 
 export function StakeFlowBlock() {
-  const { onIsPendingToggle } = useWalletStore();
-
   const { isConnected, address } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { isPending: isApprovePending } = useTokenApprove();
-  const { isPending: isStakePending, isSuccess: isStakeSuccess } = useTokenStake();
+  const { isSuccess: isStakeSuccess } = useTokenStake();
 
   const {
     data: COMPBalance,
@@ -38,20 +33,12 @@ export function StakeFlowBlock() {
     ENV.STAKED_TOKEN_ADDRESS
   );
 
-  const isLoadingTransaction = isApprovePending || isStakePending;
-
-  const isLoadingData = isLoadingTransaction || isStakedCOMPBalanceFetching;
-
-  const isStakeButtonDisabled = !isConnected || isLoadingData;
+  const isStakeButtonDisabled = !isConnected || isOpen || isStakedCOMPBalanceFetching;
 
   const COMPBalanceFormatted = formatUnits(COMPBalance.principal, ENV.BASE_TOKEN_DECIMALS);
   const stCOMPBalanceFormatted = formatUnits(stakedCOMPBalance, ENV.STAKED_TOKEN_DECIMALS);
 
   const multiplier = +COMPBalanceFormatted / +(stCOMPBalanceFormatted || '1');
-
-  if (isLoadingTransaction) {
-    onIsPendingToggle(isLoadingTransaction);
-  }
 
   useEffect(() => {
     if (isStakeSuccess) {
@@ -73,7 +60,7 @@ export function StakeFlowBlock() {
           >
             Staked
           </Text>
-          <Skeleton loading={isLoadingData}>
+          <Skeleton loading={isStakedCOMPBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -92,7 +79,7 @@ export function StakeFlowBlock() {
           >
             stCOMP balance
           </Text>
-          <Skeleton loading={isLoadingData}>
+          <Skeleton loading={isStakedCOMPBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -111,7 +98,7 @@ export function StakeFlowBlock() {
           >
             Multiplier
           </Text>
-          <Skeleton loading={isLoadingData}>
+          <Skeleton loading={isStakedCOMPBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -130,7 +117,7 @@ export function StakeFlowBlock() {
           >
             Available Rewards
           </Text>
-          <Skeleton loading={isLoadingData}>
+          <Skeleton loading={isStakedCOMPBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -149,7 +136,7 @@ export function StakeFlowBlock() {
           >
             APR
           </Text>
-          <Skeleton loading={isLoadingData}>
+          <Skeleton loading={isStakedCOMPBalanceFetching}>
             <Text
               size='17'
               weight='500'

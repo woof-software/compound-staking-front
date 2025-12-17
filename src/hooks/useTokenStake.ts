@@ -1,5 +1,5 @@
 import { type Address, encodeFunctionData, parseUnits } from 'viem';
-import { useConnection, useSendTransaction } from 'wagmi';
+import { useConnection, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 
 import { ENV } from '@/consts/env';
 import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
@@ -7,7 +7,11 @@ import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
 export function useTokenStake() {
   const { address } = useConnection();
 
-  const { sendTransactionAsync: sendStakeTx, ...query } = useSendTransaction();
+  const { sendTransactionAsync: sendTx, data: hash, isPending: isTransactionPending, ...query } = useSendTransaction();
+
+  const { isLoading: isTransactionConfirming, isSuccess: isTransactionSuccess } = useWaitForTransactionReceipt({
+    hash: hash
+  });
 
   const stake = async (delegatee: Address, amount: string) => {
     if (!address) return;
@@ -20,7 +24,7 @@ export function useTokenStake() {
       args: [delegatee, parsedAmount]
     });
 
-    await sendStakeTx({
+    await sendTx({
       to: ENV.STAKING_VAULT_ADDRESS,
       data: stakeData
     });
@@ -28,6 +32,8 @@ export function useTokenStake() {
 
   return {
     stake,
+    isPending: isTransactionPending || isTransactionConfirming,
+    isStakeSuccess: isTransactionSuccess,
     ...query
   };
 }
