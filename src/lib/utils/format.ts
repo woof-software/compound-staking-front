@@ -114,24 +114,24 @@ export namespace FormatTime {
       seconds
     };
   }
+
   /**
    * Formats a duration (in seconds) into a compact string.
    *
    * Rules:
    * - If totalSeconds <= 0 → "00d 00h"
    * - If there are days     → "DDd HHh"
-   * - Else if there are hrs → "HHh MMm"
-   * - Else                  → "MMm SSs"
+   * - Else                  → "HHh MMm"
    *
    * @param totalSeconds - Duration in seconds (e.g. remaining cooldown or lock time).
-   * @returns A string like "06d 23h", "03h 15m" or "05m 20s".
+   * @returns A string like "06d 23h", "03h 15m".
    */
   export function cooldownFromSeconds(totalSeconds: number): string {
     if (!totalSeconds || totalSeconds <= 0) {
       return '00d 00h';
     }
 
-    const { days, hours, minutes, seconds } = durationTime(totalSeconds);
+    const { days, hours, minutes } = durationTime(totalSeconds);
 
     const pad = (n: number) => n.toString().padStart(2, '0');
 
@@ -139,11 +139,7 @@ export namespace FormatTime {
       return `${pad(days)}d ${pad(hours)}h`;
     }
 
-    if (hours > 0) {
-      return `${pad(hours)}h ${pad(minutes)}m`;
-    }
-
-    return `${pad(minutes)}m ${pad(seconds)}s`;
+    return `${pad(hours)}h ${pad(minutes)}m`;
   }
 
   export function lockInfo(startTimeSec: number, durationSec: number) {
@@ -152,27 +148,27 @@ export namespace FormatTime {
         isUnlocked: false,
         unlockTimestampSec: 0,
         unlockDateLabel: '-',
-        countdownLabel: '00d 00h'
+        countdownLabel: '00d 00h',
+        remainingSeconds: 0
       };
     }
 
     const unlockTimestampSec = startTimeSec + durationSec;
 
-    const unlockDate = dayjs.unix(unlockTimestampSec);
-    const now = dayjs();
+    const nowUnix = dayjs().unix();
+    const remainingSeconds = Math.max(0, unlockTimestampSec - nowUnix);
 
-    const diffSec = Math.max(0, unlockDate.diff(now, 'second'));
+    const unlockDateLabel = dayjs.unix(unlockTimestampSec).format('MMMM D, YYYY');
+    const countdownLabel = cooldownFromSeconds(remainingSeconds);
 
-    const unlockDateLabel = unlockDate.format('MMMM D, YYYY');
-    const countdownLabel = cooldownFromSeconds(diffSec);
-
-    const isUnlocked = diffSec <= 0;
+    const isUnlocked = remainingSeconds === 0;
 
     return {
       isUnlocked,
       unlockTimestampSec,
       unlockDateLabel,
-      countdownLabel
+      countdownLabel,
+      remainingSeconds
     };
   }
 }

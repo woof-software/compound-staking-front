@@ -35,7 +35,6 @@ export function StakeModal(props: StakeModalProps) {
   const { data: compWalletBalanceData } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
 
   const {
-    isApproveSuccess,
     isApprovePending,
     isApproveConfirming,
     approve,
@@ -56,11 +55,11 @@ export function StakeModal(props: StakeModalProps) {
   const noDelegate = !selectedAddressDelegate?.address;
   const noAmount = parsedAmount === 0n;
 
-  const isApproveDisabled = noDelegate || noAmount || !needsApprove || isApproveSuccess;
-
-  const isConfirmDisabled = noDelegate || noAmount || (needsApprove && !isApproveSuccess);
-
   const disabledInputAndSelector = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
+
+  const isApproveDisabled = disabledInputAndSelector || noDelegate || noAmount || !needsApprove;
+
+  const isConfirmDisabled = disabledInputAndSelector || noDelegate || noAmount || needsApprove;
 
   // Calculate input value in USD
   const compPriceUsdValue = compPriceUsdData ?? 0n;
@@ -172,7 +171,8 @@ export function StakeModal(props: StakeModalProps) {
             weight='500'
             lineHeight='18'
             className={cn('text-white', {
-              'text-color-6': isApproveDisabled
+              'text-color-6': isApproveDisabled,
+              'text-white': isApprovePending || isApproveConfirming
             })}
           >
             {isApproveConfirming || isApprovePending ? 'Pending...' : 'Approve'}
@@ -181,7 +181,8 @@ export function StakeModal(props: StakeModalProps) {
             size='11'
             lineHeight='16'
             className={cn('text-white', {
-              'text-color-6': isApproveDisabled
+              'text-color-6': isApproveDisabled,
+              'text-white': isApprovePending || isApproveConfirming
             })}
           >
             Step 1
@@ -191,7 +192,7 @@ export function StakeModal(props: StakeModalProps) {
           className={cn('h-14 flex-col', {
             'bg-color-7': isStakePending || isStakeConfirming
           })}
-          disabled={isConfirmDisabled || isStakePending || isStakeConfirming}
+          disabled={isConfirmDisabled}
           onClick={onConfirm}
         >
           <Text
@@ -199,7 +200,8 @@ export function StakeModal(props: StakeModalProps) {
             weight='500'
             lineHeight='18'
             className={cn('text-white', {
-              'text-color-6': isConfirmDisabled
+              'text-color-6': isConfirmDisabled,
+              'text-white': isStakePending || isStakeConfirming
             })}
           >
             {isStakeConfirming || isStakePending ? 'Pending...' : 'Confirm'}
@@ -208,7 +210,8 @@ export function StakeModal(props: StakeModalProps) {
             size='11'
             lineHeight='16'
             className={cn('text-white', {
-              'text-color-6': isConfirmDisabled
+              'text-color-6': isConfirmDisabled,
+              'text-white': isStakePending || isStakeConfirming
             })}
           >
             Step 2

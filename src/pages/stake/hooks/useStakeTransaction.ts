@@ -95,8 +95,6 @@ export function useStakeTransaction() {
       to: ENV.BASE_TOKEN_ADDRESS,
       data: approveData
     });
-
-    await refetchAllowance();
   };
 
   const stake = async (delegatee: Address, amount: string) => {
@@ -115,6 +113,12 @@ export function useStakeTransaction() {
       data: stakeData
     });
   };
+
+  useEffect(() => {
+    if (isApproveSuccess) {
+      refetchAllowance();
+    }
+  }, [isApproveSuccess, refetchAllowance]);
 
   useEffect(() => {
     if (isStakeSuccess) {

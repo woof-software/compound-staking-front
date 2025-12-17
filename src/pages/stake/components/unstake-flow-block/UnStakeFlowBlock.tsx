@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
+import { CoolDown } from '@/components/common/CoolDown';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -14,6 +16,8 @@ import { useStakeTransaction } from '@/pages/stake/hooks/useStakeTransaction';
 import { useUnStakeTransaction } from '@/pages/stake/hooks/useUnStakeTransaction';
 
 export function UnStakeFlowBlock() {
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
+
   const { isConnected } = useConnection();
 
   const { COMPBalance } = useStakeTransaction();
@@ -30,19 +34,17 @@ export function UnStakeFlowBlock() {
   } = useUnStakeTransaction();
 
   const lockedCOMPBalanceFormatted = formatUnits(lockedCOMPData.amount, ENV.BASE_TOKEN_DECIMALS);
-  const { isUnlocked, countdownLabel } = FormatTime.lockInfo(lockedCOMPData.startTime, lockedCOMPData.duration);
+  const { remainingSeconds } = FormatTime.lockInfo(lockedCOMPData.startTime, lockedCOMPData.duration);
 
   const isUnStakeButtonDisabled =
     !isConnected ||
-    (Number(COMPBalance.principal) === 0 && !isUnlocked) ||
     isUnstakeRequestPending ||
     isUnlockRequestPending ||
     isUnstakeRequestConfirming ||
-    isUnlockRequestConfirming;
+    isUnlockRequestConfirming ||
+    (Number(COMPBalance.principal) === 0 && !isUnlocked);
 
   const isInfoVisible = isConnected && isUnlocked;
-
-  const coolDownValue = lockedCOMPData.startTime ? countdownLabel : '-';
 
   return (
     <div className='flex flex-col gap-1.5'>
@@ -80,16 +82,14 @@ export function UnStakeFlowBlock() {
                 Cooldown
               </Text>
               <Skeleton loading={isLockedCOMPBalanceFetching}>
-                <Text
-                  size='17'
-                  weight='500'
-                  lineHeight='17'
+                <CoolDown
+                  totalSeconds={remainingSeconds}
+                  isDisabled={isConnected && !!lockedCOMPData.startTime}
                   className={cn('text-color-2', {
                     'text-color-6': !isConnected || !lockedCOMPData.startTime
                   })}
-                >
-                  {isConnected ? coolDownValue : '-'}
-                </Text>
+                  onStateChange={(isUnlocked) => setIsUnlocked(isUnlocked)}
+                />
               </Skeleton>
             </div>
           </div>

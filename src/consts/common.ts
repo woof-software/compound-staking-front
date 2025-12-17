@@ -25,3 +25,6 @@ export const DELEGATES: Delegate[] = [
   { name: 'Wintermute', address: '0xB933AEe47C438f22DE0747D57fc239FE37878Dd1' },
   { name: 'a16z', address: '0x9aa835bc7b8ce13b9b0c9764a52fbf71ac62ccf1' }
 ];
+
+/* TIME */
+export const MINUTE_SECONDS = 60 * 1000;

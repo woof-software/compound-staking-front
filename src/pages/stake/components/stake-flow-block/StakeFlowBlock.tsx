@@ -42,7 +42,8 @@ export function StakeFlowBlock() {
     isUnstakeRequestConfirming ||
     hasActiveLock;
 
-  const isStakeButtonDisabled = !isConnected || isLoadingData || stakeBlockedByUnstakeFlow;
+  const isStakeButtonDisabled =
+    !isConnected || isLoadingData || isUnstakeRequestConfirming || isUnlockRequestPending || stakeBlockedByUnstakeFlow;
 
   const COMPBalanceFormatted = formatUnits(COMPBalance.principal, ENV.BASE_TOKEN_DECIMALS);
   const stCOMPBalanceFormatted = formatUnits(stakedCOMPBalance, ENV.STAKED_TOKEN_DECIMALS);
