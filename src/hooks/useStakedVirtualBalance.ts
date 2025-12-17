@@ -19,8 +19,6 @@ export function useStakedVirtualBalance(address?: Address) {
 
   if (typeof balanceData === 'bigint') {
     result = balanceData;
-  } else {
-    result = 0n;
   }
 
   return {

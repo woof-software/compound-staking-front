@@ -45,7 +45,7 @@ export function StakeFlowBlock() {
   const isStakeButtonDisabled = !isConnected || isOpen || isPriceOrBalanceLoading;
 
   const baseTokenBalanceFormatted = formatUnits(BigInt(COMPBalance?.principal ?? 0), ENV.BASE_TOKEN_DECIMALS);
-  const stakedTokenBalanceFormatted = formatUnits(stakedCOMPBalance, ENV.STAKED_TOKEN_DECIMALS);
+  const stakedTokenBalanceFormatted = formatUnits(BigInt(stakedCOMPBalance ?? 0), ENV.STAKED_TOKEN_DECIMALS);
 
   const multiplier = +(stakedTokenBalanceFormatted || '1') / +baseTokenBalanceFormatted;
 
