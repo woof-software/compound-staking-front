@@ -24,22 +24,23 @@ export function StakeFlowBlock() {
   const { isSuccess: isStakeSuccess } = useStakeTransaction();
 
   const {
-    data: baseTokenBalance,
-    isFetching: isBaseTokenBalanceFetching,
-    refetch: refetchBaseTokenBalance
+    data: stakedBalance,
+    isLoading: isStakedBalanceFormattedFetching,
+    refetch: refetchStakedBalanceFormatted
   } = useStakedBalance(address);
+
   const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(address);
 
   const isStakeButtonDisabled = !isConnected || isOpen;
 
-  const baseTokenBalanceFormatted = formatUnits(BigInt(baseTokenBalance?.principal ?? 0), ENV.BASE_TOKEN_DECIMALS);
-  const stakedTokenBalanceFormatted = formatUnits(BigInt(virtualBalance ?? 0), ENV.STAKED_TOKEN_DECIMALS);
+  const stakedBalanceFormatted = formatUnits(BigInt(stakedBalance?.principal ?? 0), ENV.BASE_TOKEN_DECIMALS);
+  const virtualBalanceFormatted = formatUnits(BigInt(virtualBalance ?? 0), ENV.STAKED_TOKEN_DECIMALS);
 
-  const multiplier = +(stakedTokenBalanceFormatted || '1') / +baseTokenBalanceFormatted;
+  const multiplier = +(virtualBalanceFormatted || '1') / +stakedBalanceFormatted;
 
   useEffect(() => {
     if (isStakeSuccess) {
-      refetchBaseTokenBalance();
+      refetchStakedBalanceFormatted();
       refetchVirtualBalance();
     }
   }, [isStakeSuccess]);
@@ -57,7 +58,7 @@ export function StakeFlowBlock() {
           >
             Staked
           </Text>
-          <Skeleton loading={isBaseTokenBalanceFetching}>
+          <Skeleton loading={isStakedBalanceFormattedFetching}>
             <Text
               size='17'
               weight='500'
@@ -65,7 +66,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? Format.token(baseTokenBalanceFormatted, 'compact') : '0.0000'} COMP
+              {isConnected ? Format.token(stakedBalanceFormatted, 'compact') : '0.0000'} COMP
             </Text>
           </Skeleton>
         </div>
@@ -76,7 +77,7 @@ export function StakeFlowBlock() {
           >
             stCOMP balance
           </Text>
-          <Skeleton loading={isBaseTokenBalanceFetching}>
+          <Skeleton loading={isStakedBalanceFormattedFetching}>
             <Text
               size='17'
               weight='500'
@@ -84,7 +85,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? Format.token(stakedTokenBalanceFormatted, 'compact') : '0.0000'} stCOMP
+              {isConnected ? Format.token(virtualBalanceFormatted, 'compact') : '0.0000'} stCOMP
             </Text>
           </Skeleton>
         </div>
@@ -95,7 +96,7 @@ export function StakeFlowBlock() {
           >
             Multiplier
           </Text>
-          <Skeleton loading={isBaseTokenBalanceFetching}>
+          <Skeleton loading={isStakedBalanceFormattedFetching}>
             <Text
               size='17'
               weight='500'
@@ -114,7 +115,7 @@ export function StakeFlowBlock() {
           >
             Available Rewards
           </Text>
-          <Skeleton loading={isBaseTokenBalanceFetching}>
+          <Skeleton loading={isStakedBalanceFormattedFetching}>
             <Text
               size='17'
               weight='500'
@@ -133,7 +134,7 @@ export function StakeFlowBlock() {
           >
             APR
           </Text>
-          <Skeleton loading={isBaseTokenBalanceFetching}>
+          <Skeleton loading={isStakedBalanceFormattedFetching}>
             <Text
               size='17'
               weight='500'
