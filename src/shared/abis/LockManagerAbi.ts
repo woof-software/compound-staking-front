@@ -17,5 +17,12 @@ export const LockManagerAbi = [
     stateMutability: 'view',
     type: 'function'
   },
+  {
+    inputs: [],
+    name: 'lockDuration',
+    outputs: [{ internalType: 'uint40', name: '', type: 'uint40' }],
+    stateMutability: 'view',
+    type: 'function'
+  },
   { inputs: [], name: 'unlock', outputs: [], stateMutability: 'nonpayable', type: 'function' }
 ];

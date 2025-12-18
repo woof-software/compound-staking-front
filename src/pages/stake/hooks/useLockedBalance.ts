@@ -22,7 +22,14 @@ export function useLockedBalance(address?: Address) {
     query: { enabled: !!address }
   });
 
+  const { data: lockDuration } = useReadContract({
+    address: ENV.LOCK_MANAGER_ADDRESS,
+    abi: LockManagerAbi,
+    functionName: 'lockDuration'
+  });
+
   let balance: LockedBalanceSchemaType | undefined = undefined;
+  const duration: number = Number(lockDuration ?? 0);
 
   if (balanceData) {
     const parsed = LockedBalanceSchema.safeParse(balanceData);
@@ -34,6 +41,7 @@ export function useLockedBalance(address?: Address) {
 
   return {
     data: balance,
+    lockDuration: duration,
     ...query
   };
 }

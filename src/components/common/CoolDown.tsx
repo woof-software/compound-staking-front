@@ -9,12 +9,11 @@ export type CoolDownProps = {
   totalSeconds?: number;
   className?: string;
   isDisabled?: boolean;
-  hasActiveLock?: boolean;
   onStateChange?: (isUnlocked: boolean) => void;
 };
 
 export function CoolDown(props: CoolDownProps) {
-  const { totalSeconds = 0, className = '', hasActiveLock = false, isDisabled = false, onStateChange = noop } = props;
+  const { totalSeconds = 0, className = '', isDisabled = false, onStateChange = noop } = props;
 
   const [secondsLeft, setSecondsLeft] = useState<number>(totalSeconds);
 
@@ -47,11 +46,11 @@ export function CoolDown(props: CoolDownProps) {
   }, [secondsLeft, days, hours]);
 
   useEffect(() => {
-    if (!hasActiveLock) return;
+    if (!totalSeconds) return;
 
-    const isUnlocked = !secondsLeft || secondsLeft <= 0;
+    const isUnlocked = !totalSeconds;
     onStateChange(isUnlocked);
-  }, [secondsLeft, hasActiveLock, onStateChange]);
+  }, [totalSeconds, onStateChange]);
 
   return (
     <Text

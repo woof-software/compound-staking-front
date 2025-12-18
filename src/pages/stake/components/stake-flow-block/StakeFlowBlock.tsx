@@ -14,6 +14,7 @@ import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
+import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useStakedVirtualBalance } from '@/pages/stake/hooks/useStakedVirtualBalance';
 import { useTokenStake } from '@/pages/stake/hooks/useTokenStake';
@@ -23,59 +24,50 @@ export function StakeFlowBlock() {
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  // const { isStakeFlowDisabled } = useStakeStore();
-
   const { isSuccess: isStakeSuccess } = useTokenStake();
 
   const {
-    data: COMPBalance,
-    isFetching: isStakedCOMPBalanceFetching,
-    refetch: refetchCOMPBalance
+    data: baseTokenBalance,
+    isLoading: isBaseTokenBalanceLoading,
+    refetch: refetchBaseTokenBalance
   } = useStakedBalance(address);
-  const { data: stakedCOMPBalance, refetch: refetchStakedCOMPBalance } = useStakedVirtualBalance(address);
 
-  const { data: baseTokenPriceUsdData, isFetching: isBaseTokenPriceUsdFetching } = useTokenPrice(
+  const {
+    data: stakedTokenBalance,
+    isLoading: isStakedTokenBalanceLoading,
+    refetch: refetchStakedTokenBalance
+  } = useStakedVirtualBalance(address);
+
+  const { data: lockedTokenBalance } = useLockedBalance(address);
+
+  const { data: baseTokenPriceUsdData, isLoading: isBaseTokenPriceUsdLoading } = useTokenPrice(
     ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
   );
-  const { data: baseTokenWalletBalanceData, isFetching: isBaseTokenWalletBalanceFetching } = useTokenBalance(
+  const { data: baseTokenWalletBalanceData, isLoading: isBaseTokenWalletBalanceLoading } = useTokenBalance(
     address,
     ENV.BASE_TOKEN_ADDRESS
   );
 
-  // const {
-  //   isUnstakeRequestConfirming,
-  //   isUnlockRequestPending,
-  //   isUnstakeRequestPending,
-  //   isUnlockRequestConfirming,
-  //   hasActiveLock
-  // } = useUnStakeTransaction();
+  const hasActiveLock = BigInt(lockedTokenBalance?.amount ?? 0) > 0n;
 
-  // const isLoadingData = isLoading || isStakedCOMPBalanceFetching;
+  const stakeBlockedByUnstakeFlow = hasActiveLock;
 
-  const isPriceOrBalanceLoading = isBaseTokenPriceUsdFetching || isBaseTokenWalletBalanceFetching;
+  /* Loading */
+  const isPriceOrBalanceLoading = isBaseTokenPriceUsdLoading || isBaseTokenWalletBalanceLoading;
+  const isTokenBalanceLoading = isBaseTokenBalanceLoading || isStakedTokenBalanceLoading;
+  const isLoading = isPriceOrBalanceLoading || isTokenBalanceLoading;
 
-  // const stakeBlockedByUnstakeFlow =
-  //   isStakeFlowDisabled ||
-  //   isUnstakeRequestPending ||
-  //   isUnlockRequestPending ||
-  //   isUnlockRequestConfirming ||
-  //   isUnstakeRequestConfirming ||
-  //   hasActiveLock;
+  const isStakeButtonDisabled = !isConnected || isOpen || isLoading || stakeBlockedByUnstakeFlow;
 
-  // const isStakeButtonDisabled =
-  //   !isConnected || isLoadingData || isUnstakeRequestConfirming || isUnlockRequestPending || stakeBlockedByUnstakeFlow;
-
-  const isStakeButtonDisabled = !isConnected || isOpen || isPriceOrBalanceLoading;
-
-  const baseTokenBalanceFormatted = formatUnits(BigInt(COMPBalance?.principal ?? 0), ENV.BASE_TOKEN_DECIMALS);
-  const stakedTokenBalanceFormatted = formatUnits(BigInt(stakedCOMPBalance ?? 0), ENV.STAKED_TOKEN_DECIMALS);
+  const baseTokenBalanceFormatted = formatUnits(BigInt(baseTokenBalance?.principal ?? 0), ENV.BASE_TOKEN_DECIMALS);
+  const stakedTokenBalanceFormatted = formatUnits(BigInt(stakedTokenBalance ?? 0), ENV.STAKED_TOKEN_DECIMALS);
 
   const multiplier = +(stakedTokenBalanceFormatted || '1') / +baseTokenBalanceFormatted;
 
   useEffect(() => {
     if (isStakeSuccess) {
-      refetchCOMPBalance();
-      refetchStakedCOMPBalance();
+      refetchBaseTokenBalance();
+      refetchStakedTokenBalance();
     }
   }, [isStakeSuccess]);
 
@@ -92,7 +84,7 @@ export function StakeFlowBlock() {
           >
             Staked
           </Text>
-          <Skeleton loading={isStakedCOMPBalanceFetching}>
+          <Skeleton loading={isLoading}>
             <Text
               size='17'
               weight='500'
@@ -111,7 +103,7 @@ export function StakeFlowBlock() {
           >
             stCOMP balance
           </Text>
-          <Skeleton loading={isStakedCOMPBalanceFetching}>
+          <Skeleton loading={isLoading}>
             <Text
               size='17'
               weight='500'
@@ -130,7 +122,7 @@ export function StakeFlowBlock() {
           >
             Multiplier
           </Text>
-          <Skeleton loading={isStakedCOMPBalanceFetching}>
+          <Skeleton loading={isLoading}>
             <Text
               size='17'
               weight='500'
@@ -149,7 +141,7 @@ export function StakeFlowBlock() {
           >
             Available Rewards
           </Text>
-          <Skeleton loading={isStakedCOMPBalanceFetching}>
+          <Skeleton loading={isLoading}>
             <Text
               size='17'
               weight='500'
@@ -168,7 +160,7 @@ export function StakeFlowBlock() {
           >
             APR
           </Text>
-          <Skeleton loading={isStakedCOMPBalanceFetching}>
+          <Skeleton loading={isLoading}>
             <Text
               size='17'
               weight='500'

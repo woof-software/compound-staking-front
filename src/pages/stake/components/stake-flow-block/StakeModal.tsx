@@ -13,6 +13,8 @@ import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
 import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
+import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
+import { useStakedVirtualBalance } from '@/pages/stake/hooks/useStakedVirtualBalance';
 import { useTokenApprove } from '@/pages/stake/hooks/useTokenApprove';
 import { useTokenStake } from '@/pages/stake/hooks/useTokenStake';
 
@@ -26,7 +28,7 @@ export type StakeModalProps = {
 export function StakeModal(props: StakeModalProps) {
   const { baseTokenPriceUsdData, baseTokenWalletBalanceData } = props;
 
-  const { onIsPendingToggle } = useWalletStore();
+  const { setIsPendingToggle } = useWalletStore();
 
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
@@ -34,6 +36,9 @@ export function StakeModal(props: StakeModalProps) {
   const { address } = useConnection();
 
   const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(address);
+
+  const { refetch: refetchBaseTokenBalance } = useStakedBalance(address);
+  const { refetch: refetchStakedTokenBalance } = useStakedVirtualBalance(address);
 
   const { sendTransactionAsync: approve, data: approveHash, isPending: isApprovePending } = useTokenApprove();
   const { isLoading: isApproveConfirming, isSuccess: isApproveSuccess } = useWaitForTransactionReceipt({
@@ -60,11 +65,6 @@ export function StakeModal(props: StakeModalProps) {
   /* Disabled */
   const isApproveDisabled = noDelegate || noAmount || !needsApprove || !isAmountExceedsBalance;
   const isConfirmDisabled = noDelegate || noAmount || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
-
-  // const isApproveDisabled = noDelegate || noAmount || !needsApprove || isApproveSuccess;
-  // const isConfirmDisabled = noDelegate || noAmount || (needsApprove && !isApproveSuccess);
-
-  // const disabledInputAndSelector = isApprovePending || isApproveConfirming || isStakePending || isStakeConfirming;
 
   /* Calculate input value in USD */
   const baseTokenPriceUsdValue = baseTokenPriceUsdData ?? 0n;
@@ -102,11 +102,14 @@ export function StakeModal(props: StakeModalProps) {
     if (isStakeSuccess) {
       setAmountValue('');
       setSelectedAddressDelegate(null);
+
+      refetchBaseTokenBalance();
+      refetchStakedTokenBalance();
     }
   }, [isStakeSuccess]);
 
   useEffect(() => {
-    onIsPendingToggle(isLoadingTransaction);
+    setIsPendingToggle(isLoadingTransaction);
   }, [isLoadingTransaction]);
 
   useEffect(() => {
@@ -215,17 +218,17 @@ export function StakeModal(props: StakeModalProps) {
             lineHeight='18'
             className={cn('text-white', {
               'text-color-6': isConfirmDisabled,
-              'text-white': isApproveLoading
+              'text-white': isStakeLoading
             })}
           >
-            {isApproveLoading ? 'Pending...' : 'Confirm'}
+            {isStakeLoading ? 'Pending...' : 'Confirm'}
           </Text>
           <Text
             size='11'
             lineHeight='16'
             className={cn('text-white', {
               'text-color-6': isConfirmDisabled,
-              'text-white': isApproveLoading
+              'text-white': isStakeLoading
             })}
           >
             Step 2
