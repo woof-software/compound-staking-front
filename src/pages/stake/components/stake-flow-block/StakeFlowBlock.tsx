@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
+import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
@@ -11,6 +12,7 @@ import { ENV } from '@/consts/env';
 import { useStakedBalance } from '@/hooks/useStakedBalance';
 import { useStakeTransaction } from '@/hooks/useStakeTransaction';
 import { useSwitch } from '@/hooks/useSwitch';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useVirtualBalance } from '@/hooks/useVirtualBalance';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
@@ -31,10 +33,21 @@ export function StakeFlowBlock() {
 
   const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(address);
 
-  const isStakeButtonDisabled = !isConnected || isOpen;
+  const { data: baseTokenPrice, isFetching: isBaseTokenPriceFetching } = useTokenPrice(
+    ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
+  );
 
-  const stakedBalanceFormatted = formatUnits(BigInt(stakedBalance?.principal ?? 0), ENV.BASE_TOKEN_DECIMALS);
-  const virtualBalanceFormatted = formatUnits(BigInt(virtualBalance ?? 0), ENV.STAKED_TOKEN_DECIMALS);
+  const isLoading = isStakedBalanceFormattedFetching || isBaseTokenPriceFetching;
+
+  const isStakeButtonDisabled = !isConnected || isOpen || isLoading;
+
+  const stakedBalanceFormatted = formatUnits(stakedBalance?.principal ?? 0n, ENV.BASE_TOKEN_DECIMALS);
+  const virtualBalanceFormatted = formatUnits(virtualBalance ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
+
+  const stakedBalancePriceFormatted = formatUnits(
+    (stakedBalance?.principal ?? 0n) * (baseTokenPrice ?? 0n),
+    ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
+  );
 
   const multiplier = +(virtualBalanceFormatted || '1') / +stakedBalanceFormatted;
 
@@ -52,32 +65,48 @@ export function StakeFlowBlock() {
     >
       <div className='flex justify-between p-10'>
         <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            Staked
-          </Text>
-          <Skeleton loading={isStakedBalanceFormattedFetching}>
+          <Skeleton loading={isLoading}>
             <Text
-              size='17'
-              weight='500'
-              className={cn('text-color-2', {
-                'text-color-6': !isConnected
-              })}
+              size='11'
+              className='text-color-24'
             >
-              {isConnected ? Format.token(stakedBalanceFormatted, 'compact') : '0.0000'} COMP
+              Staked
             </Text>
           </Skeleton>
+          <div className='flex flex-col gap-2'>
+            <Skeleton loading={isLoading}>
+              <Text
+                size='17'
+                weight='500'
+                className={cn('text-color-2', {
+                  'text-color-6': !isConnected
+                })}
+              >
+                {isConnected ? Format.token(stakedBalanceFormatted, 'compact') : '0.0000'} COMP
+              </Text>
+            </Skeleton>
+            <Condition if={isConnected}>
+              <Skeleton loading={isLoading}>
+                <Text
+                  size='11'
+                  className='text-color-24'
+                >
+                  {Format.price(stakedBalancePriceFormatted, 'standard')}
+                </Text>
+              </Skeleton>
+            </Condition>
+          </div>
         </div>
         <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            stCOMP balance
-          </Text>
-          <Skeleton loading={isStakedBalanceFormattedFetching}>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              stCOMP balance
+            </Text>
+          </Skeleton>
+          <Skeleton loading={isLoading}>
             <Text
               size='17'
               weight='500'
@@ -90,13 +119,15 @@ export function StakeFlowBlock() {
           </Skeleton>
         </div>
         <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            Multiplier
-          </Text>
-          <Skeleton loading={isStakedBalanceFormattedFetching}>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              Multiplier
+            </Text>
+          </Skeleton>
+          <Skeleton loading={isLoading}>
             <Text
               size='17'
               weight='500'
@@ -109,32 +140,48 @@ export function StakeFlowBlock() {
           </Skeleton>
         </div>
         <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            Available Rewards
-          </Text>
-          <Skeleton loading={isStakedBalanceFormattedFetching}>
+          <Skeleton loading={isLoading}>
             <Text
-              size='17'
-              weight='500'
-              className={cn('text-color-2', {
-                'text-color-6': !isConnected
-              })}
+              size='11'
+              className='text-color-24'
             >
-              {isConnected ? '0.0000' : '0.0000'} COMP
+              Available Rewards
             </Text>
           </Skeleton>
+          <div className='flex flex-col gap-2'>
+            <Skeleton loading={isLoading}>
+              <Text
+                size='17'
+                weight='500'
+                className={cn('text-color-2', {
+                  'text-color-6': !isConnected
+                })}
+              >
+                {isConnected ? '0.0000' : '0.0000'} COMP
+              </Text>
+            </Skeleton>
+            <Condition if={isConnected}>
+              <Skeleton loading={isLoading}>
+                <Text
+                  size='11'
+                  className='text-color-24'
+                >
+                  {Format.price(stakedBalancePriceFormatted, 'standard')}
+                </Text>
+              </Skeleton>
+            </Condition>
+          </div>
         </div>
         <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            APR
-          </Text>
-          <Skeleton loading={isStakedBalanceFormattedFetching}>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              APR
+            </Text>
+          </Skeleton>
+          <Skeleton loading={isLoading}>
             <Text
               size='17'
               weight='500'
