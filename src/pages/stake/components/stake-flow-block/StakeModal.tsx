@@ -32,6 +32,7 @@ export function StakeModal() {
   const { data: baseTokenPrice, isFetching: isBaseTokenPriceFetching } = useTokenPrice(
     ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
   );
+
   const { data: walletBalance, isFetching: isWalletBalanceFetching } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
 
   const isPriceOrBalanceLoading = isBaseTokenPriceFetching || isWalletBalanceFetching;
@@ -39,11 +40,13 @@ export function StakeModal() {
   const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(address);
 
   const { sendTransactionAsync: approve, data: approveHash, isPending: isApprovePending } = useApproveTransaction();
+
   const { isLoading: isApproveConfirming, isSuccess: isApproveSuccess } = useWaitForTransactionReceipt({
     hash: approveHash
   });
 
   const { sendTransactionAsync: stake, data: stakeHash, isPending: isStakePending } = useStakeTransaction();
+
   const { isLoading: isStakeConfirming, isSuccess: isStakeSuccess } = useWaitForTransactionReceipt({
     hash: stakeHash
   });
@@ -52,7 +55,7 @@ export function StakeModal() {
   const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
   const needsApprove = parseAmount > 0n && !hasEnoughAllowance;
   const noAmount = parseAmount === 0n;
-  const isAmountExceedsBalance = parseAmount <= BigInt(walletBalance ?? 0);
+  const isAmountExceedsBalance = parseAmount <= (walletBalance ?? 0n);
 
   /* Loading */
   const isApproveLoading = isApprovePending || isApproveConfirming;
