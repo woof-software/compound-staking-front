@@ -17,12 +17,20 @@ import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
+import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 
 import COMP from '@/assets/comp.svg';
 
-export function StakeModal() {
-  const { onIsPendingToggle } = useWalletStore();
+export type StakeModalProps = {
+  onClose?: () => void;
+  onStakeConfirmed?: () => void;
+};
+
+export function StakeModal(props: StakeModalProps) {
+  const { onClose = noop, onStakeConfirmed = noop } = props;
+
+  const { setIsPendingToggle } = useWalletStore();
 
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
@@ -97,13 +105,13 @@ export function StakeModal() {
 
   useEffect(() => {
     if (isStakeSuccess) {
-      setAmountValue('');
-      setSelectedAddressDelegate(null);
+      onStakeConfirmed();
+      onClose();
     }
   }, [isStakeSuccess]);
 
   useEffect(() => {
-    onIsPendingToggle(isLoadingTransaction);
+    setIsPendingToggle(isLoadingTransaction);
   }, [isLoadingTransaction]);
 
   useEffect(() => {

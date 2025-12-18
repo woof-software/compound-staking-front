@@ -5,7 +5,7 @@ import { Header } from '@/components/layout/Header';
 
 export function RootLayout() {
   return (
-    <div className='max-w-5xl mx-auto flex flex-col h-screen'>
+    <div className='mx-auto flex h-screen max-w-271 flex-col'>
       <Header />
       <Outlet />
       <Footer />

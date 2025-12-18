@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
@@ -10,7 +10,6 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { useStakedBalance } from '@/hooks/useStakedBalance';
-import { useStakeTransaction } from '@/hooks/useStakeTransaction';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useVirtualBalance } from '@/hooks/useVirtualBalance';
@@ -22,8 +21,6 @@ export function StakeFlowBlock() {
   const { isConnected, address } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
-
-  const { isSuccess: isStakeSuccess } = useStakeTransaction();
 
   const {
     data: stakedBalance,
@@ -51,12 +48,10 @@ export function StakeFlowBlock() {
 
   const multiplier = +(virtualBalanceFormatted || '1') / +stakedBalanceFormatted;
 
-  useEffect(() => {
-    if (isStakeSuccess) {
-      refetchStakedBalanceFormatted();
-      refetchVirtualBalance();
-    }
-  }, [isStakeSuccess]);
+  const onStakeConfirmed = useCallback(() => {
+    refetchStakedBalanceFormatted();
+    refetchVirtualBalance();
+  }, [refetchStakedBalanceFormatted, refetchVirtualBalance]);
 
   return (
     <Card
@@ -85,7 +80,7 @@ export function StakeFlowBlock() {
                 {isConnected ? Format.token(stakedBalanceFormatted, 'compact') : '0.0000'} COMP
               </Text>
             </Skeleton>
-            <Condition if={isConnected}>
+            <Condition if={isConnected && !!stakedBalance?.principal}>
               <Skeleton loading={isLoading}>
                 <Text
                   size='11'
@@ -206,7 +201,10 @@ export function StakeFlowBlock() {
         open={isOpen}
         onClose={onClose}
       >
-        <StakeModal />
+        <StakeModal
+          onStakeConfirmed={onStakeConfirmed}
+          onClose={onClose}
+        />
       </Modal>
     </Card>
   );
