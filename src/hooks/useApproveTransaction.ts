@@ -8,7 +8,7 @@ type SendApproveArgs = {
   value: bigint;
 };
 
-export function useTokenApprove() {
+export function useApproveTransaction() {
   const { sendTransactionAsync, ...query } = useSendTransaction();
 
   const _sendTransactionAsync = useCallback(async (args: SendApproveArgs) => {

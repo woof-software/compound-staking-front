@@ -1,11 +1,12 @@
 import { type Address } from 'viem';
 import { useReadContract } from 'wagmi';
+import { z } from 'zod';
 
 import { ENV } from '@/consts/env';
 import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
 
-export function useStakedVirtualBalance(address?: Address) {
-  const { data: balanceData, ...query } = useReadContract({
+export function useVirtualBalance(address?: Address) {
+  const { data, ...query } = useReadContract({
     address: ENV.STAKING_VAULT_ADDRESS,
     abi: StakingVaultAbi,
     functionName: 'virtualBalanceOf',
@@ -15,14 +16,8 @@ export function useStakedVirtualBalance(address?: Address) {
     }
   });
 
-  let result;
-
-  if (typeof balanceData === 'bigint') {
-    result = balanceData;
-  }
-
   return {
-    data: result,
+    data: z.bigint().optional().parse(data),
     ...query
   };
 }

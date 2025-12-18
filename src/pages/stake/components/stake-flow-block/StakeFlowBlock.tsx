@@ -9,11 +9,9 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { useStakedBalance } from '@/hooks/useStakedBalance';
-import { useStakedVirtualBalance } from '@/hooks/useStakedVirtualBalance';
+import { useStakeTransaction } from '@/hooks/useStakeTransaction';
 import { useSwitch } from '@/hooks/useSwitch';
-import { useTokenBalance } from '@/hooks/useTokenBalance';
-import { useTokenPrice } from '@/hooks/useTokenPrice';
-import { useTokenStake } from '@/hooks/useTokenStake';
+import { useVirtualBalance } from '@/hooks/useVirtualBalance';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
@@ -23,36 +21,26 @@ export function StakeFlowBlock() {
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { isSuccess: isStakeSuccess } = useTokenStake();
+  const { isSuccess: isStakeSuccess } = useStakeTransaction();
 
   const {
-    data: COMPBalance,
-    isFetching: isStakedCOMPBalanceFetching,
-    refetch: refetchCOMPBalance
+    data: baseTokenBalance,
+    isFetching: isBaseTokenBalanceFetching,
+    refetch: refetchBaseTokenBalance
   } = useStakedBalance(address);
-  const { data: stakedCOMPBalance, refetch: refetchStakedCOMPBalance } = useStakedVirtualBalance(address);
+  const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(address);
 
-  const { data: baseTokenPriceUsdData, isFetching: isBaseTokenPriceUsdFetching } = useTokenPrice(
-    ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
-  );
-  const { data: baseTokenWalletBalanceData, isFetching: isBaseTokenWalletBalanceFetching } = useTokenBalance(
-    address,
-    ENV.BASE_TOKEN_ADDRESS
-  );
+  const isStakeButtonDisabled = !isConnected || isOpen;
 
-  const isPriceOrBalanceLoading = isBaseTokenPriceUsdFetching || isBaseTokenWalletBalanceFetching;
-
-  const isStakeButtonDisabled = !isConnected || isOpen || isPriceOrBalanceLoading;
-
-  const baseTokenBalanceFormatted = formatUnits(BigInt(COMPBalance?.principal ?? 0), ENV.BASE_TOKEN_DECIMALS);
-  const stakedTokenBalanceFormatted = formatUnits(BigInt(stakedCOMPBalance ?? 0), ENV.STAKED_TOKEN_DECIMALS);
+  const baseTokenBalanceFormatted = formatUnits(BigInt(baseTokenBalance?.principal ?? 0), ENV.BASE_TOKEN_DECIMALS);
+  const stakedTokenBalanceFormatted = formatUnits(BigInt(virtualBalance ?? 0), ENV.STAKED_TOKEN_DECIMALS);
 
   const multiplier = +(stakedTokenBalanceFormatted || '1') / +baseTokenBalanceFormatted;
 
   useEffect(() => {
     if (isStakeSuccess) {
-      refetchCOMPBalance();
-      refetchStakedCOMPBalance();
+      refetchBaseTokenBalance();
+      refetchVirtualBalance();
     }
   }, [isStakeSuccess]);
 
@@ -69,7 +57,7 @@ export function StakeFlowBlock() {
           >
             Staked
           </Text>
-          <Skeleton loading={isStakedCOMPBalanceFetching}>
+          <Skeleton loading={isBaseTokenBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -88,7 +76,7 @@ export function StakeFlowBlock() {
           >
             stCOMP balance
           </Text>
-          <Skeleton loading={isStakedCOMPBalanceFetching}>
+          <Skeleton loading={isBaseTokenBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -107,7 +95,7 @@ export function StakeFlowBlock() {
           >
             Multiplier
           </Text>
-          <Skeleton loading={isStakedCOMPBalanceFetching}>
+          <Skeleton loading={isBaseTokenBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -126,7 +114,7 @@ export function StakeFlowBlock() {
           >
             Available Rewards
           </Text>
-          <Skeleton loading={isStakedCOMPBalanceFetching}>
+          <Skeleton loading={isBaseTokenBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -145,7 +133,7 @@ export function StakeFlowBlock() {
           >
             APR
           </Text>
-          <Skeleton loading={isStakedCOMPBalanceFetching}>
+          <Skeleton loading={isBaseTokenBalanceFetching}>
             <Text
               size='17'
               weight='500'
@@ -170,10 +158,7 @@ export function StakeFlowBlock() {
         open={isOpen}
         onClose={onClose}
       >
-        <StakeModal
-          baseTokenPriceUsdData={baseTokenPriceUsdData}
-          baseTokenWalletBalanceData={baseTokenWalletBalanceData}
-        />
+        <StakeModal />
       </Modal>
     </Card>
   );

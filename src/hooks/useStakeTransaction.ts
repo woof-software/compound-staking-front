@@ -5,7 +5,7 @@ import { useSendTransaction } from 'wagmi';
 import { ENV } from '@/consts/env';
 import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
 
-export function useTokenStake() {
+export function useStakeTransaction() {
   const { sendTransactionAsync, ...query } = useSendTransaction();
 
   const _sendTransactionAsync = async (amount: bigint, delegatee?: Address) => {
