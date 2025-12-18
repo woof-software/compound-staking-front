@@ -207,17 +207,17 @@ export function StakeModal(props: StakeModalProps) {
             lineHeight='18'
             className={cn('text-white', {
               'text-color-6': isConfirmDisabled,
-              'text-white': isApproveLoading
+              'text-white': isStakeLoading
             })}
           >
-            {isApproveLoading ? 'Pending...' : 'Confirm'}
+            {isStakeLoading ? 'Pending...' : 'Confirm'}
           </Text>
           <Text
             size='11'
             lineHeight='16'
             className={cn('text-white', {
               'text-color-6': isConfirmDisabled,
-              'text-white': isApproveLoading
+              'text-white': isStakeLoading
             })}
           >
             Step 2
