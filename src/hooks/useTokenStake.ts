@@ -1,3 +1,4 @@
+import { ZeroAddress } from 'ethers';
 import { type Address, encodeFunctionData } from 'viem';
 import { useSendTransaction } from 'wagmi';
 
@@ -7,11 +8,13 @@ import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
 export function useTokenStake() {
   const { sendTransactionAsync, ...query } = useSendTransaction();
 
-  const _sendTransactionAsync = async (delegatee: Address, amount: bigint) => {
+  const _sendTransactionAsync = async (amount: bigint, delegatee?: Address) => {
+    const delegateeAddress = delegatee ? delegatee : ZeroAddress;
+
     const stakeData = encodeFunctionData({
       abi: StakingVaultAbi,
       functionName: 'stake',
-      args: [delegatee, amount]
+      args: [delegateeAddress, amount]
     });
 
     return sendTransactionAsync({

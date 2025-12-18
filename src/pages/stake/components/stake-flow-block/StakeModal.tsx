@@ -48,7 +48,6 @@ export function StakeModal(props: StakeModalProps) {
   const parseAmount = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
   const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
   const needsApprove = parseAmount > 0n && !hasEnoughAllowance;
-  const noDelegate = !selectedAddressDelegate;
   const noAmount = parseAmount === 0n;
   const isAmountExceedsBalance = parseAmount <= BigInt(baseTokenWalletBalanceData ?? 0);
 
@@ -58,8 +57,8 @@ export function StakeModal(props: StakeModalProps) {
   const isLoadingTransaction = isApproveLoading || isStakeLoading;
 
   /* Disabled */
-  const isApproveDisabled = noDelegate || noAmount || !needsApprove || !isAmountExceedsBalance;
-  const isConfirmDisabled = noDelegate || noAmount || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
+  const isApproveDisabled = noAmount || !needsApprove || !isAmountExceedsBalance;
+  const isConfirmDisabled = noAmount || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
 
   /* Calculate input value in USD */
   const baseTokenPriceUsdValue = baseTokenPriceUsdData ?? 0n;
@@ -86,11 +85,9 @@ export function StakeModal(props: StakeModalProps) {
   };
 
   const onConfirm = async () => {
-    const delegateAddress = selectedAddressDelegate?.address;
+    if (isConfirmDisabled) return;
 
-    if (!delegateAddress || isConfirmDisabled) return;
-
-    await stake(delegateAddress, parseAmount);
+    await stake(parseAmount, selectedAddressDelegate?.address);
   };
 
   useEffect(() => {
