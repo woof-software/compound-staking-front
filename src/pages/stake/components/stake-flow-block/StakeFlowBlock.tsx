@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
+import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
@@ -11,65 +12,58 @@ import { ENV } from '@/consts/env';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
+import { useVirtualBalance } from '@/hooks/useVirtualBalance';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
-import { useStakedVirtualBalance } from '@/pages/stake/hooks/useStakedVirtualBalance';
-import { useTokenStake } from '@/pages/stake/hooks/useTokenStake';
 
 export function StakeFlowBlock() {
   const { isConnected, address } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { isSuccess: isStakeSuccess } = useTokenStake();
-
   const {
-    data: baseTokenBalance,
-    isLoading: isBaseTokenBalanceLoading,
-    refetch: refetchBaseTokenBalance
+    data: stakedBalance,
+    isLoading: isStakedBalanceFormattedFetching,
+    refetch: refetchStakedBalanceFormatted
   } = useStakedBalance(address);
 
-  const {
-    data: stakedTokenBalance,
-    isLoading: isStakedTokenBalanceLoading,
-    refetch: refetchStakedTokenBalance
-  } = useStakedVirtualBalance(address);
+  const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(address);
+
+  const { data: baseTokenPrice, isFetching: isBaseTokenPriceFetching } = useTokenPrice(
+    ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
+  );
 
   const { data: lockedTokenBalance } = useLockedBalance(address);
 
-  const { data: baseTokenPriceUsdData, isLoading: isBaseTokenPriceUsdLoading } = useTokenPrice(
-    ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
-  );
-  const { data: baseTokenWalletBalanceData, isLoading: isBaseTokenWalletBalanceLoading } = useTokenBalance(
-    address,
-    ENV.BASE_TOKEN_ADDRESS
-  );
+  const { isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
+  const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
 
-  const hasActiveLock = BigInt(lockedTokenBalance?.amount ?? 0) > 0n;
-
-  const stakeBlockedByUnstakeFlow = hasActiveLock;
+  const stakeBlockedByUnstakeFlow = BigInt(lockedTokenBalance?.amount ?? 0) > 0n;
 
   /* Loading */
-  const isPriceOrBalanceLoading = isBaseTokenPriceUsdLoading || isBaseTokenWalletBalanceLoading;
-  const isTokenBalanceLoading = isBaseTokenBalanceLoading || isStakedTokenBalanceLoading;
+  const isPriceOrBalanceLoading = isStakedTokenPrice || isStakedTokenWalletBalance;
+  const isTokenBalanceLoading = isStakedBalanceFormattedFetching || isBaseTokenPriceFetching;
   const isLoading = isPriceOrBalanceLoading || isTokenBalanceLoading;
 
   const isStakeButtonDisabled = !isConnected || isOpen || isLoading || stakeBlockedByUnstakeFlow;
 
-  const baseTokenBalanceFormatted = formatUnits(BigInt(baseTokenBalance?.principal ?? 0), ENV.BASE_TOKEN_DECIMALS);
-  const stakedTokenBalanceFormatted = formatUnits(BigInt(stakedTokenBalance ?? 0), ENV.STAKED_TOKEN_DECIMALS);
+  const stakedBalanceFormatted = formatUnits(stakedBalance?.principal ?? 0n, ENV.BASE_TOKEN_DECIMALS);
+  const virtualBalanceFormatted = formatUnits(virtualBalance ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
-  const multiplier = +(stakedTokenBalanceFormatted || '1') / +baseTokenBalanceFormatted;
+  const stakedBalancePriceFormatted = formatUnits(
+    (stakedBalance?.principal ?? 0n) * (baseTokenPrice ?? 0n),
+    ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
+  );
 
-  useEffect(() => {
-    if (isStakeSuccess) {
-      refetchBaseTokenBalance();
-      refetchStakedTokenBalance();
-    }
-  }, [isStakeSuccess]);
+  const multiplier = +(virtualBalanceFormatted || '1') / +stakedBalanceFormatted;
+
+  const onStakeConfirmed = useCallback(() => {
+    refetchStakedBalanceFormatted();
+    refetchVirtualBalance();
+  }, [refetchStakedBalanceFormatted, refetchVirtualBalance]);
 
   return (
     <Card
@@ -78,12 +72,47 @@ export function StakeFlowBlock() {
     >
       <div className='flex justify-between p-10'>
         <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            Staked
-          </Text>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              Staked
+            </Text>
+          </Skeleton>
+          <div className='flex flex-col gap-2'>
+            <Skeleton loading={isLoading}>
+              <Text
+                size='17'
+                weight='500'
+                className={cn('text-color-2', {
+                  'text-color-6': !isConnected
+                })}
+              >
+                {isConnected ? Format.token(stakedBalanceFormatted, 'compact') : '0.0000'} COMP
+              </Text>
+            </Skeleton>
+            <Condition if={isConnected && !!stakedBalance?.principal}>
+              <Skeleton loading={isLoading}>
+                <Text
+                  size='11'
+                  className='text-color-24'
+                >
+                  {Format.price(stakedBalancePriceFormatted, 'standard')}
+                </Text>
+              </Skeleton>
+            </Condition>
+          </div>
+        </div>
+        <div className='flex flex-col gap-3'>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              stCOMP balance
+            </Text>
+          </Skeleton>
           <Skeleton loading={isLoading}>
             <Text
               size='17'
@@ -92,36 +121,19 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? Format.token(baseTokenBalanceFormatted, 'compact') : '0.0000'} COMP
+              {isConnected ? Format.token(virtualBalanceFormatted, 'compact') : '0.0000'} stCOMP
             </Text>
           </Skeleton>
         </div>
         <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            stCOMP balance
-          </Text>
           <Skeleton loading={isLoading}>
             <Text
-              size='17'
-              weight='500'
-              className={cn('text-color-2', {
-                'text-color-6': !isConnected
-              })}
+              size='11'
+              className='text-color-24'
             >
-              {isConnected ? Format.token(stakedTokenBalanceFormatted, 'compact') : '0.0000'} stCOMP
+              Multiplier
             </Text>
           </Skeleton>
-        </div>
-        <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            Multiplier
-          </Text>
           <Skeleton loading={isLoading}>
             <Text
               size='17'
@@ -135,31 +147,47 @@ export function StakeFlowBlock() {
           </Skeleton>
         </div>
         <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            Available Rewards
-          </Text>
           <Skeleton loading={isLoading}>
             <Text
-              size='17'
-              weight='500'
-              className={cn('text-color-2', {
-                'text-color-6': !isConnected
-              })}
+              size='11'
+              className='text-color-24'
             >
-              {isConnected ? '0.0000' : '0.0000'} COMP
+              Available Rewards
             </Text>
           </Skeleton>
+          <div className='flex flex-col gap-2'>
+            <Skeleton loading={isLoading}>
+              <Text
+                size='17'
+                weight='500'
+                className={cn('text-color-2', {
+                  'text-color-6': !isConnected
+                })}
+              >
+                {isConnected ? '0.0000' : '0.0000'} COMP
+              </Text>
+            </Skeleton>
+            <Condition if={isConnected}>
+              <Skeleton loading={isLoading}>
+                <Text
+                  size='11'
+                  className='text-color-24'
+                >
+                  {Format.price(stakedBalancePriceFormatted, 'standard')}
+                </Text>
+              </Skeleton>
+            </Condition>
+          </div>
         </div>
         <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            APR
-          </Text>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              APR
+            </Text>
+          </Skeleton>
           <Skeleton loading={isLoading}>
             <Text
               size='17'
@@ -186,8 +214,8 @@ export function StakeFlowBlock() {
         onClose={onClose}
       >
         <StakeModal
-          baseTokenPriceUsdData={baseTokenPriceUsdData}
-          baseTokenWalletBalanceData={baseTokenWalletBalanceData}
+          onStakeConfirmed={onStakeConfirmed}
+          onClose={onClose}
         />
       </Modal>
     </Card>

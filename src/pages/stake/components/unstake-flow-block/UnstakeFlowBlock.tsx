@@ -110,15 +110,6 @@ export function UnstakeFlowBlock() {
     }
   }, [isUnstakeRequestSuccess, isUnlockRequestSuccess]);
 
-  console.log('----');
-  // console.log('lockedTokenBalance=>', lockedTokenBalance);
-  console.log('hasActiveLock=>', hasActiveLock);
-  console.log('baseTokenBalance=>', baseTokenBalance);
-  console.log('isUnlocked=>', isUnlocked);
-  console.log('isUnstakeButtonDisabled 1111=>', isUnstakeButtonDisabled);
-
-  console.log('remainingSeconds=>', remainingSeconds);
-
   return (
     <div className='flex flex-col gap-1.5'>
       <Card

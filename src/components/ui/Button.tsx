@@ -11,8 +11,8 @@ export function Button(props: ButtonProps) {
     <button
       disabled={disabled}
       className={cn(
-        'flex cursor-pointer items-center justify-center transition text-base p-3.5 h-11 focus-visible:outline-none hover:brightness-90 w-full bg-color-7 rounded-3xl',
-        { 'cursor-not-allowed bg-color-5 text-color-6': disabled },
+        'bg-color-7 flex h-11 w-full cursor-pointer items-center justify-center rounded-3xl p-3.5 text-base transition-all hover:brightness-90 focus-visible:outline-none',
+        { 'bg-color-5 text-color-6 cursor-not-allowed': disabled },
         className
       )}
       {...rest}
