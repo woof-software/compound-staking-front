@@ -41,14 +41,12 @@ export function StakeFlowBlock() {
   const { isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
   const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
 
-  const stakeBlockedByUnstakeFlow = BigInt(lockedTokenBalance?.amount ?? 0) > 0n;
-
   /* Loading */
   const isPriceOrBalanceLoading = isStakedTokenPrice || isStakedTokenWalletBalance;
   const isTokenBalanceLoading = isStakedBalanceFormattedFetching || isBaseTokenPriceFetching;
   const isLoading = isPriceOrBalanceLoading || isTokenBalanceLoading;
 
-  const isStakeButtonDisabled = !isConnected || isOpen || isLoading || stakeBlockedByUnstakeFlow;
+  const isStakeButtonDisabled = !isConnected || isOpen || isLoading || BigInt(lockedTokenBalance?.amount ?? 0) > 0n;
 
   const stakedBalanceFormatted = formatUnits(stakedBalance?.principal ?? 0n, ENV.BASE_TOKEN_DECIMALS);
   const virtualBalanceFormatted = formatUnits(virtualBalance ?? 0n, ENV.STAKED_TOKEN_DECIMALS);

@@ -2,18 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { Text } from '@/components/ui/Text';
 import { MINUTE_SECONDS } from '@/consts/common';
-import { noop } from '@/lib/utils/common';
 import { FormatTime } from '@/lib/utils/format';
 
 export type CoolDownProps = {
   totalSeconds?: number;
   className?: string;
   isDisabled?: boolean;
-  onStateChange?: (isUnlocked: boolean) => void;
 };
 
 export function CoolDown(props: CoolDownProps) {
-  const { totalSeconds = 0, className = '', isDisabled = false, onStateChange = noop } = props;
+  const { totalSeconds = 0, className = '', isDisabled = false } = props;
 
   const [secondsLeft, setSecondsLeft] = useState<number>(totalSeconds);
 
@@ -30,8 +28,6 @@ export function CoolDown(props: CoolDownProps) {
   useEffect(() => {
     if (!secondsLeft || secondsLeft <= 0) return;
 
-    if (days > 0 || hours > 0) return;
-
     const id = setInterval(() => {
       setSecondsLeft((prev) => {
         if (prev <= 0) return 0;
@@ -44,13 +40,6 @@ export function CoolDown(props: CoolDownProps) {
 
     return () => clearInterval(id);
   }, [secondsLeft, days, hours]);
-
-  useEffect(() => {
-    if (!totalSeconds) return;
-
-    const isUnlocked = !totalSeconds;
-    onStateChange(isUnlocked);
-  }, [totalSeconds, onStateChange]);
 
   return (
     <Text

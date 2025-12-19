@@ -1,32 +1,35 @@
 import { formatUnits } from 'viem';
+import { useConnection } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { useLockDuration } from '@/hooks/useLockDuration';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { noop } from '@/lib/utils/common';
 import { Format, FormatTime } from '@/lib/utils/format';
+import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 
 export type UnstakeModalProps = {
   isLoading?: boolean;
-  lockDuration?: number;
-  baseTokenPriceUsdData?: bigint | undefined;
-  baseTokenBalance?: bigint | undefined;
   onClick?: () => void;
 };
 
 export function UnstakeModal(props: UnstakeModalProps) {
-  const {
-    isLoading = false,
-    lockDuration = 0,
-    baseTokenBalance = undefined,
-    baseTokenPriceUsdData = undefined,
-    onClick = noop
-  } = props;
+  const { isLoading = false, onClick = noop } = props;
+
+  const { address } = useConnection();
+
+  const { data: lockDuration } = useLockDuration(ENV.LOCK_MANAGER_ADDRESS);
+
+  const { data: stakedTokenBalance } = useStakedBalance(address);
+
+  const { data: stakedTokenPriceUsdData } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
   const baseTokenPriceFormatted = formatUnits(
-    BigInt(baseTokenBalance ?? 0) * BigInt(baseTokenPriceUsdData ?? 0),
+    (stakedTokenBalance?.principal ?? 0n) * (stakedTokenPriceUsdData ?? 0n),
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
 
@@ -46,7 +49,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
             weight='500'
             lineHeight='20'
           >
-            {Format.token(formatUnits(BigInt(baseTokenBalance ?? 0), ENV.BASE_TOKEN_DECIMALS), 'compact')} COMP
+            {Format.token(formatUnits(stakedTokenBalance?.principal ?? 0n, ENV.BASE_TOKEN_DECIMALS), 'compact')} COMP
           </Text>
           <Text
             size='11'
@@ -69,7 +72,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
           weight='500'
           lineHeight='20'
         >
-          {FormatTime.cooldownFromSeconds(lockDuration)}
+          {FormatTime.cooldownFromSeconds(lockDuration ?? 0)}
         </Text>
       </div>
       <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>

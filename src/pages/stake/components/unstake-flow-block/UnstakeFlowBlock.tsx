@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { useStakedTokenAllowance } from '@/hooks/useStakedTokenAllowance';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useWalletStore } from '@/hooks/useWallet';
@@ -24,40 +25,37 @@ import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
 import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
 
 export function UnstakeFlowBlock() {
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
-
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
   const { setIsPendingToggle } = useWalletStore();
 
   const { isConnected, address } = useConnection();
 
-  const { data: baseTokenBalance, refetch: refetchBaseTokenBalance } = useStakedBalance(address);
+  const { refetch: refetchAllowance } = useStakedTokenAllowance(address);
 
-  const { refetch: refetchStakedTokenBalance } = useStakedVirtualBalance(address);
+  const { data: stakedTokenBalance, refetch: refetchStakedTokenBalance } = useStakedBalance(address);
+
+  const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(address);
 
   const {
     data: lockedTokenBalance,
-    lockDuration,
-    isLoading: isLockedTokenBalanceLoading,
-    refetch: refetchLockedTokenBalance
+    refetch: refetchLockedTokenBalance,
+    isLoading: isLockedTokenBalanceLoading
   } = useLockedBalance(address);
 
-  const { data: baseTokenPriceUsdData, isLoading: isBaseTokenPriceUsdLoading } = useTokenPrice(
-    ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
-  );
+  const { data: stakedTokenPrice, isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
   const { remainingSeconds } = FormatTime.lockInfo(
     lockedTokenBalance?.startTime ?? 0,
     lockedTokenBalance?.duration ?? 0
   );
-  const lockedCOMPBalanceFormatted = formatUnits(BigInt(lockedTokenBalance?.amount ?? 0), ENV.BASE_TOKEN_DECIMALS);
 
   const {
     sendTransactionAsync: unstakeRequest,
     data: unstakeRequestHash,
     isPending: isUnstakePending
   } = useUnstakeRequest();
+
   const { isLoading: isUnstakeRequestConfirming, isSuccess: isUnstakeRequestSuccess } = useWaitForTransactionReceipt({
     hash: unstakeRequestHash
   });
@@ -67,23 +65,32 @@ export function UnstakeFlowBlock() {
     data: unlockRequestHash,
     isPending: inUnlockPending
   } = useUnlockRequest();
+
   const { isLoading: isUnlockRequestConfirming, isSuccess: isUnlockRequestSuccess } = useWaitForTransactionReceipt({
     hash: unlockRequestHash
   });
 
+  const lockedStakedBalanceFormatted = formatUnits(BigInt(lockedTokenBalance?.amount ?? 0), ENV.BASE_TOKEN_DECIMALS);
+  const lockedStakedBalancePriceFormatted = formatUnits(
+    (lockedTokenBalance?.amount ?? 0n) * (stakedTokenPrice ?? 0n),
+    ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
+  );
+
   const hasActiveLock = BigInt(lockedTokenBalance?.amount ?? 0) > 0n;
-  const isInfoVisible = isConnected && isUnlocked;
+  const isInfoVisible = isConnected && hasActiveLock && remainingSeconds === 0;
+  const hasSomethingToUnstake =
+    BigInt(stakedTokenBalance?.principal ?? 0) > 0n || BigInt(lockedTokenBalance?.amount ?? 0) > 0n;
+  const cooldownFinished = remainingSeconds === 0;
+  const isCooldownBlocked = hasActiveLock && !cooldownFinished;
 
   /* Loading */
-  const isUnstakeLoading = isUnstakePending || isUnstakeRequestConfirming;
-  const isUnlockLoading = inUnlockPending || isUnlockRequestConfirming;
+  const isLoading = isLockedTokenBalanceLoading;
+
+  const isTransactionLoading =
+    isUnstakePending || isUnstakeRequestConfirming || inUnlockPending || isUnlockRequestConfirming;
+
   const isUnstakeButtonDisabled =
-    !isConnected ||
-    isOpen ||
-    isBaseTokenPriceUsdLoading ||
-    isUnstakeLoading ||
-    isUnlockLoading ||
-    (!isUnlocked && BigInt(baseTokenBalance?.principal ?? 0) === 0n);
+    !isConnected || isOpen || isTransactionLoading || isLoading || !hasSomethingToUnstake || isCooldownBlocked;
 
   const onUnstakeRequest = async () => {
     setIsPendingToggle(true);
@@ -99,12 +106,24 @@ export function UnstakeFlowBlock() {
   };
 
   useEffect(() => {
-    setIsPendingToggle(isUnstakeLoading || isUnlockLoading);
-  }, [isUnstakeLoading, isUnlockLoading]);
+    setIsPendingToggle(isTransactionLoading);
+  }, [isTransactionLoading]);
+
+  useEffect(() => {
+    if (isUnstakeRequestSuccess) {
+      onClose();
+    }
+  }, [isUnstakeRequestSuccess, onClose]);
+
+  useEffect(() => {
+    if (isUnlockRequestSuccess) {
+      refetchAllowance();
+    }
+  }, [isUnlockRequestSuccess]);
 
   useEffect(() => {
     if (isUnstakeRequestSuccess || isUnlockRequestSuccess) {
-      refetchBaseTokenBalance();
+      refetchVirtualTokenBalance();
       refetchStakedTokenBalance();
       refetchLockedTokenBalance();
     }
@@ -125,18 +144,30 @@ export function UnstakeFlowBlock() {
               >
                 Unstake
               </Text>
-              <Skeleton loading={isLockedTokenBalanceLoading}>
-                <Text
-                  size='17'
-                  weight='500'
-                  lineHeight='17'
-                  className={cn('text-color-2', {
-                    'text-color-6': !isConnected
-                  })}
-                >
-                  {isConnected ? Format.token(lockedCOMPBalanceFormatted, 'standard') : '0.0000'} COMP
-                </Text>
-              </Skeleton>
+              <div className='flex flex-col gap-2'>
+                <Skeleton loading={isLoading}>
+                  <Text
+                    size='17'
+                    weight='500'
+                    lineHeight='17'
+                    className={cn('text-color-2', {
+                      'text-color-6': !isConnected
+                    })}
+                  >
+                    {isConnected ? Format.token(lockedStakedBalanceFormatted, 'standard') : '0.0000'} COMP
+                  </Text>
+                </Skeleton>
+                <Condition if={isConnected && !!lockedTokenBalance?.amount}>
+                  <Skeleton loading={isLoading || isStakedTokenPrice}>
+                    <Text
+                      size='11'
+                      className='text-color-24'
+                    >
+                      {Format.price(lockedStakedBalancePriceFormatted, 'standard')}
+                    </Text>
+                  </Skeleton>
+                </Condition>
+              </div>
             </div>
             <div className='flex flex-col gap-3'>
               <Text
@@ -145,14 +176,13 @@ export function UnstakeFlowBlock() {
               >
                 Cooldown
               </Text>
-              <Skeleton loading={isLockedTokenBalanceLoading}>
+              <Skeleton loading={isLoading}>
                 <CoolDown
                   totalSeconds={remainingSeconds}
                   isDisabled={isConnected && !!lockedTokenBalance?.startTime}
                   className={cn('text-color-2', {
                     'text-color-6': !isConnected || !lockedTokenBalance?.startTime
                   })}
-                  onStateChange={(isUnlocked) => setIsUnlocked(isUnlocked)}
                 />
               </Skeleton>
             </div>
@@ -184,10 +214,7 @@ export function UnstakeFlowBlock() {
         onClose={onClose}
       >
         <UnstakeModal
-          isLoading={isUnstakeLoading}
-          lockDuration={lockDuration}
-          baseTokenPriceUsdData={baseTokenPriceUsdData}
-          baseTokenBalance={baseTokenBalance?.principal}
+          isLoading={isUnstakePending || isUnstakeRequestConfirming}
           onClick={onUnstakeRequest}
         />
       </Modal>
