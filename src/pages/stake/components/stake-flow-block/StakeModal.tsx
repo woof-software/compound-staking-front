@@ -1,19 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatUnits, parseUnits } from 'viem';
-import { useConnection } from 'wagmi';
+import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
-import { InfoIcon } from '@/assets/svg';
-import { Condition } from '@/components/common/Condition';
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
-import { Modal } from '@/components/ui/Modal';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { type Delegate } from '@/consts/common';
 import { ENV } from '@/consts/env';
+import { useApproveTransaction } from '@/hooks/useApproveTransaction';
+import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
+import { useStakeTransaction } from '@/hooks/useStakeTransaction';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
+import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
@@ -21,154 +23,232 @@ import { Format } from '@/lib/utils/format';
 import COMP from '@/assets/comp.svg';
 
 export type StakeModalProps = {
-  isOpen?: boolean;
   onClose?: () => void;
+  onStakeConfirmed?: () => void;
 };
 
 export function StakeModal(props: StakeModalProps) {
-  const { isOpen = false, onClose = noop } = props;
+  const { onClose = noop, onStakeConfirmed = noop } = props;
 
-  const { address } = useConnection();
+  const { setIsPendingToggle } = useWalletStore();
 
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
 
-  const { data: compPriceUsdData } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
-  const { data: compWalletBalanceData } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
+  const { address } = useConnection();
 
-  const compPriceUsdValue = compPriceUsdData ?? 0n;
-  const compWalletBalanceValue = compWalletBalanceData ?? 0n;
+  const { data: baseTokenPrice, isFetching: isBaseTokenPriceFetching } = useTokenPrice(
+    ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
+  );
 
-  const parseAmountValue = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
+  const { data: walletBalance, isFetching: isWalletBalanceFetching } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
 
-  const inputValueInCOMP = formatUnits(
-    parseAmountValue * compPriceUsdValue,
+  const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(address);
+
+  const { sendTransactionAsync: approve, data: approveHash, isPending: isApprovePending } = useApproveTransaction();
+
+  const { isLoading: isApproveConfirming, isSuccess: isApproveSuccess } = useWaitForTransactionReceipt({
+    hash: approveHash
+  });
+
+  const { sendTransactionAsync: stake, data: stakeHash, isPending: isStakePending } = useStakeTransaction();
+
+  const { isLoading: isStakeConfirming, isSuccess: isStakeSuccess } = useWaitForTransactionReceipt({
+    hash: stakeHash
+  });
+
+  const parseAmount = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
+  const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
+  const needsApprove = parseAmount > 0n && !hasEnoughAllowance;
+  const noAmount = parseAmount === 0n;
+  const isAmountExceedsBalance = parseAmount <= (walletBalance ?? 0n);
+
+  /* Loading */
+  const isPriceOrBalanceLoading = isBaseTokenPriceFetching || isWalletBalanceFetching;
+  const isApproveLoading = isApprovePending || isApproveConfirming;
+  const isStakeLoading = isStakePending || isStakeConfirming;
+  const isLoadingTransaction = isApproveLoading || isStakeLoading;
+
+  /* Disabled */
+  const isApproveDisabled = noAmount || !needsApprove || !isAmountExceedsBalance;
+  const isConfirmDisabled = noAmount || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
+
+  /* Calculate input value in USD */
+  const baseTokenPriceValue = baseTokenPrice ?? 0n;
+  const walletBalanceValue = walletBalance ?? 0n;
+
+  const baseTokenPriceFormatted = formatUnits(
+    parseAmount * baseTokenPriceValue,
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
-  const compWalletBalance = formatUnits(compWalletBalanceValue, ENV.BASE_TOKEN_DECIMALS);
-
-  const formatCOMPPrice = Format.price(inputValueInCOMP, 'standard');
-  const formatCOMPWalletBalance = Format.token(compWalletBalance, 'standard');
-
-  const isAdditionalStake = false; //Variable for additional stake condition
+  const walletBalanceFormatted = formatUnits(walletBalanceValue, ENV.BASE_TOKEN_DECIMALS);
 
   const onMaxButtonClick = () => {
-    setAmountValue(compWalletBalance);
+    setAmountValue(walletBalanceFormatted);
   };
 
   const onDelegateSelect = (address: Delegate | null) => {
     setSelectedAddressDelegate(address);
   };
 
+  const onApprove = async () => {
+    if (isApproveDisabled) return;
+
+    await approve({ token: ENV.BASE_TOKEN_ADDRESS, spender: ENV.STAKING_VAULT_ADDRESS, value: parseAmount });
+  };
+
+  const onConfirm = async () => {
+    if (isConfirmDisabled) return;
+
+    await stake(parseAmount, selectedAddressDelegate?.address);
+  };
+
+  useEffect(() => {
+    if (isStakeSuccess) {
+      onStakeConfirmed();
+      onClose();
+    }
+  }, [isStakeSuccess]);
+
+  useEffect(() => {
+    setIsPendingToggle(isLoadingTransaction);
+  }, [isLoadingTransaction]);
+
+  useEffect(() => {
+    if (isApproveSuccess) {
+      refetchAllowance();
+    }
+  }, [isApproveSuccess]);
+
   return (
-    <Modal
-      title='Stake COMP tokens'
-      open={isOpen}
-      onClose={onClose}
-    >
-      <div className='mt-8 w-full flex flex-col gap-8'>
-        <Divider orientation='horizontal' />
-        <div className='flex flex-col gap-1'>
+    <div className='mt-8 flex w-full flex-col gap-8'>
+      <Divider orientation='horizontal' />
+      <div className='flex flex-col gap-1'>
+        <Skeleton loading={isPriceOrBalanceLoading}>
           <div className='flex items-center justify-between gap-5'>
-            <div className='flex items-center gap-2 max-w-72'>
+            <div className='flex max-w-72 items-center gap-2'>
               <COMP className='size-6.75 shrink-0' />
               <AmountInput
-                className='max-w-60 min-h-12'
+                className='min-h-12 max-w-60'
+                disabled={isLoadingTransaction}
                 value={amountValue}
                 onChange={setAmountValue}
               />
             </div>
             <Button
-              className='bg-color-16 h-8 text-[11px] font-medium w-14'
+              disabled={isLoadingTransaction}
+              className='bg-color-16 h-8 w-14 text-[11px] font-medium'
               onClick={onMaxButtonClick}
             >
               Max
             </Button>
           </div>
-          <div className='flex w-full items-center justify-between'>
+        </Skeleton>
+        <div className='flex w-full items-center justify-between'>
+          <Skeleton loading={isPriceOrBalanceLoading}>
             <Text
               size='11'
               lineHeight='16'
               className='text-color-24'
             >
-              {formatCOMPPrice}
+              {Format.price(baseTokenPriceFormatted, 'standard')}
             </Text>
+          </Skeleton>
+          <Skeleton loading={isPriceOrBalanceLoading}>
             <Text
               size='11'
               lineHeight='16'
               className='text-color-24'
             >
-              {formatCOMPWalletBalance} COMP
+              {Format.token(walletBalanceFormatted, 'standard')} COMP
             </Text>
-          </div>
+          </Skeleton>
         </div>
+      </div>
+      <Skeleton loading={isPriceOrBalanceLoading}>
         <DelegateSelector
+          disabled={isLoadingTransaction}
           selectedAddressDelegate={selectedAddressDelegate}
           onSelect={onDelegateSelect}
         />
-        <Condition if={isAdditionalStake}>
-          <div className='bg-color-21 rounded-lg p-5 flex items-center gap-2.5'>
-            <InfoIcon className='size-4 text-color-22' />
-            <Text
-              size='11'
-              lineHeight='16'
-              className='text-color-22'
-            >
-              Multiplier reverts to 1x after staking more COMP. All available rewards get vested.
-            </Text>
-          </div>
-        </Condition>
-        <div className='flex flex-col gap-2.5'>
+      </Skeleton>
+      {/*TODO: add warning for additional stake */}
+      {/*<Condition if={showWarningForAdditionalStake}>*/}
+      {/*  <div className='bg-color-21 rounded-lg p-5 flex items-center gap-2.5'>*/}
+      {/*    <InfoIcon className='size-4 text-color-22' />*/}
+      {/*    <Text*/}
+      {/*      size='11'*/}
+      {/*      lineHeight='16'*/}
+      {/*      className='text-color-22'*/}
+      {/*    >*/}
+      {/*      Multiplier reverts to 1x after staking more COMP. All available rewards get vested.*/}
+      {/*    </Text>*/}
+      {/*  </div>*/}
+      {/*</Condition>*/}
+      <div className='flex flex-col gap-2.5'>
+        <Skeleton loading={isPriceOrBalanceLoading}>
           <Button
-            className={cn('flex-col h-14')}
-            disabled={true}
+            className={cn('h-14 flex-col', {
+              'bg-color-7': isApproveLoading
+            })}
+            disabled={isApproveDisabled}
+            onClick={onApprove}
           >
             <Text
               size='13'
               weight='500'
               lineHeight='18'
-              className={cn('text-color-6', {
-                'text-white': false //disabled state
+              className={cn('text-white', {
+                'text-color-6': isApproveDisabled,
+                'text-white': isApproveLoading
               })}
             >
-              Approve
+              {isApproveLoading ? 'Pending...' : 'Approve'}
             </Text>
             <Text
               size='11'
               lineHeight='16'
-              className={cn('text-color-6', {
-                'text-white': false //disabled state
+              className={cn('text-white', {
+                'text-color-6': isApproveDisabled,
+                'text-white': isApproveLoading
               })}
             >
               Step 1
             </Text>
           </Button>
+        </Skeleton>
+        <Skeleton loading={isPriceOrBalanceLoading}>
           <Button
-            className={cn('flex-col h-14')}
-            disabled={true}
+            className={cn('h-14 flex-col', {
+              'bg-color-7': isStakeLoading
+            })}
+            disabled={isConfirmDisabled || isStakeLoading}
+            onClick={onConfirm}
           >
             <Text
               size='13'
               weight='500'
               lineHeight='18'
-              className={cn('text-color-6', {
-                'text-white': false //disabled state
+              className={cn('text-white', {
+                'text-color-6': isConfirmDisabled,
+                'text-white': isStakeLoading
               })}
             >
-              Confirm
+              {isStakeLoading ? 'Pending...' : 'Confirm'}
             </Text>
             <Text
               size='11'
               lineHeight='16'
-              className={cn('text-color-6', {
-                'text-white': false //disabled state
+              className={cn('text-white', {
+                'text-color-6': isConfirmDisabled,
+                'text-white': isStakeLoading
               })}
             >
               Step 2
             </Text>
           </Button>
-        </div>
+        </Skeleton>
       </div>
-    </Modal>
+    </div>
   );
 }

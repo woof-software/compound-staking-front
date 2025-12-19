@@ -1,4 +1,4 @@
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -9,7 +9,7 @@ import { useStatisticTotalStaked } from '@/pages/stake/hooks/useStatisticTotalSt
 import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
 export function TotalStaked() {
-  const { isConnected } = useAccount();
+  const { isConnected } = useConnection();
   const { totalStaked } = useStatisticTotalStaked();
 
   const totalStakedFormatted = parseFloat(Format.token(Number(totalStaked), 'compact'));

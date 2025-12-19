@@ -92,7 +92,7 @@ export function RewardsTable() {
 
   return (
     <div>
-      <div className='py-6 px-10 border border-l-0 border-r-0 border-solid border-color-8 grid grid-cols-5 items-center'>
+      <div className='border-color-8 grid grid-cols-5 items-center border border-r-0 border-l-0 border-solid px-10 py-6'>
         {columns.map(({ accessorKey, header }) => {
           const active = sortBy === accessorKey;
 
@@ -101,7 +101,7 @@ export function RewardsTable() {
               key={accessorKey}
               role='button'
               tabIndex={0}
-              className='flex items-center cursor-pointer'
+              className='flex cursor-pointer items-center'
               onClick={() => onHeaderClick(accessorKey)}
             >
               <Text
@@ -113,14 +113,14 @@ export function RewardsTable() {
               >
                 {header}
               </Text>
-              <div className='flex flex-col gap-0.5 justify-center p-1'>
+              <div className='flex flex-col justify-center p-1'>
                 <SortArrowIcon
-                  className={cn('text-color-24 w-[5px] h-[3px]', {
+                  className={cn('text-color-24 size-[5px]', {
                     'opacity-50': active && sortDir === 'asc'
                   })}
                 />
                 <SortArrowIcon
-                  className={cn('rotate-180 text-color-24 w-[5px] h-[3px]', {
+                  className={cn('text-color-24 size-[5px] rotate-180', {
                     'opacity-50': active && sortDir === 'desc'
                   })}
                 />

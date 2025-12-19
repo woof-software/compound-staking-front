@@ -1,4 +1,4 @@
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils/cn';
 import { RewardsTable } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 
 export function RewardsFlowBlock() {
-  const { isConnected } = useAccount();
+  const { isConnected } = useConnection();
 
   const { isEnabled: isVestingOpen, enable: onVestingOpen, disable: onVestingClose } = useSwitch();
   const { isEnabled: isClaimOpen, enable: onClaimOpen, disable: onClaimClose } = useSwitch();

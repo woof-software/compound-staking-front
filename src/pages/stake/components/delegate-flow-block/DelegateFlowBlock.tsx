@@ -1,4 +1,4 @@
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 
 import { ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -9,7 +9,7 @@ import { Text } from '@/components/ui/Text';
 import { cn } from '@/lib/utils/cn';
 
 export function DelegateFlowBlock() {
-  const { isConnected } = useAccount();
+  const { isConnected } = useConnection();
 
   const isDelegateButtonDisabled = !isConnected;
 

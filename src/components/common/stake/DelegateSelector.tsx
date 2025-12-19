@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
+import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon, InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/Text';
@@ -10,15 +10,16 @@ import { useOutsideClick } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { noop, sliceAddress } from '@/lib/utils/common';
-import { getExplorerTxUrl } from '@/lib/utils/helpers';
+import { getExplorerAddressUrl } from '@/lib/utils/helpers';
 
 export type DelegateSelectorProps = {
+  disabled?: boolean;
   selectedAddressDelegate: Delegate | null;
   onSelect?: (addressDelegate: Delegate | null) => void;
 };
 
 export function DelegateSelector(props: DelegateSelectorProps) {
-  const { selectedAddressDelegate, onSelect = noop } = props;
+  const { disabled, selectedAddressDelegate, onSelect = noop } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const [searchValue, setSearchValue] = useState('');
@@ -40,6 +41,12 @@ export function DelegateSelector(props: DelegateSelectorProps) {
     [onSelect, onClose]
   );
 
+  const onSelectorOpen = () => {
+    if (disabled) return;
+
+    open();
+  };
+
   useOutsideClick(() => ref.current, onClose);
 
   return (
@@ -48,8 +55,8 @@ export function DelegateSelector(props: DelegateSelectorProps) {
       className='relative w-full'
     >
       <div
-        className='rounded-2xl flex h-12 gap-5 cursor-pointer items-center justify-between w-full max-w-88 border border-solid border-color-6 p-3'
-        onClick={open}
+        className='border-color-6 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-2xl border border-solid p-3'
+        onClick={onSelectorOpen}
       >
         {!selectedAddressDelegate ? (
           <Text
@@ -61,7 +68,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             Choose delegatee
           </Text>
         ) : (
-          <div className='flex items-center w-full justify-between'>
+          <div className='flex w-full items-center justify-between'>
             <div className='flex items-center gap-1.5'>
               <Text
                 size='13'
@@ -75,7 +82,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             <a
               className='flex items-center gap-1.5'
               target='_blank'
-              href={getExplorerTxUrl(selectedAddressDelegate?.address || '')}
+              href={getExplorerAddressUrl(selectedAddressDelegate?.address)}
               onClick={(e) => e.stopPropagation()}
             >
               <Text
@@ -91,61 +98,79 @@ export function DelegateSelector(props: DelegateSelectorProps) {
           </div>
         )}
         <ChevronIcon
-          className={cn('text-color-6 rotate-180 size-4 transition-transform', {
+          className={cn('text-color-6 size-4 rotate-180 transition-transform', {
             'rotate-0': isOpen
           })}
         />
       </div>
       <Condition if={isOpen}>
-        <div className='absolute rounded-2xl max-h-95 flex flex-col gap-7 top-13 w-full p-6 border border-solid border-color-8 bg-color-4'>
-          <Input
-            autoFocus
-            className='min-h-13'
-            placeholder='Delegatee name or address'
-            value={searchValue}
-            onChange={setSearchValue}
-          />
-          <div className='overflow-y-auto max-h-392 hide-scrollbar'>
-            {filteredDelegates.map((el, index) => (
-              <div
-                key={`${el.address}-${index}`}
-                className={cn('flex cursor-pointer items-center justify-between rounded-lg py-4 px-3', {
-                  'bg-color-5': selectedAddressDelegate?.address === el.address
-                })}
-                onClick={() => onDelegateSelect(el)}
-              >
-                <div className='flex items-center gap-1.5'>
-                  {selectedAddressDelegate?.address === el.address && (
-                    <CheckMarkIcon className='size-5 text-color-27' />
-                  )}
-                  <Text
-                    size='13'
-                    weight='500'
-                    lineHeight='16'
-                    className='text-color-2'
-                  >
-                    {el.name}
-                  </Text>
-                </div>
-                <a
-                  className='flex items-center gap-1.5'
-                  target='_blank'
-                  href={getExplorerTxUrl(selectedAddressDelegate?.address)}
-                  onClick={(e) => e.stopPropagation()}
+        <div className='border-color-8 bg-color-4 absolute top-13 flex max-h-95 w-full flex-col gap-7 rounded-2xl border border-solid p-6'>
+          <div className='flex flex-col gap-2.5'>
+            <Input
+              autoFocus
+              className={cn('min-h-13', {
+                'border-color-22': !filteredDelegates.length && !!searchValue.length
+              })}
+              placeholder='Delegatee name or address'
+              value={searchValue}
+              onChange={setSearchValue}
+            />
+            <Condition if={!filteredDelegates.length}>
+              <div className='bg-color-21 flex items-center gap-2.5 rounded-lg px-5 py-4.5'>
+                <InfoIcon className='text-color-22' />
+                <Text
+                  size='11'
+                  lineHeight='16'
+                  className='text-color-22'
                 >
-                  <Text
-                    size='13'
-                    weight='500'
-                    lineHeight='120'
-                    className='text-color-24'
-                  >
-                    {sliceAddress(el.address)}
-                  </Text>
-                  <ExternalLinkIcon className='text-color-24' />
-                </a>
+                  No delegate found
+                </Text>
               </div>
-            ))}
+            </Condition>
           </div>
+          <Condition if={!!filteredDelegates.length}>
+            <div className='hide-scrollbar max-h-392 overflow-y-auto'>
+              {filteredDelegates.map((el) => (
+                <div
+                  key={el.address}
+                  className={cn('flex cursor-pointer items-center justify-between rounded-lg px-3 py-4', {
+                    'bg-color-5': selectedAddressDelegate?.address === el.address
+                  })}
+                  onClick={() => onDelegateSelect(el)}
+                >
+                  <div className='flex items-center gap-1.5'>
+                    {selectedAddressDelegate?.address === el.address && (
+                      <CheckMarkIcon className='text-color-27 size-5' />
+                    )}
+                    <Text
+                      size='13'
+                      weight='500'
+                      lineHeight='16'
+                      className='text-color-2'
+                    >
+                      {el.name}
+                    </Text>
+                  </div>
+                  <a
+                    className='flex items-center gap-1.5'
+                    target='_blank'
+                    href={getExplorerAddressUrl(el.address)}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Text
+                      size='13'
+                      weight='500'
+                      lineHeight='120'
+                      className='text-color-24'
+                    >
+                      {sliceAddress(el.address)}
+                    </Text>
+                    <ExternalLinkIcon className='text-color-24' />
+                  </a>
+                </div>
+              ))}
+            </div>
+          </Condition>
         </div>
       </Condition>
     </div>

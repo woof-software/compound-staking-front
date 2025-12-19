@@ -7,14 +7,14 @@ import { UnStakeFlowBlock } from '@/pages/stake/components/unstake-flow-block/Un
 
 export function StakePage() {
   return (
-    <main className='pt-10 pb-15 flex-1 flex flex-col gap-10'>
+    <main className='flex flex-1 flex-col gap-10 pt-10 pb-15'>
       <Text
         tag='h1'
         size='45'
         lineHeight='54'
         weight='500'
         align='center'
-        className='p-2.5 max-w-164 mx-auto'
+        className='mx-auto max-w-164 p-2.5'
       >
         Stake your{' '}
         <Text
