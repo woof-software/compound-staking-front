@@ -38,5 +38,6 @@ export function getChainName(chainId: number) {
 }
 
 export function getExplorerAddressUrl(address?: Address) {
+  if (!address) return ENV.ETHERSCAN_URL;
   return `${ENV.ETHERSCAN_URL}/address/${address}`;
 }
