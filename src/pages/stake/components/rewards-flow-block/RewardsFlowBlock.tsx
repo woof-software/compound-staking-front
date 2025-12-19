@@ -27,8 +27,8 @@ export function RewardsFlowBlock() {
         title='Stake'
         tooltip='Stake your COMP tokens to earn yield every second!'
       >
-        <div className='flex justify-between p-10'>
-          <div className='flex w-full justify-between max-w-120'>
+        <div className='border-color-8 flex justify-between border-b-1 p-10'>
+          <div className='flex w-full max-w-120 justify-between'>
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
@@ -116,9 +116,9 @@ export function RewardsFlowBlock() {
           </Button>
         </div>
         <Condition if={!isConnected}>
-          <div className='p-10 flex'>
-            <div className='mx-auto items-center w-auto flex flex-col gap-5'>
-              <div className='w-44 h-20 no-position-yet' />
+          <div className='flex p-10'>
+            <div className='mx-auto flex w-auto flex-col items-center gap-5'>
+              <div className='no-position-yet h-20 w-44' />
               <Text
                 size='15'
                 weight='500'

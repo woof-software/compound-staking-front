@@ -4,39 +4,42 @@
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: 'Haas Grot Text R';
+  font-family: "Haas Grot Disp R";
+  src: url("../public/fonts/NeueHaasGrotDispRound-55Roman.otf");
+  font-style: normal;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Haas Grot Disp R";
+  src: url("../public/fonts/NeueHaasGrotDispRound-65Medium.otf");
+  font-style: normal;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Haas Grot Text R";
+  src: url("../public/fonts/NeueHaasGrotTextRound-55Roman.otf");
   font-style: normal;
   font-weight: 400;
-  src: url('../public/fonts/NeueHaasGrotDispRound-55Roman.otf')
-  format('opentype');
-  font-display: swap;
 }
 
 @font-face {
-  font-family: 'Haas Grot Text R';
+  font-family: "Haas Grot Text R";
+  src: url("../public/fonts/NeueHaasGrotTextRound-65Medium.otf");
   font-style: normal;
-  font-weight: 500 600;
-  src: url('../public/fonts/NeueHaasGrotDispRound-65Medium.otf')
-  format('opentype');
-  font-display: swap;
+  font-weight: 500;
 }
 
 @font-face {
-  font-family: 'Haas Grot Text R';
+  font-family: "Haas Grot Text R";
+  src: url("../public/fonts/NeueHaasGrotTextRound-75Bold.otf");
   font-style: normal;
   font-weight: 700;
-  src: url('../public/fonts/NeueHaasGrotDispRound-75Bold.otf')
-  format('opentype');
-  font-display: swap;
 }
 
 /* Light theme tokens (default) */
 :root {
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
   --color-1: #F0F2F5;
   --color-2: #17212B;
   --color-3: #D8DFE5;
@@ -145,16 +148,19 @@
 @layer base {
   * {
     font-size: 1rem;
-    font-weight: 400;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Haas Grot Text R', sans-serif;
   }
 
   body {
+    font-weight: 400;
+    line-height: 1;
     font-family: 'Haas Grot Text R', sans-serif;
     background-color: var(--color-color-1);
     color: var(--color-color-2);
+    text-rendering: optimizeSpeed;
+    font-synthesis: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -206,6 +212,12 @@
   .no-position-yet {
     background-image: url('./assets/no-position-yet.svg');
   }
+}
+
+.animate-bounce-smooth {
+  animation: bounce-animation 0.3s ease both;
+  transform-origin: top right;
+  will-change: transform, opacity;
 }
 
 html, body {
@@ -262,4 +274,19 @@ body::-webkit-scrollbar {
 @keyframes pulseOpacity {
   from { opacity: 0.10; }
   to   { opacity: 0.25; }
+}
+
+@keyframes bounce-animation {
+  0% {
+    transform: translateY(-3px);
+  }
+  30% {
+    transform: translateY(2px);
+  }
+  85% {
+    transform: translateY(-1px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }

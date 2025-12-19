@@ -29,10 +29,12 @@ export function StakePage() {
         tokens to earn yield every second!
       </Text>
       <StatisticsBlock />
-      <StakeFlowBlock />
-      <UnStakeFlowBlock />
-      <DelegateFlowBlock />
-      <RewardsFlowBlock />
+      <div className='flex flex-col gap-5'>
+        <StakeFlowBlock />
+        <UnStakeFlowBlock />
+        <DelegateFlowBlock />
+        <RewardsFlowBlock />
+      </div>
     </main>
   );
 }
