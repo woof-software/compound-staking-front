@@ -1,4 +1,4 @@
-import type { Hex } from 'viem';
+import type { Address } from 'viem';
 
 import { ENV } from '@/consts/env';
 
@@ -37,6 +37,6 @@ export function getChainName(chainId: number) {
   }
 }
 
-export function getExplorerTxUrl(hash?: Hex) {
-  return `${ENV.ETHERSCAN_URL}/tx/${hash}`;
+export function getExplorerUrl(address?: Address) {
+  return `${ENV.ETHERSCAN_URL}/${address}`;
 }
