@@ -10,7 +10,7 @@ import { useOutsideClick } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { noop, sliceAddress } from '@/lib/utils/common';
-import { getExplorerUrl } from '@/lib/utils/helpers';
+import { getExplorerAddressUrl } from '@/lib/utils/helpers';
 
 export type DelegateSelectorProps = {
   disabled?: boolean;
@@ -82,7 +82,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             <a
               className='flex items-center gap-1.5'
               target='_blank'
-              href={getExplorerUrl(selectedAddressDelegate?.address || '')}
+              href={getExplorerAddressUrl(selectedAddressDelegate?.address || '')}
               onClick={(e) => e.stopPropagation()}
             >
               <Text
@@ -154,7 +154,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                   <a
                     className='flex items-center gap-1.5'
                     target='_blank'
-                    href={getExplorerUrl(selectedAddressDelegate?.address)}
+                    href={getExplorerAddressUrl(selectedAddressDelegate?.address)}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Text
