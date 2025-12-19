@@ -18,16 +18,13 @@ export function RewardsFlowBlock() {
   const { isEnabled: isVestingOpen, enable: onVestingOpen, disable: onVestingClose } = useSwitch();
   const { isEnabled: isClaimOpen, enable: onClaimOpen, disable: onClaimClose } = useSwitch();
 
-  // const isClaimButtonDisabled = !isConnected;
-  // const isVestingButtonDisabled = !isConnected;
-
   return (
     <>
       <Card
         title='Stake'
         tooltip='Stake your COMP tokens to earn yield every second!'
       >
-        <div className='flex justify-between p-10'>
+        <div className='border-color-8 flex justify-between border-b-1 p-10'>
           <div className='flex w-full max-w-120 justify-between'>
             <div className='flex flex-col gap-3'>
               <Text

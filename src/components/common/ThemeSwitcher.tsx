@@ -6,20 +6,20 @@ export function ThemeSwitcher() {
 
   return (
     <div className='flex items-center'>
-      <span className='inline-block h-6 leading-6 max-w-full whitespace-nowrap outline-none'>
-        <label className='cursor-pointer flex items-center'>
-          <span className='relative h-6 w-14.5 shrink-0 rounded-xl bg-color-9'>
+      <span className='inline-block h-6 max-w-full leading-6 whitespace-nowrap outline-none'>
+        <label className='flex cursor-pointer items-center'>
+          <span className='bg-color-9 relative h-6 w-14.5 shrink-0 rounded-xl'>
             <input
-              className='outline-none border-none w-0 h-0 overflow-hidden absolute whitespace-nowrap p-0 m-[-1px]'
+              className='absolute m-[-1px] h-0 w-0 overflow-hidden border-none p-0 whitespace-nowrap outline-none'
               type='checkbox'
               checked={theme === 'dark'}
               onChange={toggleTheme}
             />
             <span
               className={cn(
-                'absolute shadow-10 top-[-3px] flex items-center justify-center size-7.5 transition-all rounded-full bg-color-4',
+                'shadow-10 bg-color-4 absolute top-[-3px] flex size-7.5 items-center justify-center rounded-full transition-all',
                 {
-                  'translate-x-[calc(100%-2px)]': theme === 'dark'
+                  'translate-x-full': theme === 'dark'
                 }
               )}
             />
