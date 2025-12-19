@@ -8,7 +8,7 @@ export function useAllowance(owner?: Address, tokenAddress?: Address, spender?: 
     abi: erc20Abi,
     functionName: 'allowance',
     args: owner && spender ? [owner, spender] : undefined,
-    query: { enabled: !!owner && !!tokenAddress && !!spender }
+    query: { enabled: !!owner && !!spender }
   });
 
   return {
