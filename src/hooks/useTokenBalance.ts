@@ -1,5 +1,6 @@
 import { type Address, erc20Abi } from 'viem';
 import { useReadContract } from 'wagmi';
+import { z } from 'zod';
 
 export function useTokenBalance(address?: Address, tokenAddress?: Address) {
   const { data, ...query } = useReadContract({
@@ -12,14 +13,8 @@ export function useTokenBalance(address?: Address, tokenAddress?: Address) {
     }
   });
 
-  let result: bigint | undefined;
-
-  if (typeof data === 'bigint') {
-    result = data;
-  }
-
   return {
-    data: result,
+    data: z.bigint().optional().parse(data),
     ...query
   };
 }
