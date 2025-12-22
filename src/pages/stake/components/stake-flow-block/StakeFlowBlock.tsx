@@ -46,7 +46,7 @@ export function StakeFlowBlock() {
   const isTokenBalanceLoading = isStakedBalanceFormattedFetching || isBaseTokenPriceFetching;
   const isLoading = isPriceOrBalanceLoading || isTokenBalanceLoading;
 
-  const isStakeButtonDisabled = !isConnected || isOpen || isLoading || BigInt(lockedTokenBalance?.amount ?? 0) > 0n;
+  const isStakeButtonDisabled = !isConnected || isOpen || isLoading || (lockedTokenBalance?.amount ?? 0n) > 0n;
 
   const stakedBalanceFormatted = formatUnits(stakedBalance?.principal ?? 0n, ENV.BASE_TOKEN_DECIMALS);
   const virtualBalanceFormatted = formatUnits(virtualBalance ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
@@ -87,7 +87,8 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {isConnected ? Format.token(stakedBalanceFormatted, 'compact') : '0.0000'} COMP
+                {isConnected && !!stakedBalance?.principal ? Format.token(stakedBalanceFormatted, 'compact') : '0.0000'}{' '}
+                COMP
               </Text>
             </Skeleton>
             <Condition if={isConnected && !!stakedBalance?.principal}>
@@ -119,7 +120,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? Format.token(virtualBalanceFormatted, 'compact') : '0.0000'} stCOMP
+              {isConnected && !!virtualBalance ? Format.token(virtualBalanceFormatted, 'compact') : '0.0000'} stCOMP
             </Text>
           </Skeleton>
         </div>
@@ -165,7 +166,7 @@ export function StakeFlowBlock() {
                 {isConnected ? '0.0000' : '0.0000'} COMP
               </Text>
             </Skeleton>
-            <Condition if={isConnected}>
+            <Condition if={isConnected && !!stakedBalance?.principal}>
               <Skeleton loading={isLoading}>
                 <Text
                   size='11'
@@ -200,7 +201,9 @@ export function StakeFlowBlock() {
         </div>
         <Button
           disabled={isStakeButtonDisabled}
-          className='max-w-32.5 text-[11px] font-medium'
+          className={cn('max-w-32.5 text-[11px] font-medium', {
+            'text-white': !isStakeButtonDisabled
+          })}
           onClick={onOpen}
         >
           Stake

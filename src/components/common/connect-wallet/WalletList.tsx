@@ -39,7 +39,7 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
   };
 
   return (
-    <div className='flex flex-col mt-10 w-full'>
+    <div className='mt-10 flex w-full flex-col'>
       {CONNECTORS.map(({ id, title, description, Icon }) => {
         const connector = connectors.find((c) => c.id === id);
 
@@ -48,10 +48,10 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
         return (
           <div
             key={id}
-            className='flex gap-5 items-center py-4 px-5 rounded-lg group cursor-pointer hover:bg-color-4 opacity-100 data-[disabled=true]:opacity-60'
+            className='group hover:bg-color-4 flex cursor-pointer items-center gap-3 rounded-lg p-3 opacity-100 data-[disabled=true]:opacity-60'
             onClick={() => onConnectorSelect(connector)}
           >
-            <Icon className='size-8 flex-shrink-0' />
+            <Icon className='size-10 flex-shrink-0 rounded-[5px]' />
             <div className='flex flex-col'>
               <Text
                 size='17'
@@ -70,7 +70,7 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
                 </Text>
               </Condition>
             </div>
-            <ArrowIcon className='text-color-25 size-6 flex-shrink-0 ml-auto group-hover:text-color-7' />
+            <ArrowIcon className='text-color-2 group-hover:text-color-7 ml-auto size-6 flex-shrink-0' />
           </div>
         );
       })}

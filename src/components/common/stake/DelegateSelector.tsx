@@ -154,7 +154,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                   <a
                     className='flex items-center gap-1.5'
                     target='_blank'
-                    href={getExplorerAddressUrl(selectedAddressDelegate?.address)}
+                    href={getExplorerAddressUrl(el.address)}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Text

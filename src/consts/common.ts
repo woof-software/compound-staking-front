@@ -3,6 +3,7 @@ import type { Hex } from 'viem';
 export const V2_URL = 'https://v2-app.compound.finance';
 export const TERMS_URL = `${V2_URL}/#terms`;
 export const TALLY_GOV_URL = 'https://www.tally.xyz/gov/compound';
+export const COMPOUND_FINANCE_URL = 'https://compound.finance/';
 
 export const APPLICATION_CHAIN = 1;
 
@@ -25,6 +26,3 @@ export const DELEGATES: Delegate[] = [
   { name: 'Wintermute', address: '0xB933AEe47C438f22DE0747D57fc239FE37878Dd1' },
   { name: 'a16z', address: '0x9aa835bc7b8ce13b9b0c9764a52fbf71ac62ccf1' }
 ];
-
-/* TIME */
-export const MINUTE_SECONDS = 60 * 1000;

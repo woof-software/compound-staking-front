@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
-import { CoolDown } from '@/components/common/CoolDown';
+import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
@@ -27,14 +27,16 @@ import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
 export function UnstakeFlowBlock() {
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { setIsPendingToggle } = useWalletStore();
+  const [secondsLeft, setSecondsLeft] = useState<number>(0);
 
+  const prevSecondsLeftRef = useRef<number>(0);
+
+  const { setIsPendingToggle } = useWalletStore();
   const { isConnected, address } = useConnection();
 
   const { refetch: refetchAllowance } = useStakedTokenAllowance(address);
 
   const { data: stakedTokenBalance, refetch: refetchStakedTokenBalance } = useStakedBalance(address);
-
   const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(address);
 
   const {
@@ -44,11 +46,6 @@ export function UnstakeFlowBlock() {
   } = useLockedBalance(address);
 
   const { data: stakedTokenPrice, isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
-
-  const { remainingSeconds } = FormatTime.lockInfo(
-    lockedTokenBalance?.startTime ?? 0,
-    lockedTokenBalance?.duration ?? 0
-  );
 
   const {
     sendTransactionAsync: unstakeRequest,
@@ -63,38 +60,52 @@ export function UnstakeFlowBlock() {
   const {
     sendTransactionAsync: unlockRequest,
     data: unlockRequestHash,
-    isPending: inUnlockPending
+    isPending: isUnlockPending
   } = useUnlockRequest();
 
   const { isLoading: isUnlockRequestConfirming, isSuccess: isUnlockRequestSuccess } = useWaitForTransactionReceipt({
     hash: unlockRequestHash
   });
 
-  const lockedStakedBalanceFormatted = formatUnits(BigInt(lockedTokenBalance?.amount ?? 0), ENV.BASE_TOKEN_DECIMALS);
+  const lockedStakedBalanceFormatted = formatUnits(lockedTokenBalance?.amount ?? 0n, ENV.BASE_TOKEN_DECIMALS);
   const lockedStakedBalancePriceFormatted = formatUnits(
     (lockedTokenBalance?.amount ?? 0n) * (stakedTokenPrice ?? 0n),
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
 
-  const hasActiveLock = BigInt(lockedTokenBalance?.amount ?? 0) > 0n;
-  const isInfoVisible = isConnected && hasActiveLock && remainingSeconds === 0;
-  const hasSomethingToUnstake =
-    BigInt(stakedTokenBalance?.principal ?? 0) > 0n || BigInt(lockedTokenBalance?.amount ?? 0) > 0n;
-  const cooldownFinished = remainingSeconds === 0;
-  const isCooldownBlocked = hasActiveLock && !cooldownFinished;
+  const lockEndMs = useMemo(() => {
+    const startSec = lockedTokenBalance?.startTime ?? 0;
+    const durationSec = lockedTokenBalance?.duration ?? 0;
+    console.log('startSec=>', startSec);
+    console.log('durationSec=>', durationSec);
+    const endSec = startSec + durationSec;
+
+    console.log('endSec=>', endSec);
+
+    return endSec > 0 ? Date.now() + endSec * 1000 : 0;
+  }, [lockedTokenBalance?.startTime, lockedTokenBalance?.duration]);
+
+  const hasActiveLock = (lockedTokenBalance?.amount ?? 0n) > 0n;
+
+  const isInfoVisible = isConnected && hasActiveLock && secondsLeft === 0;
+  const hasSomethingToUnstake = (stakedTokenBalance?.principal ?? 0n) > 0n || (lockedTokenBalance?.amount ?? 0n) > 0n;
+  const isCooldownBlocked = hasActiveLock && secondsLeft > 0;
 
   /* Loading */
   const isLoading = isLockedTokenBalanceLoading;
-
   const isTransactionLoading =
-    isUnstakePending || isUnstakeRequestConfirming || inUnlockPending || isUnlockRequestConfirming;
+    isUnstakePending || isUnstakeRequestConfirming || isUnlockPending || isUnlockRequestConfirming;
 
   const isUnstakeButtonDisabled =
     !isConnected || isOpen || isTransactionLoading || isLoading || !hasSomethingToUnstake || isCooldownBlocked;
 
   const onUnstakeRequest = async () => {
     setIsPendingToggle(true);
-    await unstakeRequest(ENV.STAKING_VAULT_ADDRESS);
+    try {
+      await unstakeRequest(ENV.STAKING_VAULT_ADDRESS);
+    } finally {
+      setIsPendingToggle(false);
+    }
   };
 
   const onButtonClick = async () => {
@@ -106,28 +117,49 @@ export function UnstakeFlowBlock() {
   };
 
   useEffect(() => {
-    setIsPendingToggle(isTransactionLoading);
-  }, [isTransactionLoading]);
+    if (!hasActiveLock || lockEndMs <= 0) {
+      setSecondsLeft(0);
+      prevSecondsLeftRef.current = 0;
+      return;
+    }
+
+    const diffMs = lockEndMs - Date.now();
+    const next = Math.max(0, Math.ceil(diffMs / 1000));
+    setSecondsLeft(next);
+    prevSecondsLeftRef.current = next;
+  }, [hasActiveLock, lockEndMs]);
 
   useEffect(() => {
-    if (isUnstakeRequestSuccess) {
-      onClose();
-    }
-  }, [isUnstakeRequestSuccess, onClose]);
+    prevSecondsLeftRef.current = secondsLeft;
+  }, [secondsLeft]);
+
+  useEffect(() => {
+    setIsPendingToggle(isTransactionLoading);
+  }, [isTransactionLoading]);
 
   useEffect(() => {
     if (isUnlockRequestSuccess) {
       refetchAllowance();
     }
-  }, [isUnlockRequestSuccess]);
 
-  useEffect(() => {
     if (isUnstakeRequestSuccess || isUnlockRequestSuccess) {
       refetchVirtualTokenBalance();
       refetchStakedTokenBalance();
       refetchLockedTokenBalance();
     }
-  }, [isUnstakeRequestSuccess, isUnlockRequestSuccess]);
+
+    if (isUnstakeRequestSuccess) {
+      onClose();
+    }
+  }, [
+    isUnstakeRequestSuccess,
+    isUnlockRequestSuccess,
+    refetchAllowance,
+    refetchVirtualTokenBalance,
+    refetchStakedTokenBalance,
+    refetchLockedTokenBalance,
+    onClose
+  ]);
 
   return (
     <div className='flex flex-col gap-1.5'>
@@ -154,7 +186,10 @@ export function UnstakeFlowBlock() {
                       'text-color-6': !isConnected
                     })}
                   >
-                    {isConnected ? Format.token(lockedStakedBalanceFormatted, 'standard') : '0.0000'} COMP
+                    {isConnected && !!lockedTokenBalance?.amount
+                      ? Format.token(lockedStakedBalanceFormatted, 'standard')
+                      : '0.0000'}{' '}
+                    COMP
                   </Text>
                 </Skeleton>
                 <Condition if={isConnected && !!lockedTokenBalance?.amount}>
@@ -177,19 +212,32 @@ export function UnstakeFlowBlock() {
                 Cooldown
               </Text>
               <Skeleton loading={isLoading}>
-                <CoolDown
-                  totalSeconds={remainingSeconds}
-                  isDisabled={isConnected && !!lockedTokenBalance?.startTime}
-                  className={cn('text-color-2', {
-                    'text-color-6': !isConnected || !lockedTokenBalance?.startTime
-                  })}
+                <Duration
+                  onChange={setSecondsLeft}
+                  end={hasActiveLock ? lockEndMs : 0}
+                  render={(seconds) => (
+                    <Text
+                      size='17'
+                      weight='500'
+                      lineHeight='17'
+                      className={cn('text-color-2', {
+                        'text-color-6': !isConnected || !lockedTokenBalance?.startTime
+                      })}
+                    >
+                      {Boolean(isConnected && !!lockedTokenBalance?.startTime)
+                        ? FormatTime.cooldownFromSeconds(seconds)
+                        : '-'}
+                    </Text>
+                  )}
                 />
               </Skeleton>
             </div>
           </div>
           <Button
             disabled={isUnstakeButtonDisabled}
-            className='max-w-32.5 text-[11px] font-medium'
+            className={cn('max-w-32.5 text-[11px] font-medium', {
+              'text-white': !isUnstakeButtonDisabled
+            })}
             onClick={onButtonClick}
           >
             {hasActiveLock ? 'Unstake' : 'Request unstake'}

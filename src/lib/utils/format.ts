@@ -99,7 +99,7 @@ export namespace FormatUnits {
 }
 
 export namespace FormatTime {
-  export function durationTime(totalSeconds: number) {
+  function durationTime(totalSeconds: number) {
     const dur = dayjs.duration(totalSeconds, 'seconds');
 
     const days = Math.floor(dur.asDays());
@@ -127,48 +127,25 @@ export namespace FormatTime {
    * @returns A string like "06d 23h", "03h 15m".
    */
   export function cooldownFromSeconds(totalSeconds: number): string {
+    console.log('totalSeconds=>', totalSeconds);
     if (!totalSeconds || totalSeconds <= 0) {
       return '00d 00h';
     }
 
-    const { days, hours, minutes } = durationTime(totalSeconds);
+    const { days, hours, minutes, seconds } = durationTime(totalSeconds);
 
     const pad = (n: number) => n.toString().padStart(2, '0');
 
-    if (days > 0) {
-      return `${pad(days)}d ${pad(hours)}h`;
-    }
+    if (days > 0) return `${pad(days)}d ${pad(hours)}h`;
 
-    return `${pad(hours)}h ${pad(minutes)}m`;
+    if (hours) return `${pad(hours)}h ${pad(minutes)}m`;
+
+    return `${pad(minutes)}m ${pad(seconds)}s`;
   }
 
-  export function lockInfo(startTimeSec: number, durationSec: number) {
-    if (!startTimeSec || !durationSec) {
-      return {
-        isUnlocked: false,
-        unlockTimestampSec: 0,
-        unlockDateLabel: '-',
-        countdownLabel: '00d 00h',
-        remainingSeconds: 0
-      };
-    }
+  export function getRemainingSeconds(unlockTimestampSec: number, nowUnix = dayjs().unix()): number {
+    if (!unlockTimestampSec) return 0;
 
-    const unlockTimestampSec = startTimeSec + durationSec;
-
-    const nowUnix = dayjs().unix();
-    const remainingSeconds = Math.max(0, unlockTimestampSec - nowUnix);
-
-    const unlockDateLabel = dayjs.unix(unlockTimestampSec).format('MMMM D, YYYY');
-    const countdownLabel = cooldownFromSeconds(remainingSeconds);
-
-    const isUnlocked = remainingSeconds === 0;
-
-    return {
-      isUnlocked,
-      unlockTimestampSec,
-      unlockDateLabel,
-      countdownLabel,
-      remainingSeconds
-    };
+    return Math.max(0, unlockTimestampSec - nowUnix);
   }
 }

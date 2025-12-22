@@ -61,6 +61,7 @@ export function StakeModal(props: StakeModalProps) {
   const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
   const needsApprove = parseAmount > 0n && !hasEnoughAllowance;
   const noAmount = parseAmount === 0n;
+  const noDelegate = !selectedAddressDelegate?.address;
   const isAmountExceedsBalance = parseAmount <= (walletBalance ?? 0n);
 
   /* Loading */
@@ -71,7 +72,7 @@ export function StakeModal(props: StakeModalProps) {
 
   /* Disabled */
   const isApproveDisabled = noAmount || !needsApprove || !isAmountExceedsBalance;
-  const isConfirmDisabled = noAmount || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
+  const isConfirmDisabled = noAmount || noDelegate || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
 
   /* Calculate input value in USD */
   const baseTokenPriceValue = baseTokenPrice ?? 0n;
@@ -137,7 +138,9 @@ export function StakeModal(props: StakeModalProps) {
             </div>
             <Button
               disabled={isLoadingTransaction}
-              className='bg-color-16 h-8 w-14 text-[11px] font-medium'
+              className={cn('bg-color-16 h-8 w-14 text-[11px] font-medium', {
+                'bg-color-28': isLoadingTransaction
+              })}
               onClick={onMaxButtonClick}
             >
               Max

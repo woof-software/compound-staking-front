@@ -25,7 +25,7 @@ export function Modal(props: ModalProps) {
         onClick={onClose}
       >
         <div
-          className='bg-color-4 modal-content-in relative flex w-full max-w-108 flex-col items-center rounded-lg p-10'
+          className='bg-color-5 modal-content-in relative flex w-full max-w-108 flex-col items-center rounded-lg p-10'
           onClick={(e) => e.stopPropagation()}
         >
           <div className='flex w-full justify-end'>
@@ -45,7 +45,7 @@ export function Modal(props: ModalProps) {
                 onClick={onClose}
                 className='size-auto bg-transparent p-0'
               >
-                <CloseIcon className='text-color-18 ml-auto cursor-pointer' />
+                <CloseIcon className='text-color-18 ml-auto size-5 cursor-pointer' />
               </Button>
             </Condition>
           </div>

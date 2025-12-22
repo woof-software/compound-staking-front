@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
-import { useLockDuration } from '@/hooks/useLockDuration';
+import { useUnstakeLockDuration } from '@/hooks/useLockDuration';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { noop } from '@/lib/utils/common';
 import { Format, FormatTime } from '@/lib/utils/format';
@@ -22,7 +22,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
 
   const { address } = useConnection();
 
-  const { data: lockDuration } = useLockDuration(ENV.LOCK_MANAGER_ADDRESS);
+  const { data: lockDuration } = useUnstakeLockDuration(ENV.LOCK_MANAGER_ADDRESS);
 
   const { data: stakedTokenBalance } = useStakedBalance(address);
 
