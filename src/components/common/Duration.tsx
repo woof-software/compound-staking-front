@@ -1,11 +1,8 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 export type DurationProps = {
-  /** Number of seconds to count down from (e.g. 90 => 90..0) */
   end: number;
-  /** Called ONCE when countdown reaches 0 */
   onChange?: () => void;
-  /** Render-prop that receives seconds left */
   render: (secondsLeft: number) => ReactNode;
 };
 
@@ -15,23 +12,24 @@ export function Duration(props: DurationProps) {
   const rafIdRef = useRef<number | null>(null);
   const lastTickMsRef = useRef<number>(0);
   const finishedCalledRef = useRef<boolean>(false);
+  const startedRef = useRef<boolean>(false);
 
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
 
   useEffect(() => {
+    // reset on end change
     finishedCalledRef.current = false;
     lastTickMsRef.current = 0;
 
     const initial = Number.isFinite(end) ? Math.max(0, Math.floor(end)) : 0;
+
+    // IMPORTANT: считаем "стартовали" только если initial > 0
+    startedRef.current = initial > 0;
+
     setSecondsLeft(initial);
 
-    if (initial === 0) {
-      if (!finishedCalledRef.current) {
-        finishedCalledRef.current = true;
-        onChange?.();
-      }
-      return;
-    }
+    // IMPORTANT: если initial === 0 — НЕ вызываем onChange на mount
+    if (initial === 0) return;
 
     const tick = (nowMs: number) => {
       if (lastTickMsRef.current === 0) lastTickMsRef.current = nowMs;
@@ -45,7 +43,7 @@ export function Duration(props: DurationProps) {
         setSecondsLeft((prev) => {
           const next = Math.max(0, prev - steps);
 
-          if (next === 0 && !finishedCalledRef.current) {
+          if (next === 0 && startedRef.current && !finishedCalledRef.current) {
             finishedCalledRef.current = true;
             onChange?.();
           }

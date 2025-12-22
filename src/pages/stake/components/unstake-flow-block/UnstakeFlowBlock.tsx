@@ -27,7 +27,11 @@ import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
 export function UnstakeFlowBlock() {
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { isEnabled: isDurationFinished, enable: setIsDurationFinished } = useSwitch();
+  const {
+    isEnabled: isDurationFinished,
+    enable: setIsDurationFinished,
+    disable: resetIsDurationFinished
+  } = useSwitch();
 
   const { setIsPendingToggle } = useWalletStore();
   const { isConnected, address } = useConnection();
@@ -72,14 +76,18 @@ export function UnstakeFlowBlock() {
   );
 
   const hasActiveLock = (lockedTokenBalance?.amount ?? 0n) > 0n;
-  const durationSec = hasActiveLock
-    ? // ? FormatTime.getRemainingSeconds((lockedTokenBalance?.startTime ?? 0) + (lockedTokenBalance?.duration ?? 0))
-      FormatTime.getRemainingSeconds((lockedTokenBalance?.startTime ?? 0) + 1000)
+  const unlockTimestampSec = hasActiveLock
+    ? FormatTime.normalizeUnixSeconds(lockedTokenBalance?.startTime ?? 0) + (lockedTokenBalance?.duration ?? 0)
     : 0;
+  const remainingSeconds = hasActiveLock ? FormatTime.getRemainingSeconds(unlockTimestampSec) : 0;
 
-  const isInfoVisible = isConnected && hasActiveLock && isDurationFinished;
-  const hasSomethingToUnstake = (stakedTokenBalance?.principal ?? 0n) > 0n || (lockedTokenBalance?.amount ?? 0n) > 0n;
-  const isCooldownBlocked = hasActiveLock && !isDurationFinished;
+  const isBalancesLoading = isLockedTokenBalanceLoading || (isConnected && !lockedTokenBalance);
+  const durationSec = !isBalancesLoading ? remainingSeconds : 0;
+
+  const isInfoVisible = isConnected && !isBalancesLoading && hasActiveLock && isDurationFinished;
+  const isCooldownBlocked = !isBalancesLoading && hasActiveLock && !isDurationFinished;
+  const hasSomethingToUnstake =
+    !isBalancesLoading && ((stakedTokenBalance?.principal ?? 0n) > 0n || (lockedTokenBalance?.amount ?? 0n) > 0n);
 
   /* Loading */
   const isLoading = isLockedTokenBalanceLoading;
@@ -87,7 +95,7 @@ export function UnstakeFlowBlock() {
     isUnstakePending || isUnstakeRequestConfirming || isUnlockPending || isUnlockRequestConfirming;
 
   const isUnstakeButtonDisabled =
-    !isConnected || isOpen || isTransactionLoading || isLoading || !hasSomethingToUnstake || isCooldownBlocked;
+    !isConnected || isOpen || isTransactionLoading || isBalancesLoading || !hasSomethingToUnstake || isCooldownBlocked;
 
   const onUnstakeRequest = async () => {
     setIsPendingToggle(true);
@@ -105,6 +113,21 @@ export function UnstakeFlowBlock() {
       onOpen();
     }
   };
+
+  useEffect(() => {
+    if (!isConnected || isBalancesLoading) {
+      resetIsDurationFinished();
+      return;
+    }
+
+    if (!hasActiveLock) {
+      resetIsDurationFinished();
+      return;
+    }
+
+    if (remainingSeconds <= 0) setIsDurationFinished();
+    else resetIsDurationFinished();
+  }, [isConnected, isBalancesLoading, hasActiveLock, remainingSeconds, setIsDurationFinished, resetIsDurationFinished]);
 
   useEffect(() => {
     setIsPendingToggle(isTransactionLoading);
@@ -178,8 +201,8 @@ export function UnstakeFlowBlock() {
               </Text>
               <Skeleton loading={isLoading}>
                 <Duration
-                  onChange={setIsDurationFinished}
                   end={durationSec}
+                  onChange={setIsDurationFinished}
                   render={(seconds) => (
                     <Text
                       size='17'

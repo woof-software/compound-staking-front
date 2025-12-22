@@ -148,4 +148,8 @@ export namespace FormatTime {
 
     return Math.max(0, unlockTimestampSec - nowUnix);
   }
+
+  export function normalizeUnixSeconds(ts: number): number {
+    return ts > 1e12 ? Math.floor(ts / 1000) : Math.floor(ts);
+  }
 }
