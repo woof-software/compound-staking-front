@@ -127,7 +127,6 @@ export namespace FormatTime {
    * @returns A string like "06d 23h", "03h 15m".
    */
   export function cooldownFromSeconds(totalSeconds: number): string {
-    console.log('totalSeconds=>', totalSeconds);
     if (!totalSeconds || totalSeconds <= 0) {
       return '00d 00h';
     }

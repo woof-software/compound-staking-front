@@ -9,7 +9,7 @@ export type DurationProps = {
 export function Duration(props: DurationProps) {
   const { end, render, onChange } = props;
 
-  const rafIdRef = useRef<number | null>(null);
+  const requestAnimRef = useRef<number | null>(null);
   const lastTickMsRef = useRef<number>(0);
   const finishedCalledRef = useRef<boolean>(false);
   const startedRef = useRef<boolean>(false);
@@ -17,18 +17,15 @@ export function Duration(props: DurationProps) {
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
 
   useEffect(() => {
-    // reset on end change
     finishedCalledRef.current = false;
     lastTickMsRef.current = 0;
 
     const initial = Number.isFinite(end) ? Math.max(0, Math.floor(end)) : 0;
 
-    // IMPORTANT: считаем "стартовали" только если initial > 0
     startedRef.current = initial > 0;
 
     setSecondsLeft(initial);
 
-    // IMPORTANT: если initial === 0 — НЕ вызываем onChange на mount
     if (initial === 0) return;
 
     const tick = (nowMs: number) => {
@@ -53,17 +50,17 @@ export function Duration(props: DurationProps) {
       }
 
       if (!finishedCalledRef.current) {
-        rafIdRef.current = requestAnimationFrame(tick);
+        requestAnimRef.current = requestAnimationFrame(tick);
       } else {
-        rafIdRef.current = null;
+        requestAnimRef.current = null;
       }
     };
 
-    rafIdRef.current = requestAnimationFrame(tick);
+    requestAnimRef.current = requestAnimationFrame(tick);
 
     return () => {
-      if (rafIdRef.current != null) cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
+      if (requestAnimRef.current != null) cancelAnimationFrame(requestAnimRef.current);
+      requestAnimRef.current = null;
     };
   }, [end, onChange]);
 

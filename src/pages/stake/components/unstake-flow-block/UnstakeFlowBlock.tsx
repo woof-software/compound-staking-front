@@ -115,19 +115,17 @@ export function UnstakeFlowBlock() {
   };
 
   useEffect(() => {
-    if (!isConnected || isBalancesLoading) {
+    if (!isConnected || isBalancesLoading || !hasActiveLock) {
       resetIsDurationFinished();
       return;
     }
 
-    if (!hasActiveLock) {
+    if (remainingSeconds <= 0) {
+      setIsDurationFinished();
+    } else {
       resetIsDurationFinished();
-      return;
     }
-
-    if (remainingSeconds <= 0) setIsDurationFinished();
-    else resetIsDurationFinished();
-  }, [isConnected, isBalancesLoading, hasActiveLock, remainingSeconds, setIsDurationFinished, resetIsDurationFinished]);
+  }, [isConnected, isBalancesLoading, hasActiveLock, remainingSeconds]);
 
   useEffect(() => {
     setIsPendingToggle(isTransactionLoading);
