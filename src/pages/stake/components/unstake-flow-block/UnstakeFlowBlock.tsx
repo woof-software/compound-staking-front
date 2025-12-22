@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
@@ -27,9 +27,7 @@ import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
 export function UnstakeFlowBlock() {
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const [secondsLeft, setSecondsLeft] = useState<number>(0);
-
-  const prevSecondsLeftRef = useRef<number>(0);
+  const { isEnabled: isDurationFinished, enable: setIsDurationFinished } = useSwitch();
 
   const { setIsPendingToggle } = useWalletStore();
   const { isConnected, address } = useConnection();
@@ -73,23 +71,15 @@ export function UnstakeFlowBlock() {
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
 
-  const lockEndMs = useMemo(() => {
-    const startSec = lockedTokenBalance?.startTime ?? 0;
-    const durationSec = lockedTokenBalance?.duration ?? 0;
-    console.log('startSec=>', startSec);
-    console.log('durationSec=>', durationSec);
-    const endSec = startSec + durationSec;
-
-    console.log('endSec=>', endSec);
-
-    return endSec > 0 ? Date.now() + endSec * 1000 : 0;
-  }, [lockedTokenBalance?.startTime, lockedTokenBalance?.duration]);
-
   const hasActiveLock = (lockedTokenBalance?.amount ?? 0n) > 0n;
+  const durationSec = hasActiveLock
+    ? // ? FormatTime.getRemainingSeconds((lockedTokenBalance?.startTime ?? 0) + (lockedTokenBalance?.duration ?? 0))
+      FormatTime.getRemainingSeconds((lockedTokenBalance?.startTime ?? 0) + 1000)
+    : 0;
 
-  const isInfoVisible = isConnected && hasActiveLock && secondsLeft === 0;
+  const isInfoVisible = isConnected && hasActiveLock && isDurationFinished;
   const hasSomethingToUnstake = (stakedTokenBalance?.principal ?? 0n) > 0n || (lockedTokenBalance?.amount ?? 0n) > 0n;
-  const isCooldownBlocked = hasActiveLock && secondsLeft > 0;
+  const isCooldownBlocked = hasActiveLock && !isDurationFinished;
 
   /* Loading */
   const isLoading = isLockedTokenBalanceLoading;
@@ -117,23 +107,6 @@ export function UnstakeFlowBlock() {
   };
 
   useEffect(() => {
-    if (!hasActiveLock || lockEndMs <= 0) {
-      setSecondsLeft(0);
-      prevSecondsLeftRef.current = 0;
-      return;
-    }
-
-    const diffMs = lockEndMs - Date.now();
-    const next = Math.max(0, Math.ceil(diffMs / 1000));
-    setSecondsLeft(next);
-    prevSecondsLeftRef.current = next;
-  }, [hasActiveLock, lockEndMs]);
-
-  useEffect(() => {
-    prevSecondsLeftRef.current = secondsLeft;
-  }, [secondsLeft]);
-
-  useEffect(() => {
     setIsPendingToggle(isTransactionLoading);
   }, [isTransactionLoading]);
 
@@ -151,15 +124,7 @@ export function UnstakeFlowBlock() {
     if (isUnstakeRequestSuccess) {
       onClose();
     }
-  }, [
-    isUnstakeRequestSuccess,
-    isUnlockRequestSuccess,
-    refetchAllowance,
-    refetchVirtualTokenBalance,
-    refetchStakedTokenBalance,
-    refetchLockedTokenBalance,
-    onClose
-  ]);
+  }, [isUnstakeRequestSuccess, isUnlockRequestSuccess]);
 
   return (
     <div className='flex flex-col gap-1.5'>
@@ -213,8 +178,8 @@ export function UnstakeFlowBlock() {
               </Text>
               <Skeleton loading={isLoading}>
                 <Duration
-                  onChange={setSecondsLeft}
-                  end={hasActiveLock ? lockEndMs : 0}
+                  onChange={setIsDurationFinished}
+                  end={durationSec}
                   render={(seconds) => (
                     <Text
                       size='17'
