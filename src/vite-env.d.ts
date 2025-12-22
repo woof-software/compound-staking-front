@@ -20,6 +20,8 @@ interface ImportMetaEnv {
   readonly VITE_STAKED_TOKEN_DECIMALS?: string;
 
   readonly VITE_STAKING_VAULT_ADDRESS?: string;
+
+  readonly VITE_SUBACCOUNT_MANAGER_ADDRESS?: string;
 }
 
 interface ImportMeta {
