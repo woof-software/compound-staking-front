@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import type { Address } from 'viem';
 
 import { ENV } from '@/consts/env';
@@ -40,4 +41,30 @@ export function getChainName(chainId: number) {
 export function getExplorerAddressUrl(address?: Address) {
   if (!address) return ENV.ETHERSCAN_URL;
   return `${ENV.ETHERSCAN_URL}/address/${address}`;
+}
+
+export function durationTime(totalSeconds: number) {
+  const dur = dayjs.duration(totalSeconds, 'seconds');
+
+  const days = Math.floor(dur.asDays());
+  const hours = dur.hours();
+  const minutes = dur.minutes();
+  const seconds = dur.seconds();
+
+  return {
+    days,
+    hours,
+    minutes,
+    seconds
+  };
+}
+
+export function getRemainingSeconds(unlockTimestampSec: number, nowUnix = dayjs().unix()): number {
+  if (!unlockTimestampSec) return 0;
+
+  return Math.max(0, unlockTimestampSec - nowUnix);
+}
+
+export function normalizeUnixSeconds(ts: number): number {
+  return ts > 1e12 ? Math.floor(ts / 1000) : Math.floor(ts);
 }

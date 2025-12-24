@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
+import { durationTime } from '@/lib/utils/helpers';
+
 dayjs.extend(duration);
 
 export namespace Format {
@@ -99,22 +101,6 @@ export namespace FormatUnits {
 }
 
 export namespace FormatTime {
-  function durationTime(totalSeconds: number) {
-    const dur = dayjs.duration(totalSeconds, 'seconds');
-
-    const days = Math.floor(dur.asDays());
-    const hours = dur.hours();
-    const minutes = dur.minutes();
-    const seconds = dur.seconds();
-
-    return {
-      days,
-      hours,
-      minutes,
-      seconds
-    };
-  }
-
   /**
    * Formats a duration (in seconds) into a compact string.
    *
@@ -140,15 +126,5 @@ export namespace FormatTime {
     if (hours) return `${pad(hours)}h ${pad(minutes)}m`;
 
     return `${pad(minutes)}m ${pad(seconds)}s`;
-  }
-
-  export function getRemainingSeconds(unlockTimestampSec: number, nowUnix = dayjs().unix()): number {
-    if (!unlockTimestampSec) return 0;
-
-    return Math.max(0, unlockTimestampSec - nowUnix);
-  }
-
-  export function normalizeUnixSeconds(ts: number): number {
-    return ts > 1e12 ? Math.floor(ts / 1000) : Math.floor(ts);
   }
 }

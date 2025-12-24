@@ -1,4 +1,4 @@
-import { type PropsWithChildren } from 'react';
+import { type PropsWithChildren, useEffect } from 'react';
 
 import { CloseIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -15,6 +15,16 @@ export interface ModalProps extends PropsWithChildren {
 
 export function Modal(props: ModalProps) {
   const { open, title, children, onClose } = props;
+
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add('disable-scroll-vertical');
+    }
+
+    return () => {
+      document.body.classList.remove('disable-scroll-vertical');
+    };
+  }, [open]);
 
   if (!open) return null;
 

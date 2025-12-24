@@ -11,12 +11,13 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
-import { useStakedTokenAllowance } from '@/hooks/useStakedTokenAllowance';
+import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
 import { Format, FormatTime } from '@/lib/utils/format';
+import { getRemainingSeconds, normalizeUnixSeconds } from '@/lib/utils/helpers';
 import { UnstakeModal } from '@/pages/stake/components/unstake-flow-block/UnstakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
@@ -36,7 +37,7 @@ export function UnstakeFlowBlock() {
   const { setIsPendingToggle } = useWalletStore();
   const { isConnected, address } = useConnection();
 
-  const { refetch: refetchAllowance } = useStakedTokenAllowance(address);
+  const { refetch: refetchAllowance } = useBaseTokenAllowance(address);
 
   const { data: stakedTokenBalance, refetch: refetchStakedTokenBalance } = useStakedBalance(address);
   const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(address);
@@ -77,9 +78,9 @@ export function UnstakeFlowBlock() {
 
   const hasActiveLock = (lockedTokenBalance?.amount ?? 0n) > 0n;
   const unlockTimestampSec = hasActiveLock
-    ? FormatTime.normalizeUnixSeconds(lockedTokenBalance?.startTime ?? 0) + (lockedTokenBalance?.duration ?? 0)
+    ? normalizeUnixSeconds(lockedTokenBalance?.startTime ?? 0) + (lockedTokenBalance?.duration ?? 0)
     : 0;
-  const remainingSeconds = hasActiveLock ? FormatTime.getRemainingSeconds(unlockTimestampSec) : 0;
+  const remainingSeconds = hasActiveLock ? getRemainingSeconds(unlockTimestampSec) : 0;
 
   const isBalancesLoading = isLockedTokenBalanceLoading || (isConnected && !lockedTokenBalance);
   const durationSec = !isBalancesLoading ? remainingSeconds : 0;

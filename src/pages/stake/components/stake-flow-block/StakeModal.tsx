@@ -6,12 +6,13 @@ import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
+import { Image } from '@/components/ui/Image';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { type Delegate } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useApproveTransaction } from '@/hooks/useApproveTransaction';
-import { useStakedTokenAllowance } from '@/hooks/useStakedTokenAllowance';
+import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
 import { useStakeTransaction } from '@/hooks/useStakeTransaction';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -19,9 +20,6 @@ import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
-
-import COMP from '@/assets/comp.svg';
-
 export type StakeModalProps = {
   onClose?: () => void;
   onStakeConfirmed?: () => void;
@@ -43,7 +41,7 @@ export function StakeModal(props: StakeModalProps) {
 
   const { data: walletBalance, isFetching: isWalletBalanceFetching } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
 
-  const { data: allowance, refetch: refetchAllowance } = useStakedTokenAllowance(address);
+  const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(address);
 
   const { sendTransactionAsync: approve, data: approveHash, isPending: isApprovePending } = useApproveTransaction();
 
@@ -128,7 +126,10 @@ export function StakeModal(props: StakeModalProps) {
         <Skeleton loading={isPriceOrBalanceLoading}>
           <div className='flex items-center justify-between gap-5'>
             <div className='flex max-w-72 items-center gap-2'>
-              <COMP className='size-6.75 shrink-0' />
+              <Image
+                src='/comp.avif'
+                className='size-6.75 shrink-0 rounded-full'
+              />
               <AmountInput
                 className='min-h-12 max-w-60'
                 disabled={isLoadingTransaction}

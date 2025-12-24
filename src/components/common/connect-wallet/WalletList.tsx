@@ -5,26 +5,22 @@ import { Condition } from '@/components/common/Condition';
 
 import { Text } from '../../ui/Text';
 
-import CoinbaseIcon from '@/assets/coinbase.svg';
-import MetaMaskAndBrowsers from '@/assets/metamask-and-browsers.svg';
-import WalletConnectIcon from '@/assets/walletconnect.svg';
-
 const CONNECTORS = [
   {
     id: 'metaMaskSDK',
     title: 'MetaMask',
     description: 'and other browser wallets',
-    Icon: MetaMaskAndBrowsers
+    icon: 'metamask-and-browsers'
   },
   {
     id: 'walletConnect',
     title: 'WalletConnect',
-    Icon: WalletConnectIcon
+    icon: 'walletconnect'
   },
   {
     id: 'coinbaseWalletSDK',
     title: 'Coinbase Wallet',
-    Icon: CoinbaseIcon
+    icon: 'coinbase'
   }
 ];
 
@@ -40,7 +36,7 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
 
   return (
     <div className='mt-10 flex w-full flex-col'>
-      {CONNECTORS.map(({ id, title, description, Icon }) => {
+      {CONNECTORS.map(({ id, title, description, icon }) => {
         const connector = connectors.find((c) => c.id === id);
 
         if (!connector) return null;
@@ -51,7 +47,11 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
             className='group hover:bg-color-4 flex cursor-pointer items-center gap-3 rounded-lg p-3 opacity-100 data-[disabled=true]:opacity-60'
             onClick={() => onConnectorSelect(connector)}
           >
-            <Icon className='size-10 flex-shrink-0 rounded-[5px]' />
+            <img
+              src={`/src/assets/${icon}.avif`}
+              alt='wallet-icon'
+              className='size-10 flex-shrink-0 rounded-[5px]'
+            />
             <div className='flex flex-col'>
               <Text
                 size='17'
