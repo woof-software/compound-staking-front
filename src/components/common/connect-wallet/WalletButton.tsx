@@ -15,7 +15,7 @@ export function WalletButton() {
     <>
       <Condition if={!address}>
         <Button
-          className='border-2 bg-color-10 rounded-64 text-color-7 border-color-7 max-w-28 text-[11px] font-medium'
+          className='bg-color-4 rounded-64 text-color-2 py-3.375 border-color-7 max-w-30.5 border-1 px-5 text-[11px] font-medium'
           onClick={onOpen}
         >
           Connect Wallet

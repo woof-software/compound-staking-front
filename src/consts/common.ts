@@ -3,6 +3,7 @@ import type { Hex } from 'viem';
 export const V2_URL = 'https://v2-app.compound.finance';
 export const TERMS_URL = `${V2_URL}/#terms`;
 export const TALLY_GOV_URL = 'https://www.tally.xyz/gov/compound';
+export const COMPOUND_FINANCE_URL = 'https://compound.finance/';
 
 export const APPLICATION_CHAIN = 1;
 

@@ -20,8 +20,8 @@ export function ConnectorsModal(props: ConnectorsModalProps) {
       onClose={onClose}
     >
       <div className='flex flex-col items-center justify-center gap-5'>
-        <CompoundBlackCircle className='mt-1 size-16 text-color-4' />
-        <div className='flex flex-col gap-1 items-center justify-center'>
+        <CompoundBlackCircle className='text-color-4 mt-1 size-16' />
+        <div className='flex flex-col items-center justify-center gap-1'>
           <Text
             size='21'
             weight='600'
@@ -47,7 +47,7 @@ export function ConnectorsModal(props: ConnectorsModalProps) {
       >
         By connecting, I accept Compound’s{' '}
         <a
-          className='text-[11px] font-medium text-color-7 hover:brightness-90'
+          className='text-color-7 text-[11px] font-medium'
           href={TERMS_URL}
           target='_blank'
         >

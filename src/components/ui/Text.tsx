@@ -31,6 +31,7 @@ const text = cva('text-color-2', {
       '21': 'leading-[21px]',
       '24': 'leading-[24px]',
       '27': 'leading-[27px]',
+      '28': 'leading-[28px]',
       '38': 'leading-[38px]',
       '44': 'leading-[44px]',
       '54': 'leading-[54px]',

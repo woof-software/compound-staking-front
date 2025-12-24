@@ -76,7 +76,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 lineHeight='16'
                 className='text-color-2'
               >
-                {selectedAddressDelegate?.name}
+                {selectedAddressDelegate.name}
               </Text>
             </div>
             <a

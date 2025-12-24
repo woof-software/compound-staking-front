@@ -1,3 +1,10 @@
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+import { durationTime } from '@/lib/utils/helpers';
+
+dayjs.extend(duration);
+
 export namespace Format {
   export type FormatView = 'standard' | 'compact';
   /**
@@ -69,6 +76,20 @@ export namespace Format {
 }
 
 export namespace FormatUnits {
+  /**
+   * Parses a numeric value and returns an appropriate short unit suffix
+   * for large values, such as `"K"`, `"M"`, `"B"`, or `"T"`.
+   *
+   * Returns `undefined` for values smaller than 1000 or invalid inputs.
+   *
+   * @param value - Numeric value to inspect.
+   * @returns A unit suffix (`"K"`, `"M"`, `"B"`, `"T"`) or `undefined` if no unit applies.
+   *
+   * @example
+   * FormatUnits.parse(999);      // -> undefined
+   * FormatUnits.parse(12_300);   // -> "K"
+   * FormatUnits.parse(5_000_000); // -> "M"
+   */
   export function parse(value: number): string | undefined {
     if (Number.isNaN(value) || !Number.isFinite(value) || value < 1000) return;
 
@@ -76,5 +97,34 @@ export namespace FormatUnits {
     if (value < 1_000_000_000) return 'M';
     if (value < 1_000_000_000_000) return 'B';
     if (value < 1_000_000_000_000_000) return 'T';
+  }
+}
+
+export namespace FormatTime {
+  /**
+   * Formats a duration (in seconds) into a compact string.
+   *
+   * Rules:
+   * - If totalSeconds <= 0 → "00d 00h"
+   * - If there are days     → "DDd HHh"
+   * - Else                  → "HHh MMm"
+   *
+   * @param totalSeconds - Duration in seconds (e.g. remaining cooldown or lock time).
+   * @returns A string like "06d 23h", "03h 15m".
+   */
+  export function cooldownFromSeconds(totalSeconds: number): string {
+    if (!totalSeconds || totalSeconds <= 0) {
+      return '00d 00h';
+    }
+
+    const { days, hours, minutes, seconds } = durationTime(totalSeconds);
+
+    const pad = (n: number) => n.toString().padStart(2, '0');
+
+    if (days > 0) return `${pad(days)}d ${pad(hours)}h`;
+
+    if (hours) return `${pad(hours)}h ${pad(minutes)}m`;
+
+    return `${pad(minutes)}m ${pad(seconds)}s`;
   }
 }
