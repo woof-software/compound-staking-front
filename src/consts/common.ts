@@ -9,7 +9,7 @@ export const APPLICATION_CHAIN = 1;
 export const DEFAULT_INTEGER_PART_LENGTH = 16;
 
 /* DELEGATES  */
-export type Delegate = { name: string; address: Hex };
+export type Delegate = { name: string | undefined; address: Hex };
 
 export const DELEGATES: Delegate[] = [
   { name: 'Compound Foundation', address: '0xb06df4dd01a5c5782f360ada9345c87e86adae3d' },

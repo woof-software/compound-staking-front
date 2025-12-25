@@ -5,42 +5,49 @@ import { ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-import { DELEGATES } from '@/consts/common';
+import { type Delegate, DELEGATES } from '@/consts/common';
 import { useDelegateDuration } from '@/hooks/useDelegateDuration';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useSubAccount } from '@/hooks/useSubAccount';
+import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { getExplorerAddressUrl } from '@/lib/utils/helpers';
+import { DelegateModal } from '@/pages/stake/components/delegate-flow-block/DelegateModal';
 
 export function DelegateFlowBlock() {
   const { isConnected } = useConnection();
 
   const { address } = useConnection();
 
+  const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
+
   const { data: delegateDuration, isLoading: isDurationLoading } = useDelegateDuration();
   const { data: subAccountAddress, isLoading: isSubAccountLoading } = useDelegateSubAccount(address);
-  const { data: delegateData, isLoading: isDelegateLoading } = useSubAccount(subAccountAddress);
+  const {
+    data: delegateData,
+    isLoading: isDelegateLoading,
+    refetch: refetchDelegate
+  } = useSubAccount(subAccountAddress);
 
   const isLoading = isDurationLoading || isSubAccountLoading || isDelegateLoading;
 
   const isDelegateButtonDisabled = !isConnected || isLoading;
 
-  const delegate = useMemo(() => {
-    const target = DELEGATES.find(
-      (delegate) => delegate.address.toLowerCase() === delegateData?.delegatee?.toLowerCase()
-    );
+  const delegate = useMemo<Delegate | undefined>(() => {
+    const delegatee = delegateData?.delegatee;
+    if (!delegatee) return undefined;
 
-    if (!target) {
-      return {
-        name: delegateData?.delegatee,
-        address: delegateData?.delegatee
-      };
-    }
+    const target = DELEGATES.find((d) => d.address.toLowerCase() === delegatee.toLowerCase());
 
-    return target;
-  }, [delegateData]);
+    return target ?? { name: undefined, address: delegatee };
+  }, [delegateData?.delegatee]);
+
+  const onDelegateConfirmed = () => {
+    refetchDelegate();
+  };
 
   console.log('delegateDuration=>', delegateDuration);
   console.log('subAccountAddress=>', subAccountAddress);
@@ -78,7 +85,7 @@ export function DelegateFlowBlock() {
                     'text-color-6': !isConnected
                   })}
                 >
-                  {isConnected ? delegate?.name : '-'}
+                  {isConnected ? delegate?.name || delegate?.address : '-'}
                 </Text>
                 <Condition if={isConnected}>
                   <ExternalLinkIcon className='text-color-24' />
@@ -132,12 +139,24 @@ export function DelegateFlowBlock() {
           </div>
         </div>
         <Button
+          onClick={onOpen}
           disabled={isDelegateButtonDisabled}
           className='max-w-32.5 text-[11px] font-medium'
         >
           Delegate
         </Button>
       </div>
+      <Modal
+        open={isOpen}
+        title='Delegate'
+        onClose={onClose}
+      >
+        <DelegateModal
+          delegate={delegate}
+          onClose={onClose}
+          onDelegateConfirmed={onDelegateConfirmed}
+        />
+      </Modal>
     </Card>
   );
 }
