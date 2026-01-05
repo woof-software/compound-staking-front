@@ -3,6 +3,10 @@ import type { Address } from 'viem';
 
 import { ENV } from '@/consts/env';
 
+export function getImgPath(src: string) {
+  return `/src/assets${src}`;
+}
+
 export function getChainLogo(chainId: number) {
   //TODO: add fallback
   if (![1, 10, 130, 137, 2020, 5000, 8453, 42161, 43114, 59144, 534352].includes(chainId)) return;

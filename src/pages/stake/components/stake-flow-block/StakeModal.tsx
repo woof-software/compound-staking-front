@@ -6,7 +6,6 @@ import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
-import { Image } from '@/components/ui/Image';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { type Delegate } from '@/consts/common';
@@ -20,6 +19,7 @@ import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
+import { getImgPath } from '@/lib/utils/helpers';
 export type StakeModalProps = {
   onClose?: () => void;
   onStakeConfirmed?: () => void;
@@ -126,8 +126,9 @@ export function StakeModal(props: StakeModalProps) {
         <Skeleton loading={isPriceOrBalanceLoading}>
           <div className='flex items-center justify-between gap-5'>
             <div className='flex max-w-72 items-center gap-2'>
-              <Image
-                src='/comp.avif'
+              <img
+                src={getImgPath('/comp.avif')}
+                alt='comp'
                 className='size-6.75 shrink-0 rounded-full'
               />
               <AmountInput

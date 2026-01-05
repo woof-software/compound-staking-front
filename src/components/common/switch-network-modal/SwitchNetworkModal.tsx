@@ -1,10 +1,9 @@
 import { useChainId } from 'wagmi';
 
 import { Button } from '@/components/ui/Button';
-import { Image } from '@/components/ui/Image';
 import { Modal } from '@/components/ui/Modal';
 import { Text } from '@/components/ui/Text';
-import { getChainLogo, getChainName } from '@/lib/utils/helpers';
+import { getChainLogo, getChainName, getImgPath } from '@/lib/utils/helpers';
 
 export function SwitchNetworkModal() {
   const chainId = useChainId();
@@ -20,8 +19,9 @@ export function SwitchNetworkModal() {
           alt='chain-logo'
           className='size-16 rounded-full'
         />
-        <Image
-          src='/comp.avif'
+        <img
+          src={getImgPath('/comp.avif')}
+          alt='comp'
           className='size-6.75 shrink-0 rounded-full'
         />
         <div className='chain-slide inline-block size-6 shrink-0' />
