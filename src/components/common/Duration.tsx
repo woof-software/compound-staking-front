@@ -9,82 +9,60 @@ export type DurationProps = {
 export function Duration(props: DurationProps) {
   const { end, render, onChange } = props;
 
-  const endAtMsRef = useRef<number | null>(null);
-  const finishedCalledRef = useRef(false);
-  const startedRef = useRef(false);
+  const requestAnimRef = useRef<number | null>(null);
+  const lastTickMsRef = useRef<number>(0);
+  const finishedCalledRef = useRef<boolean>(false);
+  const startedRef = useRef<boolean>(false);
 
-  const safeTickRef = useRef<() => void>(() => {});
-  const [secondsLeft, setSecondsLeft] = useState(0);
-  const [nextTickAtMs, setNextTickAtMs] = useState<number | undefined>(undefined);
+  const [secondsLeft, setSecondsLeft] = useState<number>(0);
 
   useEffect(() => {
     finishedCalledRef.current = false;
+    lastTickMsRef.current = 0;
 
     const initial = Number.isFinite(end) ? Math.max(0, Math.floor(end)) : 0;
+
     startedRef.current = initial > 0;
 
     setSecondsLeft(initial);
 
-    if (initial === 0) {
-      endAtMsRef.current = null;
-      setNextTickAtMs(undefined);
-      return;
-    }
+    if (initial === 0) return;
 
-    const now = Date.now();
-    endAtMsRef.current = now + initial * 1000;
+    const tick = (nowMs: number) => {
+      if (lastTickMsRef.current === 0) lastTickMsRef.current = nowMs;
 
-    setNextTickAtMs(now + 1000);
-  }, [end]);
+      const elapsedMs = nowMs - lastTickMsRef.current;
 
-  const tick = () => {
-    const endAt = endAtMsRef.current;
-    if (!endAt || finishedCalledRef.current) return;
+      if (elapsedMs >= 1000) {
+        const steps = Math.floor(elapsedMs / 1000);
+        lastTickMsRef.current += steps * 1000;
 
-    const now = Date.now();
-    const leftMs = endAt - now;
+        setSecondsLeft((prev) => {
+          const next = Math.max(0, prev - steps);
 
-    const nextSeconds = Math.max(0, Math.ceil(leftMs / 1000));
-    setSecondsLeft(nextSeconds);
+          if (next === 0 && startedRef.current && !finishedCalledRef.current) {
+            finishedCalledRef.current = true;
+            onChange?.();
+          }
 
-    if (nextSeconds === 0) {
-      if (startedRef.current && !finishedCalledRef.current) {
-        finishedCalledRef.current = true;
-        onChange?.();
-      }
-      setNextTickAtMs(undefined);
-      return;
-    }
-
-    const remainder = leftMs % 1000;
-    const delayMs = remainder === 0 ? 1000 : remainder;
-    setNextTickAtMs(now + Math.max(1, delayMs));
-  };
-
-  safeTickRef.current = tick;
-
-  useEffect(() => {
-    if (!nextTickAtMs) return;
-
-    let id = 0;
-
-    const iterate = () => {
-      const now = Date.now();
-      const tillTheEnd = nextTickAtMs - now;
-
-      if (tillTheEnd <= 0) {
-        safeTickRef.current();
+          return next;
+        });
       }
 
-      id = requestAnimationFrame(iterate);
+      if (!finishedCalledRef.current) {
+        requestAnimRef.current = requestAnimationFrame(tick);
+      } else {
+        requestAnimRef.current = null;
+      }
     };
 
-    id = requestAnimationFrame(iterate);
+    requestAnimRef.current = requestAnimationFrame(tick);
 
     return () => {
-      cancelAnimationFrame(id);
+      if (requestAnimRef.current != null) cancelAnimationFrame(requestAnimRef.current);
+      requestAnimRef.current = null;
     };
-  }, [nextTickAtMs]);
+  }, [end, onChange]);
 
   return <>{render(secondsLeft)}</>;
 }
