@@ -2,67 +2,36 @@ import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 export type DurationProps = {
   end: number;
-  onChange?: () => void;
   render: (secondsLeft: number) => ReactNode;
 };
 
 export function Duration(props: DurationProps) {
-  const { end, render, onChange } = props;
+  const { end, render } = props;
 
-  const requestAnimRef = useRef<number | null>(null);
-  const lastTickMsRef = useRef<number>(0);
-  const finishedCalledRef = useRef<boolean>(false);
-  const startedRef = useRef<boolean>(false);
-
-  const [secondsLeft, setSecondsLeft] = useState<number>(0);
+  const [value, setValue] = useState(0);
+  const last = useRef(-1);
 
   useEffect(() => {
-    finishedCalledRef.current = false;
-    lastTickMsRef.current = 0;
+    if (!end) return;
 
-    const initial = Number.isFinite(end) ? Math.max(0, Math.floor(end)) : 0;
+    let id = 0;
 
-    startedRef.current = initial > 0;
+    const iterate = () => {
+      const leftMs = end - Date.now();
+      const next = Math.max(0, Math.ceil(leftMs / 1000));
 
-    setSecondsLeft(initial);
-
-    if (initial === 0) return;
-
-    const tick = (nowMs: number) => {
-      if (lastTickMsRef.current === 0) lastTickMsRef.current = nowMs;
-
-      const elapsedMs = nowMs - lastTickMsRef.current;
-
-      if (elapsedMs >= 1000) {
-        const steps = Math.floor(elapsedMs / 1000);
-        lastTickMsRef.current += steps * 1000;
-
-        setSecondsLeft((prev) => {
-          const next = Math.max(0, prev - steps);
-
-          if (next === 0 && startedRef.current && !finishedCalledRef.current) {
-            finishedCalledRef.current = true;
-            onChange?.();
-          }
-
-          return next;
-        });
+      if (next !== last.current) {
+        last.current = next;
+        setValue(next);
       }
 
-      if (!finishedCalledRef.current) {
-        requestAnimRef.current = requestAnimationFrame(tick);
-      } else {
-        requestAnimRef.current = null;
-      }
+      if (leftMs <= 0) return;
+      id = requestAnimationFrame(iterate);
     };
 
-    requestAnimRef.current = requestAnimationFrame(tick);
+    id = requestAnimationFrame(iterate);
+    return () => cancelAnimationFrame(id);
+  }, [end]);
 
-    return () => {
-      if (requestAnimRef.current != null) cancelAnimationFrame(requestAnimRef.current);
-      requestAnimRef.current = null;
-    };
-  }, [end, onChange]);
-
-  return <>{render(secondsLeft)}</>;
+  return render(value);
 }

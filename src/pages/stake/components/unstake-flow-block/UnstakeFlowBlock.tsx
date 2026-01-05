@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
+import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useWalletStore } from '@/hooks/useWallet';
@@ -83,7 +84,11 @@ export function UnstakeFlowBlock() {
   const remainingSeconds = hasActiveLock ? getRemainingSeconds(unlockTimestampSec) : 0;
 
   const isBalancesLoading = isLockedTokenBalanceLoading || (isConnected && !lockedTokenBalance);
-  const durationSec = !isBalancesLoading ? remainingSeconds : 0;
+  const durationSec = useMemo(() => {
+    if (isBalancesLoading) return 0;
+
+    return Date.now() + remainingSeconds * 1000;
+  }, [isBalancesLoading, remainingSeconds]);
 
   const isInfoVisible = isConnected && !isBalancesLoading && hasActiveLock && isDurationFinished;
   const isCooldownBlocked = !isBalancesLoading && hasActiveLock && !isDurationFinished;
@@ -116,21 +121,23 @@ export function UnstakeFlowBlock() {
   };
 
   useEffect(() => {
-    if (!isConnected || isBalancesLoading || !hasActiveLock) {
+    setIsPendingToggle(isTransactionLoading);
+  }, [isTransactionLoading]);
+
+  useEffect(() => {
+    if (isBalancesLoading) {
       resetIsDurationFinished();
       return;
     }
 
-    if (remainingSeconds <= 0) {
-      setIsDurationFinished();
-    } else {
+    if (!hasActiveLock) {
       resetIsDurationFinished();
+      return;
     }
-  }, [isConnected, isBalancesLoading, hasActiveLock, remainingSeconds]);
 
-  useEffect(() => {
-    setIsPendingToggle(isTransactionLoading);
-  }, [isTransactionLoading]);
+    if (remainingSeconds > 0) resetIsDurationFinished();
+    else setIsDurationFinished();
+  }, [isBalancesLoading, hasActiveLock, remainingSeconds]);
 
   useEffect(() => {
     if (isUnlockRequestSuccess) {
@@ -147,6 +154,8 @@ export function UnstakeFlowBlock() {
       onClose();
     }
   }, [isUnstakeRequestSuccess, isUnlockRequestSuccess]);
+
+  useExecuteAtTime(setIsDurationFinished, durationSec);
 
   return (
     <div className='flex flex-col gap-1.5'>
@@ -201,7 +210,6 @@ export function UnstakeFlowBlock() {
               <Skeleton loading={isLoading}>
                 <Duration
                   end={durationSec}
-                  onChange={setIsDurationFinished}
                   render={(seconds) => (
                     <Text
                       size='17'
