@@ -84,11 +84,12 @@ export function UnstakeFlowBlock() {
   const remainingSeconds = hasActiveLock ? getRemainingSeconds(unlockTimestampSec) : 0;
 
   const isBalancesLoading = isLockedTokenBalanceLoading || (isConnected && !lockedTokenBalance);
-  const durationSec = useMemo(() => {
-    if (isBalancesLoading) return 0;
 
-    return Date.now() + remainingSeconds * 1000;
-  }, [isBalancesLoading, remainingSeconds]);
+  const durationSec = useMemo(() => {
+    if (isBalancesLoading || !hasActiveLock) return 0;
+
+    return unlockTimestampSec * 1000;
+  }, [isBalancesLoading, hasActiveLock, unlockTimestampSec]);
 
   const isInfoVisible = isConnected && !isBalancesLoading && hasActiveLock && isDurationFinished;
   const isCooldownBlocked = !isBalancesLoading && hasActiveLock && !isDurationFinished;
@@ -210,20 +211,27 @@ export function UnstakeFlowBlock() {
               <Skeleton loading={isLoading}>
                 <Duration
                   end={durationSec}
-                  render={(seconds) => (
-                    <Text
-                      size='17'
-                      weight='500'
-                      lineHeight='17'
-                      className={cn('text-color-2', {
-                        'text-color-6': !isConnected || !lockedTokenBalance?.startTime
-                      })}
-                    >
-                      {Boolean(isConnected && !!lockedTokenBalance?.startTime)
-                        ? FormatTime.cooldownFromSeconds(seconds)
-                        : '-'}
-                    </Text>
-                  )}
+                  unsafeRound={(msLeft) => {
+                    if (msLeft <= 0) return 0;
+
+                    return Math.ceil(msLeft / 1000);
+                  }}
+                  render={(seconds) => {
+                    return (
+                      <Text
+                        size='17'
+                        weight='500'
+                        lineHeight='17'
+                        className={cn('text-color-2', {
+                          'text-color-6': !isConnected || !lockedTokenBalance?.startTime
+                        })}
+                      >
+                        {Boolean(isConnected && !!lockedTokenBalance?.startTime)
+                          ? FormatTime.cooldownFromSeconds(seconds)
+                          : '-'}
+                      </Text>
+                    );
+                  }}
                 />
               </Skeleton>
             </div>

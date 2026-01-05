@@ -1,37 +1,41 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useEffectEvent, useState } from 'react';
 
 export type DurationProps = {
   end: number;
   render: (secondsLeft: number) => ReactNode;
+  unsafeRound?: (value: number) => number;
 };
 
 export function Duration(props: DurationProps) {
-  const { end, render } = props;
+  const { end, render, unsafeRound = (v) => v } = props;
 
-  const [value, setValue] = useState(0);
-  const last = useRef(-1);
+  const _unsafeRound = useEffectEvent(unsafeRound);
+
+  const [value, setValue] = useState<number>();
 
   useEffect(() => {
     if (!end) return;
 
-    let id = 0;
+    let id: number;
 
     const iterate = () => {
-      const leftMs = end - Date.now();
-      const next = Math.max(0, Math.ceil(leftMs / 1000));
+      const now = Date.now();
 
-      if (next !== last.current) {
-        last.current = next;
-        setValue(next);
-      }
+      const tillTheEnd = _unsafeRound(end - now);
 
-      if (leftMs <= 0) return;
+      setValue(Math.max(tillTheEnd, 0));
+
+      if (tillTheEnd <= 0) return;
+
       id = requestAnimationFrame(iterate);
     };
 
     id = requestAnimationFrame(iterate);
-    return () => cancelAnimationFrame(id);
+
+    return () => {
+      cancelAnimationFrame(id);
+    };
   }, [end]);
 
-  return render(value);
+  return value === undefined ? null : render(value);
 }
