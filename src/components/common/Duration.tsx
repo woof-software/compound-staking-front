@@ -1,7 +1,5 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 
-import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
-
 export type DurationProps = {
   end: number;
   onChange?: () => void;
@@ -15,6 +13,7 @@ export function Duration(props: DurationProps) {
   const finishedCalledRef = useRef(false);
   const startedRef = useRef(false);
 
+  const safeTickRef = useRef<() => void>(() => {});
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [nextTickAtMs, setNextTickAtMs] = useState<number | undefined>(undefined);
 
@@ -62,7 +61,30 @@ export function Duration(props: DurationProps) {
     setNextTickAtMs(now + Math.max(1, delayMs));
   };
 
-  useExecuteAtTime(tick, nextTickAtMs);
+  safeTickRef.current = tick;
+
+  useEffect(() => {
+    if (!nextTickAtMs) return;
+
+    let id = 0;
+
+    const iterate = () => {
+      const now = Date.now();
+      const tillTheEnd = nextTickAtMs - now;
+
+      if (tillTheEnd <= 0) {
+        safeTickRef.current();
+      }
+
+      id = requestAnimationFrame(iterate);
+    };
+
+    id = requestAnimationFrame(iterate);
+
+    return () => {
+      cancelAnimationFrame(id);
+    };
+  }, [nextTickAtMs]);
 
   return <>{render(secondsLeft)}</>;
 }
