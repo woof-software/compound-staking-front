@@ -44,16 +44,15 @@ jobs:
           npm ci
 
       - name: Lint
-        continue-on-error: true
         run: |
           npm run lint
 
       - name: Typescript check
-        continue-on-error: true
         run: |
           tsc --noEmit
 
       - name: Build
         run: |
           npm run build
+
 
