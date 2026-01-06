@@ -19,9 +19,7 @@ import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
-
-import COMP from '@/assets/comp.svg';
-
+import { getImgPath } from '@/lib/utils/helpers';
 export type StakeModalProps = {
   onClose?: () => void;
   onStakeConfirmed?: () => void;
@@ -61,6 +59,7 @@ export function StakeModal(props: StakeModalProps) {
   const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
   const needsApprove = parseAmount > 0n && !hasEnoughAllowance;
   const noAmount = parseAmount === 0n;
+  const noDelegate = !selectedAddressDelegate?.address;
   const isAmountExceedsBalance = parseAmount <= (walletBalance ?? 0n);
 
   /* Loading */
@@ -71,7 +70,7 @@ export function StakeModal(props: StakeModalProps) {
 
   /* Disabled */
   const isApproveDisabled = noAmount || !needsApprove || !isAmountExceedsBalance;
-  const isConfirmDisabled = noAmount || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
+  const isConfirmDisabled = noAmount || noDelegate || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
 
   /* Calculate input value in USD */
   const baseTokenPriceValue = baseTokenPrice ?? 0n;
@@ -127,7 +126,11 @@ export function StakeModal(props: StakeModalProps) {
         <Skeleton loading={isPriceOrBalanceLoading}>
           <div className='flex items-center justify-between gap-5'>
             <div className='flex max-w-72 items-center gap-2'>
-              <COMP className='size-6.75 shrink-0' />
+              <img
+                src={getImgPath('/comp.avif')}
+                alt='comp'
+                className='size-6.75 shrink-0 rounded-full'
+              />
               <AmountInput
                 className='min-h-12 max-w-60'
                 disabled={isLoadingTransaction}
@@ -137,7 +140,9 @@ export function StakeModal(props: StakeModalProps) {
             </div>
             <Button
               disabled={isLoadingTransaction}
-              className='bg-color-16 h-8 w-14 text-[11px] font-medium'
+              className={cn('bg-color-16 h-8 w-14 text-[11px] font-medium', {
+                'bg-color-28': isLoadingTransaction
+              })}
               onClick={onMaxButtonClick}
             >
               Max

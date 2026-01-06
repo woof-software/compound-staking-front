@@ -65,6 +65,8 @@ function buildEnvOrThrow() {
 
     STAKING_VAULT_ADDRESS: requiredAddress('VITE_STAKING_VAULT_ADDRESS'),
 
+    LOCK_MANAGER_ADDRESS: requiredAddress('VITE_LOCK_MANAGER_ADDRESS'),
+
     WALLET_CONNECT_PROJECT_ID: requiredString('VITE_WALLET_CONNECT_PROJECT_ID'),
     ETHERSCAN_URL: requiredString('VITE_ETHERSCAN_URL')
   };

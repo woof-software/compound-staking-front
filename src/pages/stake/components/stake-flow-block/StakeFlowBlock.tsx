@@ -9,13 +9,15 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
-import { useStakedBalance } from '@/hooks/useStakedBalance';
 import { useSwitch } from '@/hooks/useSwitch';
+import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useVirtualBalance } from '@/hooks/useVirtualBalance';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
+import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
+import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 
 export function StakeFlowBlock() {
   const { isConnected, address } = useConnection();
@@ -34,9 +36,17 @@ export function StakeFlowBlock() {
     ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
   );
 
-  const isLoading = isStakedBalanceFormattedFetching || isBaseTokenPriceFetching;
+  const { data: lockedTokenBalance } = useLockedBalance(address);
 
-  const isStakeButtonDisabled = !isConnected || isOpen || isLoading;
+  const { isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
+  const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
+
+  /* Loading */
+  const isPriceOrBalanceLoading = isStakedTokenPrice || isStakedTokenWalletBalance;
+  const isTokenBalanceLoading = isStakedBalanceFormattedFetching || isBaseTokenPriceFetching;
+  const isLoading = isPriceOrBalanceLoading || isTokenBalanceLoading;
+
+  const isStakeButtonDisabled = !isConnected || isOpen || isLoading || (lockedTokenBalance?.amount ?? 0n) > 0n;
 
   const stakedBalanceFormatted = formatUnits(stakedBalance?.principal ?? 0n, ENV.BASE_TOKEN_DECIMALS);
   const virtualBalanceFormatted = formatUnits(virtualBalance ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
@@ -77,7 +87,8 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {isConnected ? Format.token(stakedBalanceFormatted, 'compact') : '0.0000'} COMP
+                {isConnected && !!stakedBalance?.principal ? Format.token(stakedBalanceFormatted, 'compact') : '0.0000'}{' '}
+                COMP
               </Text>
             </Skeleton>
             <Condition if={isConnected && !!stakedBalance?.principal}>
@@ -109,7 +120,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? Format.token(virtualBalanceFormatted, 'compact') : '0.0000'} stCOMP
+              {isConnected && !!virtualBalance ? Format.token(virtualBalanceFormatted, 'compact') : '0.0000'} stCOMP
             </Text>
           </Skeleton>
         </div>
@@ -155,7 +166,7 @@ export function StakeFlowBlock() {
                 {isConnected ? '0.0000' : '0.0000'} COMP
               </Text>
             </Skeleton>
-            <Condition if={isConnected}>
+            <Condition if={isConnected && !!stakedBalance?.principal}>
               <Skeleton loading={isLoading}>
                 <Text
                   size='11'
@@ -190,7 +201,9 @@ export function StakeFlowBlock() {
         </div>
         <Button
           disabled={isStakeButtonDisabled}
-          className='max-w-32.5 text-[11px] font-medium'
+          className={cn('max-w-32.5 text-[11px] font-medium', {
+            'text-white': !isStakeButtonDisabled
+          })}
           onClick={onOpen}
         >
           Stake

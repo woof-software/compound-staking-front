@@ -1,25 +1,30 @@
-import { useEffect } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 
-export function useOutsideClick<T extends HTMLElement>(target: () => T | null, handler: (event: MouseEvent) => void) {
+type MaybeNode<T extends HTMLElement> = T | null;
+type TargetGetter<T extends HTMLElement> = () => MaybeNode<T> | MaybeNode<T>[];
+
+export function useOutsideClick<T extends HTMLElement>(target: TargetGetter<T>, handler: (event: MouseEvent) => void) {
+  const _handler = useEffectEvent(handler);
+  const _target = useEffectEvent(target);
+
   useEffect(() => {
-    const _target = target();
-
-    if (!_target) return;
-
-    const handleClick = (event: MouseEvent) => {
+    const onMouseDown = (event: MouseEvent) => {
       const source = event.target;
-
       if (!(source instanceof Node)) return;
 
-      if (_target === source || _target.contains(source)) return;
+      const nodes = _target();
 
-      handler(event);
+      const targetArray = Array.isArray(nodes) ? nodes : [nodes];
+      const nodesArray = nodes === null ? [] : targetArray;
+
+      const isInside = nodesArray.some((node: MaybeNode<T>) => !!node && (node === source || node.contains(source)));
+
+      if (isInside) return;
+
+      _handler(event);
     };
 
-    document.addEventListener('mousedown', handleClick);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-    };
-  }, [target, handler]);
+    document.addEventListener('mousedown', onMouseDown);
+    return () => document.removeEventListener('mousedown', onMouseDown);
+  }, []);
 }
