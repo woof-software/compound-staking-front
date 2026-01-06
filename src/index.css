@@ -161,9 +161,6 @@
     background-color: var(--color-color-1);
     color: var(--color-color-2);
     text-rendering: optimizeSpeed;
-    font-synthesis: none;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 }
 
