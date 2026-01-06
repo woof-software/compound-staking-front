@@ -33,5 +33,6 @@ export const StakingVaultAbi = [
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function'
-  }
+  },
+  { inputs: [], name: 'unstake', outputs: [], stateMutability: 'nonpayable', type: 'function' }
 ];

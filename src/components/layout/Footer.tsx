@@ -3,18 +3,18 @@ import { TALLY_GOV_URL, TERMS_URL } from '@/consts/common';
 
 export function Footer() {
   return (
-    <footer className='bg-transparent mt-auto'>
-      <div className='flex py-5 items-center justify-between border-t border-border-1'>
-        <div className='basis-1/2 flex items-center gap-x-5.5'>
+    <footer className='mt-auto bg-transparent'>
+      <div className='border-border-1 flex items-center justify-between border-t py-5'>
+        <div className='flex basis-1/2 items-center gap-x-5.5'>
           <a
-            className='text-[11px] font-medium text-color-24 hover:text-color-7'
+            className='text-color-24 hover:text-color-7 text-sm leading-3.5 font-medium'
             href={TALLY_GOV_URL}
             target='_blank'
           >
             Governance
           </a>
           <a
-            className='text-[11px] font-medium text-color-24 hover:text-color-7'
+            className='text-color-24 hover:text-color-7 text-sm leading-3.5 font-medium'
             href={TERMS_URL}
             target='_blank'
           >

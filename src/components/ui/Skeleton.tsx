@@ -12,7 +12,7 @@ export function Skeleton(props: SkeletonProps) {
   return (
     <div
       className={cn(className, {
-        'bg-color-24 opacity-10 text-transparent bg-clip-padding shrink-0 pointer-events-none select-none pulse-animation rounded-lg':
+        'bg-color-24 pulse-animation pointer-events-none shrink-0 rounded-lg bg-clip-padding text-transparent opacity-10 select-none':
           loading
       })}
       {...rest}

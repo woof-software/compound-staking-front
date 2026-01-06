@@ -21,6 +21,8 @@ interface ImportMetaEnv {
 
   readonly VITE_STAKING_VAULT_ADDRESS?: string;
 
+  readonly VITE_LOCK_MANAGER_ADDRESS?: string;
+
   readonly VITE_SUBACCOUNT_MANAGER_ADDRESS?: string;
 }
 
