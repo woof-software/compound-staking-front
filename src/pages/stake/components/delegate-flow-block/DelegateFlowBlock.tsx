@@ -1,40 +1,92 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useConnection } from 'wagmi';
 
 import { ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
+import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { type Delegate, DELEGATES } from '@/consts/common';
+import { useDelegateStore } from '@/hooks/useDelegate';
 import { useDelegateDuration } from '@/hooks/useDelegateDuration';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
+import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
 import { useSubAccount } from '@/hooks/useSubAccount';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
-import { getExplorerAddressUrl } from '@/lib/utils/helpers';
+import { FormatTime } from '@/lib/utils/format';
+import { getExplorerAddressUrl, getRemainingSeconds } from '@/lib/utils/helpers';
 import { DelegateModal } from '@/pages/stake/components/delegate-flow-block/DelegateModal';
+import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
+import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 
 export function DelegateFlowBlock() {
-  const { isConnected } = useConnection();
+  const { isConnected, address } = useConnection();
 
-  const { address } = useConnection();
+  const { needDelegateRefresh, resetDelegateRefresh } = useDelegateStore();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { data: delegateDuration, isLoading: isDurationLoading } = useDelegateDuration();
-  const { data: subAccountAddress, isLoading: isSubAccountLoading } = useDelegateSubAccount(address);
+  const { isEnabled: isCooldownFinished, enable: setCooldownFinished, disable: resetCooldownFinished } = useSwitch();
+
+  const { data: stakedTokenBalance } = useStakedBalance(address);
+  const { data: lockedTokenBalance } = useLockedBalance(address);
+
+  const {
+    data: delegateDuration,
+    isLoading: isDurationLoading,
+    refetch: refetchDelegateDuration
+  } = useDelegateDuration();
+  const {
+    data: subAccountAddress,
+    isLoading: isSubAccountLoading,
+    refetch: refetchSubAccountAddress
+  } = useDelegateSubAccount(address);
+
   const {
     data: delegateData,
     isLoading: isDelegateLoading,
     refetch: refetchDelegate
   } = useSubAccount(subAccountAddress);
 
+  const hasOpenPosition = (stakedTokenBalance?.principal ?? 0n) > 0n || (lockedTokenBalance?.amount ?? 0n) > 0n;
+
+  const executableAtSec = useMemo(() => {
+    const executableAt = delegateData?.executableAt;
+
+    if (!executableAt) return 0;
+
+    return Number(executableAt);
+  }, [delegateData?.executableAt]);
+
+  const hasCooldownRequest = !!executableAtSec && !delegateData?.executed;
+
   const isLoading = isDurationLoading || isSubAccountLoading || isDelegateLoading;
 
-  const isDelegateButtonDisabled = !isConnected || isLoading;
+  const isCooldownBlocked = isConnected && !isCooldownFinished;
+
+  const isDelegateButtonDisabled = !isConnected || isLoading || isCooldownBlocked || !hasOpenPosition;
+
+  const cooldownEndMs = useMemo(() => {
+    if (!isConnected || isLoading || !hasCooldownRequest) return 0;
+
+    return executableAtSec * 1000;
+  }, [isConnected, isLoading, hasCooldownRequest, executableAtSec]);
+
+  const remainingSeconds = useMemo(() => {
+    if (!isConnected || isLoading || !hasCooldownRequest) return 0;
+
+    return getRemainingSeconds(executableAtSec);
+  }, [isConnected, isLoading, hasCooldownRequest, executableAtSec]);
+
+  const endDateLabel = useMemo(() => {
+    if (!isConnected || isLoading || !hasCooldownRequest) return '-';
+
+    return FormatTime.endDate(executableAtSec);
+  }, [isConnected, isLoading, hasCooldownRequest, executableAtSec]);
 
   const delegate = useMemo<Delegate | undefined>(() => {
     const delegatee = delegateData?.delegatee;
@@ -49,6 +101,30 @@ export function DelegateFlowBlock() {
     refetchDelegate();
   };
 
+  useEffect(() => {
+    if (!isConnected || isLoading || !hasCooldownRequest) {
+      setCooldownFinished();
+      return;
+    }
+
+    if (remainingSeconds > 0) resetCooldownFinished();
+    else setCooldownFinished();
+  }, [isConnected, isLoading, hasCooldownRequest, remainingSeconds, setCooldownFinished, resetCooldownFinished]);
+
+  useEffect(() => {
+    if (!isConnected || !needDelegateRefresh) return;
+
+    refetchSubAccountAddress();
+    refetchDelegateDuration();
+    refetchDelegate();
+
+    resetDelegateRefresh();
+  }, [needDelegateRefresh, isConnected]);
+
+  useExecuteAtTime(setCooldownFinished, cooldownEndMs);
+
+  console.log('----------');
+  console.log('address=>', address);
   console.log('delegateDuration=>', delegateDuration);
   console.log('subAccountAddress=>', subAccountAddress);
   console.log('delegateData=>', delegateData);
@@ -67,7 +143,7 @@ export function DelegateFlowBlock() {
                 size='11'
                 className='text-color-24'
               >
-                Wallet address of Delegatee
+                Name of Delegatee
               </Text>
             </Skeleton>
             <Skeleton loading={isLoading}>
@@ -82,12 +158,12 @@ export function DelegateFlowBlock() {
                   weight='500'
                   lineHeight='17'
                   className={cn('text-color-2 max-w-36 truncate', {
-                    'text-color-6': !isConnected
+                    'text-color-6': !isConnected || !hasOpenPosition
                   })}
                 >
-                  {isConnected ? delegate?.name || delegate?.address : '-'}
+                  {isConnected && hasOpenPosition ? delegate?.name || delegate?.address : '-'}
                 </Text>
-                <Condition if={isConnected}>
+                <Condition if={isConnected && hasOpenPosition}>
                   <ExternalLinkIcon className='text-color-24' />
                 </Condition>
               </a>
@@ -103,16 +179,23 @@ export function DelegateFlowBlock() {
               </Text>
             </Skeleton>
             <Skeleton loading={isLoading}>
-              <Text
-                size='17'
-                weight='500'
-                lineHeight='17'
-                className={cn('text-color-2', {
-                  'text-color-6': !isConnected
-                })}
-              >
-                {isConnected ? '00d 00h' : '-'}
-              </Text>
+              <Duration
+                end={cooldownEndMs}
+                unsafeRound={(msLeft) => {
+                  if (msLeft <= 0) return 0;
+                  return Math.ceil(msLeft / 1000);
+                }}
+                render={(seconds) => (
+                  <Text
+                    size='17'
+                    weight='500'
+                    lineHeight='17'
+                    className={cn('text-color-2', { 'text-color-6': !isConnected || !hasOpenPosition })}
+                  >
+                    {isConnected && hasOpenPosition ? FormatTime.cooldownFromSeconds(seconds) : '-'}
+                  </Text>
+                )}
+              />
             </Skeleton>
           </div>
           <div className='flex flex-col gap-3'>
@@ -130,10 +213,10 @@ export function DelegateFlowBlock() {
                 weight='500'
                 lineHeight='17'
                 className={cn('text-color-2', {
-                  'text-color-6': !isConnected
+                  'text-color-6': !isConnected || !hasOpenPosition
                 })}
               >
-                {isConnected ? 'July 24, 2025' : '-'}
+                {isConnected && hasOpenPosition ? endDateLabel : '-'}
               </Text>
             </Skeleton>
           </div>

@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
+import { useDelegateStore } from '@/hooks/useDelegate';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -36,6 +37,8 @@ export function UnstakeFlowBlock() {
   } = useSwitch();
 
   const { setIsPendingToggle } = useWalletStore();
+  const { triggerDelegateRefresh } = useDelegateStore();
+
   const { isConnected, address } = useConnection();
 
   const { refetch: refetchAllowance } = useBaseTokenAllowance(address);
@@ -149,6 +152,8 @@ export function UnstakeFlowBlock() {
       refetchVirtualTokenBalance();
       refetchStakedTokenBalance();
       refetchLockedTokenBalance();
+
+      triggerDelegateRefresh();
     }
 
     if (isUnstakeRequestSuccess) {

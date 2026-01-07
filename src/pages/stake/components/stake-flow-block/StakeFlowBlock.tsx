@@ -9,6 +9,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { useDelegateStore } from '@/hooks/useDelegate';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -23,6 +24,8 @@ export function StakeFlowBlock() {
   const { isConnected, address } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
+
+  const { triggerDelegateRefresh } = useDelegateStore();
 
   const {
     data: stakedBalance,
@@ -61,7 +64,9 @@ export function StakeFlowBlock() {
   const onStakeConfirmed = useCallback(() => {
     refetchStakedBalanceFormatted();
     refetchVirtualBalance();
-  }, [refetchStakedBalanceFormatted, refetchVirtualBalance]);
+
+    triggerDelegateRefresh();
+  }, [refetchStakedBalanceFormatted, refetchVirtualBalance, triggerDelegateRefresh]);
 
   return (
     <Card
