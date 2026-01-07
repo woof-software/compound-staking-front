@@ -11,7 +11,6 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { type Delegate, DELEGATES } from '@/consts/common';
 import { useDelegateStore } from '@/hooks/useDelegate';
-import { useDelegateDuration } from '@/hooks/useDelegateDuration';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
 import { useSubAccount } from '@/hooks/useSubAccount';
@@ -36,11 +35,6 @@ export function DelegateFlowBlock() {
   const { data: lockedTokenBalance } = useLockedBalance(address);
 
   const {
-    data: delegateDuration,
-    isLoading: isDurationLoading,
-    refetch: refetchDelegateDuration
-  } = useDelegateDuration();
-  const {
     data: subAccountAddress,
     isLoading: isSubAccountLoading,
     refetch: refetchSubAccountAddress
@@ -64,7 +58,7 @@ export function DelegateFlowBlock() {
 
   const hasCooldownRequest = !!executableAtSec && !delegateData?.executed;
 
-  const isLoading = isDurationLoading || isSubAccountLoading || isDelegateLoading;
+  const isLoading = isSubAccountLoading || isDelegateLoading;
 
   const isCooldownBlocked = isConnected && !isCooldownFinished;
 
@@ -115,20 +109,12 @@ export function DelegateFlowBlock() {
     if (!isConnected || !needDelegateRefresh) return;
 
     refetchSubAccountAddress();
-    refetchDelegateDuration();
     refetchDelegate();
 
     resetDelegateRefresh();
   }, [needDelegateRefresh, isConnected]);
 
   useExecuteAtTime(setCooldownFinished, cooldownEndMs);
-
-  console.log('----------');
-  console.log('address=>', address);
-  console.log('delegateDuration=>', delegateDuration);
-  console.log('subAccountAddress=>', subAccountAddress);
-  console.log('delegateData=>', delegateData);
-  console.log('delegate=>', delegate);
 
   return (
     <Card
