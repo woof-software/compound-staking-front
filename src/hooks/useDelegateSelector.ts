@@ -9,7 +9,7 @@ export function useDelegateSelector(search?: string) {
     const pattern = search.toLowerCase();
 
     return DELEGATES.filter(({ name, address }) => {
-      return name.toLowerCase().includes(pattern) || address.toLowerCase().includes(pattern);
+      return name?.toLowerCase().includes(pattern) || address.toLowerCase().includes(pattern);
     });
   }, [search]);
 }
