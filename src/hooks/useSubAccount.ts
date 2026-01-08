@@ -12,9 +12,11 @@ export function useSubAccount(owner?: Address) {
     query: { enabled: !!owner }
   });
 
+  const addressSchema = z.string().refine((v): v is Address => isAddress(v), { message: 'Invalid address' });
+
   const shema = z
     .object({
-      delegatee: z.string().transform((v) => (isAddress(v) ? v : undefined)),
+      delegatee: addressSchema.optional(),
       executableAt: z.bigint().optional(),
       executed: z.boolean().optional()
     })

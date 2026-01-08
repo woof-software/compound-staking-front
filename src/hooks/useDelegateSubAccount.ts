@@ -1,4 +1,4 @@
-import type { Address } from 'viem';
+import { type Address, isAddress } from 'viem';
 import { useReadContract } from 'wagmi';
 import { z } from 'zod';
 
@@ -16,8 +16,8 @@ export function useDelegateSubAccount(owner?: Address) {
 
   const addressSchema = z
     .string()
-    .optional()
-    .transform((v) => v as Address | undefined);
+    .refine((v): v is Address => isAddress(v), { message: 'Invalid address' })
+    .optional();
 
   return {
     data: addressSchema.parse(data),
