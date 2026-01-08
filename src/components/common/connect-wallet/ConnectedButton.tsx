@@ -50,9 +50,9 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
       <div
         ref={toggleRef}
         onClick={onOpen}
-        className='border-color-8 rounded-64 bg-color-11 flex h-11 max-w-fit cursor-pointer justify-end border-1'
+        className='border-color-8 rounded-64 bg-color-11 flex h-11 max-w-fit cursor-pointer justify-end border-[0.25px]'
       >
-        <div className='bg-color-11 rounded-64 relative flex w-23 items-center justify-center gap-2 border-r-0 px-3 py-2'>
+        <div className='bg-color-11 rounded-64 relative flex w-23 items-center justify-center gap-2 border-r-0 py-2 pl-3'>
           <CompoundWalletIcon className='size-6 flex-shrink-0' />
           <Text
             size='11'
@@ -60,11 +60,11 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             lineHeight='16'
             className='text-color-2'
           >
-            0.0000
+            0.0039
           </Text>
         </div>
         <Condition if={!isPending}>
-          <div className='border-color-8 bg-color-4 rounded-64 relative -top-0.25 -right-0.25 flex h-11 w-30.5 items-center justify-center gap-2 border-1 px-3 py-2 hover:brightness-90'>
+          <div className='border-color-8 bg-color-4 rounded-64 relative -top-[0.5px] -right-0.25 flex h-11 w-[118.852px] items-center justify-center gap-2 border-[0.25px] px-3 py-2 hover:brightness-90'>
             <Text
               size='11'
               weight='500'
@@ -92,7 +92,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
       <Condition if={isOpen}>
         <div
           ref={ref}
-          className='bg-color-4 border-color-8 animate-bounce-smooth absolute top-12 right-0 flex h-auto min-w-80 flex-col gap-3 rounded-2xl border-1 p-5'
+          className='bg-color-4 border-color-8 animate-bounce-smooth absolute top-12 right-0 flex h-auto min-h-44.75 min-w-80 flex-col gap-3 rounded-2xl border-[0.25px] p-5'
         >
           <Text
             size='11'

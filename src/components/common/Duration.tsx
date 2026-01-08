@@ -37,5 +37,5 @@ export function Duration(props: DurationProps) {
     };
   }, [end]);
 
-  return value === undefined ? null : render(value);
+  return render(value || 0);
 }

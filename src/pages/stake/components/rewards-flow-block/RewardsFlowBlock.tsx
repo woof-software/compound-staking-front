@@ -29,6 +29,7 @@ export function RewardsFlowBlock() {
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
+                weight='500'
                 className='text-color-24'
               >
                 Available Rewards
@@ -48,6 +49,7 @@ export function RewardsFlowBlock() {
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
+                weight='500'
                 className='text-color-24'
               >
                 Total to claim
@@ -76,6 +78,7 @@ export function RewardsFlowBlock() {
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
+              weight='500'
               className='text-color-24'
             >
               Available Rewards

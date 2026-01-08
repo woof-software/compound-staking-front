@@ -46,7 +46,7 @@
   --color-4: #FFFFFF;
   --color-5: #F0F2F5;
   --color-6: #A7B4C2;
-  --color-7: #00C289;
+  --color-7: #00AD79;
   --color-8: #0D131A26;
   --color-9: #D8DFE5;
   --color-10: #FFFFFF;
@@ -80,7 +80,7 @@
   --color-4: #1D2833;
   --color-5: #17212B;
   --color-6: #516070;
-  --color-7: #00C289;
+  --color-7: #00AD79;
   --color-8: #FFFFFF26;
   --color-9: #2B3947;
   --color-10: #19232E;
@@ -164,6 +164,14 @@
   }
 }
 
+.font-grot-text {
+  font-family: 'Haas Grot Text R', sans-serif;
+}
+
+.font-grot-disp {
+  font-family: 'Haas Grot Disp R', sans-serif;
+}
+
 /*=======================*/
 /* Scrollbar Styles */
 .hide-scrollbar {
@@ -218,16 +226,6 @@
   animation: bounce-animation 0.3s ease both;
   transform-origin: top right;
   will-change: transform, opacity;
-}
-
-html, body {
-  -ms-overflow-style: none;      /* IE и Edge */
-  scrollbar-width: none;         /* Firefox */
-}
-
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-  display: none;                 /* Chrome, Safari, Opera */
 }
 
 @keyframes modal-fade-in {
