@@ -1,4 +1,4 @@
-import type { Address } from 'viem';
+import { type Address, isAddress } from 'viem';
 import { useReadContract } from 'wagmi';
 import { z } from 'zod';
 
@@ -14,7 +14,7 @@ export function useSubAccount(owner?: Address) {
 
   const shema = z
     .object({
-      delegatee: z.string().transform((v) => v as Address | undefined),
+      delegatee: z.string().transform((v) => (isAddress(v) ? v : undefined)),
       executableAt: z.bigint().optional(),
       executed: z.boolean().optional()
     })

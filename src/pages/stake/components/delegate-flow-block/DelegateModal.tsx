@@ -8,9 +8,9 @@ import { Text } from '@/components/ui/Text';
 import { type Delegate } from '@/consts/common';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useDelegateTransaction } from '@/hooks/useDelegateTransaction';
-import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
+import { useWalletStore } from '@/stores/useWalletStore';
 
 export type DelegateModalProps = {
   delegate?: Delegate | undefined;

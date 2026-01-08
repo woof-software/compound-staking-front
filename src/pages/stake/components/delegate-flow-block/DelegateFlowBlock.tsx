@@ -9,8 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-import { type Delegate, DELEGATES } from '@/consts/common';
-import { useDelegateStore } from '@/hooks/useDelegate';
+import { useDelegateByAddress } from '@/hooks/useDelegateByAddress';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
 import { useSubAccount } from '@/hooks/useSubAccount';
@@ -21,6 +20,7 @@ import { getExplorerAddressUrl, getRemainingSeconds } from '@/lib/utils/helpers'
 import { DelegateModal } from '@/pages/stake/components/delegate-flow-block/DelegateModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
+import { useDelegateStore } from '@/stores/useDelegateStore';
 
 export function DelegateFlowBlock() {
   const { isConnected, address } = useConnection();
@@ -64,32 +64,13 @@ export function DelegateFlowBlock() {
 
   const isDelegateButtonDisabled = !isConnected || isLoading || isCooldownBlocked || !hasOpenPosition;
 
-  const cooldownEndMs = useMemo(() => {
-    if (!isConnected || isLoading || !hasCooldownRequest) return 0;
+  const cooldownEndMs = !isConnected || isLoading || !hasCooldownRequest ? 0 : executableAtSec * 1000;
 
-    return executableAtSec * 1000;
-  }, [isConnected, isLoading, hasCooldownRequest, executableAtSec]);
+  const remainingSeconds = !isConnected || isLoading || !hasCooldownRequest ? 0 : getRemainingSeconds(executableAtSec);
 
-  const remainingSeconds = useMemo(() => {
-    if (!isConnected || isLoading || !hasCooldownRequest) return 0;
+  const endDateLabel = !isConnected || isLoading || !hasCooldownRequest ? '-' : FormatTime.endDate(executableAtSec);
 
-    return getRemainingSeconds(executableAtSec);
-  }, [isConnected, isLoading, hasCooldownRequest, executableAtSec]);
-
-  const endDateLabel = useMemo(() => {
-    if (!isConnected || isLoading || !hasCooldownRequest) return '-';
-
-    return FormatTime.endDate(executableAtSec);
-  }, [isConnected, isLoading, hasCooldownRequest, executableAtSec]);
-
-  const delegate = useMemo<Delegate | undefined>(() => {
-    const delegatee = delegateData?.delegatee;
-    if (!delegatee) return undefined;
-
-    const target = DELEGATES.find((d) => d.address.toLowerCase() === delegatee.toLowerCase());
-
-    return target ?? { name: undefined, address: delegatee };
-  }, [delegateData?.delegatee]);
+  const delegate = useDelegateByAddress(delegateData?.delegatee);
 
   const onDelegateConfirmed = () => {
     refetchDelegate();
@@ -101,8 +82,11 @@ export function DelegateFlowBlock() {
       return;
     }
 
-    if (remainingSeconds > 0) resetCooldownFinished();
-    else setCooldownFinished();
+    if (remainingSeconds > 0) {
+      resetCooldownFinished();
+    } else {
+      setCooldownFinished();
+    }
   }, [isConnected, isLoading, hasCooldownRequest, remainingSeconds, setCooldownFinished, resetCooldownFinished]);
 
   useEffect(() => {
@@ -168,8 +152,7 @@ export function DelegateFlowBlock() {
               <Duration
                 end={cooldownEndMs}
                 unsafeRound={(msLeft) => {
-                  if (msLeft <= 0) return 0;
-                  return Math.ceil(msLeft / 1000);
+                  return Math.max(Math.ceil(msLeft / 1000), 0);
                 }}
                 render={(seconds) => (
                   <Text

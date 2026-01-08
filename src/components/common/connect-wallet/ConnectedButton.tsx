@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { useOutsideClick } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
-import { useWalletStore } from '@/hooks/useWallet';
 import { sliceAddress } from '@/lib/utils/common';
+import { useWalletStore } from '@/stores/useWalletStore';
 
 import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
 import Spinner from '@/assets/spinner.svg';
