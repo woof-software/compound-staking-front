@@ -127,4 +127,14 @@ export namespace FormatTime {
 
     return `${pad(minutes)}m ${pad(seconds)}s`;
   }
+
+  export function endDate(unixSeconds: number): string {
+    if (!unixSeconds) return '-';
+
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(new Date(unixSeconds * 1000));
+  }
 }

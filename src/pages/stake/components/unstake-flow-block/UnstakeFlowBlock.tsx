@@ -15,7 +15,6 @@ import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
-import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
 import { Format, FormatTime } from '@/lib/utils/format';
 import { getRemainingSeconds, normalizeUnixSeconds } from '@/lib/utils/helpers';
@@ -25,6 +24,8 @@ import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useStakedVirtualBalance } from '@/pages/stake/hooks/useStakedVirtualBalance';
 import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
 import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
+import { useDelegateStore } from '@/stores/useDelegateStore';
+import { useWalletStore } from '@/stores/useWalletStore';
 
 export function UnstakeFlowBlock() {
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
@@ -36,6 +37,8 @@ export function UnstakeFlowBlock() {
   } = useSwitch();
 
   const { setIsPendingToggle } = useWalletStore();
+  const { triggerDelegateRefresh } = useDelegateStore();
+
   const { isConnected, address } = useConnection();
 
   const { refetch: refetchAllowance } = useBaseTokenAllowance(address);
@@ -136,8 +139,11 @@ export function UnstakeFlowBlock() {
       return;
     }
 
-    if (remainingSeconds > 0) resetIsDurationFinished();
-    else setIsDurationFinished();
+    if (remainingSeconds > 0) {
+      resetIsDurationFinished();
+    } else {
+      setIsDurationFinished();
+    }
   }, [isBalancesLoading, hasActiveLock, remainingSeconds]);
 
   useEffect(() => {
@@ -149,6 +155,8 @@ export function UnstakeFlowBlock() {
       refetchVirtualTokenBalance();
       refetchStakedTokenBalance();
       refetchLockedTokenBalance();
+
+      triggerDelegateRefresh();
     }
 
     if (isUnstakeRequestSuccess) {
@@ -215,9 +223,7 @@ export function UnstakeFlowBlock() {
                 <Duration
                   end={durationSec}
                   unsafeRound={(msLeft) => {
-                    if (msLeft <= 0) return 0;
-
-                    return Math.ceil(msLeft / 1000);
+                    return Math.max(Math.ceil(msLeft / 1000), 0);
                   }}
                   render={(seconds) => {
                     const canShow = isConnected && !!lockedTokenBalance?.startTime && seconds !== undefined;

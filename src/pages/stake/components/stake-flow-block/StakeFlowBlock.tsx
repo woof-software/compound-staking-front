@@ -18,11 +18,14 @@ import { Format } from '@/lib/utils/format';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
+import { useDelegateStore } from '@/stores/useDelegateStore';
 
 export function StakeFlowBlock() {
   const { isConnected, address } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
+
+  const { triggerDelegateRefresh } = useDelegateStore();
 
   const {
     data: stakedBalance,
@@ -61,7 +64,9 @@ export function StakeFlowBlock() {
   const onStakeConfirmed = useCallback(() => {
     refetchStakedBalanceFormatted();
     refetchVirtualBalance();
-  }, [refetchStakedBalanceFormatted, refetchVirtualBalance]);
+
+    triggerDelegateRefresh();
+  }, [refetchStakedBalanceFormatted, refetchVirtualBalance, triggerDelegateRefresh]);
 
   return (
     <Card

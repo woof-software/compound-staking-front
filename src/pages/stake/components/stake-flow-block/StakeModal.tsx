@@ -15,11 +15,11 @@ import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
 import { useStakeTransaction } from '@/hooks/useStakeTransaction';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
-import { useWalletStore } from '@/hooks/useWallet';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 import { getImgPath } from '@/lib/utils/helpers';
+import { useWalletStore } from '@/stores/useWalletStore';
 export type StakeModalProps = {
   onClose?: () => void;
   onStakeConfirmed?: () => void;

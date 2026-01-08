@@ -11,12 +11,12 @@ on:
     branches:
       - develop
     paths-ignore:
-      - ".github/workflows/**"
+      - '.github/workflows/**'
   push:
     branches:
       - develop
     paths-ignore:
-      - ".github/workflows/**"
+      - '.github/workflows/**'
 
 jobs:
   Lint:
@@ -54,5 +54,3 @@ jobs:
       - name: Build
         run: |
           npm run build
-
-
