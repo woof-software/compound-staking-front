@@ -220,6 +220,8 @@ export function UnstakeFlowBlock() {
                     return Math.ceil(msLeft / 1000);
                   }}
                   render={(seconds) => {
+                    const canShow = isConnected && !!lockedTokenBalance?.startTime && seconds !== undefined;
+
                     return (
                       <Text
                         size='17'
@@ -229,9 +231,7 @@ export function UnstakeFlowBlock() {
                           'text-color-6': !isConnected || !lockedTokenBalance?.startTime
                         })}
                       >
-                        {Boolean(isConnected && !!lockedTokenBalance?.startTime)
-                          ? FormatTime.cooldownFromSeconds(seconds)
-                          : '-'}
+                        {canShow ? FormatTime.cooldownFromSeconds(seconds) : '-'}
                       </Text>
                     );
                   }}

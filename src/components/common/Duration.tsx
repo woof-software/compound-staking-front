@@ -2,7 +2,7 @@ import { type ReactNode, useEffect, useEffectEvent, useState } from 'react';
 
 export type DurationProps = {
   end: number;
-  render: (secondsLeft: number) => ReactNode;
+  render: (secondsLeft: number | undefined) => ReactNode;
   unsafeRound?: (value: number) => number;
 };
 
@@ -37,5 +37,5 @@ export function Duration(props: DurationProps) {
     };
   }, [end]);
 
-  return render(value || 0);
+  return render(value ?? undefined);
 }
