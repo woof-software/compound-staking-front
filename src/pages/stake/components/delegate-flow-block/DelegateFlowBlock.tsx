@@ -108,14 +108,13 @@ export function DelegateFlowBlock() {
       <div className='flex justify-between p-10'>
         <div className='flex gap-15'>
           <div className='flex flex-col gap-3'>
-            <Skeleton loading={isLoading}>
-              <Text
-                size='11'
-                className='text-color-24'
-              >
-                Name of Delegatee
-              </Text>
-            </Skeleton>
+            <Text
+              size='11'
+              weight='500'
+              className='text-color-24'
+            >
+              Name of Delegatee
+            </Text>
             <Skeleton loading={isLoading}>
               <a
                 className='flex cursor-pointer items-start gap-1'
@@ -140,14 +139,13 @@ export function DelegateFlowBlock() {
             </Skeleton>
           </div>
           <div className='flex flex-col gap-3'>
-            <Skeleton loading={isLoading}>
-              <Text
-                size='11'
-                className='text-color-24'
-              >
-                Cooldown
-              </Text>
-            </Skeleton>
+            <Text
+              size='11'
+              weight='500'
+              className='text-color-24'
+            >
+              Cooldown
+            </Text>
             <Skeleton loading={isLoading}>
               <Duration
                 end={cooldownEndMs}
@@ -168,15 +166,14 @@ export function DelegateFlowBlock() {
             </Skeleton>
           </div>
           <div className='flex flex-col gap-3'>
-            <Skeleton loading={isLoading}>
-              <Text
-                size='11'
-                className='text-color-24'
-              >
-                End Date
-              </Text>
-            </Skeleton>
-            <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              weight='500'
+              className='text-color-24'
+            >
+              End Date
+            </Text>
+            <Skeleton loading={false}>
               <Text
                 size='17'
                 weight='500'

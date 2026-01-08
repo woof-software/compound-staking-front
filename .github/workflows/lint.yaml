@@ -11,12 +11,12 @@ on:
     branches:
       - develop
     paths-ignore:
-      - ".github/workflows/**"
+      - '.github/workflows/**'
   push:
     branches:
       - develop
     paths-ignore:
-      - ".github/workflows/**"
+      - '.github/workflows/**'
 
 jobs:
   Lint:
@@ -44,9 +44,12 @@ jobs:
           npm ci
 
       - name: Lint
-        continue-on-error: true
         run: |
           npm run lint
+
+      - name: Typescript check
+        run: |
+          tsc --noEmit
 
       - name: Build
         run: |
