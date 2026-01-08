@@ -142,7 +142,8 @@
 
   --shadow-10: 0 2px 1px -1px rgba(0, 0, 0, 0.25), 0 1px 1px 0 rgba(0, 0, 0, 0.25), 0 1px 3px 0 rgba(0, 0, 0, 0.25);
   --shadow-15: 0 2px 8px 0 rgba(0, 0, 0, 0.4);
-  --shadow-20: 0 0 0 0.5px #f9fafb26;
+  --shadow-20: 0px 1px 2px rgba(15, 23, 31, .02), 0px 1px 4px rgba(15, 23, 31, .02);
+  --shadow-25: 0px 2px 4px rgba(15, 23, 31, .02), 0px 4px 8px rgba(15, 23, 31, .02);
 
   --radius-64: 64px;
   --radius-100: 100px;
