@@ -152,16 +152,20 @@ export function DelegateFlowBlock() {
                 unsafeRound={(msLeft) => {
                   return Math.max(Math.ceil(msLeft / 1000), 0);
                 }}
-                render={(seconds) => (
-                  <Text
-                    size='17'
-                    weight='500'
-                    lineHeight='17'
-                    className={cn('text-color-2', { 'text-color-6': !isConnected || !hasOpenPosition })}
-                  >
-                    {isConnected && hasOpenPosition ? FormatTime.cooldownFromSeconds(seconds) : '-'}
-                  </Text>
-                )}
+                render={(seconds) => {
+                  const canShow = isConnected && hasOpenPosition && seconds !== undefined;
+
+                  return (
+                    <Text
+                      size='17'
+                      weight='500'
+                      lineHeight='17'
+                      className={cn('text-color-2', { 'text-color-6': !isConnected || !hasOpenPosition })}
+                    >
+                      {canShow ? FormatTime.cooldownFromSeconds(seconds) : '-'}
+                    </Text>
+                  );
+                }}
               />
             </Skeleton>
           </div>
