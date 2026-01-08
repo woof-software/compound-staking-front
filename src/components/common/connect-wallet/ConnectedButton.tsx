@@ -50,21 +50,21 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
       <div
         ref={toggleRef}
         onClick={onOpen}
-        className='border-color-8 rounded-64 bg-color-11 flex h-11 max-w-fit cursor-pointer justify-end border-1'
+        className='border-color-8 rounded-64 bg-color-11 shadow-20 flex h-11 max-w-fit cursor-pointer justify-end border-[0.25px]'
       >
-        <div className='bg-color-11 rounded-64 relative flex w-23 items-center justify-center gap-2 border-r-0 px-3 py-2'>
+        <div className='rounded-64 relative flex w-23 items-center border-r-0 py-2 pl-4'>
           <CompoundWalletIcon className='size-6 flex-shrink-0' />
           <Text
             size='11'
             weight='500'
             lineHeight='16'
-            className='text-color-2'
+            className='text-color-2 ml-2'
           >
-            0.0000
+            0.0039
           </Text>
         </div>
         <Condition if={!isPending}>
-          <div className='border-color-8 bg-color-4 rounded-64 relative -top-0.25 -right-0.25 flex h-11 w-30.5 items-center justify-center gap-2 border-1 px-3 py-2 hover:brightness-90'>
+          <div className='border-color-8 shadow-25 bg-color-4 rounded-64 relative -top-[0.5px] -right-[0.25px] h-11 border-[0.25px] px-5 py-[13.5px] hover:brightness-90'>
             <Text
               size='11'
               weight='500'
@@ -76,7 +76,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
           </div>
         </Condition>
         <Condition if={isPending}>
-          <div className='bg-color-7 rounded-64 flex h-11 min-w-25 items-center justify-center gap-2'>
+          <div className='bg-color-7 rounded-64 relative -top-[0.5px] flex h-11 min-w-28 items-center justify-center gap-2 hover:brightness-90'>
             <Spinner className='size-4 flex-shrink-0 animate-spin' />
             <Text
               size='11'
@@ -92,7 +92,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
       <Condition if={isOpen}>
         <div
           ref={ref}
-          className='bg-color-4 border-color-8 animate-bounce-smooth absolute top-12 right-0 flex h-auto min-w-80 flex-col gap-3 rounded-2xl border-1 p-5'
+          className='bg-color-4 border-color-8 animate-bounce-smooth absolute top-12 right-0 flex h-auto min-h-44.75 min-w-80 flex-col gap-3 rounded-2xl border-[0.25px] p-5'
         >
           <Text
             size='11'

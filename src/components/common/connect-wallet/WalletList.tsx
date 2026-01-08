@@ -1,6 +1,9 @@
 import { type Connector, type CreateConnectorFn, useConnect, useConnectors } from 'wagmi';
 
+import coinbase from '@/assets/coinbase.avif';
+import metamask from '@/assets/metamask-and-browsers.avif';
 import { ArrowIcon } from '@/assets/svg';
+import walletconnect from '@/assets/walletconnect.avif';
 import { Condition } from '@/components/common/Condition';
 
 import { Text } from '../../ui/Text';
@@ -8,8 +11,8 @@ import { Text } from '../../ui/Text';
 const CONNECTORS = [
   {
     id: 'metaMaskSDK',
-    title: 'MetaMask',
-    description: 'and other browser wallets',
+    title: 'Metamask',
+    description: 'And other browser wallets',
     icon: 'metamask-and-browsers'
   },
   {
@@ -24,6 +27,12 @@ const CONNECTORS = [
   }
 ];
 
+const ICONS: Record<string, string> = {
+  'metamask-and-browsers': metamask,
+  walletconnect,
+  coinbase
+};
+
 export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
   const { connect } = useConnect();
   const connectors = useConnectors();
@@ -35,7 +44,7 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
   };
 
   return (
-    <div className='mt-10 flex w-full flex-col'>
+    <div className='my-8 flex w-full flex-col'>
       {CONNECTORS.map(({ id, title, description, icon }) => {
         const connector = connectors.find((c) => c.id === id);
 
@@ -48,15 +57,17 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
             onClick={() => onConnectorSelect(connector)}
           >
             <img
-              src={`/src/assets/${icon}.avif`}
+              // src={`/assets/${icon}.avif`}
+              src={ICONS[icon]}
               alt='wallet-icon'
-              className='size-10 flex-shrink-0 rounded-[5px]'
+              className='size-10 flex-shrink-0 rounded-[8px]'
             />
             <div className='flex flex-col'>
               <Text
                 size='17'
                 weight='600'
                 lineHeight='20'
+                font='font-grot-disp'
               >
                 {title}
               </Text>

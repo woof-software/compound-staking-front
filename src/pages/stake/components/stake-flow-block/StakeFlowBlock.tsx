@@ -44,7 +44,7 @@ export function StakeFlowBlock() {
   /* Loading */
   const isPriceOrBalanceLoading = isStakedTokenPrice || isStakedTokenWalletBalance;
   const isTokenBalanceLoading = isStakedBalanceFormattedFetching || isBaseTokenPriceFetching;
-  const isLoading = isPriceOrBalanceLoading || isTokenBalanceLoading;
+  const isLoading = isConnected ? isPriceOrBalanceLoading || isTokenBalanceLoading : false;
 
   const isStakeButtonDisabled = !isConnected || isOpen || isLoading || (lockedTokenBalance?.amount ?? 0n) > 0n;
 
@@ -65,19 +65,19 @@ export function StakeFlowBlock() {
 
   return (
     <Card
+      isLoading={isLoading}
       title='Stake'
       tooltip='Stake your COMP tokens to earn yield every second!'
     >
       <div className='flex justify-between p-10'>
         <div className='flex flex-col gap-3'>
-          <Skeleton loading={isLoading}>
-            <Text
-              size='11'
-              className='text-color-24'
-            >
-              Staked
-            </Text>
-          </Skeleton>
+          <Text
+            size='11'
+            weight='500'
+            className='text-color-24'
+          >
+            Staked
+          </Text>
           <div className='flex flex-col gap-2'>
             <Skeleton loading={isLoading}>
               <Text
@@ -104,14 +104,13 @@ export function StakeFlowBlock() {
           </div>
         </div>
         <div className='flex flex-col gap-3'>
-          <Skeleton loading={isLoading}>
-            <Text
-              size='11'
-              className='text-color-24'
-            >
-              stCOMP balance
-            </Text>
-          </Skeleton>
+          <Text
+            size='11'
+            weight='500'
+            className='text-color-24'
+          >
+            stCOMP balance
+          </Text>
           <Skeleton loading={isLoading}>
             <Text
               size='17'
@@ -125,14 +124,13 @@ export function StakeFlowBlock() {
           </Skeleton>
         </div>
         <div className='flex flex-col gap-3'>
-          <Skeleton loading={isLoading}>
-            <Text
-              size='11'
-              className='text-color-24'
-            >
-              Multiplier
-            </Text>
-          </Skeleton>
+          <Text
+            size='11'
+            weight='500'
+            className='text-color-24'
+          >
+            Multiplier
+          </Text>
           <Skeleton loading={isLoading}>
             <Text
               size='17'
@@ -146,14 +144,13 @@ export function StakeFlowBlock() {
           </Skeleton>
         </div>
         <div className='flex flex-col gap-3'>
-          <Skeleton loading={isLoading}>
-            <Text
-              size='11'
-              className='text-color-24'
-            >
-              Available Rewards
-            </Text>
-          </Skeleton>
+          <Text
+            size='11'
+            weight='500'
+            className='text-color-24'
+          >
+            Available Rewards
+          </Text>
           <div className='flex flex-col gap-2'>
             <Skeleton loading={isLoading}>
               <Text
@@ -179,14 +176,13 @@ export function StakeFlowBlock() {
           </div>
         </div>
         <div className='flex flex-col gap-3'>
-          <Skeleton loading={isLoading}>
-            <Text
-              size='11'
-              className='text-color-24'
-            >
-              APR
-            </Text>
-          </Skeleton>
+          <Text
+            size='11'
+            weight='500'
+            className='text-color-24'
+          >
+            APR
+          </Text>
           <Skeleton loading={isLoading}>
             <Text
               size='17'
@@ -201,12 +197,25 @@ export function StakeFlowBlock() {
         </div>
         <Button
           disabled={isStakeButtonDisabled}
-          className={cn('max-w-32.5 text-[11px] font-medium', {
-            'text-white': !isStakeButtonDisabled
-          })}
+          className='max-w-32.5'
           onClick={onOpen}
         >
-          Stake
+          <Skeleton
+            loading={isLoading}
+            className='w-full'
+          >
+            <Text
+              tag='p'
+              size='11'
+              weight='500'
+              align='center'
+              className={cn('text-color-6', {
+                'text-white': !isStakeButtonDisabled
+              })}
+            >
+              Stake
+            </Text>
+          </Skeleton>
         </Button>
       </div>
       <Modal

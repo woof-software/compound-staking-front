@@ -23,6 +23,7 @@ export function DelegateFlowBlock() {
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
+              weight='500'
               className='text-color-24'
             >
               Wallet address of Delegatee
@@ -51,6 +52,7 @@ export function DelegateFlowBlock() {
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
+              weight='500'
               className='text-color-24'
             >
               Cooldown
@@ -71,6 +73,7 @@ export function DelegateFlowBlock() {
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
+              weight='500'
               className='text-color-24'
             >
               End Date

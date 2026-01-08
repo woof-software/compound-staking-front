@@ -97,7 +97,7 @@ export function UnstakeFlowBlock() {
     !isBalancesLoading && ((stakedTokenBalance?.principal ?? 0n) > 0n || (lockedTokenBalance?.amount ?? 0n) > 0n);
 
   /* Loading */
-  const isLoading = isLockedTokenBalanceLoading;
+  const isLoading = isConnected ? isLockedTokenBalanceLoading : false;
   const isTransactionLoading =
     isUnstakePending || isUnstakeRequestConfirming || isUnlockPending || isUnlockRequestConfirming;
 
@@ -161,6 +161,7 @@ export function UnstakeFlowBlock() {
   return (
     <div className='flex flex-col gap-1.5'>
       <Card
+        isLoading={isLoading}
         title='Unstake'
         tooltip='Cooldown period for unstaking process is 18d 00h 00m 00s'
       >
@@ -169,6 +170,7 @@ export function UnstakeFlowBlock() {
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
+                weight='500'
                 className='text-color-24'
               >
                 Unstake
@@ -204,6 +206,7 @@ export function UnstakeFlowBlock() {
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
+                weight='500'
                 className='text-color-24'
               >
                 Cooldown
@@ -217,6 +220,8 @@ export function UnstakeFlowBlock() {
                     return Math.ceil(msLeft / 1000);
                   }}
                   render={(seconds) => {
+                    const canShow = isConnected && !!lockedTokenBalance?.startTime && seconds !== undefined;
+
                     return (
                       <Text
                         size='17'
@@ -226,9 +231,7 @@ export function UnstakeFlowBlock() {
                           'text-color-6': !isConnected || !lockedTokenBalance?.startTime
                         })}
                       >
-                        {Boolean(isConnected && !!lockedTokenBalance?.startTime)
-                          ? FormatTime.cooldownFromSeconds(seconds)
-                          : '-'}
+                        {canShow ? FormatTime.cooldownFromSeconds(seconds) : '-'}
                       </Text>
                     );
                   }}
@@ -238,12 +241,25 @@ export function UnstakeFlowBlock() {
           </div>
           <Button
             disabled={isUnstakeButtonDisabled}
-            className={cn('max-w-32.5 text-[11px] font-medium', {
-              'text-white': !isUnstakeButtonDisabled
-            })}
+            className='max-w-32.5'
             onClick={onButtonClick}
           >
-            {hasActiveLock ? 'Unstake' : 'Request unstake'}
+            <Skeleton
+              loading={isLoading}
+              className='w-full'
+            >
+              <Text
+                tag='p'
+                size='11'
+                weight='500'
+                align='center'
+                className={cn('text-color-6', {
+                  'text-white': !isUnstakeButtonDisabled
+                })}
+              >
+                {hasActiveLock ? 'Unstake' : 'Request unstake'}
+              </Text>
+            </Skeleton>
           </Button>
         </div>
       </Card>

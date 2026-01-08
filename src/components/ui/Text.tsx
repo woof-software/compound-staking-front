@@ -42,9 +42,14 @@ const text = cva('text-color-2', {
       left: 'text-left',
       center: 'text-center',
       right: 'text-right'
+    },
+    font: {
+      'font-grot-disp': 'font-grot-disp',
+      'font-grot-text': 'font-grot-text'
     }
   },
   defaultVariants: {
+    font: 'font-grot-text',
     size: '16',
     weight: '400',
     lineHeight: '100',
@@ -58,11 +63,11 @@ export interface TextProps extends PropsWithChildren, VariantProps<typeof text> 
 }
 
 export function Text(props: TextProps) {
-  const { className, size, weight, lineHeight, align, tag: Tag = 'p', children, ...rest } = props;
+  const { className, size, weight, lineHeight, align, font, tag: Tag = 'p', children, ...rest } = props;
 
   return (
     <Tag
-      className={text({ size, weight, lineHeight, align, className })}
+      className={text({ size, weight, lineHeight, align, font, className })}
       {...rest}
     >
       {children}
