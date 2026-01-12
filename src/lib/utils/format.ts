@@ -7,6 +7,14 @@ dayjs.extend(duration);
 
 export namespace Format {
   export type FormatView = 'standard' | 'compact';
+
+  const LOCALE = 'en-US';
+
+  function toNumber(value: number | string) {
+    const x = Number(value);
+    return Number.isFinite(x) ? x : 0;
+  }
+
   /**
    * Formats a number as a USD price.
    * @example
@@ -14,20 +22,16 @@ export namespace Format {
    * e.g., price(12345.67, view: 'full' ) -> '$12,345.67'
    */
   export function price(value: number | string, view?: FormatView) {
-    let numberValue = Number(value);
+    const numberValue = toNumber(value);
     const options: Intl.NumberFormatOptions = {};
-    const locale = 'en-US';
 
-    if (isNaN(numberValue) || !isFinite(numberValue)) {
-      numberValue = 0;
-    }
-
+    options.minimumFractionDigits = 2;
     options.maximumFractionDigits = 2;
     options.notation = view;
     options.style = 'currency';
     options.currency = 'USD';
 
-    return new Intl.NumberFormat(locale, options).format(numberValue);
+    return new Intl.NumberFormat(LOCALE, options).format(numberValue);
   }
 
   /**
@@ -37,19 +41,15 @@ export namespace Format {
    * e.g., token(123.45678, tokenSymbol: 'ETH', view: 'full') -> '123.4568 ETH'
    */
   export function token(value: number | string, view?: FormatView, tokenSymbol?: string) {
-    let numberValue = Number(value);
+    const numberValue = toNumber(value);
     const options: Intl.NumberFormatOptions = {};
-    const locale = 'en-US';
-
-    if (isNaN(numberValue) || !isFinite(numberValue)) {
-      numberValue = 0;
-    }
 
     options.notation = view;
+    options.minimumFractionDigits = 4;
     options.maximumFractionDigits = 4;
     options.style = 'decimal';
 
-    const formattedNumber = new Intl.NumberFormat(locale, options).format(numberValue);
+    const formattedNumber = new Intl.NumberFormat(LOCALE, options).format(numberValue);
     return tokenSymbol ? `${formattedNumber} ${tokenSymbol}` : formattedNumber;
   }
 
@@ -68,7 +68,7 @@ export namespace Format {
    * rate(10) // -> "10.00%"
    */
   export function rate(value: number): string {
-    return `${value.toLocaleString('en-US', {
+    return `${value.toLocaleString(LOCALE, {
       maximumFractionDigits: 2,
       minimumFractionDigits: 2
     })}`;

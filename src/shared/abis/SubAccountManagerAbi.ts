@@ -17,5 +17,12 @@ export const SubAccountManagerAbi = [
     ],
     stateMutability: 'view',
     type: 'function'
+  },
+  {
+    inputs: [],
+    name: 'delegationDelay',
+    outputs: [{ internalType: 'uint40', name: '', type: 'uint40' }],
+    stateMutability: 'view',
+    type: 'function'
   }
 ];

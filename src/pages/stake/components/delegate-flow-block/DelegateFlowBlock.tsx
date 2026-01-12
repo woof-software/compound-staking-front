@@ -10,6 +10,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { useDelegateByAddress } from '@/hooks/useDelegateByAddress';
+import { useDelegateDuration } from '@/hooks/useDelegateDuration';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
 import { useSubAccount } from '@/hooks/useSubAccount';
@@ -33,6 +34,8 @@ export function DelegateFlowBlock() {
 
   const { data: stakedTokenBalance } = useStakedBalance(address);
   const { data: lockedTokenBalance } = useLockedBalance(address);
+
+  const { data: delegateDuration, isLoading: isDurationLoading } = useDelegateDuration();
 
   const {
     data: subAccountAddress,
@@ -58,7 +61,7 @@ export function DelegateFlowBlock() {
 
   const hasCooldownRequest = !!executableAtSec && !delegateData?.executed;
 
-  const isLoading = isSubAccountLoading || isDelegateLoading;
+  const isLoading = isSubAccountLoading || isDelegateLoading || isDurationLoading;
 
   const isCooldownBlocked = isConnected && !isCooldownFinished;
 
@@ -102,8 +105,9 @@ export function DelegateFlowBlock() {
 
   return (
     <Card
+      isLoading={isLoading}
       title='Delegation'
-      tooltip='Cooldown period for redelegation process is 01d 00h 00m 00s'
+      tooltip={`Cooldown period for redelegation process is ${FormatTime.cooldownFromSeconds(delegateDuration ?? 0)}`}
     >
       <div className='flex justify-between p-10'>
         <div className='flex gap-15'>
@@ -160,7 +164,7 @@ export function DelegateFlowBlock() {
                       size='17'
                       weight='500'
                       lineHeight='17'
-                      className={cn('text-color-2', { 'text-color-6': !isConnected || !hasOpenPosition })}
+                      className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected || !hasOpenPosition })}
                     >
                       {canShow ? FormatTime.cooldownFromSeconds(seconds) : '-'}
                     </Text>
@@ -177,7 +181,7 @@ export function DelegateFlowBlock() {
             >
               End Date
             </Text>
-            <Skeleton loading={false}>
+            <Skeleton loading={isLoading}>
               <Text
                 size='17'
                 weight='500'
@@ -194,9 +198,24 @@ export function DelegateFlowBlock() {
         <Button
           onClick={onOpen}
           disabled={isDelegateButtonDisabled}
-          className='max-w-32.5 text-[11px] font-medium'
+          className='max-w-32.5'
         >
-          Delegate
+          <Skeleton
+            loading={isLoading}
+            className='w-full'
+          >
+            <Text
+              tag='p'
+              size='11'
+              weight='500'
+              align='center'
+              className={cn('text-color-6', {
+                'text-white': !isDelegateButtonDisabled
+              })}
+            >
+              Delegate
+            </Text>
+          </Skeleton>
         </Button>
       </div>
       <Modal
