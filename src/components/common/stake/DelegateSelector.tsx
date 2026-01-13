@@ -136,7 +136,8 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                   className={cn(
                     'hover:bg-color-5 flex cursor-pointer items-center justify-between rounded-lg px-3 py-4',
                     {
-                      'bg-color-5': selectedAddressDelegate?.address === el.address
+                      'bg-color-5':
+                        selectedAddressDelegate?.address.toLocaleLowerCase() === el.address.toLocaleLowerCase()
                     }
                   )}
                   onClick={() => onDelegateSelect(el)}
