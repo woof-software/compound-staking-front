@@ -12,7 +12,6 @@ import { type Delegate } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useApproveTransaction } from '@/hooks/useApproveTransaction';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
-import { useInitialEffect } from '@/hooks/useInitialEffect';
 import { useStakeTransaction } from '@/hooks/useStakeTransaction';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -120,7 +119,9 @@ export function StakeModal(props: StakeModalProps) {
     }
   }, [isApproveSuccess]);
 
-  useInitialEffect(refetchAllowance);
+  useEffect(() => {
+    refetchAllowance();
+  }, []);
 
   return (
     <div className='mt-8 flex w-full flex-col gap-8'>

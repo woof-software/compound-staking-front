@@ -10,11 +10,6 @@ export namespace Format {
 
   const LOCALE = 'en-US';
 
-  function toNumber(value: number | string) {
-    const x = Number(value);
-    return Number.isFinite(x) ? x : 0;
-  }
-
   /**
    * Formats a number as a USD price.
    * @example
@@ -22,8 +17,12 @@ export namespace Format {
    * e.g., price(12345.67, view: 'full' ) -> '$12,345.67'
    */
   export function price(value: number | string, view?: FormatView) {
-    const numberValue = toNumber(value);
+    let numberValue = Number(value);
     const options: Intl.NumberFormatOptions = {};
+
+    if (isNaN(numberValue) || !isFinite(numberValue)) {
+      numberValue = 0;
+    }
 
     options.minimumFractionDigits = 2;
     options.maximumFractionDigits = 2;
@@ -41,8 +40,12 @@ export namespace Format {
    * e.g., token(123.45678, tokenSymbol: 'ETH', view: 'full') -> '123.4568 ETH'
    */
   export function token(value: number | string, view?: FormatView, tokenSymbol?: string) {
-    const numberValue = toNumber(value);
+    let numberValue = Number(value);
     const options: Intl.NumberFormatOptions = {};
+
+    if (isNaN(numberValue) || !isFinite(numberValue)) {
+      numberValue = 0;
+    }
 
     options.notation = view;
     options.minimumFractionDigits = 4;
