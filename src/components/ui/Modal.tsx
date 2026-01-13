@@ -32,12 +32,12 @@ export function Modal(props: ModalProps) {
     <Portal>
       <div
         className='modal-fade-in bg-modal-bg fixed inset-0 z-50 flex items-center justify-center'
-        onClick={onClose}
+        onPointerDown={(e) => {
+          if (!onClose) return;
+          if (e.target === e.currentTarget) onClose();
+        }}
       >
-        <div
-          className='bg-color-5 modal-content-in relative flex w-full max-w-105 flex-col items-center rounded-lg p-10'
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className='bg-color-5 modal-content-in relative flex w-full max-w-105 flex-col items-center rounded-lg p-10'>
           <div className='flex w-full justify-end'>
             <Condition if={title}>
               <Text

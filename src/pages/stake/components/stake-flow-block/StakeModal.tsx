@@ -119,6 +119,10 @@ export function StakeModal(props: StakeModalProps) {
     }
   }, [isApproveSuccess]);
 
+  useEffect(() => {
+    refetchAllowance();
+  }, []);
+
   return (
     <div className='mt-8 flex w-full flex-col gap-8'>
       <Divider orientation='horizontal' />

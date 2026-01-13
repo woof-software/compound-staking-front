@@ -13,6 +13,7 @@ import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
+import { useUnstakeLockDuration } from '@/hooks/useLockDuration';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
@@ -40,6 +41,8 @@ export function UnstakeFlowBlock() {
   const { triggerDelegateRefresh } = useDelegateStore();
 
   const { isConnected, address } = useConnection();
+
+  const { data: lockDuration } = useUnstakeLockDuration(ENV.LOCK_MANAGER_ADDRESS);
 
   const { refetch: refetchAllowance } = useBaseTokenAllowance(address);
 
@@ -171,7 +174,7 @@ export function UnstakeFlowBlock() {
       <Card
         isLoading={isLoading}
         title='Unstake'
-        tooltip='Cooldown period for unstaking process is 18d 00h 00m 00s'
+        tooltip={`Cooldown period for unstaking process is ${FormatTime.cooldownFromSeconds(lockDuration ?? 0)}`}
       >
         <div className='flex items-start justify-between p-10'>
           <div className='flex gap-15'>
@@ -233,7 +236,7 @@ export function UnstakeFlowBlock() {
                         size='17'
                         weight='500'
                         lineHeight='17'
-                        className={cn('text-color-2', {
+                        className={cn('text-color-2 tabular-nums', {
                           'text-color-6': !isConnected || !lockedTokenBalance?.startTime
                         })}
                       >

@@ -24,7 +24,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [searchValue, setSearchValue] = useState('');
 
-  const { isEnabled: isOpen, enable: open, disable: close } = useSwitch();
+  const { isEnabled: isOpen, toggle: open, disable: close } = useSwitch();
 
   const filteredDelegates = useDelegateSelector(searchValue);
 
@@ -133,9 +133,13 @@ export function DelegateSelector(props: DelegateSelectorProps) {
               {filteredDelegates.map((el) => (
                 <div
                   key={el.address}
-                  className={cn('flex cursor-pointer items-center justify-between rounded-lg px-3 py-4', {
-                    'bg-color-5': selectedAddressDelegate?.address === el.address
-                  })}
+                  className={cn(
+                    'hover:bg-color-5 flex cursor-pointer items-center justify-between rounded-lg px-3 py-4',
+                    {
+                      'bg-color-5':
+                        selectedAddressDelegate?.address.toLocaleLowerCase() === el.address.toLocaleLowerCase()
+                    }
+                  )}
                   onClick={() => onDelegateSelect(el)}
                 >
                   <div className='flex items-center gap-1.5'>
