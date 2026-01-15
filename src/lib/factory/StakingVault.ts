@@ -1,8 +1,7 @@
 import { StakingVault__factory } from '@woof-software/compound-staked-comp-artifacts/types/ethers-contracts/factories/StakingVault__factory.js';
 
 import { ENV } from '@/consts/env';
-import { getEthersProvider } from '@/lib/utils/provider';
-import { getEthersSigner } from '@/lib/utils/singer';
+import { getEthersProvider, getEthersSigner } from '@/lib/utils/wagmi';
 import { config } from '@/shared/config/wagmiConfig';
 
 export function getStakingVaultRead(chainId: number) {
