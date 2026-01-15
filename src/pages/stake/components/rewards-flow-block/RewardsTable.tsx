@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 
 import { SortArrowIcon } from '@/assets/svg';
-import { RewardRow, type RewardRowProps } from '@/components/common/stake/RewardRow';
+import { RewardRow } from '@/components/common/stake/RewardRow';
 import { Text } from '@/components/ui/Text';
+import type { RewardRowProps } from '@/lib/dto/rewards';
 import { cn } from '@/lib/utils/cn';
 
 type SortKey = keyof RewardRowProps;
@@ -43,43 +44,20 @@ const columns: Column<RewardRowProps>[] = [
   }
 ];
 
-const data = [
-  {
-    vestingAmount: 5000,
-    claimedAmount: 3500,
-    toClaim: 1500,
-    startDate: Date.parse('2025-01-01T00:00:00Z'),
-    endDate: Date.parse('2025-02-01T00:00:00Z'),
-    vestingStartDate: Date.parse('2024-12-01T00:00:00Z'),
-    vestingEndDate: Date.parse('2025-06-01T00:00:00Z'),
-    percents: 30
-  },
-  {
-    vestingAmount: 10000,
-    claimedAmount: 2500,
-    toClaim: 7500,
-    startDate: Date.parse('2024-11-15T12:00:00Z'),
-    endDate: Date.parse('2025-05-15T12:00:00Z'),
-    vestingStartDate: Date.parse('2024-11-01T00:00:00Z'),
-    vestingEndDate: Date.parse('2026-11-01T00:00:00Z'),
-    percents: 25
-  }
-];
+export function RewardsTable(props: { rows: RewardRowProps[] }) {
+  const { rows } = props;
 
-export function RewardsTable() {
   const [sortBy, setSortBy] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const sortedData = useMemo(() => {
-    if (!sortBy) return data;
+    if (!sortBy) return rows;
 
     const col = columns.find((c) => c.accessorKey === sortBy);
-    if (!col || !col.sort) return data;
+    if (!col?.sort) return rows;
 
-    const sort = col.sort;
-
-    return [...data].sort((a, b) => sort(a, b, sortDir));
-  }, [sortBy, sortDir]);
+    return [...rows].sort((a, b) => col.sort!(a, b, sortDir));
+  }, [rows, sortBy, sortDir]);
 
   const onHeaderClick = (accessorKey: SortKey) => {
     if (sortBy === accessorKey) {
@@ -98,7 +76,7 @@ export function RewardsTable() {
 
           return (
             <div
-              key={accessorKey}
+              key={String(accessorKey)}
               role='button'
               tabIndex={0}
               className='flex cursor-pointer items-center'
@@ -132,7 +110,7 @@ export function RewardsTable() {
       <div className='m-2'>
         {sortedData.map((row, index) => (
           <RewardRow
-            key={index}
+            key={`${row.startDate}-${row.endDate}-${index}`}
             {...row}
           />
         ))}

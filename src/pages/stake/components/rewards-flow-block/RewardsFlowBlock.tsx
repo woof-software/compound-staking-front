@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useConnection } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
@@ -9,19 +10,38 @@ import { Divider } from '@/components/ui/Divider';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { useSwitch } from '@/hooks/useSwitch';
+import { rewardsDto } from '@/lib/dto/rewards';
 import { cn } from '@/lib/utils/cn';
+import { Format } from '@/lib/utils/format';
 import { RewardsTable } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
+import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 
 export function RewardsFlowBlock() {
-  const { isConnected } = useConnection();
+  const { isConnected, address } = useConnection();
 
   const { isEnabled: isVestingOpen, enable: onVestingOpen, disable: onVestingClose } = useSwitch();
   const { isEnabled: isClaimOpen, enable: onClaimOpen, disable: onClaimClose } = useSwitch();
 
+  const { data: vestingPositions, isLoading: isVestingLoading } = useVestingPosition(address);
+
+  const isLoading = isConnected ? isVestingLoading : false;
+
+  const rows = useMemo(() => rewardsDto(vestingPositions), [vestingPositions]);
+
+  const availableRewards = useMemo(() => rows.reduce((acc, r) => acc + r.toClaim, 0), [rows]);
+
+  const totalToClaim = useMemo(() => rows.reduce((acc, r) => acc + (r.vestingAmount - r.claimedAmount), 0), [rows]);
+
+  const isClaimButtonDisabled = !isConnected || isLoading;
+  const isVestButtonDisabled = !isConnected || isLoading;
+
+  console.log('vestingPositions=>', vestingPositions);
+
   return (
     <>
       <Card
-        title='Stake'
+        isLoading={isLoading}
+        title='Rewards'
         tooltip='Stake your COMP tokens to earn yield every second!'
       >
         <div className='border-color-8 flex justify-between border-b-1 p-10'>
@@ -34,7 +54,7 @@ export function RewardsFlowBlock() {
               >
                 Available Rewards
               </Text>
-              <Skeleton loading={false}>
+              <Skeleton loading={isLoading}>
                 <Text
                   size='17'
                   weight='500'
@@ -42,7 +62,7 @@ export function RewardsFlowBlock() {
                     'text-color-6': !isConnected
                   })}
                 >
-                  {isConnected ? '0.0000' : '0.0000'} COMP
+                  {(isConnected ?? !!availableRewards) ? Format.token(availableRewards, 'compact') : '0.0000'} COMP
                 </Text>
               </Skeleton>
             </div>
@@ -54,7 +74,7 @@ export function RewardsFlowBlock() {
               >
                 Total to claim
               </Text>
-              <Skeleton loading={false}>
+              <Skeleton loading={isLoading}>
                 <Text
                   size='17'
                   weight='500'
@@ -62,16 +82,31 @@ export function RewardsFlowBlock() {
                     'text-color-6': !isConnected
                   })}
                 >
-                  {isConnected ? '0.0000' : '0.0000'} COMP
+                  {(isConnected ?? !!totalToClaim) ? Format.token(totalToClaim, 'compact') : '0.0000'} COMP
                 </Text>
               </Skeleton>
             </div>
             <Button
-              disabled={true}
+              disabled={isLoading}
               onClick={onClaimOpen}
               className='max-w-32.5 text-[11px] font-medium'
             >
-              Claim
+              <Skeleton
+                loading={isLoading}
+                className='w-full'
+              >
+                <Text
+                  tag='p'
+                  size='11'
+                  weight='500'
+                  align='center'
+                  className={cn('text-color-6', {
+                    'text-white': !isClaimButtonDisabled
+                  })}
+                >
+                  Claim
+                </Text>
+              </Skeleton>
             </Button>
           </div>
           <Divider orientation='vertical' />
@@ -84,7 +119,7 @@ export function RewardsFlowBlock() {
               Available Rewards
             </Text>
             <div className='flex flex-col gap-2'>
-              <Skeleton loading={false}>
+              <Skeleton loading={isLoading}>
                 <Text
                   size='17'
                   weight='500'
@@ -96,7 +131,7 @@ export function RewardsFlowBlock() {
                 </Text>
               </Skeleton>
               <Condition if={isConnected}>
-                <Skeleton loading={false}>
+                <Skeleton loading={isLoading}>
                   <Text
                     size='11'
                     className='text-color-24'
@@ -108,14 +143,29 @@ export function RewardsFlowBlock() {
             </div>
           </div>
           <Button
-            disabled={true}
+            disabled={isVestButtonDisabled}
             onClick={onVestingOpen}
             className='max-w-32.5 text-[11px] font-medium'
           >
-            Vest
+            <Skeleton
+              loading={isLoading}
+              className='w-full'
+            >
+              <Text
+                tag='p'
+                size='11'
+                weight='500'
+                align='center'
+                className={cn('text-color-6', {
+                  'text-white': !isVestButtonDisabled
+                })}
+              >
+                Vest
+              </Text>
+            </Skeleton>
           </Button>
         </div>
-        <Condition if={!isConnected}>
+        <Condition if={!isConnected && !rows.length}>
           <div className='flex p-10'>
             <div className='mx-auto flex w-auto flex-col items-center gap-5'>
               <div className='no-position-yet h-20 w-44' />
@@ -137,8 +187,8 @@ export function RewardsFlowBlock() {
             </div>
           </div>
         </Condition>
-        <Condition if={isConnected}>
-          <RewardsTable />
+        <Condition if={isConnected && !!rows.length}>
+          <RewardsTable rows={rows} />
         </Condition>
       </Card>
       <VestingModal

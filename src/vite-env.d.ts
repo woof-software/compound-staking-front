@@ -25,6 +25,8 @@ interface ImportMetaEnv {
   readonly VITE_LOCK_MANAGER_ADDRESS?: string;
 
   readonly VITE_SUBACCOUNT_MANAGER_ADDRESS?: string;
+
+  readonly VITE_VESTING_MANAGER_ADDRESS?: string;
 }
 
 interface ImportMeta {

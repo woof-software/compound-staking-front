@@ -14,7 +14,7 @@ export function useStakedBalance(address?: Address) {
     query: { enabled: !!address }
   });
 
-  const shema = z
+  const schema = z
     .object({
       principal: z.bigint(),
       stakeTimestamp: z.number().int().nonnegative(),
@@ -23,7 +23,7 @@ export function useStakedBalance(address?: Address) {
     .optional();
 
   return {
-    data: shema.parse(data),
+    data: schema.parse(data),
     ...query
   };
 }
