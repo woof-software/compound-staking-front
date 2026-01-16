@@ -2,7 +2,6 @@ import { useEffect, useMemo } from 'react';
 import { useConnection } from 'wagmi';
 
 import { ExternalLinkIcon } from '@/assets/svg';
-import { Condition } from '@/components/common/Condition';
 import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
@@ -49,8 +48,6 @@ export function DelegateFlowBlock() {
     refetch: refetchDelegate
   } = useSubAccount(subAccountAddress);
 
-  const hasOpenPosition = (stakedTokenBalance?.principal ?? 0n) > 0n || (lockedTokenBalance?.amount ?? 0n) > 0n;
-
   const executableAtSec = useMemo(() => {
     const executableAt = delegateData?.executableAt;
 
@@ -59,28 +56,36 @@ export function DelegateFlowBlock() {
     return Number(executableAt);
   }, [delegateData?.executableAt]);
 
+  const isLoading = isSubAccountLoading || isDelegateLoading || isDurationLoading;
+
+  const hasOpenPosition = (stakedTokenBalance?.principal ?? 0n) > 0n || (lockedTokenBalance?.amount ?? 0n) > 0n;
+
+  const hasActiveLock = (lockedTokenBalance?.amount ?? 0n) > 0n;
+
   const hasCooldownRequest = !!executableAtSec && !delegateData?.executed;
 
-  const isLoading = isSubAccountLoading || isDelegateLoading || isDurationLoading;
+  const canShowDelegation = isConnected && hasOpenPosition && !hasActiveLock;
 
   const isCooldownBlocked = isConnected && !isCooldownFinished;
 
-  const isDelegateButtonDisabled = !isConnected || isLoading || isCooldownBlocked || !hasOpenPosition;
+  const isDelegateButtonDisabled = !isConnected || isLoading || isCooldownBlocked || !hasOpenPosition || hasActiveLock;
 
-  const cooldownEndMs = !isConnected || isLoading || !hasCooldownRequest ? 0 : executableAtSec * 1000;
+  const cooldownEndMs = !canShowDelegation || !hasCooldownRequest ? 0 : executableAtSec * 1000;
 
-  const remainingSeconds = !isConnected || isLoading || !hasCooldownRequest ? 0 : getRemainingSeconds(executableAtSec);
+  const remainingSeconds = !canShowDelegation || !hasCooldownRequest ? 0 : getRemainingSeconds(executableAtSec);
 
-  const endDateLabel = !isConnected || isLoading || !hasCooldownRequest ? '-' : FormatTime.endDate(executableAtSec);
+  const endDateLabel = !canShowDelegation || !hasCooldownRequest ? '-' : FormatTime.endDate(executableAtSec);
 
   const delegate = useDelegateByAddress(delegateData?.delegatee);
+
+  const delegateLabel = !canShowDelegation ? '-' : delegate?.name || delegate?.address || '-';
 
   const onDelegateConfirmed = () => {
     refetchDelegate();
   };
 
   useEffect(() => {
-    if (!isConnected || isLoading || !hasCooldownRequest) {
+    if (!isConnected || isLoading || !hasCooldownRequest || hasActiveLock) {
       setCooldownFinished();
       return;
     }
@@ -90,7 +95,15 @@ export function DelegateFlowBlock() {
     } else {
       setCooldownFinished();
     }
-  }, [isConnected, isLoading, hasCooldownRequest, remainingSeconds, setCooldownFinished, resetCooldownFinished]);
+  }, [
+    isConnected,
+    isLoading,
+    hasCooldownRequest,
+    hasActiveLock,
+    remainingSeconds,
+    setCooldownFinished,
+    resetCooldownFinished
+  ]);
 
   useEffect(() => {
     if (!isConnected || !needDelegateRefresh) return;
@@ -101,7 +114,7 @@ export function DelegateFlowBlock() {
     resetDelegateRefresh();
   }, [needDelegateRefresh, isConnected]);
 
-  useExecuteAtTime(setCooldownFinished, cooldownEndMs);
+  useExecuteAtTime(setCooldownFinished, hasActiveLock ? 0 : cooldownEndMs);
 
   return (
     <Card
@@ -120,26 +133,33 @@ export function DelegateFlowBlock() {
               Name of Delegatee
             </Text>
             <Skeleton loading={isLoading}>
-              <a
-                className='flex cursor-pointer items-start gap-1'
-                target='_blank'
-                href={getExplorerAddressUrl(delegate?.address)}
-                onClick={(e) => e.stopPropagation()}
-              >
+              {canShowDelegation && delegate?.address ? (
+                <a
+                  className='flex cursor-pointer items-start gap-1'
+                  target='_blank'
+                  href={getExplorerAddressUrl(delegate.address)}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Text
+                    size='17'
+                    weight='500'
+                    lineHeight='17'
+                    className={cn('text-color-2 max-w-36 truncate')}
+                  >
+                    {delegate?.name || delegate.address}
+                  </Text>
+                  <ExternalLinkIcon className='text-color-24' />
+                </a>
+              ) : (
                 <Text
                   size='17'
                   weight='500'
                   lineHeight='17'
-                  className={cn('text-color-2 max-w-36 truncate', {
-                    'text-color-6': !isConnected || !hasOpenPosition
-                  })}
+                  className='text-color-6'
                 >
-                  {isConnected && hasOpenPosition ? delegate?.name || delegate?.address : '-'}
+                  {delegateLabel}
                 </Text>
-                <Condition if={isConnected && hasOpenPosition}>
-                  <ExternalLinkIcon className='text-color-24' />
-                </Condition>
-              </a>
+              )}
             </Skeleton>
           </div>
           <div className='flex flex-col gap-3'>
@@ -153,23 +173,17 @@ export function DelegateFlowBlock() {
             <Skeleton loading={isLoading}>
               <Duration
                 end={cooldownEndMs}
-                unsafeRound={(msLeft) => {
-                  return Math.max(Math.ceil(msLeft / 1000), 0);
-                }}
-                render={(seconds) => {
-                  const canShow = isConnected && hasOpenPosition && seconds !== undefined;
-
-                  return (
-                    <Text
-                      size='17'
-                      weight='500'
-                      lineHeight='17'
-                      className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected || !hasOpenPosition })}
-                    >
-                      {canShow ? FormatTime.cooldownFromSeconds(seconds) : '-'}
-                    </Text>
-                  );
-                }}
+                unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
+                render={(seconds) => (
+                  <Text
+                    size='17'
+                    weight='500'
+                    lineHeight='17'
+                    className={cn('text-color-2 tabular-nums', { 'text-color-6': !canShowDelegation })}
+                  >
+                    {canShowDelegation && seconds !== undefined ? FormatTime.cooldownFromSeconds(seconds) : '-'}
+                  </Text>
+                )}
               />
             </Skeleton>
           </div>
@@ -186,11 +200,9 @@ export function DelegateFlowBlock() {
                 size='17'
                 weight='500'
                 lineHeight='17'
-                className={cn('text-color-2', {
-                  'text-color-6': !isConnected || !hasOpenPosition
-                })}
+                className={cn('text-color-2', { 'text-color-6': !canShowDelegation })}
               >
-                {isConnected && hasOpenPosition ? endDateLabel : '-'}
+                {canShowDelegation ? endDateLabel : '-'}
               </Text>
             </Skeleton>
           </div>
@@ -209,9 +221,7 @@ export function DelegateFlowBlock() {
               size='11'
               weight='500'
               align='center'
-              className={cn('text-color-6', {
-                'text-white': !isDelegateButtonDisabled
-              })}
+              className={cn('text-color-6', { 'text-white': !isDelegateButtonDisabled })}
             >
               Delegate
             </Text>
