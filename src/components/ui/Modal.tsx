@@ -17,8 +17,13 @@ export function Modal(props: ModalProps) {
   const { open, title, children, onClose } = props;
 
   useEffect(() => {
-    if (open) document.body.classList.add('disable-scroll-vertical');
-    return () => document.body.classList.remove('disable-scroll-vertical');
+    if (open) {
+      document.body.classList.add('disable-scroll-vertical');
+    }
+
+    return () => {
+      document.body.classList.remove('disable-scroll-vertical');
+    };
   }, [open]);
 
   if (!open) return null;
