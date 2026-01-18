@@ -71,6 +71,7 @@ function buildEnvOrThrow() {
 
     VESTING_MANAGER_ADDRESS: requiredAddress('VITE_VESTING_MANAGER_ADDRESS'),
 
+    ANKR_RPC_KEY: requiredString('VITE_ANKR_RPC_KEY'),
     WALLET_CONNECT_PROJECT_ID: requiredString('VITE_WALLET_CONNECT_PROJECT_ID'),
     ETHERSCAN_URL: requiredString('VITE_ETHERSCAN_URL')
   };

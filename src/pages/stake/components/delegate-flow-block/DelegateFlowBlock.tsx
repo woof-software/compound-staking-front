@@ -19,7 +19,6 @@ import { cn } from '@/lib/utils/cn';
 import { FormatTime } from '@/lib/utils/format';
 import { getExplorerAddressUrl, getRemainingSeconds } from '@/lib/utils/helpers';
 import { DelegateModal } from '@/pages/stake/components/delegate-flow-block/DelegateModal';
-import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 
@@ -33,7 +32,6 @@ export function DelegateFlowBlock() {
   const { isEnabled: isCooldownFinished, enable: setCooldownFinished, disable: resetCooldownFinished } = useSwitch();
 
   const { data: stakedTokenBalance } = useStakedBalance(address);
-  const { data: lockedTokenBalance } = useLockedBalance(address);
 
   const { data: delegateDuration, isLoading: isDurationLoading } = useDelegateDuration();
 
@@ -49,7 +47,7 @@ export function DelegateFlowBlock() {
     refetch: refetchDelegate
   } = useSubAccount(subAccountAddress);
 
-  const hasOpenPosition = (stakedTokenBalance?.principal ?? 0n) > 0n || (lockedTokenBalance?.amount ?? 0n) > 0n;
+  const hasOpenPosition = (stakedTokenBalance?.principal ?? 0n) > 0n;
 
   const executableAtSec = useMemo(() => {
     const executableAt = delegateData?.executableAt;

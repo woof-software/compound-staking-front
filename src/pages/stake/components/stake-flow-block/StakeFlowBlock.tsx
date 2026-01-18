@@ -9,6 +9,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { useMultiplier } from '@/hooks/useMultiplier';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -35,6 +36,8 @@ export function StakeFlowBlock() {
 
   const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(address);
 
+  const { data: multiplier, refetch: refetchMultiplier } = useMultiplier(address);
+
   const { data: baseTokenPrice, isFetching: isBaseTokenPriceFetching } = useTokenPrice(
     ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
   );
@@ -53,20 +56,20 @@ export function StakeFlowBlock() {
 
   const stakedBalanceFormatted = formatUnits(stakedBalance?.principal ?? 0n, ENV.BASE_TOKEN_DECIMALS);
   const virtualBalanceFormatted = formatUnits(virtualBalance ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
+  const multiplierFormatted = formatUnits(multiplier ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
   const stakedBalancePriceFormatted = formatUnits(
     (stakedBalance?.principal ?? 0n) * (baseTokenPrice ?? 0n),
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
 
-  const multiplier = +(virtualBalanceFormatted || '1') / +stakedBalanceFormatted;
-
   const onStakeConfirmed = useCallback(() => {
     refetchStakedBalanceFormatted();
     refetchVirtualBalance();
+    refetchMultiplier();
 
     triggerDelegateRefresh();
-  }, [refetchStakedBalanceFormatted, refetchVirtualBalance, triggerDelegateRefresh]);
+  }, [refetchStakedBalanceFormatted, refetchVirtualBalance, refetchMultiplier, triggerDelegateRefresh]);
 
   return (
     <Card
@@ -144,7 +147,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? (multiplier ? `${Format.rate(multiplier)}x` : '1x') : '-'}
+              {isConnected ? (multiplier ? `${Format.rate(+multiplierFormatted)}x` : '1x') : '-'}
             </Text>
           </Skeleton>
         </div>

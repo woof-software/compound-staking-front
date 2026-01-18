@@ -4,13 +4,13 @@ import { Condition } from '@/components/common/Condition';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { Format, FormatUnits } from '@/lib/utils/format';
-import { useStatisticTotalStaked } from '@/pages/stake/hooks/useStatisticTotalStaked';
+import { useTotalStaked } from '@/pages/stake/hooks/useTotalStaked';
 
 import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
 export function TotalStaked() {
   const { isConnected } = useConnection();
-  const { totalStaked } = useStatisticTotalStaked();
+  const { data: totalStaked, isLoading } = useTotalStaked();
 
   const totalStakedFormatted = parseFloat(Format.token(Number(totalStaked), 'compact'));
   const unit = FormatUnits.parse(Number(totalStaked));
@@ -24,14 +24,14 @@ export function TotalStaked() {
       >
         Total staked
       </Text>
-      <Skeleton loading={false}>
+      <Skeleton loading={isLoading}>
         <div className='flex items-start gap-3'>
           <CompoundBlackCircle className='text-compound-icon-bg mt-1 size-10' />
           <Text
             size='40'
             weight='500'
           >
-            {isConnected ? totalStakedFormatted : '0.00'}
+            {isConnected && !isLoading ? totalStakedFormatted : '0.00'}
             <Condition if={isConnected}>
               <Text
                 tag='span'
