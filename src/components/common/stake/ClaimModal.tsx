@@ -100,7 +100,7 @@ export function ClaimModal(props: ClaimModalProps) {
 
   return (
     <Modal
-      title='Vesting'
+      title='Claim COMP'
       open={isOpen}
       onClose={onClose}
     >
@@ -121,7 +121,7 @@ export function ClaimModal(props: ClaimModalProps) {
                 weight='500'
                 lineHeight='20'
               >
-                {isConnected && !!totalToClaim ? Format.token(totalClaimFormatted, 'compact') : '0.0000'} COMP
+                {isConnected && !!totalToClaim ? `≈${Format.token(totalClaimFormatted, 'compact')}` : '0.0000'} COMP
               </Text>
             </Skeleton>
             <Skeleton loading={isLoading}>

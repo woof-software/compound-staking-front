@@ -12,10 +12,12 @@ import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
+import { useVestingPerUser } from '@/hooks/useVestingPerUser';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
-import { useVestingClaim } from '@/pages/stake/hooks/useVestingClaim';
+import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
+import { useVestRewards } from '@/pages/stake/hooks/useVestRewards';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export type VestingModalProps = {
@@ -33,10 +35,18 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
 
   const { data: availableRewards, isLoading: isAvailableRewardsLoading } = useAvailableRewards(address);
 
-  const { sendTransactionAsync: vestRequest, data: vestHash, isPending: isVestPending } = useVestingClaim();
+  const { data: maxVestingPositions } = useVestingPerUser();
 
-  const { isLoading: isVestingConfirming, isSuccess: isVestSuccess } = useWaitForTransactionReceipt({
-    hash: vestHash
+  const { data: vestingPositions, isLoading: isVestingPositionsLoading } = useVestingPosition(address);
+
+  const {
+    sendTransactionAsync: vestRewardsRequest,
+    data: vestRewardsHash,
+    isPending: isVestRewardsPending
+  } = useVestRewards();
+
+  const { isLoading: isVestRewardsConfirming, isSuccess: isVestRewardsSuccess } = useWaitForTransactionReceipt({
+    hash: vestRewardsHash
   });
 
   const baseTokenPriceValue = baseTokenPrice ?? 0n;
@@ -47,24 +57,27 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
 
   const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
-  const isVestingLoading = isVestPending || isVestingConfirming;
+  const hasPosition = !!vestingPositions?.length;
+  const hasMaxPosition = hasPosition ? vestingPositions?.length === maxVestingPositions : false;
+
+  const isVestingLoading = isVestingPositionsLoading || isVestRewardsPending || isVestRewardsConfirming;
   const isLoading = isConnected ? isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
 
-  const isClaimButtonDisabled = isLoading || isVestPending;
+  const isVestButtonDisabled = isLoading || isVestingLoading || hasMaxPosition;
 
   const onConfirm = async () => {
     if (!address) return;
 
-    await vestRequest(address);
+    await vestRewardsRequest();
   };
 
   useEffect(() => {
-    if (!isVestSuccess) return;
+    if (!isVestRewardsSuccess) return;
 
     setIsPendingToggle(false);
     onClose();
     onVestingConfirmed();
-  }, [isVestSuccess]);
+  }, [isVestRewardsSuccess]);
 
   return (
     <Modal
@@ -108,21 +121,35 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
             </Condition>
           </div>
         </div>
-        <div className='bg-color-26 flex w-full items-center gap-2.5 rounded-lg px-4 py-5'>
-          <InfoIcon className='text-color-7 size-4' />
-          <Text
-            size='11'
-            lineHeight='16'
-            className='text-color-7'
-          >
-            The whole amount will be added to your Claim balance
-          </Text>
-        </div>
+        <Condition if={hasMaxPosition}>
+          <div className='bg-color-21 flex w-full items-center gap-2.5 rounded-lg px-4 py-5'>
+            <InfoIcon className='text-color-22 size-4 shrink-0' />
+            <Text
+              size='11'
+              lineHeight='16'
+              className='text-color-22'
+            >
+              {`You have reached the maximum limit (${maxVestingPositions}) for Vesting entries. You need to close completed entries or wait until they are finished.`}
+            </Text>
+          </div>
+        </Condition>
+        <Condition if={!hasMaxPosition}>
+          <div className='bg-color-26 flex w-full items-center gap-2.5 rounded-lg px-4 py-5'>
+            <InfoIcon className='text-color-7 size-4 shrink-0' />
+            <Text
+              size='11'
+              lineHeight='16'
+              className='text-color-7'
+            >
+              The whole amount will be added to your Claim balance
+            </Text>
+          </div>
+        </Condition>
         <Button
           className={cn('h-14 flex-col', {
             'bg-color-7': isVestingLoading
           })}
-          disabled={isVestingLoading}
+          disabled={isVestButtonDisabled}
           onClick={onConfirm}
         >
           <Text
@@ -130,7 +157,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
             weight='500'
             lineHeight='18'
             className={cn('text-white', {
-              'text-color-6': isClaimButtonDisabled,
+              'text-color-6': isVestButtonDisabled,
               'text-white': isVestingLoading
             })}
           >

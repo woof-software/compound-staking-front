@@ -2,15 +2,18 @@ import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
+import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { useUnstakeLockDuration } from '@/hooks/useLockDuration';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
+import { useVestingPerUser } from '@/hooks/useVestingPerUser';
 import { noop } from '@/lib/utils/common';
 import { Format, FormatTime } from '@/lib/utils/format';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
+import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 
 export type UnstakeModalProps = {
   isLoading?: boolean;
@@ -28,10 +31,19 @@ export function UnstakeModal(props: UnstakeModalProps) {
 
   const { data: stakedTokenPriceUsdData } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
+  const { data: maxVestingPositions } = useVestingPerUser();
+
+  const { data: vestingPositions, isLoading: isVestingPositionsLoading } = useVestingPosition(address);
+
   const baseTokenPriceFormatted = formatUnits(
     (stakedTokenBalance?.principal ?? 0n) * (stakedTokenPriceUsdData ?? 0n),
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
+
+  const hasPosition = !!vestingPositions?.length;
+  const hasMaxPosition = hasPosition ? vestingPositions?.length === maxVestingPositions : false;
+
+  const isButtonDisabled = isLoading || isVestingPositionsLoading || hasMaxPosition;
 
   return (
     <div className='mt-8 flex w-full flex-col gap-8'>
@@ -75,33 +87,48 @@ export function UnstakeModal(props: UnstakeModalProps) {
           {FormatTime.cooldownFromSeconds(lockDuration ?? 0)}
         </Text>
       </div>
-      <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
-        <InfoIcon className='text-color-22' />
-        <div>
+      <Condition if={hasMaxPosition}>
+        <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
+          <InfoIcon className='text-color-22 size-4 shrink-0' />
           <Text
             size='11'
             lineHeight='16'
             className='text-color-22'
           >
-            All the COMP will be unstaked.
-          </Text>
-          <Text
-            size='11'
-            lineHeight='16'
-            className='text-color-22'
-          >
-            All the rewards get vested.
-          </Text>
-          <Text
-            size='11'
-            lineHeight='16'
-            className='text-color-22'
-          >
-            The X.XX% rewards will be gone.
+            {`You have reached the maximum limit (${maxVestingPositions}) for Vesting entries. You need to close completed entries or wait until they are finished.`}
           </Text>
         </div>
-      </div>
+      </Condition>
+      <Condition if={!hasMaxPosition}>
+        <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
+          <InfoIcon className='text-color-22 size-4 shrink-0' />
+          <div>
+            <Text
+              size='11'
+              lineHeight='16'
+              className='text-color-22'
+            >
+              All the COMP will be unstaked.
+            </Text>
+            <Text
+              size='11'
+              lineHeight='16'
+              className='text-color-22'
+            >
+              All the rewards get vested.
+            </Text>
+            <Text
+              size='11'
+              lineHeight='16'
+              className='text-color-22'
+            >
+              The X.XX% rewards will be gone.
+            </Text>
+          </div>
+        </div>
+      </Condition>
       <Button
+        disabled={isButtonDisabled}
         className='h-14 text-[13px] font-medium'
         onClick={onClick}
       >

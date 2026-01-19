@@ -9,7 +9,7 @@ export function useStakedBalance(address?: Address) {
   const { data, ...query } = useReadContract({
     address: ENV.STAKING_VAULT_ADDRESS,
     abi: StakingVaultAbi,
-    functionName: 'getUserStake',
+    functionName: 'stakeInfoOf',
     args: address ? [address] : undefined,
     query: { enabled: !!address }
   });

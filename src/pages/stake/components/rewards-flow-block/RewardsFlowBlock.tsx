@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
@@ -23,9 +23,11 @@ import { useRewardStore } from '@/stores/useRewardStore';
 import { useToClaimLiveStore } from '@/stores/useToClaimStore';
 
 export function RewardsFlowBlock() {
+  const [claimAmount, setClaimAmount] = useState<bigint>(0n);
+
   const { isConnected, address } = useConnection();
 
-  const { needRewardRefresh, resetRewardRefresh } = useRewardStore();
+  const { needRefresh: needRewardRefresh, resetRefresh: resetRewardRefresh } = useRewardStore();
 
   const { isEnabled: isVestingOpen, enable: onVestingOpen, disable: onVestingClose } = useSwitch();
   const { isEnabled: isClaimOpen, enable: onClaimOpen, disable: onClaimClose } = useSwitch();
@@ -54,6 +56,8 @@ export function RewardsFlowBlock() {
 
   const rows = useMemo(() => rewardsDto(vestingPositions), [vestingPositions]);
 
+  console.log('rows=>', rows);
+
   const totalVesting = useMemo(() => rows.reduce((acc, r) => acc + r.vestingAmount, 0), [rows]);
 
   const totalToClaim = useToClaimLiveStore((s) => s.total);
@@ -67,8 +71,8 @@ export function RewardsFlowBlock() {
   const hasAvailableRewards = (availableRewards ?? 0n) > 0n;
   const hasPosition = !!rows.length;
 
-  const isClaimButtonDisabled = !isConnected || isLoading || !hasPosition;
-  const isVestButtonDisabled = !isConnected || isLoading || !hasAvailableRewards;
+  const isClaimButtonDisabled = !isConnected || isLoading || !hasPosition || isClaimOpen;
+  const isVestButtonDisabled = !isConnected || isLoading || !hasAvailableRewards || isVestingOpen;
 
   const onVestingConfirmed = () => {
     refetchAvailableRewards();
@@ -77,6 +81,16 @@ export function RewardsFlowBlock() {
 
   const onClaimConfirmed = () => {
     refetchVestingPositions();
+  };
+
+  const onClaimModalOpen = () => {
+    setClaimAmount(totalToClaim);
+    onClaimOpen();
+  };
+
+  const onClaimModalClose = () => {
+    setClaimAmount(0n);
+    onClaimClose();
   };
 
   useEffect(() => {
@@ -110,7 +124,7 @@ export function RewardsFlowBlock() {
                 <Text
                   size='17'
                   weight='500'
-                  className={cn('text-color-2', {
+                  className={cn('text-color-2 tabular-nums', {
                     'text-color-6': !isConnected
                   })}
                 >
@@ -130,7 +144,7 @@ export function RewardsFlowBlock() {
                 <Text
                   size='17'
                   weight='500'
-                  className={cn('text-color-2', {
+                  className={cn('text-color-2 tabular-nums', {
                     'text-color-6': !isConnected
                   })}
                 >
@@ -140,7 +154,7 @@ export function RewardsFlowBlock() {
             </div>
             <Button
               disabled={isClaimButtonDisabled}
-              onClick={onClaimOpen}
+              onClick={onClaimModalOpen}
               className='max-w-32.5 text-[11px] font-medium'
             >
               <Skeleton
@@ -175,7 +189,7 @@ export function RewardsFlowBlock() {
                 <Text
                   size='17'
                   weight='500'
-                  className={cn('text-color-2', {
+                  className={cn('text-color-2 tabular-nums', {
                     'text-color-6': !isConnected
                   })}
                 >
@@ -184,11 +198,11 @@ export function RewardsFlowBlock() {
                     : '0.0000'}{' '}
                 </Text>
               </Skeleton>
-              <Condition if={isConnected}>
+              <Condition if={isConnected && !!availableRewards}>
                 <Skeleton loading={isLoading}>
                   <Text
                     size='11'
-                    className='text-color-24'
+                    className='text-color-24 tabular-nums'
                   >
                     {Format.price(availableRewardsPriceFormatted, 'standard')}
                   </Text>
@@ -251,9 +265,9 @@ export function RewardsFlowBlock() {
         onVestingConfirmed={onVestingConfirmed}
       />
       <ClaimModal
-        totalToClaim={totalToClaim}
+        totalToClaim={claimAmount}
         isOpen={isClaimOpen}
-        onClose={onClaimClose}
+        onClose={onClaimModalClose}
         onClaimConfirmed={onClaimConfirmed}
       />
     </>

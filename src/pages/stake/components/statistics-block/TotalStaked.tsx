@@ -1,21 +1,35 @@
+import { useEffect } from 'react';
+import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { ENV } from '@/consts/env';
 import { Format, FormatUnits } from '@/lib/utils/format';
 import { useTotalStaked } from '@/pages/stake/hooks/useTotalStaked';
+import { useStatisticStore } from '@/stores/useStatisticStore';
 
 import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
 export function TotalStaked() {
   const { isConnected } = useConnection();
-  const { data: totalStaked, isLoading: isTotalStakedLoading } = useTotalStaked();
+
+  const { data: totalStaked, isLoading: isTotalStakedLoading, refetch: refetchTotalStaked } = useTotalStaked();
+
+  const { needRefresh: needTotalStakedRefresh } = useStatisticStore();
+
+  const totalStakedFormatted = formatUnits(totalStaked ?? 0n, ENV.BASE_TOKEN_DECIMALS);
+
+  const unit = FormatUnits.parse(Number(totalStakedFormatted));
 
   const isLoading = isConnected ? isTotalStakedLoading : false;
 
-  const totalStakedFormatted = parseFloat(Format.token(Number(totalStaked), 'compact'));
-  const unit = FormatUnits.parse(Number(totalStaked));
+  useEffect(() => {
+    if (!isConnected || !needTotalStakedRefresh) return;
+
+    refetchTotalStaked();
+  }, [needTotalStakedRefresh, isConnected]);
 
   return (
     <div className='flex flex-col items-start gap-1.5'>
@@ -33,8 +47,10 @@ export function TotalStaked() {
             size='40'
             weight='500'
           >
-            {isConnected && !isLoading ? totalStakedFormatted : '0.00'}
-            <Condition if={isConnected}>
+            {isConnected && !isLoading
+              ? Format.token(totalStakedFormatted, 'compact', undefined, 2).slice(0, -1)
+              : '0.00'}
+            <Condition if={isConnected && !!unit}>
               <Text
                 tag='span'
                 size='40'

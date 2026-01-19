@@ -52,6 +52,7 @@ export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
             <Text
               size='15'
               lineHeight='20'
+              className='tabular-nums'
             >
               {Format.token(vestingAmount, 'compact')} COMP
             </Text>
@@ -60,7 +61,7 @@ export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
             <Text
               size='11'
               lineHeight='16'
-              className='text-color-24'
+              className='text-color-24 tabular-nums'
             >
               {Format.price(vestingAmountPriceFormatted, 'standard')}
             </Text>
@@ -95,6 +96,7 @@ export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
           <Text
             size='15'
             lineHeight='20'
+            className='tabular-nums'
           >
             {Format.token(claimedAmount, 'compact')} COMP
           </Text>

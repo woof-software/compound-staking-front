@@ -22,14 +22,16 @@ import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
+import { useStatisticStore } from '@/stores/useStatisticStore';
 
 export function StakeFlowBlock() {
   const { isConnected, address } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { triggerDelegateRefresh } = useDelegateStore();
-  const { triggerRewardRefresh } = useRewardStore();
+  const { triggerRefresh: triggerStatisticRefresh } = useStatisticStore();
+  const { triggerRefresh: triggerDelegateRefresh } = useDelegateStore();
+  const { triggerRefresh: triggerRewardRefresh } = useRewardStore();
 
   const {
     data: stakedBalance,
@@ -77,6 +79,7 @@ export function StakeFlowBlock() {
     refetchMultiplier();
     refetchAvailableRewards();
 
+    triggerStatisticRefresh();
     triggerDelegateRefresh();
     triggerRewardRefresh();
   }, [
@@ -84,9 +87,12 @@ export function StakeFlowBlock() {
     refetchVirtualBalance,
     refetchMultiplier,
     refetchAvailableRewards,
+    triggerStatisticRefresh,
     triggerDelegateRefresh,
     triggerRewardRefresh
   ]);
+
+  console.log('stakedBalanceFormatted=>', stakedBalanceFormatted);
 
   return (
     <Card
@@ -108,7 +114,7 @@ export function StakeFlowBlock() {
               <Text
                 size='17'
                 weight='500'
-                className={cn('text-color-2', {
+                className={cn('text-color-2 tabular-nums', {
                   'text-color-6': !isConnected
                 })}
               >
@@ -120,7 +126,7 @@ export function StakeFlowBlock() {
               <Skeleton loading={isLoading}>
                 <Text
                   size='11'
-                  className='text-color-24'
+                  className='text-color-24 tabular-nums'
                 >
                   {Format.price(stakedBalancePriceFormatted, 'standard')}
                 </Text>
@@ -140,7 +146,7 @@ export function StakeFlowBlock() {
             <Text
               size='17'
               weight='500'
-              className={cn('text-color-2', {
+              className={cn('text-color-2 tabular-nums', {
                 'text-color-6': !isConnected
               })}
             >
@@ -160,7 +166,7 @@ export function StakeFlowBlock() {
             <Text
               size='17'
               weight='500'
-              className={cn('text-color-2', {
+              className={cn('text-color-2 tabular-nums', {
                 'text-color-6': !isConnected
               })}
             >
@@ -181,19 +187,18 @@ export function StakeFlowBlock() {
               <Text
                 size='17'
                 weight='500'
-                className={cn('text-color-2', {
+                className={cn('text-color-2 tabular-nums', {
                   'text-color-6': !isConnected
                 })}
               >
-                {isConnected && !!availableRewards ? Format.token(availableRewardsFormatted, 'compact') : '0.0000'}{' '}
-                stCOMP
+                {isConnected && !!availableRewards ? Format.token(availableRewardsFormatted, 'compact') : '0.0000'} COMP
               </Text>
             </Skeleton>
             <Condition if={isConnected && !!availableRewards}>
               <Skeleton loading={isLoading}>
                 <Text
                   size='11'
-                  className='text-color-24'
+                  className='text-color-24 tabular-nums'
                 >
                   {Format.price(availableRewardsPriceFormatted, 'standard')}
                 </Text>
@@ -213,7 +218,7 @@ export function StakeFlowBlock() {
             <Text
               size='17'
               weight='500'
-              className={cn('text-color-2', {
+              className={cn('text-color-2 tabular-nums', {
                 'text-color-6': !isConnected
               })}
             >
