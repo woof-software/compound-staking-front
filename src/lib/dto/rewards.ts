@@ -12,7 +12,7 @@ export type Reward = {
   startTime: number;
 };
 
-export type RewardRowProps = {
+export type RewardDtoRet = {
   vestingAmount: number;
   toClaim: number;
   startDate: number;
@@ -23,7 +23,7 @@ export type RewardRowProps = {
   percents: number;
 };
 
-export function rewardDto(reward: Reward): RewardRowProps {
+export function rewardDto(reward: Reward): RewardDtoRet {
   const now = dayjs().unix();
 
   const vestingStart = normalizeUnixSeconds(reward.startTime ?? 0);

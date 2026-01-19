@@ -29,12 +29,12 @@ export function Input(props: InputProps) {
   return (
     <div
       className={cn(
-        'w-full flex items-center gap-5 justify-between rounded-lg py-2.5 pr-2.5 pl-5 bg-color-10 border border-solid h-13 border-color-8 text-[13px] font-medium leading-4.5',
+        'bg-color-10 border-color-8 flex h-13 w-full items-center justify-between gap-5 rounded-lg border border-solid py-2.5 pr-2.5 pl-5 text-[13px] leading-4.5 font-medium',
         className
       )}
     >
       <input
-        className='focus-visible:outline-none w-full focus:outline-none focus-visible:border-none focus:border-none'
+        className='placeholder:text-color-6 w-full focus:border-none focus:outline-none focus-visible:border-none focus-visible:outline-none'
         placeholder='0'
         value={value}
         onChange={_onChange}

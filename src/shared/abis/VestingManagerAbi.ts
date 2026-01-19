@@ -17,5 +17,12 @@ export const VestingManagerAbi = [
     ],
     stateMutability: 'view',
     type: 'function'
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'recipient', type: 'address' }],
+    name: 'claim',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
   }
 ];
