@@ -64,7 +64,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
           </Text>
         </div>
         <Condition if={!isPending}>
-          <div className='border-color-8 shadow-25 bg-color-4 rounded-64 relative -top-[0.5px] -right-[0.25px] h-11 border-[0.25px] px-5 py-[13.5px] hover:brightness-90'>
+          <div className='border-color-8 shadow-25 bg-color-4 rounded-64 relative top-[-1.5px] right-[-0.5px] h-11 border-[0.25px] px-5 py-[13.5px] hover:brightness-90'>
             <Text
               size='11'
               weight='500'
