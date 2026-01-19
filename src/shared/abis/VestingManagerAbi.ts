@@ -1,5 +1,12 @@
 export const VestingManagerAbi = [
   {
+    inputs: [],
+    name: 'MAX_VESTINGS_PER_USER',
+    outputs: [{ internalType: 'uint16', name: '', type: 'uint16' }],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
     name: 'getActiveVestings',
     outputs: [

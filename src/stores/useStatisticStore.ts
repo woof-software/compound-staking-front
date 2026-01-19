@@ -6,7 +6,7 @@ type State = {
   resetRefresh: () => void;
 };
 
-export const useRewardStore = create<State>((set) => ({
+export const useStatisticStore = create<State>((set) => ({
   needRefresh: false,
   triggerRefresh: () => set({ needRefresh: true }),
   resetRefresh: () => set({ needRefresh: false })

@@ -15,6 +15,7 @@ export type Reward = {
 export type RewardDtoRet = {
   vestingAmount: number;
   toClaim: number;
+  remaining: number;
   startDate: number;
   endDate: number;
   claimedAmount: number;
@@ -32,29 +33,31 @@ export function rewardDto(reward: Reward): RewardDtoRet {
 
   const elapsedSec = totalSec > 0 ? (clamp(now - vestingStart, 0, totalSec) as number) : 0;
 
-  const vestedSoFar = totalSec > 0 ? (reward.amount * BigInt(elapsedSec)) / BigInt(totalSec) : 0n;
-
+  const amount = reward.amount ?? 0n;
   const claimed = reward.claimedAmount ?? 0n;
 
-  const claimable = vestedSoFar > claimed ? vestedSoFar - claimed : 0n;
+  const vestedSoFar = totalSec > 0 ? (amount * BigInt(elapsedSec)) / BigInt(totalSec) : 0n;
+
+  const claimableNow = vestedSoFar > claimed ? vestedSoFar - claimed : 0n;
+  const remainingTotal = amount > claimed ? amount - claimed : 0n;
 
   const percents = totalSec > 0 ? Math.round((elapsedSec / totalSec) * 100) : 0;
 
-  const vestingAmount = Number(formatUnits(reward.amount, ENV.BASE_TOKEN_DECIMALS));
+  const vestingAmount = Number(formatUnits(amount, ENV.BASE_TOKEN_DECIMALS));
   const claimedAmount = Number(formatUnits(claimed, ENV.BASE_TOKEN_DECIMALS));
-  const toClaim = Number(formatUnits(claimable, ENV.BASE_TOKEN_DECIMALS));
+  const toClaim = Number(formatUnits(claimableNow, ENV.BASE_TOKEN_DECIMALS));
+  const remaining = Number(formatUnits(remainingTotal, ENV.BASE_TOKEN_DECIMALS));
 
   return {
     vestingAmount,
     toClaim,
-    claimedAmount,
+    remaining,
 
+    claimedAmount,
     startDate: vestingStart,
     endDate: vestingEnd,
-
     vestingStartDate: vestingStart,
     vestingEndDate: vestingEnd,
-
     percents
   };
 }

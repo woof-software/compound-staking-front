@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
 type State = {
-  needDelegateRefresh: boolean;
-  triggerDelegateRefresh: () => void;
-  resetDelegateRefresh: () => void;
+  needRefresh: boolean;
+  triggerRefresh: () => void;
+  resetRefresh: () => void;
 };
 
 export const useDelegateStore = create<State>((set) => ({
-  needDelegateRefresh: false,
-  triggerDelegateRefresh: () => set({ needDelegateRefresh: true }),
-  resetDelegateRefresh: () => set({ needDelegateRefresh: false })
+  needRefresh: false,
+  triggerRefresh: () => set({ needRefresh: true }),
+  resetRefresh: () => set({ needRefresh: false })
 }));

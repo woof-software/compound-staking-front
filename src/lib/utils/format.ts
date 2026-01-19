@@ -39,7 +39,7 @@ export namespace Format {
    * e.g., token(12345, tokenSymbol: 'ETH', view: 'compact' ) -> '12.35K ETH'
    * e.g., token(123.45678, tokenSymbol: 'ETH', view: 'full') -> '123.4568 ETH'
    */
-  export function token(value: number | string, view?: FormatView, tokenSymbol?: string) {
+  export function token(value: number | string, view?: FormatView, tokenSymbol?: string, fractionDigits = 4) {
     let numberValue = Number(value);
     const options: Intl.NumberFormatOptions = {};
 
@@ -48,8 +48,8 @@ export namespace Format {
     }
 
     options.notation = view;
-    options.minimumFractionDigits = 4;
-    options.maximumFractionDigits = 4;
+    options.minimumFractionDigits = fractionDigits;
+    options.maximumFractionDigits = fractionDigits;
     options.style = 'decimal';
 
     const formattedNumber = new Intl.NumberFormat(LOCALE, options).format(numberValue);

@@ -13,10 +13,8 @@ export type RewardToClaimProps = {
   rowKey: string;
   isLoading: boolean;
   baseTokenPriceValue: bigint;
-
   vesting: bigint;
   claimed: bigint;
-
   vestingStartDate: number;
   vestingEndDate: number;
 };
@@ -51,8 +49,7 @@ export const RewardToClaim = memo(function RewardToClaim(props: RewardToClaimPro
 
     const toClaim = vested > claimed ? vested - claimed : 0n;
 
-    const toClaimFormatted = formatUnits(vested, ENV.STAKED_TOKEN_DECIMALS);
-
+    const toClaimFormatted = formatUnits(toClaim, ENV.STAKED_TOKEN_DECIMALS);
     const toClaimPriceFormatted = formatUnits(
       toClaim * baseTokenPriceValue,
       ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
@@ -63,11 +60,9 @@ export const RewardToClaim = memo(function RewardToClaim(props: RewardToClaimPro
 
   useEffect(() => {
     setRow(rowKey, toClaim);
-  }, [rowKey, toClaim]);
 
-  useEffect(() => {
     return () => removeRow(rowKey);
-  }, [rowKey]);
+  }, [rowKey, toClaim]);
 
   return (
     <div>
@@ -75,6 +70,7 @@ export const RewardToClaim = memo(function RewardToClaim(props: RewardToClaimPro
         <Text
           size='15'
           lineHeight='20'
+          className='tabular-nums'
         >
           {Format.token(toClaimFormatted, 'compact')} COMP
         </Text>
@@ -83,7 +79,7 @@ export const RewardToClaim = memo(function RewardToClaim(props: RewardToClaimPro
         <Text
           size='11'
           lineHeight='16'
-          className='text-color-24'
+          className='text-color-24 tabular-nums'
         >
           {Format.price(toClaimPriceFormatted, 'standard')}
         </Text>

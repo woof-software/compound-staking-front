@@ -1,7 +1,7 @@
 export const StakingVaultAbi = [
   {
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
-    name: 'getUserStake',
+    name: 'stakeInfoOf',
     outputs: [
       {
         components: [
@@ -55,5 +55,6 @@ export const StakingVaultAbi = [
     stateMutability: 'nonpayable',
     type: 'function'
   },
-  { inputs: [], name: 'unstake', outputs: [], stateMutability: 'nonpayable', type: 'function' }
+  { inputs: [], name: 'unstake', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+  { inputs: [], name: 'vestRewards', outputs: [], stateMutability: 'nonpayable', type: 'function' }
 ];
