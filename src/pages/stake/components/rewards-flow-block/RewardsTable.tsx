@@ -3,18 +3,20 @@ import { useMemo, useState } from 'react';
 import { SortArrowIcon } from '@/assets/svg';
 import { RewardRow } from '@/components/common/stake/RewardRow';
 import { Text } from '@/components/ui/Text';
-import type { RewardRowProps } from '@/lib/dto/rewards';
+import { ENV } from '@/consts/env';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
+import type { RewardDtoRet } from '@/lib/dto/rewards';
 import { cn } from '@/lib/utils/cn';
 
-type SortKey = keyof RewardRowProps;
+type SortKey = keyof RewardDtoRet;
 
 export type Column<Row> = {
   accessorKey: keyof Row;
   header: string;
-  sort?: (a: RewardRowProps, b: RewardRowProps, direction: 'asc' | 'desc') => number;
+  sort?: (a: RewardDtoRet, b: RewardDtoRet, direction: 'asc' | 'desc') => number;
 };
 
-const columns: Column<RewardRowProps>[] = [
+const columns: Column<RewardDtoRet>[] = [
   {
     accessorKey: 'vestingAmount',
     header: 'Vesting Amount',
@@ -44,11 +46,17 @@ const columns: Column<RewardRowProps>[] = [
   }
 ];
 
-export function RewardsTable(props: { rows: RewardRowProps[] }) {
+export function RewardsTable(props: { rows: RewardDtoRet[] }) {
   const { rows } = props;
 
   const [sortBy, setSortBy] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
+
+  const baseTokenPriceValue = baseTokenPrice ?? 0n;
+
+  const isRowLoading = isBaseTokenPriceLoading;
 
   const sortedData = useMemo(() => {
     if (!sortBy) return rows;
@@ -108,9 +116,11 @@ export function RewardsTable(props: { rows: RewardRowProps[] }) {
         })}
       </div>
       <div className='m-2'>
-        {sortedData.map((row, index) => (
+        {sortedData.map((row) => (
           <RewardRow
-            key={`${row.startDate}-${row.endDate}-${index}`}
+            key={`${row.vestingStartDate}-${row.vestingEndDate}`}
+            baseTokenPriceValue={baseTokenPriceValue}
+            isLoading={isRowLoading}
             {...row}
           />
         ))}

@@ -10,7 +10,9 @@ import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
 export function TotalStaked() {
   const { isConnected } = useConnection();
-  const { data: totalStaked, isLoading } = useTotalStaked();
+  const { data: totalStaked, isLoading: isTotalStakedLoading } = useTotalStaked();
+
+  const isLoading = isConnected ? isTotalStakedLoading : false;
 
   const totalStakedFormatted = parseFloat(Format.token(Number(totalStaked), 'compact'));
   const unit = FormatUnits.parse(Number(totalStaked));

@@ -26,6 +26,7 @@ import { useStakedVirtualBalance } from '@/pages/stake/hooks/useStakedVirtualBal
 import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
 import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
 import { useDelegateStore } from '@/stores/useDelegateStore';
+import { useRewardStore } from '@/stores/useRewardStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function UnstakeFlowBlock() {
@@ -39,6 +40,7 @@ export function UnstakeFlowBlock() {
 
   const { setIsPendingToggle } = useWalletStore();
   const { triggerDelegateRefresh } = useDelegateStore();
+  const { triggerRewardRefresh } = useRewardStore();
 
   const { isConnected, address } = useConnection();
 
@@ -160,6 +162,7 @@ export function UnstakeFlowBlock() {
       refetchLockedTokenBalance();
 
       triggerDelegateRefresh();
+      triggerRewardRefresh();
     }
 
     if (isUnstakeRequestSuccess) {
