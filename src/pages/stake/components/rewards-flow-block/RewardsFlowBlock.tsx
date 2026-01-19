@@ -56,6 +56,8 @@ export function RewardsFlowBlock() {
 
   const rows = useMemo(() => rewardsDto(vestingPositions), [vestingPositions]);
 
+  console.log('rows=>', rows);
+
   const totalVesting = useMemo(() => rows.reduce((acc, r) => acc + r.vestingAmount, 0), [rows]);
 
   const totalToClaim = useToClaimLiveStore((s) => s.total);
