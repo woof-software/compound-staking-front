@@ -42,7 +42,6 @@ export function Modal(props: ModalProps) {
             <Condition if={title}>
               <Text
                 size='17'
-                weight='500'
                 lineHeight='20'
                 align='center'
                 className='w-full'

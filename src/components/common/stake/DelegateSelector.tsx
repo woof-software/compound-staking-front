@@ -61,7 +61,6 @@ export function DelegateSelector(props: DelegateSelectorProps) {
         {!selectedAddressDelegate ? (
           <Text
             size='13'
-            weight='500'
             lineHeight='16'
             className='text-color-6'
           >
@@ -109,7 +108,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             <Input
               autoFocus
               className={cn('min-h-13', {
-                'border-color-22': !filteredDelegates.length && !!searchValue.length
+                'border-color-29': !filteredDelegates.length && !!searchValue.length
               })}
               placeholder='Delegatee name or address'
               value={searchValue}
