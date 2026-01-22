@@ -11,10 +11,10 @@ export function useVestingPerUser() {
     functionName: 'MAX_VESTINGS_PER_USER'
   });
 
-  const shema = z.number().int().nonnegative().optional();
+  const schema = z.number().int().nonnegative().optional();
 
   return {
-    data: shema.parse(data),
+    data: schema.parse(data),
     ...query
   };
 }

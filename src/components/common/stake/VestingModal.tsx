@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
@@ -71,12 +71,16 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
     await vestRewardsRequest();
   };
 
-  useEffect(() => {
-    if (!isVestRewardsSuccess) return;
-
+  const onVestRewardsSuccess = useEffectEvent(() => {
     setIsPendingToggle(false);
     onClose();
     onVestingConfirmed();
+  });
+
+  useEffect(() => {
+    if (!isVestRewardsSuccess) return;
+
+    onVestRewardsSuccess();
   }, [isVestRewardsSuccess]);
 
   return (

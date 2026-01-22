@@ -42,6 +42,8 @@ export function DelegateFlowBlock() {
     refetch: refetchSubAccountAddress
   } = useDelegateSubAccount(address);
 
+  console.log('subAccountAddress=>', subAccountAddress);
+
   const {
     data: delegateData,
     isLoading: isDelegateLoading,

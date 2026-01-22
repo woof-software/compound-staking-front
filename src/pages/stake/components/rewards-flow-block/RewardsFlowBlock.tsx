@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { formatUnits } from 'viem';
+import { formatUnits } from 'viem'; // parseUnits понадобится ниже (если захочешь bigint обратно)
 import { useConnection } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
@@ -14,7 +14,7 @@ import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
-import { rewardsDto } from '@/lib/dto/rewards';
+import { type RewardNormalizeRet, rewardsNormalize } from '@/lib/dto/rewards';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { RewardsTable } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
@@ -26,7 +26,6 @@ export function RewardsFlowBlock() {
   const [claimAmount, setClaimAmount] = useState<bigint>(0n);
 
   const { isConnected, address } = useConnection();
-
   const { needRefresh: needRewardRefresh, resetRefresh: resetRewardRefresh } = useRewardStore();
 
   const { isEnabled: isVestingOpen, enable: onVestingOpen, disable: onVestingClose } = useSwitch();
@@ -46,30 +45,25 @@ export function RewardsFlowBlock() {
     isLoading: isVestingLoading
   } = useVestingPosition(address);
 
-  const baseTokenPriceValue = baseTokenPrice ?? 0n;
+  const rows: RewardNormalizeRet[] = useMemo(() => rewardsNormalize(vestingPositions), [vestingPositions]);
+
   const availableRewardsPriceFormatted = formatUnits(
-    (availableRewards ?? 0n) * baseTokenPriceValue,
+    (availableRewards ?? 0n) * (baseTokenPrice ?? 0n),
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
 
   const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
-  const rows = useMemo(() => rewardsDto(vestingPositions), [vestingPositions]);
+  const totalVesting = useMemo(() => rows.reduce((acc, r) => acc + (r.vestingAmount || 0), 0), [rows]);
 
-  console.log('rows=>', rows);
+  const totalToClaimRaw = useToClaimLiveStore((s) => s.total);
 
-  const totalVesting = useMemo(() => rows.reduce((acc, r) => acc + r.vestingAmount, 0), [rows]);
-
-  const totalToClaim = useToClaimLiveStore((s) => s.total);
-
-  const totalToClaimFormatted = useMemo(() => {
-    return formatUnits(totalToClaim, ENV.STAKED_TOKEN_DECIMALS);
-  }, [totalToClaim]);
-
-  const isLoading = isConnected ? isVestingLoading || isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
+  const totalToClaimFormatted = formatUnits(totalToClaimRaw, ENV.BASE_TOKEN_DECIMALS);
 
   const hasAvailableRewards = (availableRewards ?? 0n) > 0n;
-  const hasPosition = !!rows.length;
+  const hasPosition = rows.length > 0;
+
+  const isLoading = isConnected ? isVestingLoading || isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
 
   const isClaimButtonDisabled = !isConnected || isLoading || !hasPosition || isClaimOpen;
   const isVestButtonDisabled = !isConnected || isLoading || !hasAvailableRewards || isVestingOpen;
@@ -84,7 +78,7 @@ export function RewardsFlowBlock() {
   };
 
   const onClaimModalOpen = () => {
-    setClaimAmount(totalToClaim);
+    setClaimAmount(totalToClaimRaw);
     onClaimOpen();
   };
 
@@ -97,9 +91,8 @@ export function RewardsFlowBlock() {
     if (!isConnected || !needRewardRefresh) return;
 
     refetchVestingPositions();
-
     resetRewardRefresh();
-  }, [needRewardRefresh, isConnected]);
+  }, [needRewardRefresh, isConnected, refetchVestingPositions, resetRewardRefresh]);
 
   return (
     <>
@@ -115,17 +108,15 @@ export function RewardsFlowBlock() {
                 weight='500'
                 className='text-color-24'
               >
-                Available Rewards
+                Total vesting
               </Text>
               <Skeleton loading={isLoading}>
                 <Text
                   size='17'
                   weight='500'
-                  className={cn('text-color-2 tabular-nums', {
-                    'text-color-6': !isConnected
-                  })}
+                  className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                 >
-                  {(isConnected ?? !!totalVesting) ? Format.token(totalVesting, 'compact') : '0.0000'} COMP
+                  {isConnected && hasPosition ? Format.token(String(totalVesting), 'compact') : '0.0000'} COMP
                 </Text>
               </Skeleton>
             </div>
@@ -141,9 +132,7 @@ export function RewardsFlowBlock() {
                 <Text
                   size='17'
                   weight='500'
-                  className={cn('text-color-2 tabular-nums', {
-                    'text-color-6': !isConnected
-                  })}
+                  className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                 >
                   {isConnected && hasPosition ? Format.token(totalToClaimFormatted, 'compact') : '0.0000'} COMP
                 </Text>
@@ -163,9 +152,7 @@ export function RewardsFlowBlock() {
                   size='11'
                   weight='500'
                   align='center'
-                  className={cn('text-color-6', {
-                    'text-white': !isClaimButtonDisabled
-                  })}
+                  className={cn('text-color-6', { 'text-white': !isClaimButtonDisabled })}
                 >
                   Claim
                 </Text>
@@ -186,13 +173,9 @@ export function RewardsFlowBlock() {
                 <Text
                   size='17'
                   weight='500'
-                  className={cn('text-color-2 tabular-nums', {
-                    'text-color-6': !isConnected
-                  })}
+                  className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                 >
-                  {isConnected && !!availableRewards
-                    ? Format.token(availableRewardsFormatted, 'compact')
-                    : '0.0000'}{' '}
+                  {isConnected && !!availableRewards ? Format.token(availableRewardsFormatted, 'compact') : '0.0000'}
                 </Text>
               </Skeleton>
               <Condition if={isConnected && !!availableRewards}>
@@ -221,16 +204,14 @@ export function RewardsFlowBlock() {
                 size='11'
                 weight='500'
                 align='center'
-                className={cn('text-color-6', {
-                  'text-white': !isVestButtonDisabled
-                })}
+                className={cn('text-color-6', { 'text-white': !isVestButtonDisabled })}
               >
                 Vest
               </Text>
             </Skeleton>
           </Button>
         </div>
-        <Condition if={!rows.length}>
+        <Condition if={!hasPosition}>
           <div className='flex p-10'>
             <div className='mx-auto flex w-auto flex-col items-center gap-5'>
               <div className='no-position-yet h-20 w-44' />
@@ -252,7 +233,7 @@ export function RewardsFlowBlock() {
             </div>
           </div>
         </Condition>
-        <Condition if={isConnected && !!rows.length}>
+        <Condition if={isConnected && hasPosition}>
           <RewardsTable rows={rows} />
         </Condition>
       </Card>

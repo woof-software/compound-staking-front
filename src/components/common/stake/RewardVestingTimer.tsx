@@ -1,37 +1,71 @@
-import { memo, useMemo } from 'react';
+import { useMemo } from 'react';
 
-import type { RewardRowProps } from '@/components/common/stake/RewardRow';
+import { Duration } from '@/components/common/Duration';
 import { Text } from '@/components/ui/Text';
-import { useNowTime } from '@/hooks/useNowTime';
+import { noop } from '@/lib/utils/common';
 import { FormatTime } from '@/lib/utils/format';
 import { clamp } from '@/lib/utils/numeric';
-import { getNowSecSnapshot } from '@/lib/utils/time';
 
-export type RewardVestingTimerProps = Pick<RewardRowProps, 'vestingStartDate' | 'vestingEndDate' | 'percents'>;
+export type RewardVestingTimerProps = {
+  vestingStartDate: number;
+  vestingEndDate: number;
+  initProgress?: number;
+  initialLeftSec?: number;
+  onTickSeconds?: (secondsLeft: number) => void;
+};
 
-export const RewardVestingTimer = memo(function RewardVestingTimer(props: RewardVestingTimerProps) {
-  const { percents: percentsFromProps, vestingStartDate, vestingEndDate } = props;
+type VestingTimerProps = {
+  completedProgress: number;
+  remainingProgress: number;
+  leftSec: number;
+  totalSec: number;
+};
 
-  const snapshotNow = getNowSecSnapshot();
-  const shouldTick = vestingEndDate > snapshotNow;
+export function RewardVestingTimer(props: RewardVestingTimerProps) {
+  const { vestingStartDate, vestingEndDate, initProgress = 0, initialLeftSec = 0, onTickSeconds = noop } = props;
 
-  const nowSec = useNowTime(shouldTick);
+  const totalSec = useMemo(() => Math.max(0, vestingEndDate - vestingStartDate), [vestingStartDate, vestingEndDate]);
 
-  const { totalSec, leftSec, progress, percents } = useMemo(() => {
-    const totalSec = Math.max(0, vestingEndDate - vestingStartDate);
-    const leftSec = Math.max(0, vestingEndDate - nowSec);
+  if (totalSec <= 0) {
+    return (
+      <VestingTimerLine
+        completedProgress={100}
+        remainingProgress={0}
+        leftSec={0}
+        totalSec={0}
+      />
+    );
+  }
 
-    if (totalSec <= 0) {
-      const percents = clamp(percentsFromProps ?? 0, 0, 100);
-      return { totalSec: 0, leftSec: 0, progress: percents, percents: 100 - percents };
-    }
+  return (
+    <Duration
+      end={vestingEndDate * 1000}
+      unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
+      onTick={(secondsLeft) => {
+        onTickSeconds?.(secondsLeft);
+      }}
+      render={(secondsLeft = initialLeftSec) => {
+        const elapsedSec = Math.max(0, totalSec - secondsLeft);
 
-    const elapsedSec = Math.max(0, Math.min(totalSec, nowSec - vestingStartDate));
-    const progress = clamp((elapsedSec / totalSec) * 100, 0, 100);
-    const percents = 100 - progress;
+        const progress = clamp((elapsedSec / totalSec) * 100, 0, 100);
+        const completedProgress = Math.max(progress, clamp(initProgress, 0, 100));
+        const remainingProgress = 100 - completedProgress;
 
-    return { totalSec, leftSec, progress, percents };
-  }, [vestingStartDate, vestingEndDate, nowSec, percentsFromProps]);
+        return (
+          <VestingTimerLine
+            completedProgress={completedProgress}
+            remainingProgress={remainingProgress}
+            leftSec={secondsLeft}
+            totalSec={totalSec}
+          />
+        );
+      }}
+    />
+  );
+}
+
+const VestingTimerLine = (props: VestingTimerProps) => {
+  const { completedProgress, remainingProgress, leftSec, totalSec } = props;
 
   return (
     <div className='flex items-center gap-5'>
@@ -46,7 +80,7 @@ export const RewardVestingTimer = memo(function RewardVestingTimer(props: Reward
       <div className='flex w-full items-center gap-1'>
         <div
           className='bg-color-7 transition-width h-1 w-full rounded-xs'
-          style={{ width: `${clamp(progress, 0, 100)}%` }}
+          style={{ width: `${clamp(completedProgress, 0, 100)}%` }}
         />
         <Text
           size='11'
@@ -58,7 +92,7 @@ export const RewardVestingTimer = memo(function RewardVestingTimer(props: Reward
         </Text>
         <div
           className='bg-color-9 transition-width h-1 w-full rounded-xs'
-          style={{ width: `${clamp(percents, 0, 100)}%` }}
+          style={{ width: `${clamp(remainingProgress, 0, 100)}%` }}
         />
         <Text
           size='11'
@@ -71,4 +105,4 @@ export const RewardVestingTimer = memo(function RewardVestingTimer(props: Reward
       </div>
     </div>
   );
-});
+};

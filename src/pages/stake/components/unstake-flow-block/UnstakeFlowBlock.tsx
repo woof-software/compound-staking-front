@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useEffectEvent, useMemo } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
@@ -133,6 +133,17 @@ export function UnstakeFlowBlock() {
     }
   };
 
+  const onRequestSuccess = useEffectEvent(() => {
+    refetchStakedTokenBalance();
+    refetchVirtualTokenBalance();
+    refetchMultiplier();
+    refetchAvailableRewards();
+    refetchLockedTokenBalance();
+
+    triggerDelegateRefresh();
+    triggerRewardRefresh();
+  });
+
   useEffect(() => {
     setIsPendingToggle(isTransactionLoading);
   }, [isTransactionLoading]);
@@ -161,14 +172,7 @@ export function UnstakeFlowBlock() {
     }
 
     if (isUnstakeRequestSuccess || isUnlockRequestSuccess) {
-      refetchStakedTokenBalance();
-      refetchVirtualTokenBalance();
-      refetchMultiplier();
-      refetchAvailableRewards();
-      refetchLockedTokenBalance();
-
-      triggerDelegateRefresh();
-      triggerRewardRefresh();
+      onRequestSuccess();
     }
 
     if (isUnstakeRequestSuccess) {

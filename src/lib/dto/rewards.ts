@@ -12,56 +12,53 @@ export type Reward = {
   startTime: number;
 };
 
-export type RewardDtoRet = {
+export type RewardNormalizeRet = {
   vestingAmount: number;
   toClaim: number;
-  remaining: number;
+  claimedAmount: number;
   startDate: number;
   endDate: number;
-  claimedAmount: number;
-  vestingStartDate: number;
-  vestingEndDate: number;
   percents: number;
+
+  vestingAmountRaw: bigint;
+  claimedAmountRaw: bigint;
 };
 
-export function rewardDto(reward: Reward): RewardDtoRet {
+export function rewardNormalize(reward: Reward): RewardNormalizeRet {
   const now = dayjs().unix();
 
-  const vestingStart = normalizeUnixSeconds(reward.startTime ?? 0);
+  const startDate = normalizeUnixSeconds(reward.startTime ?? 0);
   const totalSec = Math.max(0, reward.duration ?? 0);
-  const vestingEnd = vestingStart + totalSec;
+  const endDate = startDate + totalSec;
 
-  const elapsedSec = totalSec > 0 ? (clamp(now - vestingStart, 0, totalSec) as number) : 0;
+  const elapsedSec = totalSec > 0 ? clamp(now - startDate, 0, totalSec) : 0;
 
   const amount = reward.amount ?? 0n;
   const claimed = reward.claimedAmount ?? 0n;
 
-  const vestedSoFar = totalSec > 0 ? (amount * BigInt(elapsedSec)) / BigInt(totalSec) : 0n;
+  const vestedSoFar = totalSec > 0 ? (amount * BigInt(elapsedSec)) / BigInt(totalSec) : amount;
 
   const claimableNow = vestedSoFar > claimed ? vestedSoFar - claimed : 0n;
-  const remainingTotal = amount > claimed ? amount - claimed : 0n;
 
-  const percents = totalSec > 0 ? Math.round((elapsedSec / totalSec) * 100) : 0;
+  const percents = totalSec > 0 ? Math.round((elapsedSec / totalSec) * 100) : 100;
 
   const vestingAmount = Number(formatUnits(amount, ENV.BASE_TOKEN_DECIMALS));
   const claimedAmount = Number(formatUnits(claimed, ENV.BASE_TOKEN_DECIMALS));
   const toClaim = Number(formatUnits(claimableNow, ENV.BASE_TOKEN_DECIMALS));
-  const remaining = Number(formatUnits(remainingTotal, ENV.BASE_TOKEN_DECIMALS));
 
   return {
     vestingAmount,
     toClaim,
-    remaining,
-
     claimedAmount,
-    startDate: vestingStart,
-    endDate: vestingEnd,
-    vestingStartDate: vestingStart,
-    vestingEndDate: vestingEnd,
-    percents
+    startDate,
+    endDate,
+    percents,
+
+    vestingAmountRaw: amount,
+    claimedAmountRaw: claimed
   };
 }
 
-export function rewardsDto(rewards: Reward[] | undefined) {
-  return rewards?.map(rewardDto) ?? [];
+export function rewardsNormalize(rewards: Reward[] | undefined) {
+  return rewards?.map(rewardNormalize) ?? [];
 }

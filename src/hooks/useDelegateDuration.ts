@@ -11,10 +11,10 @@ export function useDelegateDuration() {
     functionName: 'delegationDelay'
   });
 
-  const shema = z.number().int().nonnegative().optional();
+  const schema = z.number().int().nonnegative().optional();
 
   return {
-    data: shema.parse(data),
+    data: schema.parse(data),
     ...query
   };
 }

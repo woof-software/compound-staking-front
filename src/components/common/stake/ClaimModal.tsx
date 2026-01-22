@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import { formatUnits, isAddress } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
@@ -49,9 +49,7 @@ export function ClaimModal(props: ClaimModalProps) {
 
   const baseTokenPriceValue = baseTokenPrice ?? 0n;
 
-  const totalClaimFormatted = useMemo(() => {
-    return formatUnits(totalToClaim, ENV.STAKED_TOKEN_DECIMALS);
-  }, [totalToClaim]);
+  const totalClaimFormatted = formatUnits(totalToClaim, ENV.STAKED_TOKEN_DECIMALS);
 
   const totalClaimPriceFormatted = formatUnits(
     totalToClaim * baseTokenPriceValue,
@@ -79,9 +77,9 @@ export function ClaimModal(props: ClaimModalProps) {
   const onPaste = async () => {
     const text = await navigator.clipboard.readText();
 
-    if (isAddress(text)) return;
+    if (!isAddress(text)) return;
 
-    setWalletAddress(text ?? '');
+    setWalletAddress(text);
   };
 
   const onConfirm = async () => {
@@ -90,12 +88,16 @@ export function ClaimModal(props: ClaimModalProps) {
     await claimRequest(address);
   };
 
-  useEffect(() => {
-    if (!isClaimSuccess) return;
-
+  const onClaimSuccess = useEffectEvent(() => {
     setIsPendingToggle(false);
     onClose();
     onClaimConfirmed();
+  });
+
+  useEffect(() => {
+    if (!isClaimSuccess) return;
+
+    onClaimSuccess();
   }, [isClaimSuccess]);
 
   return (
