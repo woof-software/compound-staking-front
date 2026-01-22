@@ -2,6 +2,7 @@ import { type Address } from 'viem';
 import { useReadContract } from 'wagmi';
 import { z } from 'zod';
 
+import { REFETCH_TIME_MS } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
 
@@ -12,7 +13,8 @@ export function useVirtualBalance(address?: Address) {
     functionName: 'virtualBalanceOf',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address
+      enabled: !!address,
+      refetchInterval: REFETCH_TIME_MS
     }
   });
 

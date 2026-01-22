@@ -8,10 +8,7 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-      refetchOnMount: false,
-
-      refetchInterval: 60 * 1000,
-      refetchIntervalInBackground: true
+      refetchOnMount: false
     }
   }
 });

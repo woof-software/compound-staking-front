@@ -5,15 +5,15 @@ import { RewardRow } from '@/components/common/stake/RewardRow';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
-import type { RewardNormalizeRet } from '@/lib/dto/rewards';
+import type { RewardNormalizeRet } from '@/lib/normalize/rewards';
 import { cn } from '@/lib/utils/cn';
 
 type SortKey = keyof Pick<RewardNormalizeRet, 'vestingAmount' | 'toClaim' | 'startDate' | 'endDate' | 'claimedAmount'>;
 
-export type Column<Row> = {
-  accessorKey: keyof Row;
+export type Column<T> = {
+  accessorKey: keyof T;
   header: string;
-  sort?: (a: Row, b: Row, direction: 'asc' | 'desc') => number;
+  sort?: (a: T, b: T, direction: 'asc' | 'desc') => number;
 };
 
 const columns: Column<RewardNormalizeRet>[] = [
@@ -79,7 +79,7 @@ export function RewardsTable(props: { rows: RewardNormalizeRet[] }) {
 
           return (
             <div
-              key={String(accessorKey)}
+              key={accessorKey}
               role='button'
               tabIndex={0}
               className='flex cursor-pointer items-center'

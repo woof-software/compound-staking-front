@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import dayjs from 'dayjs';
 
 import { RewardToClaim } from '@/components/common/stake/RewardToClaim';
 import { RewardVestingTimer } from '@/components/common/stake/RewardVestingTimer';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-import type { RewardNormalizeRet } from '@/lib/dto/rewards';
+import type { RewardNormalizeRet } from '@/lib/normalize/rewards';
 import { Format, FormatTime } from '@/lib/utils/format';
 import { clamp } from '@/lib/utils/numeric';
 import { useToClaimLiveStore } from '@/stores/useToClaimStore';
@@ -15,7 +15,7 @@ export interface RewardRowProps extends RewardNormalizeRet {
   isLoading: boolean;
 }
 
-export function RewardRow(props: RewardRowProps) {
+export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
   const {
     baseTokenPriceValue,
     isLoading,
@@ -30,12 +30,14 @@ export function RewardRow(props: RewardRowProps) {
     claimedAmountRaw
   } = props;
 
+  const rowKey = `${startDate}-${endDate}`;
+
   const nowSec = dayjs().unix();
   const totalSec = Math.max(0, endDate - startDate);
 
   const leftSecInit = useMemo(() => Math.max(0, endDate - nowSec), [endDate, nowSec]);
-  const rowKey = `${startDate}-${endDate}`;
 
+  const toClaimRaw = useToClaimLiveStore((s) => s.byKey.get(rowKey) ?? 0n);
   const setRow = useToClaimLiveStore((s) => s.setRow);
   const removeRow = useToClaimLiveStore((s) => s.removeRow);
 
@@ -47,7 +49,7 @@ export function RewardRow(props: RewardRowProps) {
 
       const initElapsedSec = totalSec > 0 ? Math.floor((totalSec * clamp(percents, 0, 100)) / 100) : 0;
 
-      const elapsedSec = Math.max(realElapsedSec, initElapsedSec);
+      const elapsedSec = clamp(realElapsedSec, initElapsedSec, totalSec);
 
       let claimableRaw = 0n;
 
@@ -68,8 +70,6 @@ export function RewardRow(props: RewardRowProps) {
 
     return () => removeRow(rowKey);
   }, [leftSecInit, updateClaimable, removeRow, rowKey]);
-
-  const toClaimRaw = useToClaimLiveStore((s) => s.byKey.get(rowKey) ?? 0n);
 
   return (
     <div className='even:bg-color-5 flex flex-col gap-5 rounded-sm px-8 py-6'>
@@ -127,4 +127,4 @@ export function RewardRow(props: RewardRowProps) {
       />
     </div>
   );
-}
+});

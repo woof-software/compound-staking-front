@@ -14,7 +14,7 @@ import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
-import { type RewardNormalizeRet, rewardsNormalize } from '@/lib/dto/rewards';
+import { type RewardNormalizeRet, rewardsNormalize } from '@/lib/normalize/rewards';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { RewardsTable } from '@/pages/stake/components/rewards-flow-block/RewardsTable';

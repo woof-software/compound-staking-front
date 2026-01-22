@@ -6,7 +6,6 @@ type ToClaimState = {
 
   setRow: (key: string, value: bigint) => void;
   removeRow: (key: string) => void;
-  reset: () => void;
 };
 
 export const useToClaimLiveStore = create<ToClaimState>((set, get) => ({
@@ -41,7 +40,5 @@ export const useToClaimLiveStore = create<ToClaimState>((set, get) => ({
       byKey: nextMap,
       total: total - prev
     });
-  },
-
-  reset: () => set({ byKey: new Map(), total: 0n })
+  }
 }));
