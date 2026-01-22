@@ -92,8 +92,6 @@ export function StakeFlowBlock() {
     triggerRewardRefresh
   ]);
 
-  console.log('stakedBalanceFormatted=>', stakedBalanceFormatted);
-
   return (
     <Card
       isLoading={isLoading}
