@@ -15,9 +15,9 @@ import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
+import { vestingToClaimCalc } from '@/lib/math/calc';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
-import { max } from '@/lib/utils/numeric';
 import { RewardsTable, type RewardsTableItem } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useRewardStore } from '@/stores/useRewardStore';
@@ -72,6 +72,11 @@ export function RewardsFlowBlock() {
     return acc + r.vestingAmount;
   }, 0n);
 
+  const totalVestingPriceFormatted = formatUnits(
+    totalVesting * (baseTokenPrice ?? 0n),
+    ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
+  );
+
   const hasAvailableRewards = (availableRewards ?? 0n) > 0n;
   const hasPosition = rows.length > 0;
 
@@ -90,22 +95,8 @@ export function RewardsFlowBlock() {
   };
 
   const onClaimModalOpen = () => {
-    const toClaim = rows.reduce((acc, record) => {
-      const { startDate: vestingStartDate, endDate: vestingEndDate, claimedAmount, vestingAmount } = record;
-
-      const totalSecNum = Math.max(0, vestingEndDate - vestingStartDate);
-
-      const secondsLeft = vestingEndDate - Date.now();
-
-      const elapsed = BigInt(totalSecNum - secondsLeft);
-
-      const total = BigInt(totalSecNum);
-
-      const vested = (vestingAmount * elapsed) / (total || 1n) - claimedAmount;
-
-      const toClaim = max(vested, 0n);
-
-      return acc + toClaim;
+    const toClaim = rows.reduce((acc, row) => {
+      return acc + vestingToClaimCalc(row);
     }, 0n);
 
     setClaimAmount(toClaim);
@@ -145,15 +136,30 @@ export function RewardsFlowBlock() {
               >
                 Total vesting
               </Text>
-              <Skeleton loading={isLoading}>
-                <Text
-                  size='17'
-                  weight='500'
-                  className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
-                >
-                  {isConnected && hasPosition ? Format.token(String(totalVesting), 'compact') : '0.0000'} COMP
-                </Text>
-              </Skeleton>
+              <div className='flex flex-col gap-2'>
+                <Skeleton loading={isLoading}>
+                  <Text
+                    size='17'
+                    weight='500'
+                    className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
+                  >
+                    {isConnected && hasPosition
+                      ? Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), 'compact')
+                      : '0.0000'}{' '}
+                    COMP
+                  </Text>
+                </Skeleton>
+                <Condition if={isConnected && !!totalVesting}>
+                  <Skeleton loading={isLoading}>
+                    <Text
+                      size='11'
+                      className='text-color-24 tabular-nums'
+                    >
+                      {Format.price(totalVestingPriceFormatted, 'standard')}
+                    </Text>
+                  </Skeleton>
+                </Condition>
+              </div>
             </div>
             <div className='flex flex-col gap-3'>
               <Text
@@ -163,50 +169,87 @@ export function RewardsFlowBlock() {
               >
                 Total to claim
               </Text>
-              <Skeleton loading={isLoading}>
-                <Text
-                  size='17'
-                  weight='500'
-                  className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
-                >
-                  {isConnected && hasPosition ? (
-                    <Duration
-                      end={longestDurationTs}
-                      render={() => {
-                        const toClaim = rows.reduce((acc, record) => {
-                          const {
-                            startDate: vestingStartDate,
-                            endDate: vestingEndDate,
-                            claimedAmount,
-                            vestingAmount
-                          } = record;
+              <div className='flex flex-col gap-2'>
+                <Skeleton loading={isLoading}>
+                  <Text
+                    size='17'
+                    weight='500'
+                    className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
+                  >
+                    {isConnected && hasPosition ? (
+                      <Duration
+                        end={longestDurationTs * 1000}
+                        unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
+                        render={(secondsLeft = 0) => {
+                          const nowSec = longestDurationTs - secondsLeft;
 
-                          const totalSecNum = Math.max(0, vestingEndDate - vestingStartDate);
+                          const totalToClaim = rows.reduce((acc, row) => {
+                            const rowSecondsLeft = Math.max(row.endDate - nowSec, 0);
 
-                          const secondsLeft = vestingEndDate - Date.now();
+                            return (
+                              acc +
+                              vestingToClaimCalc(
+                                {
+                                  vestingAmount: row.vestingAmount,
+                                  claimedAmount: row.claimedAmount,
+                                  startDate: row.startDate,
+                                  endDate: row.endDate
+                                },
+                                rowSecondsLeft
+                              )
+                            );
+                          }, 0n);
 
-                          const elapsed = BigInt(totalSecNum - secondsLeft);
+                          return Format.token(formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS), 'compact');
+                        }}
+                      />
+                    ) : (
+                      '0.0000'
+                    )}{' '}
+                    COMP
+                  </Text>
+                </Skeleton>
+                <Condition if={isConnected && !!totalVesting}>
+                  <Skeleton loading={isLoading}>
+                    <Text
+                      size='11'
+                      className='text-color-24 tabular-nums'
+                    >
+                      <Duration
+                        end={longestDurationTs * 1000}
+                        unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
+                        render={(secondsLeft = 0) => {
+                          const nowSec = longestDurationTs - secondsLeft;
 
-                          const total = BigInt(totalSecNum);
+                          const totalToClaim = rows.reduce((acc, row) => {
+                            const rowSecondsLeft = Math.max(row.endDate - nowSec, 0);
 
-                          const vested = (vestingAmount * elapsed) / (total || 1n) - claimedAmount;
+                            return (
+                              acc +
+                              vestingToClaimCalc(
+                                {
+                                  vestingAmount: row.vestingAmount,
+                                  claimedAmount: row.claimedAmount,
+                                  startDate: row.startDate,
+                                  endDate: row.endDate
+                                },
+                                rowSecondsLeft
+                              )
+                            );
+                          }, 0n);
 
-                          const toClaim = max(vested, 0n);
+                          const toClaimPriceFormatted = formatUnits(
+                            totalToClaim * (baseTokenPrice ?? 0n),
+                            ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
+                          );
 
-                          return acc + toClaim;
-                        }, 0n);
-
-                        const toClaimFormatted = formatUnits(toClaim, ENV.STAKED_TOKEN_DECIMALS);
-
-                        return Format.token(toClaimFormatted, 'compact');
-                      }}
-                    />
-                  ) : (
-                    '0.0000'
-                  )}{' '}
-                  COMP
-                </Text>
-              </Skeleton>
+                          return Format.price(toClaimPriceFormatted, 'standard');
+                        }}
+                      />
+                    </Text>
+                  </Skeleton>
+                </Condition>
+              </div>
             </div>
             <Button
               disabled={isClaimButtonDisabled}

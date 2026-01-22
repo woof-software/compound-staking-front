@@ -85,10 +85,18 @@ export function ClaimModal(props: ClaimModalProps) {
   const onConfirm = async () => {
     if (!address) return;
 
+    if (isAddress(walletAddress)) {
+      await claimRequest(walletAddress);
+      return;
+    }
+
     await claimRequest(address);
   };
 
   const onClaimSuccess = useEffectEvent(() => {
+    setIsChangeWallet(false);
+    setWalletAddress('');
+
     setIsPendingToggle(false);
     onClose();
     onClaimConfirmed();

@@ -60,7 +60,7 @@ export function StakeFlowBlock() {
 
   const stakedBalanceFormatted = formatUnits(stakedBalance?.principal ?? 0n, ENV.BASE_TOKEN_DECIMALS);
   const virtualBalanceFormatted = formatUnits(virtualBalance ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
-  const multiplierFormatted = formatUnits(multiplier ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
+  const multiplierFormatted = formatUnits(multiplier ?? 0n, 18);
   const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
   const baseTokenPriceValue = baseTokenPrice ?? 0n;

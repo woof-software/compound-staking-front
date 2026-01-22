@@ -96,15 +96,7 @@ export function DelegateFlowBlock() {
     } else {
       setCooldownFinished();
     }
-  }, [
-    isConnected,
-    isLoading,
-    hasCooldownRequest,
-    hasActiveLock,
-    remainingSeconds,
-    setCooldownFinished,
-    resetCooldownFinished
-  ]);
+  }, [isConnected, isLoading, hasCooldownRequest, hasActiveLock, remainingSeconds]);
 
   useEffect(() => {
     if (!isConnected || !needDelegateRefresh) return;

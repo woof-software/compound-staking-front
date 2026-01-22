@@ -21,6 +21,11 @@ export interface RewardRowProps {
 export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
   const { baseTokenPriceValue, isLoading, vestingAmount, claimedAmount, startDate, endDate } = props;
 
+  const vestingAmountPriceFormatted = formatUnits(
+    vestingAmount * baseTokenPriceValue,
+    ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
+  );
+
   return (
     <div className='even:bg-color-5 flex flex-col gap-5 rounded-sm px-8 py-6'>
       <div className='grid grid-cols-5'>
@@ -32,6 +37,15 @@ export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
               className='tabular-nums'
             >
               {Format.token(formatUnits(vestingAmount, ENV.BASE_TOKEN_DECIMALS), 'compact')} COMP
+            </Text>
+          </Skeleton>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              lineHeight='16'
+              className='text-color-24 tabular-nums'
+            >
+              {Format.price(vestingAmountPriceFormatted, 'standard')}
             </Text>
           </Skeleton>
         </div>
@@ -66,7 +80,7 @@ export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
               lineHeight='20'
               className='tabular-nums'
             >
-              {Format.token(String(claimedAmount), 'compact')} COMP
+              {Format.token(formatUnits(claimedAmount, ENV.BASE_TOKEN_DECIMALS), 'compact')} COMP
             </Text>
           </Skeleton>
         </div>
