@@ -5,10 +5,17 @@ import { RewardRow } from '@/components/common/stake/RewardRow';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
-import type { RewardNormalizeRet } from '@/lib/normalize/rewards';
 import { cn } from '@/lib/utils/cn';
 
-type SortKey = keyof Pick<RewardNormalizeRet, 'vestingAmount' | 'toClaim' | 'startDate' | 'endDate' | 'claimedAmount'>;
+export type RewardsTableItem = {
+  vestingAmount: bigint;
+  toClaim: bigint;
+  claimedAmount: bigint;
+  startDate: number;
+  endDate: number;
+};
+
+type SortKey = keyof RewardsTableItem;
 
 export type Column<T> = {
   accessorKey: keyof T;
@@ -16,17 +23,20 @@ export type Column<T> = {
   sort?: (a: T, b: T, direction: 'asc' | 'desc') => number;
 };
 
-const columns: Column<RewardNormalizeRet>[] = [
+const columns: Column<RewardsTableItem>[] = [
   {
     accessorKey: 'vestingAmount',
     header: 'Vesting Amount',
-    sort: (a, b, direction) =>
-      direction === 'asc' ? a.vestingAmount - b.vestingAmount : b.vestingAmount - a.vestingAmount
+    sort: (a, b, direction) => {
+      return Number(direction === 'asc' ? a.vestingAmount - b.vestingAmount : b.vestingAmount - a.vestingAmount);
+    }
   },
   {
     accessorKey: 'toClaim',
     header: 'To claim',
-    sort: (a, b, direction) => (direction === 'asc' ? a.toClaim - b.toClaim : b.toClaim - a.toClaim)
+    sort: (a, b, direction) => {
+      return Number(direction === 'asc' ? a.toClaim - b.toClaim : b.toClaim - a.toClaim);
+    }
   },
   {
     accessorKey: 'startDate',
@@ -41,12 +51,13 @@ const columns: Column<RewardNormalizeRet>[] = [
   {
     accessorKey: 'claimedAmount',
     header: 'Claimed Amount',
-    sort: (a, b, direction) =>
-      direction === 'asc' ? a.claimedAmount - b.claimedAmount : b.claimedAmount - a.claimedAmount
+    sort: (a, b, direction) => {
+      return Number(direction === 'asc' ? a.claimedAmount - b.claimedAmount : b.claimedAmount - a.claimedAmount);
+    }
   }
 ];
 
-export function RewardsTable(props: { rows: RewardNormalizeRet[] }) {
+export function RewardsTable(props: { rows: RewardsTableItem[] }) {
   const { rows } = props;
 
   const [sortBy, setSortBy] = useState<SortKey>('vestingAmount');

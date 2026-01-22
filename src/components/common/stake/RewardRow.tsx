@@ -1,75 +1,25 @@
-import { memo, useCallback, useEffect, useMemo } from 'react';
-import dayjs from 'dayjs';
+import { memo } from 'react';
+import { formatUnits } from 'viem';
 
 import { RewardToClaim } from '@/components/common/stake/RewardToClaim';
 import { RewardVestingTimer } from '@/components/common/stake/RewardVestingTimer';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-import type { RewardNormalizeRet } from '@/lib/normalize/rewards';
+import { ENV } from '@/consts/env';
 import { Format, FormatTime } from '@/lib/utils/format';
-import { clamp } from '@/lib/utils/numeric';
-import { useToClaimLiveStore } from '@/stores/useToClaimStore';
 
-export interface RewardRowProps extends RewardNormalizeRet {
+export interface RewardRowProps {
   baseTokenPriceValue: bigint;
   isLoading: boolean;
+  vestingAmount: bigint;
+  toClaim: bigint;
+  claimedAmount: bigint;
+  startDate: number;
+  endDate: number;
 }
 
 export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
-  const {
-    baseTokenPriceValue,
-    isLoading,
-
-    vestingAmount,
-    claimedAmount,
-    startDate,
-    endDate,
-    percents,
-
-    vestingAmountRaw,
-    claimedAmountRaw
-  } = props;
-
-  const rowKey = `${startDate}-${endDate}`;
-
-  const nowSec = dayjs().unix();
-  const totalSec = Math.max(0, endDate - startDate);
-
-  const leftSecInit = useMemo(() => Math.max(0, endDate - nowSec), [endDate, nowSec]);
-
-  const toClaimRaw = useToClaimLiveStore((s) => s.byKey.get(rowKey) ?? 0n);
-  const setRow = useToClaimLiveStore((s) => s.setRow);
-  const removeRow = useToClaimLiveStore((s) => s.removeRow);
-
-  const updateClaimable = useCallback(
-    (secondsLeft: number) => {
-      const safeSecondsLeft = clamp(secondsLeft, 0, totalSec);
-
-      const realElapsedSec = totalSec > 0 ? clamp(totalSec - safeSecondsLeft, 0, totalSec) : 0;
-
-      const initElapsedSec = totalSec > 0 ? Math.floor((totalSec * clamp(percents, 0, 100)) / 100) : 0;
-
-      const elapsedSec = clamp(realElapsedSec, initElapsedSec, totalSec);
-
-      let claimableRaw = 0n;
-
-      if (totalSec <= 0) {
-        claimableRaw = vestingAmountRaw > claimedAmountRaw ? vestingAmountRaw - claimedAmountRaw : 0n;
-      } else {
-        const vestedRaw = (vestingAmountRaw * BigInt(elapsedSec)) / BigInt(totalSec);
-        claimableRaw = vestedRaw > claimedAmountRaw ? vestedRaw - claimedAmountRaw : 0n;
-      }
-
-      setRow(rowKey, claimableRaw);
-    },
-    [totalSec, percents, vestingAmountRaw, claimedAmountRaw, setRow, rowKey]
-  );
-
-  useEffect(() => {
-    updateClaimable(leftSecInit);
-
-    return () => removeRow(rowKey);
-  }, [leftSecInit, updateClaimable, removeRow, rowKey]);
+  const { baseTokenPriceValue, isLoading, vestingAmount, claimedAmount, startDate, endDate } = props;
 
   return (
     <div className='even:bg-color-5 flex flex-col gap-5 rounded-sm px-8 py-6'>
@@ -81,14 +31,17 @@ export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
               lineHeight='20'
               className='tabular-nums'
             >
-              {Format.token(String(vestingAmount), 'compact')} COMP
+              {Format.token(formatUnits(vestingAmount, ENV.BASE_TOKEN_DECIMALS), 'compact')} COMP
             </Text>
           </Skeleton>
         </div>
         <RewardToClaim
           isLoading={isLoading}
           baseTokenPriceValue={baseTokenPriceValue}
-          toClaimRaw={toClaimRaw}
+          vesting={vestingAmount}
+          claimed={claimedAmount}
+          vestingStartDate={startDate}
+          vestingEndDate={endDate}
         />
         <div>
           <Text
@@ -121,9 +74,6 @@ export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
       <RewardVestingTimer
         vestingStartDate={startDate}
         vestingEndDate={endDate}
-        initProgress={percents}
-        initialLeftSec={leftSecInit}
-        onTickSeconds={updateClaimable}
       />
     </div>
   );

@@ -3,6 +3,7 @@ import { formatUnits } from 'viem'; // parseUnits понадобится ниж�
 import { useConnection } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
+import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
 import { ClaimModal } from '@/components/common/stake/ClaimModal';
 import { VestingModal } from '@/components/common/stake/VestingModal';
@@ -14,13 +15,12 @@ import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
-import { type RewardNormalizeRet, rewardsNormalize } from '@/lib/normalize/rewards';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
-import { RewardsTable } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
+import { max } from '@/lib/utils/numeric';
+import { RewardsTable, type RewardsTableItem } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useRewardStore } from '@/stores/useRewardStore';
-import { useToClaimLiveStore } from '@/stores/useToClaimStore';
 
 export function RewardsFlowBlock() {
   const [claimAmount, setClaimAmount] = useState<bigint>(0n);
@@ -40,12 +40,26 @@ export function RewardsFlowBlock() {
   } = useAvailableRewards(address);
 
   const {
-    data: vestingPositions,
+    data: vestingPositions = [],
     refetch: refetchVestingPositions,
     isLoading: isVestingLoading
   } = useVestingPosition(address);
 
-  const rows: RewardNormalizeRet[] = useMemo(() => rewardsNormalize(vestingPositions), [vestingPositions]);
+  const rows = useMemo(() => {
+    return vestingPositions.map(({ amount, claimedAmount, startTime, duration }) => {
+      const endDate = startTime + duration;
+
+      const elapsed = BigInt(endDate - startTime);
+
+      return {
+        vestingAmount: amount,
+        claimedAmount: claimedAmount,
+        endDate: endDate,
+        startDate: startTime,
+        toClaim: (amount * elapsed) / (BigInt(duration) || 1n) - claimedAmount
+      } satisfies RewardsTableItem;
+    });
+  }, [vestingPositions]);
 
   const availableRewardsPriceFormatted = formatUnits(
     (availableRewards ?? 0n) * (baseTokenPrice ?? 0n),
@@ -54,11 +68,9 @@ export function RewardsFlowBlock() {
 
   const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
-  const totalVesting = useMemo(() => rows.reduce((acc, r) => acc + (r.vestingAmount || 0), 0), [rows]);
-
-  const totalToClaimRaw = useToClaimLiveStore((s) => s.total);
-
-  const totalToClaimFormatted = formatUnits(totalToClaimRaw, ENV.BASE_TOKEN_DECIMALS);
+  const totalVesting = rows.reduce((acc, r) => {
+    return acc + r.vestingAmount;
+  }, 0n);
 
   const hasAvailableRewards = (availableRewards ?? 0n) > 0n;
   const hasPosition = rows.length > 0;
@@ -78,7 +90,26 @@ export function RewardsFlowBlock() {
   };
 
   const onClaimModalOpen = () => {
-    setClaimAmount(totalToClaimRaw);
+    const toClaim = rows.reduce((acc, record) => {
+      const { startDate: vestingStartDate, endDate: vestingEndDate, claimedAmount, vestingAmount } = record;
+
+      const totalSecNum = Math.max(0, vestingEndDate - vestingStartDate);
+
+      const secondsLeft = vestingEndDate - Date.now();
+
+      const elapsed = BigInt(totalSecNum - secondsLeft);
+
+      const total = BigInt(totalSecNum);
+
+      const vested = (vestingAmount * elapsed) / (total || 1n) - claimedAmount;
+
+      const toClaim = max(vested, 0n);
+
+      return acc + toClaim;
+    }, 0n);
+
+    setClaimAmount(toClaim);
+
     onClaimOpen();
   };
 
@@ -93,6 +124,10 @@ export function RewardsFlowBlock() {
     refetchVestingPositions();
     resetRewardRefresh();
   }, [needRewardRefresh, isConnected, refetchVestingPositions, resetRewardRefresh]);
+
+  const longestDurationTs = rows.reduce((acc, { endDate }) => {
+    return acc > endDate ? acc : endDate;
+  }, 0);
 
   return (
     <>
@@ -134,7 +169,42 @@ export function RewardsFlowBlock() {
                   weight='500'
                   className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                 >
-                  {isConnected && hasPosition ? Format.token(totalToClaimFormatted, 'compact') : '0.0000'} COMP
+                  {isConnected && hasPosition ? (
+                    <Duration
+                      end={longestDurationTs}
+                      render={() => {
+                        const toClaim = rows.reduce((acc, record) => {
+                          const {
+                            startDate: vestingStartDate,
+                            endDate: vestingEndDate,
+                            claimedAmount,
+                            vestingAmount
+                          } = record;
+
+                          const totalSecNum = Math.max(0, vestingEndDate - vestingStartDate);
+
+                          const secondsLeft = vestingEndDate - Date.now();
+
+                          const elapsed = BigInt(totalSecNum - secondsLeft);
+
+                          const total = BigInt(totalSecNum);
+
+                          const vested = (vestingAmount * elapsed) / (total || 1n) - claimedAmount;
+
+                          const toClaim = max(vested, 0n);
+
+                          return acc + toClaim;
+                        }, 0n);
+
+                        const toClaimFormatted = formatUnits(toClaim, ENV.STAKED_TOKEN_DECIMALS);
+
+                        return Format.token(toClaimFormatted, 'compact');
+                      }}
+                    />
+                  ) : (
+                    '0.0000'
+                  )}{' '}
+                  COMP
                 </Text>
               </Skeleton>
             </div>

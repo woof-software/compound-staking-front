@@ -1,16 +1,13 @@
 import { type ReactNode, useEffect, useEffectEvent, useState } from 'react';
 
-import { noop } from '@/lib/utils/common';
-
 export type DurationProps = {
   end: number;
   render: (secondsLeft: number | undefined) => ReactNode;
   unsafeRound?: (value: number) => number;
-  onTick?: (value: number) => void;
 };
 
 export function Duration(props: DurationProps) {
-  const { end, render, unsafeRound = (v) => v, onTick = noop } = props;
+  const { end, render, unsafeRound = (v) => v } = props;
 
   const _unsafeRound = useEffectEvent(unsafeRound);
 
@@ -27,7 +24,6 @@ export function Duration(props: DurationProps) {
       const tillTheEnd = _unsafeRound(end - now);
 
       setValue(Math.max(tillTheEnd, 0));
-      onTick?.(Math.max(tillTheEnd, 0));
 
       if (tillTheEnd <= 0) return;
 
