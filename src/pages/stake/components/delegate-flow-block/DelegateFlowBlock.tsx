@@ -26,7 +26,7 @@ import { useWalletStore } from '@/stores/useWalletStore';
 export function DelegateFlowBlock() {
   const { isConnected, address } = useConnection();
 
-  const { setIsPendingToggle } = useWalletStore();
+  const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
   const { needRefresh: needDelegateRefresh, resetRefresh: resetDelegateRefresh } = useDelegateStore();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
