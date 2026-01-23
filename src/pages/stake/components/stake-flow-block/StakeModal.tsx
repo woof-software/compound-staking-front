@@ -31,7 +31,7 @@ export type StakeModalProps = {
 export function StakeModal(props: StakeModalProps) {
   const { onClose = noop, onStakeConfirmed = noop } = props;
 
-  const { setIsPendingToggle } = useWalletStore();
+  const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
@@ -175,7 +175,7 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='16'
               className='text-color-24'
             >
-              {Format.token(walletBalanceFormatted, 'standard')} COMP
+              {Format.token(walletBalanceFormatted, 'standard', 'COMP')}
             </Text>
           </Skeleton>
         </div>

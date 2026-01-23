@@ -25,7 +25,7 @@ export function DelegateModal(props: DelegateModalProps) {
 
   const { data: subAccountAddress, isLoading: isSubAccountLoading } = useDelegateSubAccount(address);
 
-  const { setIsPendingToggle } = useWalletStore();
+  const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const {
     sendTransactionAsync: delegateTransaction,

@@ -40,9 +40,9 @@ export function UnstakeFlowBlock() {
     disable: resetIsDurationFinished
   } = useSwitch();
 
-  const { setIsPendingToggle } = useWalletStore();
-  const { triggerRefresh: triggerDelegateRefresh } = useDelegateStore();
-  const { triggerRefresh: triggerRewardRefresh } = useRewardStore();
+  const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
+  const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
+  const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
 
   const { isConnected, address } = useConnection();
 
@@ -214,10 +214,7 @@ export function UnstakeFlowBlock() {
                       'text-color-6': !isConnected
                     })}
                   >
-                    {isConnected && !!lockedTokenBalance?.amount
-                      ? Format.token(lockedStakedBalanceFormatted, 'standard')
-                      : '0.0000'}{' '}
-                    COMP
+                    {Format.token(lockedStakedBalanceFormatted, 'standard', 'COMP')}
                   </Text>
                 </Skeleton>
                 <Condition if={isConnected && !!lockedTokenBalance?.amount}>

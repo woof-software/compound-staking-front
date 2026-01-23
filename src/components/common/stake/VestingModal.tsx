@@ -29,7 +29,7 @@ export type VestingModalProps = {
 export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirmed = noop }: VestingModalProps) {
   const { isConnected, address } = useConnection();
 
-  const { setIsPendingToggle } = useWalletStore();
+  const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
@@ -109,7 +109,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
                   'text-color-6': !isConnected
                 })}
               >
-                {isConnected && !!availableRewards ? Format.token(availableRewardsFormatted, 'compact') : '0.0000'} COMP
+                {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
               </Text>
             </Skeleton>
             <Condition if={isConnected}>

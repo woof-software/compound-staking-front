@@ -4,7 +4,7 @@ import { Duration } from '@/components/common/Duration';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
-import { vestingToClaimCalc } from '@/lib/math/calc';
+import { vestingToClaimCalc } from '@/lib/rewards';
 import { Format } from '@/lib/utils/format';
 
 export type RewardToClaimProps = {
@@ -16,7 +16,7 @@ export type RewardToClaimProps = {
   vestingEndDate: number;
 };
 
-export const RewardToClaim = function RewardToClaim(props: RewardToClaimProps) {
+export function RewardToClaim(props: RewardToClaimProps) {
   const { isLoading, baseTokenPriceValue, vesting, claimed, vestingStartDate, vestingEndDate } = props;
 
   return (
@@ -24,15 +24,13 @@ export const RewardToClaim = function RewardToClaim(props: RewardToClaimProps) {
       end={vestingEndDate * 1000}
       unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
       render={(secondsLeft = 0) => {
-        const toClaim = vestingToClaimCalc(
-          {
-            vestingAmount: vesting,
-            claimedAmount: claimed,
-            endDate: vestingEndDate,
-            startDate: vestingStartDate
-          },
+        const toClaim = vestingToClaimCalc({
+          vestingAmount: vesting,
+          claimedAmount: claimed,
+          endDate: vestingEndDate,
+          startDate: vestingStartDate,
           secondsLeft
-        );
+        });
 
         const toClaimFormatted = formatUnits(toClaim, ENV.STAKED_TOKEN_DECIMALS);
 
@@ -49,7 +47,7 @@ export const RewardToClaim = function RewardToClaim(props: RewardToClaimProps) {
                 lineHeight='20'
                 className='tabular-nums'
               >
-                {Format.token(toClaimFormatted, 'compact')} COMP
+                {Format.token(toClaimFormatted, 'compact', 'COMP')}
               </Text>
             </Skeleton>
             <Skeleton loading={isLoading}>
@@ -66,4 +64,4 @@ export const RewardToClaim = function RewardToClaim(props: RewardToClaimProps) {
       }}
     />
   );
-};
+}

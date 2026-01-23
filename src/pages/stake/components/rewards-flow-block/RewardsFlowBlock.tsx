@@ -15,7 +15,7 @@ import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
-import { vestingToClaimCalc } from '@/lib/math/calc';
+import { vestingToClaimCalc } from '@/lib/rewards';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { RewardsTable, type RewardsTableItem } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
@@ -28,7 +28,8 @@ export function RewardsFlowBlock() {
 
   const { isConnected, address } = useConnection();
 
-  const { setIsPendingToggle } = useWalletStore();
+  const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
+
   const { needRefresh: needRewardRefresh, resetRefresh: resetRewardRefresh } = useRewardStore();
 
   const { isEnabled: isVestingOpen, enable: onVestingOpen, disable: onVestingClose } = useSwitch();
@@ -156,10 +157,7 @@ export function RewardsFlowBlock() {
                     weight='500'
                     className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                   >
-                    {isConnected && hasPosition
-                      ? Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), 'compact')
-                      : '0.0000'}{' '}
-                    COMP
+                    {Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP')}
                   </Text>
                 </Skeleton>
                 <Condition if={isConnected && !!totalVesting}>
@@ -189,37 +187,30 @@ export function RewardsFlowBlock() {
                     weight='500'
                     className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                   >
-                    {isConnected && hasPosition ? (
-                      <Duration
-                        end={longestDurationTs * 1000}
-                        unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
-                        render={(secondsLeft = 0) => {
-                          const nowSec = longestDurationTs - secondsLeft;
+                    <Duration
+                      end={longestDurationTs * 1000}
+                      unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
+                      render={(secondsLeft = 0) => {
+                        const nowSec = longestDurationTs - secondsLeft;
 
-                          const totalToClaim = rows.reduce((acc, row) => {
-                            const rowSecondsLeft = Math.max(row.endDate - nowSec, 0);
+                        const totalToClaim = rows.reduce((acc, row) => {
+                          const rowSecondsLeft = Math.max(row.endDate - nowSec, 0);
 
-                            return (
-                              acc +
-                              vestingToClaimCalc(
-                                {
-                                  vestingAmount: row.vestingAmount,
-                                  claimedAmount: row.claimedAmount,
-                                  startDate: row.startDate,
-                                  endDate: row.endDate
-                                },
-                                rowSecondsLeft
-                              )
-                            );
-                          }, 0n);
+                          return (
+                            acc +
+                            vestingToClaimCalc({
+                              vestingAmount: row.vestingAmount,
+                              claimedAmount: row.claimedAmount,
+                              startDate: row.startDate,
+                              endDate: row.endDate,
+                              secondsLeft: rowSecondsLeft
+                            })
+                          );
+                        }, 0n);
 
-                          return Format.token(formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS), 'compact');
-                        }}
-                      />
-                    ) : (
-                      '0.0000'
-                    )}{' '}
-                    COMP
+                        return Format.token(formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP');
+                      }}
+                    />
                   </Text>
                 </Skeleton>
                 <Condition if={isConnected && !!totalVesting}>
@@ -239,15 +230,13 @@ export function RewardsFlowBlock() {
 
                             return (
                               acc +
-                              vestingToClaimCalc(
-                                {
-                                  vestingAmount: row.vestingAmount,
-                                  claimedAmount: row.claimedAmount,
-                                  startDate: row.startDate,
-                                  endDate: row.endDate
-                                },
-                                rowSecondsLeft
-                              )
+                              vestingToClaimCalc({
+                                vestingAmount: row.vestingAmount,
+                                claimedAmount: row.claimedAmount,
+                                startDate: row.startDate,
+                                endDate: row.endDate,
+                                secondsLeft: rowSecondsLeft
+                              })
                             );
                           }, 0n);
 
@@ -301,7 +290,7 @@ export function RewardsFlowBlock() {
                   weight='500'
                   className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                 >
-                  {isConnected && !!availableRewards ? Format.token(availableRewardsFormatted, 'compact') : '0.0000'}
+                  {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
                 </Text>
               </Skeleton>
               <Condition if={isConnected && !!availableRewards}>
