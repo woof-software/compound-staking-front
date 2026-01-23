@@ -10,6 +10,7 @@ import { ENV } from '@/consts/env';
 import { useUnstakeLockDuration } from '@/hooks/useLockDuration';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useVestingPerUser } from '@/hooks/useVestingPerUser';
+import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format, FormatTime } from '@/lib/utils/format';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
@@ -129,10 +130,22 @@ export function UnstakeModal(props: UnstakeModalProps) {
       </Condition>
       <Button
         disabled={isButtonDisabled}
-        className='h-14 text-[13px] font-medium'
+        className={cn('h-14 flex-col', {
+          'bg-color-7': isLoading
+        })}
         onClick={onClick}
       >
-        {isLoading ? 'Pending...' : 'Confirm'}
+        <Text
+          size='13'
+          weight='500'
+          lineHeight='18'
+          className={cn('text-white', {
+            'text-color-6': isButtonDisabled,
+            'after-animate-loading-dots text-white': isLoading
+          })}
+        >
+          {isLoading ? 'Pending' : 'Confirm'}
+        </Text>
       </Button>
     </div>
   );

@@ -19,8 +19,6 @@ export function TotalStaked() {
 
   const needTotalStakedRefresh = useStatisticStore(({ needRefresh }) => needRefresh);
 
-  console.log('totalStaked=>', totalStaked);
-
   const totalStakedFormatted = formatUnits(totalStaked ?? 0n, ENV.BASE_TOKEN_DECIMALS);
 
   const unit = FormatUnits.parse(Number(totalStakedFormatted));
@@ -44,13 +42,13 @@ export function TotalStaked() {
       </Text>
       <Skeleton loading={isLoading}>
         <div className='flex items-start gap-3'>
-          <CompoundBlackCircle className='text-compound-icon-bg mt-1 size-10' />
+          <CompoundBlackCircle className='text-compound-icon-bg size-10' />
           <Text
             size='40'
             weight='500'
           >
             {Format.token(totalStakedFormatted, 'compact', undefined, 2).slice(0, -1)}
-            <Condition if={!!unit}>
+            <Condition if={isConnected && !!unit}>
               <Text
                 tag='span'
                 size='40'

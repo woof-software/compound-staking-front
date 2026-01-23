@@ -1,13 +1,17 @@
-import { useRef } from 'react';
+import { useEffect, useEffectEvent, useRef } from 'react';
+import { formatUnits } from 'viem';
 import { useConnection, useDisconnect } from 'wagmi';
 
 import { CopyIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
+import { ENV } from '@/consts/env';
+import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useOutsideClick } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { sliceAddress } from '@/lib/utils/common';
+import { Format } from '@/lib/utils/format';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
@@ -21,11 +25,20 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
   const ref = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLDivElement>(null);
 
-  const { address } = useConnection();
+  const isPending = useWalletStore(({ isPending }) => isPending);
+
+  const { address, isConnected } = useConnection();
   const { disconnect } = useDisconnect();
-  const { isPending } = useWalletStore();
 
   const { isEnabled: isOpen, toggle: onOpen, disable: onClose } = useSwitch();
+
+  const {
+    data: availableRewards,
+    refetch: refetchAvailableRewards,
+    isLoading: isAvailableRewardsLoading
+  } = useAvailableRewards(address);
+
+  const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
   const onDisconnect = () => {
     onClose();
@@ -43,16 +56,22 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
     await navigator.clipboard.writeText(address!);
   };
 
+  const onRefetchAvailableRewards = useEffectEvent(() => {
+    refetchAvailableRewards();
+  });
+
+  useEffect(() => {
+    if (!isConnected) return;
+
+    onRefetchAvailableRewards();
+  }, [isConnected]);
+
   useOutsideClick(() => [ref.current, toggleRef.current], onClose);
 
   return (
     <div className='relative'>
-      <div
-        ref={toggleRef}
-        onClick={onOpen}
-        className='border-color-8 rounded-64 bg-color-11 shadow-20 flex h-11 max-w-fit cursor-pointer justify-end border-[0.25px]'
-      >
-        <div className='rounded-64 relative flex w-23 items-center border-r-0 py-2 pl-4'>
+      <Condition if={!isAvailableRewardsLoading}>
+        <div className='rounded-64 bg-color-11 border-color-8 absolute right-[68%] flex h-11 min-w-[6.45rem] items-center border-[0.25px] py-2 pr-11 pl-4 hover:brightness-90'>
           <CompoundWalletIcon className='size-6 flex-shrink-0' />
           <Text
             size='11'
@@ -60,15 +79,21 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             lineHeight='16'
             className='text-color-2 ml-2'
           >
-            0.0039
+            {Format.token(availableRewardsFormatted, 'compact')}
           </Text>
         </div>
+      </Condition>
+      <div
+        ref={toggleRef}
+        onClick={onOpen}
+        className='rounded-64 shadow-20 flex h-11 max-w-fit cursor-pointer justify-end'
+      >
         <Condition if={!isPending}>
-          <div className='border-color-8 shadow-25 bg-color-4 rounded-64 relative top-[-1.5px] right-[-0.5px] h-11 border-[0.25px] px-5 py-[13.5px] hover:brightness-90'>
+          <div className='border-color-8 shadow-25 bg-color-4 rounded-64 relative h-11 border-[0.25px] px-5 py-[13.5px] hover:brightness-90'>
             <Text
               size='11'
               weight='500'
-              lineHeight='16'
+              lineHeight='14'
               className='text-color-2'
             >
               {sliceAddress(address ?? '')}
@@ -97,26 +122,29 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
           <Text
             size='11'
             weight='500'
+            lineHeight='16'
             className='text-color-24'
           >
             Connected Wallet
           </Text>
           <div className='flex items-center justify-between gap-2'>
             <div className='flex items-center justify-start gap-2'>
-              <div className='bg-color-24 size-2 rounded-full' />
+              <div className='bg-color-24 size-[9px] rounded-full' />
               <Text
                 size='13'
                 weight='500'
-                lineHeight='18'
+                lineHeight='16'
                 className='text-color-2'
               >
                 {sliceAddress(address ?? '')}
               </Text>
             </div>
-            <CopyIcon
-              onClick={onAddressCopy}
-              className='text-color-2 size-4 cursor-pointer transition-all duration-200 hover:brightness-90'
-            />
+            <div className='mb-[3px]'>
+              <CopyIcon
+                onClick={onAddressCopy}
+                className='text-color-2 size-3 cursor-pointer transition-all duration-200 hover:brightness-90'
+              />
+            </div>
           </div>
           <div className='flex flex-col gap-3'>
             <Button

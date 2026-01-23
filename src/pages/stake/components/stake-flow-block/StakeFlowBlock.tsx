@@ -22,6 +22,7 @@ import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { useStatisticStore } from '@/stores/useStatisticStore';
+import { useWalletStore } from '@/stores/useWalletStore';
 
 export function StakeFlowBlock() {
   const { isConnected, address } = useConnection();
@@ -31,6 +32,7 @@ export function StakeFlowBlock() {
   const triggerStatisticRefresh = useStatisticStore(({ triggerRefresh }) => triggerRefresh);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
+  const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const {
     data: stakedBalance,
@@ -67,10 +69,16 @@ export function StakeFlowBlock() {
     (stakedBalance?.principal ?? 0n) * baseTokenPriceValue,
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
+
   const availableRewardsPriceFormatted = formatUnits(
     (availableRewards ?? 0n) * baseTokenPriceValue,
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
+
+  const onModalClose = () => {
+    setIsPendingToggle(false);
+    onClose();
+  };
 
   const onStakeConfirmed = () => {
     refetchStakedBalanceFormatted();
@@ -240,7 +248,7 @@ export function StakeFlowBlock() {
       <Modal
         title='Stake COMP tokens'
         open={isOpen}
-        onClose={onClose}
+        onClose={onModalClose}
       >
         <StakeModal
           onStakeConfirmed={onStakeConfirmed}

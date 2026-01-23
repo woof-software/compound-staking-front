@@ -34,7 +34,7 @@ export function Input(props: InputProps) {
       )}
     >
       <input
-        className='placeholder:text-color-6 w-full focus:border-none focus:outline-none focus-visible:border-none focus-visible:outline-none'
+        className='placeholder:text-color-6 w-full placeholder:text-[13px] placeholder:font-medium focus:border-none focus:outline-none focus-visible:border-none focus-visible:outline-none'
         placeholder='0'
         value={value}
         onChange={_onChange}

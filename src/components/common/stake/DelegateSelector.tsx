@@ -55,13 +55,12 @@ export function DelegateSelector(props: DelegateSelectorProps) {
       className='relative w-full'
     >
       <div
-        className='border-color-6 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-2xl border border-solid p-3'
+        className='border-color-6 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3'
         onClick={onSelectorOpen}
       >
         {!selectedAddressDelegate ? (
           <Text
             size='13'
-            weight='500'
             lineHeight='16'
             className='text-color-6'
           >
@@ -109,7 +108,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             <Input
               autoFocus
               className={cn('min-h-13', {
-                'border-color-22': !filteredDelegates.length && !!searchValue.length
+                'border-color-29': !filteredDelegates.length && !!searchValue.length
               })}
               placeholder='Delegatee name or address'
               value={searchValue}

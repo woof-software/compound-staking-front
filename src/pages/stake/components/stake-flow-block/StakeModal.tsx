@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { formatUnits, parseUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
+import COMP_AVIF from '@/assets/comp.avif';
+import { InfoIcon } from '@/assets/svg';
+import { Condition } from '@/components/common/Condition';
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
@@ -18,8 +21,8 @@ import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
-import { getImgPath } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
+
 export type StakeModalProps = {
   onClose?: () => void;
   onStakeConfirmed?: () => void;
@@ -134,12 +137,12 @@ export function StakeModal(props: StakeModalProps) {
           <div className='flex items-center justify-between gap-5'>
             <div className='flex max-w-72 items-center gap-2'>
               <img
-                src={getImgPath('/comp.avif')}
+                src={COMP_AVIF}
                 alt='comp'
                 className='size-6.75 shrink-0 rounded-full'
               />
               <AmountInput
-                className='min-h-12 max-w-60'
+                className='min-h-12 max-w-60 min-w-55'
                 disabled={isLoadingTransaction}
                 value={amountValue}
                 onChange={setAmountValue}
@@ -147,7 +150,7 @@ export function StakeModal(props: StakeModalProps) {
             </div>
             <Button
               disabled={isLoadingTransaction}
-              className={cn('bg-color-16 h-8 w-14 text-[11px] font-medium', {
+              className={cn('bg-color-16 h-8 w-14 min-w-[55px] text-[11px] font-medium', {
                 'bg-color-28': isLoadingTransaction
               })}
               onClick={onMaxButtonClick}
@@ -177,6 +180,18 @@ export function StakeModal(props: StakeModalProps) {
           </Skeleton>
         </div>
       </div>
+      <Condition if={!isAmountExceedsBalance}>
+        <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
+          <InfoIcon className='text-color-22 size-4' />
+          <Text
+            size='11'
+            lineHeight='16'
+            className='text-color-22'
+          >
+            Amount Exceeds Wallet Balance
+          </Text>
+        </div>
+      </Condition>
       <Skeleton loading={isPriceOrBalanceLoading}>
         <DelegateSelector
           disabled={isLoadingTransaction}
@@ -212,10 +227,10 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='18'
               className={cn('text-white', {
                 'text-color-6': isApproveDisabled,
-                'text-white': isApproveLoading
+                'after-animate-loading-dots text-white': isApproveLoading
               })}
             >
-              {isApproveLoading ? 'Pending...' : 'Approve'}
+              {isApproveLoading ? 'Pending' : 'Approve'}
             </Text>
             <Text
               size='11'
@@ -243,10 +258,10 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='18'
               className={cn('text-white', {
                 'text-color-6': isConfirmDisabled,
-                'text-white': isStakeLoading
+                'after-animate-loading-dots text-white': isStakeLoading
               })}
             >
-              {isStakeLoading ? 'Pending...' : 'Confirm'}
+              {isStakeLoading ? 'Pending' : 'Confirm'}
             </Text>
             <Text
               size='11'
