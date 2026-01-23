@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
@@ -25,7 +25,7 @@ export function DelegateModal(props: DelegateModalProps) {
 
   const { data: subAccountAddress, isLoading: isSubAccountLoading } = useDelegateSubAccount(address);
 
-  const { setIsPendingToggle } = useWalletStore();
+  const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const {
     sendTransactionAsync: delegateTransaction,
@@ -55,6 +55,12 @@ export function DelegateModal(props: DelegateModalProps) {
     await delegateTransaction({ subAddress: subAccountAddress, delegate: selectedAddressDelegate.address });
   };
 
+  const onDelegateSuccess = useEffectEvent(() => {
+    setIsPendingToggle(false);
+    onClose();
+    onDelegateConfirmed();
+  });
+
   useEffect(() => {
     setSelectedAddressDelegate(delegate ?? null);
   }, [delegate]);
@@ -62,9 +68,7 @@ export function DelegateModal(props: DelegateModalProps) {
   useEffect(() => {
     if (!isDelegateSuccess) return;
 
-    setIsPendingToggle(false);
-    onClose();
-    onDelegateConfirmed();
+    onDelegateSuccess();
   }, [isDelegateSuccess]);
 
   return (

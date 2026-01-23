@@ -1,38 +1,67 @@
-import { Text } from '@/components/ui/Text';
-import { clamp } from '@/lib/utils/numeric';
+import { formatUnits } from 'viem';
 
-export type RewardRowProps = {
-  vestingAmount: number;
-  toClaim: number;
+import { RewardToClaim } from '@/components/common/stake/RewardToClaim';
+import { RewardVestingTimer } from '@/components/common/stake/RewardVestingTimer';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Text } from '@/components/ui/Text';
+import { ENV } from '@/consts/env';
+import { Format, FormatTime } from '@/lib/utils/format';
+
+export interface RewardRowProps {
+  baseTokenPriceValue: bigint;
+  isLoading: boolean;
+  vestingAmount: bigint;
+  toClaim: bigint;
+  claimedAmount: bigint;
   startDate: number;
   endDate: number;
-  claimedAmount: number;
-  vestingStartDate: number;
-  vestingEndDate: number;
-  percents: number;
-};
+}
 
 export function RewardRow(props: RewardRowProps) {
-  const { vestingAmount, toClaim, startDate, endDate, claimedAmount, percents } = props;
+  const { baseTokenPriceValue, isLoading, vestingAmount, claimedAmount, startDate, endDate } = props;
 
-  const vestingDuration = 100 - percents;
+  const vestingAmountPriceFormatted = formatUnits(
+    vestingAmount * baseTokenPriceValue,
+    ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
+  );
 
   return (
-    <div className='py-6 flex flex-col gap-5 px-8 even:bg-color-5 rounded-sm'>
+    <div className='even:bg-color-5 flex flex-col gap-5 rounded-sm px-8 py-6'>
       <div className='grid grid-cols-5'>
         <div>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='15'
+              lineHeight='20'
+              className='tabular-nums'
+            >
+              {Format.token(formatUnits(vestingAmount, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP')}
+            </Text>
+          </Skeleton>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              lineHeight='16'
+              className='text-color-24 tabular-nums'
+            >
+              {Format.price(vestingAmountPriceFormatted, 'standard')}
+            </Text>
+          </Skeleton>
+        </div>
+        <RewardToClaim
+          isLoading={isLoading}
+          baseTokenPriceValue={baseTokenPriceValue}
+          vesting={vestingAmount}
+          claimed={claimedAmount}
+          vestingStartDate={startDate}
+          vestingEndDate={endDate}
+        />
+        <div>
           <Text
             size='15'
             lineHeight='20'
           >
-            {vestingAmount} COMP
-          </Text>
-          <Text
-            size='11'
-            lineHeight='16'
-            className='text-color-24'
-          >
-            $40.00
+            {FormatTime.endDate(startDate)}
           </Text>
         </div>
         <div>
@@ -40,70 +69,25 @@ export function RewardRow(props: RewardRowProps) {
             size='15'
             lineHeight='20'
           >
-            {toClaim} COMP
+            {FormatTime.endDate(endDate)}
           </Text>
         </div>
         <div>
-          <Text
-            size='15'
-            lineHeight='20'
-          >
-            {startDate}
-          </Text>
-        </div>
-        <div>
-          <Text
-            size='15'
-            lineHeight='20'
-          >
-            {endDate}
-          </Text>
-        </div>
-        <div>
-          <Text
-            size='15'
-            lineHeight='20'
-          >
-            {claimedAmount}
-          </Text>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='15'
+              lineHeight='20'
+              className='tabular-nums'
+            >
+              {Format.token(formatUnits(claimedAmount, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP')}
+            </Text>
+          </Skeleton>
         </div>
       </div>
-      <div className='flex items-center gap-5'>
-        <Text
-          size='11'
-          weight='500'
-          lineHeight='16'
-          className='text-color-24 shrink-0'
-        >
-          Vesting Duration
-        </Text>
-        <div className='flex items-center gap-1 w-full'>
-          <div
-            className='bg-color-7 w-full h-1 rounded-xs transition-width'
-            style={{ width: `${clamp(percents, 0, 100)}%` }}
-          />
-          <Text
-            size='11'
-            weight='500'
-            lineHeight='16'
-            className='shrink-0 animate-vesting-text'
-          >
-            6d 23h
-          </Text>
-          <div
-            className='bg-color-9 w-full h-1 rounded-xs transition-width'
-            style={{ width: `${clamp(vestingDuration, 0, 100)}%` }}
-          />
-          <Text
-            size='11'
-            weight='500'
-            lineHeight='16'
-            className='shrink-0'
-          >
-            18d 23h
-          </Text>
-        </div>
-      </div>
+      <RewardVestingTimer
+        vestingStartDate={startDate}
+        vestingEndDate={endDate}
+      />
     </div>
   );
 }

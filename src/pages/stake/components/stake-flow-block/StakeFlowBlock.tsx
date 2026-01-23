@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
@@ -9,6 +8,8 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { useAvailableRewards } from '@/hooks/useAvailableRewards';
+import { useMultiplier } from '@/hooks/useMultiplier';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -19,25 +20,30 @@ import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
+import { useRewardStore } from '@/stores/useRewardStore';
+import { useStatisticStore } from '@/stores/useStatisticStore';
 
 export function StakeFlowBlock() {
   const { isConnected, address } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { triggerDelegateRefresh } = useDelegateStore();
+  const triggerStatisticRefresh = useStatisticStore(({ triggerRefresh }) => triggerRefresh);
+  const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
+  const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
 
   const {
     data: stakedBalance,
-    isLoading: isStakedBalanceFormattedFetching,
+    isLoading: isStakedBalanceLoading,
     refetch: refetchStakedBalanceFormatted
   } = useStakedBalance(address);
 
   const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(address);
 
-  const { data: baseTokenPrice, isFetching: isBaseTokenPriceFetching } = useTokenPrice(
-    ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
-  );
+  const { data: multiplier, refetch: refetchMultiplier } = useMultiplier(address);
+  const { data: availableRewards, refetch: refetchAvailableRewards } = useAvailableRewards(address);
+
+  const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
   const { data: lockedTokenBalance } = useLockedBalance(address);
 
@@ -46,27 +52,36 @@ export function StakeFlowBlock() {
 
   /* Loading */
   const isPriceOrBalanceLoading = isStakedTokenPrice || isStakedTokenWalletBalance;
-  const isTokenBalanceLoading = isStakedBalanceFormattedFetching || isBaseTokenPriceFetching;
+  const isTokenBalanceLoading = isStakedBalanceLoading || isBaseTokenPriceLoading;
   const isLoading = isConnected ? isPriceOrBalanceLoading || isTokenBalanceLoading : false;
 
   const isStakeButtonDisabled = !isConnected || isOpen || isLoading || (lockedTokenBalance?.amount ?? 0n) > 0n;
 
   const stakedBalanceFormatted = formatUnits(stakedBalance?.principal ?? 0n, ENV.BASE_TOKEN_DECIMALS);
   const virtualBalanceFormatted = formatUnits(virtualBalance ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
+  const multiplierFormatted = formatUnits(multiplier ?? 0n, 18);
+  const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
+  const baseTokenPriceValue = baseTokenPrice ?? 0n;
   const stakedBalancePriceFormatted = formatUnits(
-    (stakedBalance?.principal ?? 0n) * (baseTokenPrice ?? 0n),
+    (stakedBalance?.principal ?? 0n) * baseTokenPriceValue,
+    ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
+  );
+  const availableRewardsPriceFormatted = formatUnits(
+    (availableRewards ?? 0n) * baseTokenPriceValue,
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
 
-  const multiplier = +(virtualBalanceFormatted || '1') / +stakedBalanceFormatted;
-
-  const onStakeConfirmed = useCallback(() => {
+  const onStakeConfirmed = () => {
     refetchStakedBalanceFormatted();
     refetchVirtualBalance();
+    refetchMultiplier();
+    refetchAvailableRewards();
 
+    triggerStatisticRefresh();
     triggerDelegateRefresh();
-  }, [refetchStakedBalanceFormatted, refetchVirtualBalance, triggerDelegateRefresh]);
+    triggerRewardRefresh();
+  };
 
   return (
     <Card
@@ -88,19 +103,18 @@ export function StakeFlowBlock() {
               <Text
                 size='17'
                 weight='500'
-                className={cn('text-color-2', {
+                className={cn('text-color-2 tabular-nums', {
                   'text-color-6': !isConnected
                 })}
               >
-                {isConnected && !!stakedBalance?.principal ? Format.token(stakedBalanceFormatted, 'compact') : '0.0000'}{' '}
-                COMP
+                {Format.token(stakedBalanceFormatted, 'compact', 'COMP')}
               </Text>
             </Skeleton>
             <Condition if={isConnected && !!stakedBalance?.principal}>
               <Skeleton loading={isLoading}>
                 <Text
                   size='11'
-                  className='text-color-24'
+                  className='text-color-24 tabular-nums'
                 >
                   {Format.price(stakedBalancePriceFormatted, 'standard')}
                 </Text>
@@ -120,11 +134,11 @@ export function StakeFlowBlock() {
             <Text
               size='17'
               weight='500'
-              className={cn('text-color-2', {
+              className={cn('text-color-2 tabular-nums', {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected && !!virtualBalance ? Format.token(virtualBalanceFormatted, 'compact') : '0.0000'} stCOMP
+              {Format.token(virtualBalanceFormatted, 'compact', 'COMP')}
             </Text>
           </Skeleton>
         </div>
@@ -140,11 +154,11 @@ export function StakeFlowBlock() {
             <Text
               size='17'
               weight='500'
-              className={cn('text-color-2', {
+              className={cn('text-color-2 tabular-nums', {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? (multiplier ? `${Format.rate(multiplier)}x` : '1x') : '-'}
+              {isConnected ? (multiplier ? `${Format.rate(+multiplierFormatted)}x` : '1x') : '-'}
             </Text>
           </Skeleton>
         </div>
@@ -161,20 +175,20 @@ export function StakeFlowBlock() {
               <Text
                 size='17'
                 weight='500'
-                className={cn('text-color-2', {
+                className={cn('text-color-2 tabular-nums', {
                   'text-color-6': !isConnected
                 })}
               >
-                {isConnected ? '0.0000' : '0.0000'} COMP
+                {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
               </Text>
             </Skeleton>
-            <Condition if={isConnected && !!stakedBalance?.principal}>
+            <Condition if={isConnected && !!availableRewards}>
               <Skeleton loading={isLoading}>
                 <Text
                   size='11'
-                  className='text-color-24'
+                  className='text-color-24 tabular-nums'
                 >
-                  {Format.price(stakedBalancePriceFormatted, 'standard')}
+                  {Format.price(availableRewardsPriceFormatted, 'standard')}
                 </Text>
               </Skeleton>
             </Condition>
@@ -192,7 +206,7 @@ export function StakeFlowBlock() {
             <Text
               size='17'
               weight='500'
-              className={cn('text-color-2', {
+              className={cn('text-color-2 tabular-nums', {
                 'text-color-6': !isConnected
               })}
             >

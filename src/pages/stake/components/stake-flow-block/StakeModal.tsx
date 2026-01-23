@@ -28,18 +28,20 @@ export type StakeModalProps = {
 export function StakeModal(props: StakeModalProps) {
   const { onClose = noop, onStakeConfirmed = noop } = props;
 
-  const { setIsPendingToggle } = useWalletStore();
+  const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
 
   const { address } = useConnection();
 
-  const { data: baseTokenPrice, isFetching: isBaseTokenPriceFetching } = useTokenPrice(
-    ENV.BASE_TOKEN_PRICE_FEED_ADDRESS
-  );
+  const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
-  const { data: walletBalance, isFetching: isWalletBalanceFetching } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
+  const {
+    data: walletBalance,
+    refetch: refetchWalletBalance,
+    isLoading: isWalletBalanceLoading
+  } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
 
   const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(address);
 
@@ -63,7 +65,7 @@ export function StakeModal(props: StakeModalProps) {
   const isAmountExceedsBalance = parseAmount <= (walletBalance ?? 0n);
 
   /* Loading */
-  const isPriceOrBalanceLoading = isBaseTokenPriceFetching || isWalletBalanceFetching;
+  const isPriceOrBalanceLoading = isBaseTokenPriceLoading || isWalletBalanceLoading;
   const isApproveLoading = isApprovePending || isApproveConfirming;
   const isStakeLoading = isStakePending || isStakeConfirming;
   const isLoadingTransaction = isApproveLoading || isStakeLoading;
@@ -121,6 +123,7 @@ export function StakeModal(props: StakeModalProps) {
 
   useEffect(() => {
     refetchAllowance();
+    refetchWalletBalance();
   }, []);
 
   return (
@@ -169,7 +172,7 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='16'
               className='text-color-24'
             >
-              {Format.token(walletBalanceFormatted, 'standard')} COMP
+              {Format.token(walletBalanceFormatted, 'standard', 'COMP')}
             </Text>
           </Skeleton>
         </div>

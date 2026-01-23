@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { isAddress } from 'viem';
+import { useEffect, useEffectEvent, useState } from 'react';
+import { formatUnits, isAddress } from 'viem';
+import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import { CrossIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -7,50 +8,113 @@ import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Switch } from '@/components/ui/Switch';
 import { Text } from '@/components/ui/Text';
+import { ENV } from '@/consts/env';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
+import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
+import { Format } from '@/lib/utils/format';
+import { useVestingClaim } from '@/pages/stake/hooks/useVestingClaim';
+import { useWalletStore } from '@/stores/useWalletStore';
 
 export type ClaimModalProps = {
   isOpen?: boolean;
+  totalToClaim?: bigint;
   onClose?: () => void;
+  onClaimConfirmed?: () => void;
 };
 
-export function ClaimModal({ isOpen = false, onClose = noop }: ClaimModalProps) {
-  const [delegateNameOrAddress, setDelegateNameOrAddress] = useState<string>('');
+export function ClaimModal(props: ClaimModalProps) {
+  const { isOpen = false, totalToClaim = 0n, onClose = noop, onClaimConfirmed = noop } = props;
+
+  const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
+
+  const { isConnected, address } = useConnection();
+
+  const [walletAddress, setWalletAddress] = useState<string>('');
 
   const [isChangeWallet, setIsChangeWallet] = useState<boolean>(false);
 
-  const isValidAddress = !isChangeWallet || isAddress(delegateNameOrAddress);
+  const isValidAddress = !isChangeWallet || isAddress(walletAddress);
 
-  const onDelegateNameOrAddressChange = (value: string) => {
-    setDelegateNameOrAddress(value);
+  const { sendTransactionAsync: claimRequest, data: claimHash, isPending: isClaimPending } = useVestingClaim();
+
+  const { isLoading: isClaimConfirming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({
+    hash: claimHash
+  });
+
+  const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
+
+  const baseTokenPriceValue = baseTokenPrice ?? 0n;
+
+  const totalClaimFormatted = formatUnits(totalToClaim, ENV.STAKED_TOKEN_DECIMALS);
+
+  const totalClaimPriceFormatted = formatUnits(
+    totalToClaim * baseTokenPriceValue,
+    ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
+  );
+
+  const isLoading = isConnected ? isBaseTokenPriceLoading : false;
+  const isVestingLoading = isClaimPending || isClaimConfirming;
+
+  const isClaimButtonDisabled = isLoading || isVestingLoading || !isValidAddress;
+
+  const onWalletAddressChange = (value: string) => {
+    setWalletAddress(value);
   };
 
   const onClear = () => {
-    setDelegateNameOrAddress('');
+    setWalletAddress('');
   };
 
   const onSwitchChange = () => {
     setIsChangeWallet(!isChangeWallet);
-    setDelegateNameOrAddress('');
+    setWalletAddress('');
   };
 
   const onPaste = async () => {
     const text = await navigator.clipboard.readText();
 
-    if (isAddress(text)) return;
+    if (!isAddress(text)) return;
 
-    setDelegateNameOrAddress(text ?? '');
+    setWalletAddress(text);
   };
+
+  const onConfirm = async () => {
+    if (isAddress(walletAddress)) {
+      await claimRequest(walletAddress);
+      return;
+    }
+
+    if (!address) return;
+
+    await claimRequest(address);
+  };
+
+  const onClaimSuccess = useEffectEvent(() => {
+    setIsChangeWallet(false);
+    setWalletAddress('');
+
+    setIsPendingToggle(false);
+    onClose();
+    onClaimConfirmed();
+  });
+
+  useEffect(() => {
+    if (!isClaimSuccess) return;
+
+    onClaimSuccess();
+  }, [isClaimSuccess]);
 
   return (
     <Modal
-      title='Vesting'
+      title='Claim COMP'
       open={isOpen}
       onClose={onClose}
     >
-      <div className='w-full mt-8 flex flex-col gap-8'>
+      <div className='mt-8 flex w-full flex-col gap-8'>
         <Divider orientation='horizontal' />
         <div className='flex'>
           <Text
@@ -60,24 +124,29 @@ export function ClaimModal({ isOpen = false, onClose = noop }: ClaimModalProps) 
           >
             Amount to be claimed
           </Text>
-          <div className='flex flex-col shrink-0 items-end'>
-            <Text
-              size='15'
-              weight='500'
-              lineHeight='20'
-            >
-              1.0000 COMP
-            </Text>
-            <Text
-              size='11'
-              lineHeight='16'
-              className='text-color-24'
-            >
-              $40.00
-            </Text>
+          <div className='flex shrink-0 flex-col items-end'>
+            <Skeleton loading={isLoading}>
+              <Text
+                size='15'
+                weight='500'
+                lineHeight='20'
+              >
+                {totalToClaim > 0 && '≈'}
+                {Format.token(totalClaimFormatted, 'compact', 'COMP')}
+              </Text>
+            </Skeleton>
+            <Skeleton loading={isLoading}>
+              <Text
+                size='11'
+                lineHeight='16'
+                className='text-color-24'
+              >
+                {Format.price(totalClaimPriceFormatted, 'standard')}
+              </Text>
+            </Skeleton>
           </div>
         </div>
-        <div className='items-center justify-center gap-3 flex'>
+        <div className='flex items-center justify-center gap-3'>
           <Text
             size='11'
             weight='500'
@@ -92,21 +161,21 @@ export function ClaimModal({ isOpen = false, onClose = noop }: ClaimModalProps) 
         </div>
         <Condition if={isChangeWallet}>
           <Input
-            placeholder='Delegator name or address'
-            value={delegateNameOrAddress}
-            onChange={onDelegateNameOrAddressChange}
+            placeholder='Wallet address'
+            value={walletAddress}
+            onChange={onWalletAddressChange}
             addonRight={
               <>
-                <Condition if={!!delegateNameOrAddress.length}>
+                <Condition if={!!walletAddress.length}>
                   <CrossIcon
                     onClick={onClear}
-                    className='size-4 shrink-0 text-color-25 cursor-pointer'
+                    className='text-color-25 size-4 shrink-0 cursor-pointer'
                   />
                 </Condition>
-                <Condition if={!delegateNameOrAddress.length}>
+                <Condition if={!walletAddress.length}>
                   <Button
                     onClick={onPaste}
-                    className='bg-color-9 rounded-4xl w-13 h-8 !text-color-24 text-[11px] font-medium'
+                    className='bg-color-9 !text-color-24 h-8 w-13 rounded-4xl text-[11px] font-medium'
                   >
                     Paste
                   </Button>
@@ -116,10 +185,23 @@ export function ClaimModal({ isOpen = false, onClose = noop }: ClaimModalProps) 
           />
         </Condition>
         <Button
-          disabled={!isValidAddress}
-          className='h-14 rounded-100 text-[13px] fs leading-[18px] font-medium'
+          className={cn('h-14 flex-col', {
+            'bg-color-7': isVestingLoading
+          })}
+          disabled={isClaimButtonDisabled}
+          onClick={onConfirm}
         >
-          Confirm
+          <Text
+            size='13'
+            weight='500'
+            lineHeight='18'
+            className={cn('text-white', {
+              'text-color-6': isClaimButtonDisabled,
+              'text-white': isVestingLoading
+            })}
+          >
+            {isVestingLoading ? 'Pending...' : 'Confirm'}
+          </Text>
         </Button>
       </div>
     </Modal>

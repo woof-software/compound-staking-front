@@ -1,19 +1,37 @@
+import { useEffect } from 'react';
+import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { ENV } from '@/consts/env';
 import { Format, FormatUnits } from '@/lib/utils/format';
-import { useStatisticTotalStaked } from '@/pages/stake/hooks/useStatisticTotalStaked';
+import { useTotalStaked } from '@/pages/stake/hooks/useTotalStaked';
+import { useStatisticStore } from '@/stores/useStatisticStore';
 
 import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
 export function TotalStaked() {
   const { isConnected } = useConnection();
-  const { totalStaked } = useStatisticTotalStaked();
 
-  const totalStakedFormatted = parseFloat(Format.token(Number(totalStaked), 'compact'));
-  const unit = FormatUnits.parse(Number(totalStaked));
+  const { data: totalStaked, isLoading: isTotalStakedLoading, refetch: refetchTotalStaked } = useTotalStaked();
+
+  const needTotalStakedRefresh = useStatisticStore(({ needRefresh }) => needRefresh);
+
+  console.log('totalStaked=>', totalStaked);
+
+  const totalStakedFormatted = formatUnits(totalStaked ?? 0n, ENV.BASE_TOKEN_DECIMALS);
+
+  const unit = FormatUnits.parse(Number(totalStakedFormatted));
+
+  const isLoading = isConnected ? isTotalStakedLoading : false;
+
+  useEffect(() => {
+    if (!isConnected || !needTotalStakedRefresh) return;
+
+    refetchTotalStaked();
+  }, [needTotalStakedRefresh, isConnected]);
 
   return (
     <div className='flex flex-col items-start gap-1.5'>
@@ -24,15 +42,15 @@ export function TotalStaked() {
       >
         Total staked
       </Text>
-      <Skeleton loading={false}>
+      <Skeleton loading={isLoading}>
         <div className='flex items-start gap-3'>
           <CompoundBlackCircle className='text-compound-icon-bg mt-1 size-10' />
           <Text
             size='40'
             weight='500'
           >
-            {isConnected ? totalStakedFormatted : '0.00'}
-            <Condition if={isConnected}>
+            {Format.token(totalStakedFormatted, 'compact', undefined, 2).slice(0, -1)}
+            <Condition if={!!unit}>
               <Text
                 tag='span'
                 size='40'

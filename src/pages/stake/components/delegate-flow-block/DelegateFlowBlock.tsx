@@ -25,7 +25,7 @@ import { useDelegateStore } from '@/stores/useDelegateStore';
 export function DelegateFlowBlock() {
   const { isConnected, address } = useConnection();
 
-  const { needDelegateRefresh, resetDelegateRefresh } = useDelegateStore();
+  const { needRefresh: needDelegateRefresh, resetRefresh: resetDelegateRefresh } = useDelegateStore();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
@@ -68,7 +68,8 @@ export function DelegateFlowBlock() {
 
   const isCooldownBlocked = isConnected && !isCooldownFinished;
 
-  const isDelegateButtonDisabled = !isConnected || isLoading || isCooldownBlocked || !hasOpenPosition || hasActiveLock;
+  const isDelegateButtonDisabled =
+    !isConnected || isOpen || isLoading || isCooldownBlocked || !hasOpenPosition || hasActiveLock;
 
   const cooldownEndMs = !canShowDelegation || !hasCooldownRequest ? 0 : executableAtSec * 1000;
 
@@ -95,15 +96,7 @@ export function DelegateFlowBlock() {
     } else {
       setCooldownFinished();
     }
-  }, [
-    isConnected,
-    isLoading,
-    hasCooldownRequest,
-    hasActiveLock,
-    remainingSeconds,
-    setCooldownFinished,
-    resetCooldownFinished
-  ]);
+  }, [isConnected, isLoading, hasCooldownRequest, hasActiveLock, remainingSeconds]);
 
   useEffect(() => {
     if (!isConnected || !needDelegateRefresh) return;

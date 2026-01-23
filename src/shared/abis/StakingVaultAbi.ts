@@ -1,7 +1,7 @@
 export const StakingVaultAbi = [
   {
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
-    name: 'getUserStake',
+    name: 'stakeInfoOf',
     outputs: [
       {
         components: [
@@ -19,7 +19,28 @@ export const StakingVaultAbi = [
   },
   {
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'availableRewardsOf',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'multiplierOf',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
     name: 'virtualBalanceOf',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    inputs: [],
+    name: 'totalStaked',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function'
@@ -34,5 +55,6 @@ export const StakingVaultAbi = [
     stateMutability: 'nonpayable',
     type: 'function'
   },
-  { inputs: [], name: 'unstake', outputs: [], stateMutability: 'nonpayable', type: 'function' }
+  { inputs: [], name: 'unstake', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+  { inputs: [], name: 'vestRewards', outputs: [], stateMutability: 'nonpayable', type: 'function' }
 ];
