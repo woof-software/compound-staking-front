@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
@@ -29,9 +28,9 @@ export function StakeFlowBlock() {
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const { triggerRefresh: triggerStatisticRefresh } = useStatisticStore();
-  const { triggerRefresh: triggerDelegateRefresh } = useDelegateStore();
-  const { triggerRefresh: triggerRewardRefresh } = useRewardStore();
+  const triggerStatisticRefresh = useStatisticStore(({ triggerRefresh }) => triggerRefresh);
+  const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
+  const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
 
   const {
     data: stakedBalance,
@@ -73,7 +72,7 @@ export function StakeFlowBlock() {
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
 
-  const onStakeConfirmed = useCallback(() => {
+  const onStakeConfirmed = () => {
     refetchStakedBalanceFormatted();
     refetchVirtualBalance();
     refetchMultiplier();
@@ -82,15 +81,7 @@ export function StakeFlowBlock() {
     triggerStatisticRefresh();
     triggerDelegateRefresh();
     triggerRewardRefresh();
-  }, [
-    refetchStakedBalanceFormatted,
-    refetchVirtualBalance,
-    refetchMultiplier,
-    refetchAvailableRewards,
-    triggerStatisticRefresh,
-    triggerDelegateRefresh,
-    triggerRewardRefresh
-  ]);
+  };
 
   return (
     <Card
@@ -116,8 +107,7 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {isConnected && !!stakedBalance?.principal ? Format.token(stakedBalanceFormatted, 'compact') : '0.0000'}{' '}
-                COMP
+                {Format.token(stakedBalanceFormatted, 'compact', 'COMP')}
               </Text>
             </Skeleton>
             <Condition if={isConnected && !!stakedBalance?.principal}>
@@ -148,7 +138,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected && !!virtualBalance ? Format.token(virtualBalanceFormatted, 'compact') : '0.0000'} stCOMP
+              {Format.token(virtualBalanceFormatted, 'compact', 'COMP')}
             </Text>
           </Skeleton>
         </div>
@@ -189,7 +179,7 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {isConnected && !!availableRewards ? Format.token(availableRewardsFormatted, 'compact') : '0.0000'} COMP
+                {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
               </Text>
             </Skeleton>
             <Condition if={isConnected && !!availableRewards}>

@@ -17,7 +17,7 @@ export function TotalStaked() {
 
   const { data: totalStaked, isLoading: isTotalStakedLoading, refetch: refetchTotalStaked } = useTotalStaked();
 
-  const { needRefresh: needTotalStakedRefresh } = useStatisticStore();
+  const needTotalStakedRefresh = useStatisticStore(({ needRefresh }) => needRefresh);
 
   const totalStakedFormatted = formatUnits(totalStaked ?? 0n, ENV.BASE_TOKEN_DECIMALS);
 

@@ -1,16 +1,17 @@
 import { max } from '@/lib/utils/numeric';
 
-type VestingToClaimCalc = {
+type VestingToClaimCalcArgs = {
   vestingAmount: bigint;
   claimedAmount: bigint;
   endDate: number;
   startDate: number;
+  secondsLeft?: number;
 };
 
-export function vestingToClaimCalc(props: VestingToClaimCalc, secondsLeft = 0) {
-  const { startDate: vestingStartDate, endDate: vestingEndDate, claimedAmount, vestingAmount } = props;
+export function vestingToClaimCalc(args: VestingToClaimCalcArgs) {
+  const { startDate, endDate, claimedAmount, vestingAmount, secondsLeft = 0 } = args;
 
-  const totalSecNum = Math.max(0, vestingEndDate - vestingStartDate);
+  const totalSecNum = Math.max(0, endDate - startDate);
 
   const elapsed = BigInt(totalSecNum - secondsLeft);
 

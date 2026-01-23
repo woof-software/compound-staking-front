@@ -29,7 +29,7 @@ export type ClaimModalProps = {
 export function ClaimModal(props: ClaimModalProps) {
   const { isOpen = false, totalToClaim = 0n, onClose = noop, onClaimConfirmed = noop } = props;
 
-  const { setIsPendingToggle } = useWalletStore();
+  const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const { isConnected, address } = useConnection();
 
@@ -83,12 +83,12 @@ export function ClaimModal(props: ClaimModalProps) {
   };
 
   const onConfirm = async () => {
-    if (!address) return;
-
     if (isAddress(walletAddress)) {
       await claimRequest(walletAddress);
       return;
     }
+
+    if (!address) return;
 
     await claimRequest(address);
   };
@@ -131,7 +131,8 @@ export function ClaimModal(props: ClaimModalProps) {
                 weight='500'
                 lineHeight='20'
               >
-                {isConnected && !!totalToClaim ? `≈${Format.token(totalClaimFormatted, 'compact')}` : '0.0000'} COMP
+                {totalToClaim > 0 && '≈'}
+                {Format.token(totalClaimFormatted, 'compact', 'COMP')}
               </Text>
             </Skeleton>
             <Skeleton loading={isLoading}>
