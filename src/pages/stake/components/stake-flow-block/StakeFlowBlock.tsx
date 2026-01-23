@@ -32,7 +32,6 @@ export function StakeFlowBlock() {
   const triggerStatisticRefresh = useStatisticStore(({ triggerRefresh }) => triggerRefresh);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
-  const triggerWalletRefresh = useWalletStore(({ triggerRefresh }) => triggerRefresh);
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const {
@@ -87,7 +86,7 @@ export function StakeFlowBlock() {
     refetchMultiplier();
     refetchAvailableRewards();
 
-    triggerWalletRefresh();
+    // triggerWalletRefresh();
     triggerStatisticRefresh();
     triggerDelegateRefresh();
     triggerRewardRefresh();
