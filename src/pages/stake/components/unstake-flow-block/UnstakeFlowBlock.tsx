@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useEffectEvent, useMemo } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
@@ -11,9 +11,11 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
 import { useUnstakeLockDuration } from '@/hooks/useLockDuration';
+import { useMultiplier } from '@/hooks/useMultiplier';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
@@ -26,6 +28,7 @@ import { useStakedVirtualBalance } from '@/pages/stake/hooks/useStakedVirtualBal
 import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
 import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
 import { useDelegateStore } from '@/stores/useDelegateStore';
+import { useRewardStore } from '@/stores/useRewardStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function UnstakeFlowBlock() {
@@ -38,7 +41,8 @@ export function UnstakeFlowBlock() {
   } = useSwitch();
 
   const { setIsPendingToggle } = useWalletStore();
-  const { triggerDelegateRefresh } = useDelegateStore();
+  const { triggerRefresh: triggerDelegateRefresh } = useDelegateStore();
+  const { triggerRefresh: triggerRewardRefresh } = useRewardStore();
 
   const { isConnected, address } = useConnection();
 
@@ -48,6 +52,8 @@ export function UnstakeFlowBlock() {
 
   const { data: stakedTokenBalance, refetch: refetchStakedTokenBalance } = useStakedBalance(address);
   const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(address);
+  const { refetch: refetchMultiplier } = useMultiplier(address);
+  const { refetch: refetchAvailableRewards } = useAvailableRewards(address);
 
   const {
     data: lockedTokenBalance,
@@ -127,6 +133,17 @@ export function UnstakeFlowBlock() {
     }
   };
 
+  const onRequestSuccess = useEffectEvent(() => {
+    refetchStakedTokenBalance();
+    refetchVirtualTokenBalance();
+    refetchMultiplier();
+    refetchAvailableRewards();
+    refetchLockedTokenBalance();
+
+    triggerDelegateRefresh();
+    triggerRewardRefresh();
+  });
+
   useEffect(() => {
     setIsPendingToggle(isTransactionLoading);
   }, [isTransactionLoading]);
@@ -155,11 +172,7 @@ export function UnstakeFlowBlock() {
     }
 
     if (isUnstakeRequestSuccess || isUnlockRequestSuccess) {
-      refetchVirtualTokenBalance();
-      refetchStakedTokenBalance();
-      refetchLockedTokenBalance();
-
-      triggerDelegateRefresh();
+      onRequestSuccess();
     }
 
     if (isUnstakeRequestSuccess) {
@@ -192,7 +205,7 @@ export function UnstakeFlowBlock() {
                     size='17'
                     weight='500'
                     lineHeight='17'
-                    className={cn('text-color-2', {
+                    className={cn('text-color-2 tabular-nums', {
                       'text-color-6': !isConnected
                     })}
                   >
@@ -206,7 +219,7 @@ export function UnstakeFlowBlock() {
                   <Skeleton loading={isLoading || isStakedTokenPrice}>
                     <Text
                       size='11'
-                      className='text-color-24'
+                      className='text-color-24 tabular-nums'
                     >
                       {Format.price(lockedStakedBalancePriceFormatted, 'standard')}
                     </Text>

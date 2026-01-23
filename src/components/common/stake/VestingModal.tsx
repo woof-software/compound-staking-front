@@ -1,27 +1,87 @@
-import { useState } from 'react';
-import { isAddress } from 'viem';
+import { useEffect, useEffectEvent } from 'react';
+import { formatUnits } from 'viem';
+import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
+import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
-import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { ENV } from '@/consts/env';
+import { useAvailableRewards } from '@/hooks/useAvailableRewards';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
+import { useVestingPerUser } from '@/hooks/useVestingPerUser';
+import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
+import { Format } from '@/lib/utils/format';
+import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
+import { useVestRewards } from '@/pages/stake/hooks/useVestRewards';
+import { useWalletStore } from '@/stores/useWalletStore';
 
 export type VestingModalProps = {
   isOpen?: boolean;
   onClose?: () => void;
+  onVestingConfirmed?: () => void;
 };
 
-export function VestingModal({ isOpen = false, onClose = noop }: VestingModalProps) {
-  const [delegateNameOrAddress, setDelegateNameOrAddress] = useState<string>('');
+export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirmed = noop }: VestingModalProps) {
+  const { isConnected, address } = useConnection();
 
-  const isValidAddress = isAddress(delegateNameOrAddress);
+  const { setIsPendingToggle } = useWalletStore();
 
-  const onDelegateNameOrAddressChange = (value: string) => {
-    setDelegateNameOrAddress(value);
+  const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
+
+  const { data: availableRewards, isLoading: isAvailableRewardsLoading } = useAvailableRewards(address);
+
+  const { data: maxVestingPositions } = useVestingPerUser();
+
+  const { data: vestingPositions, isLoading: isVestingPositionsLoading } = useVestingPosition(address);
+
+  const {
+    sendTransactionAsync: vestRewardsRequest,
+    data: vestRewardsHash,
+    isPending: isVestRewardsPending
+  } = useVestRewards();
+
+  const { isLoading: isVestRewardsConfirming, isSuccess: isVestRewardsSuccess } = useWaitForTransactionReceipt({
+    hash: vestRewardsHash
+  });
+
+  const baseTokenPriceValue = baseTokenPrice ?? 0n;
+  const availableRewardsPriceFormatted = formatUnits(
+    (availableRewards ?? 0n) * baseTokenPriceValue,
+    ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
+  );
+
+  const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
+
+  const hasPosition = !!vestingPositions?.length;
+  const hasMaxPosition = hasPosition ? vestingPositions?.length === maxVestingPositions : false;
+
+  const isVestingLoading = isVestingPositionsLoading || isVestRewardsPending || isVestRewardsConfirming;
+  const isLoading = isConnected ? isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
+
+  const isVestButtonDisabled = isLoading || isVestingLoading || hasMaxPosition;
+
+  const onConfirm = async () => {
+    if (!address) return;
+
+    await vestRewardsRequest();
   };
+
+  const onVestRewardsSuccess = useEffectEvent(() => {
+    setIsPendingToggle(false);
+    onClose();
+    onVestingConfirmed();
+  });
+
+  useEffect(() => {
+    if (!isVestRewardsSuccess) return;
+
+    onVestRewardsSuccess();
+  }, [isVestRewardsSuccess]);
 
   return (
     <Modal
@@ -29,7 +89,7 @@ export function VestingModal({ isOpen = false, onClose = noop }: VestingModalPro
       open={isOpen}
       onClose={onClose}
     >
-      <div className='mt-8 flex gap-8 flex-col'>
+      <div className='mt-8 flex flex-col gap-8'>
         <Divider orientation='horizontal' />
         <div className='flex'>
           <Text
@@ -39,43 +99,74 @@ export function VestingModal({ isOpen = false, onClose = noop }: VestingModalPro
           >
             Amount to be vested
           </Text>
-          <div className='flex flex-col items-end'>
-            <Text
-              size='15'
-              weight='500'
-              lineHeight='20'
-            >
-              1.0000 COMP
-            </Text>
+          <div className='flex shrink-0 flex-col items-end'>
+            <Skeleton loading={isLoading}>
+              <Text
+                size='15'
+                weight='500'
+                lineHeight='20'
+                className={cn('text-color-2', {
+                  'text-color-6': !isConnected
+                })}
+              >
+                {isConnected && !!availableRewards ? Format.token(availableRewardsFormatted, 'compact') : '0.0000'} COMP
+              </Text>
+            </Skeleton>
+            <Condition if={isConnected}>
+              <Skeleton loading={isLoading}>
+                <Text
+                  size='11'
+                  lineHeight='16'
+                  className='text-color-24'
+                >
+                  {Format.price(availableRewardsPriceFormatted, 'standard')}
+                </Text>
+              </Skeleton>
+            </Condition>
+          </div>
+        </div>
+        <Condition if={hasMaxPosition}>
+          <div className='bg-color-21 flex w-full items-center gap-2.5 rounded-lg px-4 py-5'>
+            <InfoIcon className='text-color-22 size-4 shrink-0' />
             <Text
               size='11'
               lineHeight='16'
-              className='text-color-24'
+              className='text-color-22'
             >
-              $40.00
+              {`You have reached the maximum limit (${maxVestingPositions}) for Vesting entries. You need to close completed entries or wait until they are finished.`}
             </Text>
           </div>
-        </div>
-        <Input
-          placeholder='Delegator name or address'
-          value={delegateNameOrAddress}
-          onChange={onDelegateNameOrAddressChange}
-        />
-        <div className='p-5 flex items-center w-full rounded-lg bg-color-26 gap-2.5'>
-          <InfoIcon className='text-color-7 size-4' />
-          <Text
-            size='11'
-            lineHeight='16'
-            className='text-color-7'
-          >
-            The whole amount will be added to your Claim balance
-          </Text>
-        </div>
+        </Condition>
+        <Condition if={!hasMaxPosition}>
+          <div className='bg-color-26 flex w-full items-center gap-2.5 rounded-lg px-4 py-5'>
+            <InfoIcon className='text-color-7 size-4 shrink-0' />
+            <Text
+              size='11'
+              lineHeight='16'
+              className='text-color-7'
+            >
+              The whole amount will be added to your Claim balance
+            </Text>
+          </div>
+        </Condition>
         <Button
-          disabled={!isValidAddress}
-          className='h-14 rounded-100 text-[13px] leading-[18px] font-medium'
+          className={cn('h-14 flex-col', {
+            'bg-color-7': isVestingLoading
+          })}
+          disabled={isVestButtonDisabled}
+          onClick={onConfirm}
         >
-          Confirm
+          <Text
+            size='13'
+            weight='500'
+            lineHeight='18'
+            className={cn('text-white', {
+              'text-color-6': isVestButtonDisabled,
+              'text-white': isVestingLoading
+            })}
+          >
+            {isVestingLoading ? 'Pending...' : 'Confirm'}
+          </Text>
         </Button>
       </div>
     </Modal>

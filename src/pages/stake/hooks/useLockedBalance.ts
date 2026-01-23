@@ -14,7 +14,7 @@ export function useLockedBalance(address?: Address) {
     query: { enabled: !!address }
   });
 
-  const shema = z
+  const schema = z
     .object({
       amount: z.bigint(),
       duration: z.number().int().nonnegative(),
@@ -23,7 +23,7 @@ export function useLockedBalance(address?: Address) {
     .optional();
 
   return {
-    data: shema.parse(data),
+    data: schema.parse(data),
     ...query
   };
 }

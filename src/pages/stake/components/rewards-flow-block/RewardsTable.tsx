@@ -1,29 +1,42 @@
 import { useMemo, useState } from 'react';
 
 import { SortArrowIcon } from '@/assets/svg';
-import { RewardRow, type RewardRowProps } from '@/components/common/stake/RewardRow';
+import { RewardRow } from '@/components/common/stake/RewardRow';
 import { Text } from '@/components/ui/Text';
+import { ENV } from '@/consts/env';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
 
-type SortKey = keyof RewardRowProps;
-
-export type Column<Row> = {
-  accessorKey: keyof Row;
-  header: string;
-  sort?: (a: RewardRowProps, b: RewardRowProps, direction: 'asc' | 'desc') => number;
+export type RewardsTableItem = {
+  vestingAmount: bigint;
+  toClaim: bigint;
+  claimedAmount: bigint;
+  startDate: number;
+  endDate: number;
 };
 
-const columns: Column<RewardRowProps>[] = [
+type SortKey = keyof RewardsTableItem;
+
+export type Column<T> = {
+  accessorKey: keyof T;
+  header: string;
+  sort?: (a: T, b: T, direction: 'asc' | 'desc') => number;
+};
+
+const columns: Column<RewardsTableItem>[] = [
   {
     accessorKey: 'vestingAmount',
     header: 'Vesting Amount',
-    sort: (a, b, direction) =>
-      direction === 'asc' ? a.vestingAmount - b.vestingAmount : b.vestingAmount - a.vestingAmount
+    sort: (a, b, direction) => {
+      return Number(direction === 'asc' ? a.vestingAmount - b.vestingAmount : b.vestingAmount - a.vestingAmount);
+    }
   },
   {
     accessorKey: 'toClaim',
     header: 'To claim',
-    sort: (a, b, direction) => (direction === 'asc' ? a.toClaim - b.toClaim : b.toClaim - a.toClaim)
+    sort: (a, b, direction) => {
+      return Number(direction === 'asc' ? a.toClaim - b.toClaim : b.toClaim - a.toClaim);
+    }
   },
   {
     accessorKey: 'startDate',
@@ -38,53 +51,32 @@ const columns: Column<RewardRowProps>[] = [
   {
     accessorKey: 'claimedAmount',
     header: 'Claimed Amount',
-    sort: (a, b, direction) =>
-      direction === 'asc' ? a.claimedAmount - b.claimedAmount : b.claimedAmount - a.claimedAmount
+    sort: (a, b, direction) => {
+      return Number(direction === 'asc' ? a.claimedAmount - b.claimedAmount : b.claimedAmount - a.claimedAmount);
+    }
   }
 ];
 
-const data = [
-  {
-    vestingAmount: 5000,
-    claimedAmount: 3500,
-    toClaim: 1500,
-    startDate: Date.parse('2025-01-01T00:00:00Z'),
-    endDate: Date.parse('2025-02-01T00:00:00Z'),
-    vestingStartDate: Date.parse('2024-12-01T00:00:00Z'),
-    vestingEndDate: Date.parse('2025-06-01T00:00:00Z'),
-    percents: 30
-  },
-  {
-    vestingAmount: 10000,
-    claimedAmount: 2500,
-    toClaim: 7500,
-    startDate: Date.parse('2024-11-15T12:00:00Z'),
-    endDate: Date.parse('2025-05-15T12:00:00Z'),
-    vestingStartDate: Date.parse('2024-11-01T00:00:00Z'),
-    vestingEndDate: Date.parse('2026-11-01T00:00:00Z'),
-    percents: 25
-  }
-];
+export function RewardsTable(props: { rows: RewardsTableItem[] }) {
+  const { rows } = props;
 
-export function RewardsTable() {
-  const [sortBy, setSortBy] = useState<SortKey | null>(null);
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState<SortKey>('vestingAmount');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+
+  const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
+
+  const baseTokenPriceValue = baseTokenPrice ?? 0n;
 
   const sortedData = useMemo(() => {
-    if (!sortBy) return data;
-
     const col = columns.find((c) => c.accessorKey === sortBy);
-    if (!col || !col.sort) return data;
+    if (!col?.sort) return rows;
 
-    const sort = col.sort;
-
-    return [...data].sort((a, b) => sort(a, b, sortDir));
-  }, [sortBy, sortDir]);
+    return [...rows].sort((a, b) => col.sort!(a, b, sortDir));
+  }, [rows, sortBy, sortDir]);
 
   const onHeaderClick = (accessorKey: SortKey) => {
-    if (sortBy === accessorKey) {
-      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
+    if (sortBy === accessorKey) setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    else {
       setSortBy(accessorKey);
       setSortDir('asc');
     }
@@ -102,7 +94,7 @@ export function RewardsTable() {
               role='button'
               tabIndex={0}
               className='flex cursor-pointer items-center'
-              onClick={() => onHeaderClick(accessorKey)}
+              onClick={() => onHeaderClick(accessorKey as SortKey)}
             >
               <Text
                 tag='span'
@@ -115,24 +107,22 @@ export function RewardsTable() {
               </Text>
               <div className='flex flex-col justify-center p-1'>
                 <SortArrowIcon
-                  className={cn('text-color-24 size-[5px]', {
-                    'opacity-50': active && sortDir === 'asc'
-                  })}
+                  className={cn('text-color-24 size-[5px]', { 'opacity-50': active && sortDir === 'asc' })}
                 />
                 <SortArrowIcon
-                  className={cn('text-color-24 size-[5px] rotate-180', {
-                    'opacity-50': active && sortDir === 'desc'
-                  })}
+                  className={cn('text-color-24 size-[5px] rotate-180', { 'opacity-50': active && sortDir === 'desc' })}
                 />
               </div>
             </div>
           );
         })}
       </div>
-      <div className='m-2'>
-        {sortedData.map((row, index) => (
+      <div className='m-2 max-h-300 overflow-y-auto'>
+        {sortedData.map((row) => (
           <RewardRow
-            key={index}
+            key={`${row.startDate}-${row.endDate}`}
+            baseTokenPriceValue={baseTokenPriceValue}
+            isLoading={isBaseTokenPriceLoading}
             {...row}
           />
         ))}

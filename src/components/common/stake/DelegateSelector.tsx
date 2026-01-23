@@ -143,13 +143,13 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 >
                   <div className='flex items-center gap-1.5'>
                     {selectedAddressDelegate?.address === el.address && (
-                      <CheckMarkIcon className='text-color-27 size-5' />
+                      <CheckMarkIcon className='text-color-27 size-5 shrink-0' />
                     )}
                     <Text
                       size='13'
                       weight='500'
                       lineHeight='16'
-                      className='text-color-2'
+                      className='text-color-2 max-w-30 shrink-0 truncate'
                     >
                       {el.name}
                     </Text>

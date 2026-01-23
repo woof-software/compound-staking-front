@@ -7,7 +7,7 @@ export const COMPOUND_FINANCE_URL = 'https://compound.finance';
 
 export const APPLICATION_CHAIN = 1;
 
-export const DEFAULT_INTEGER_PART_LENGTH = 16;
+export const REFETCH_TIME_MS = 1000 * 60 * 5;
 
 /* DELEGATES  */
 export type Delegate = { name: string | undefined; address: Hex };
