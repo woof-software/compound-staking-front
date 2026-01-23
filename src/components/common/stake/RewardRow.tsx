@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { formatUnits } from 'viem';
 
 import { RewardToClaim } from '@/components/common/stake/RewardToClaim';
@@ -18,7 +17,7 @@ export interface RewardRowProps {
   endDate: number;
 }
 
-export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
+export function RewardRow(props: RewardRowProps) {
   const { baseTokenPriceValue, isLoading, vestingAmount, claimedAmount, startDate, endDate } = props;
 
   const vestingAmountPriceFormatted = formatUnits(
@@ -91,4 +90,4 @@ export const RewardRow = memo(function RewardRow(props: RewardRowProps) {
       />
     </div>
   );
-});
+}
