@@ -19,6 +19,8 @@ export function TotalStaked() {
 
   const needTotalStakedRefresh = useStatisticStore(({ needRefresh }) => needRefresh);
 
+  console.log('totalStaked=>', totalStaked);
+
   const totalStakedFormatted = formatUnits(totalStaked ?? 0n, ENV.BASE_TOKEN_DECIMALS);
 
   const unit = FormatUnits.parse(Number(totalStakedFormatted));
@@ -47,10 +49,8 @@ export function TotalStaked() {
             size='40'
             weight='500'
           >
-            {isConnected && !isLoading
-              ? Format.token(totalStakedFormatted, 'compact', undefined, 2).slice(0, -1)
-              : '0.00'}
-            <Condition if={isConnected && !!unit}>
+            {Format.token(totalStakedFormatted, 'compact', undefined, 2).slice(0, -1)}
+            <Condition if={!!unit}>
               <Text
                 tag='span'
                 size='40'
