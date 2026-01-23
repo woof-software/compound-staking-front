@@ -23,6 +23,7 @@ import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { useStatisticStore } from '@/stores/useStatisticStore';
+import { useWalletStore } from '@/stores/useWalletStore';
 
 export function StakeFlowBlock() {
   const { isConnected, address } = useConnection();
@@ -32,6 +33,7 @@ export function StakeFlowBlock() {
   const { triggerRefresh: triggerStatisticRefresh } = useStatisticStore();
   const { triggerRefresh: triggerDelegateRefresh } = useDelegateStore();
   const { triggerRefresh: triggerRewardRefresh } = useRewardStore();
+  const { triggerRefresh: triggerWalletRefresh, setIsPendingToggle } = useWalletStore();
 
   const {
     data: stakedBalance,
@@ -68,10 +70,16 @@ export function StakeFlowBlock() {
     (stakedBalance?.principal ?? 0n) * baseTokenPriceValue,
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
+
   const availableRewardsPriceFormatted = formatUnits(
     (availableRewards ?? 0n) * baseTokenPriceValue,
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
+
+  const onModalClose = () => {
+    setIsPendingToggle(false);
+    onClose();
+  };
 
   const onStakeConfirmed = useCallback(() => {
     refetchStakedBalanceFormatted();
@@ -79,6 +87,7 @@ export function StakeFlowBlock() {
     refetchMultiplier();
     refetchAvailableRewards();
 
+    triggerWalletRefresh();
     triggerStatisticRefresh();
     triggerDelegateRefresh();
     triggerRewardRefresh();
@@ -89,7 +98,8 @@ export function StakeFlowBlock() {
     refetchAvailableRewards,
     triggerStatisticRefresh,
     triggerDelegateRefresh,
-    triggerRewardRefresh
+    triggerRewardRefresh,
+    triggerWalletRefresh
   ]);
 
   return (
@@ -250,7 +260,7 @@ export function StakeFlowBlock() {
       <Modal
         title='Stake COMP tokens'
         open={isOpen}
-        onClose={onClose}
+        onClose={onModalClose}
       >
         <StakeModal
           onStakeConfirmed={onStakeConfirmed}

@@ -21,10 +21,12 @@ import { DelegateModal } from '@/pages/stake/components/delegate-flow-block/Dele
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
+import { useWalletStore } from '@/stores/useWalletStore';
 
 export function DelegateFlowBlock() {
   const { isConnected, address } = useConnection();
 
+  const { setIsPendingToggle } = useWalletStore();
   const { needRefresh: needDelegateRefresh, resetRefresh: resetDelegateRefresh } = useDelegateStore();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
@@ -83,6 +85,11 @@ export function DelegateFlowBlock() {
 
   const onDelegateConfirmed = () => {
     refetchDelegate();
+  };
+
+  const onModalClose = () => {
+    setIsPendingToggle(false);
+    onClose();
   };
 
   useEffect(() => {
@@ -224,7 +231,7 @@ export function DelegateFlowBlock() {
       <Modal
         open={isOpen}
         title='Delegate'
-        onClose={onClose}
+        onClose={onModalClose}
       >
         <DelegateModal
           delegate={delegate}

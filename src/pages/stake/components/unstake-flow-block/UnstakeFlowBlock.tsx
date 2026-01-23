@@ -133,6 +133,11 @@ export function UnstakeFlowBlock() {
     }
   };
 
+  const onModalClose = () => {
+    setIsPendingToggle(false);
+    onClose();
+  };
+
   const onRequestSuccess = useEffectEvent(() => {
     refetchStakedTokenBalance();
     refetchVirtualTokenBalance();
@@ -300,7 +305,7 @@ export function UnstakeFlowBlock() {
       <Modal
         title='Unstake'
         open={isOpen}
-        onClose={onClose}
+        onClose={onModalClose}
       >
         <UnstakeModal
           isLoading={isUnstakePending || isUnstakeRequestConfirming}

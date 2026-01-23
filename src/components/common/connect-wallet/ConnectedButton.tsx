@@ -1,13 +1,17 @@
-import { useRef } from 'react';
+import { useEffect, useEffectEvent, useRef } from 'react';
+import { formatUnits } from 'viem';
 import { useConnection, useDisconnect } from 'wagmi';
 
 import { CopyIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
+import { ENV } from '@/consts/env';
+import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useOutsideClick } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { sliceAddress } from '@/lib/utils/common';
+import { Format } from '@/lib/utils/format';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
@@ -21,11 +25,20 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
   const ref = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLDivElement>(null);
 
-  const { address } = useConnection();
+  const { isPending, needRefresh: needWalletRefresh, resetRefresh: resetWalletRefresh } = useWalletStore();
+
+  const { address, isConnected } = useConnection();
   const { disconnect } = useDisconnect();
-  const { isPending } = useWalletStore();
 
   const { isEnabled: isOpen, toggle: onOpen, disable: onClose } = useSwitch();
+
+  const {
+    data: availableRewards,
+    refetch: refetchAvailableRewards,
+    isLoading: isAvailableRewardsLoading
+  } = useAvailableRewards(address);
+
+  const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
   const onDisconnect = () => {
     onClose();
@@ -43,21 +56,34 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
     await navigator.clipboard.writeText(address!);
   };
 
+  const onRefetchAvailableRewards = useEffectEvent(() => {
+    refetchAvailableRewards();
+    resetWalletRefresh();
+  });
+
+  useEffect(() => {
+    if (!isConnected || !needWalletRefresh) return;
+
+    onRefetchAvailableRewards();
+  }, [isConnected, needWalletRefresh]);
+
   useOutsideClick(() => [ref.current, toggleRef.current], onClose);
 
   return (
     <div className='relative'>
-      <div className='rounded-64 bg-color-11 border-color-8 absolute right-[68%] flex h-11 min-w-[6.45rem] items-center border-[0.25px] py-2 pr-11 pl-4 hover:brightness-90'>
-        <CompoundWalletIcon className='size-6 flex-shrink-0' />
-        <Text
-          size='11'
-          weight='500'
-          lineHeight='16'
-          className='text-color-2 ml-2'
-        >
-          0.0039
-        </Text>
-      </div>
+      <Condition if={!isAvailableRewardsLoading}>
+        <div className='rounded-64 bg-color-11 border-color-8 absolute right-[68%] flex h-11 min-w-[6.45rem] items-center border-[0.25px] py-2 pr-11 pl-4 hover:brightness-90'>
+          <CompoundWalletIcon className='size-6 flex-shrink-0' />
+          <Text
+            size='11'
+            weight='500'
+            lineHeight='16'
+            className='text-color-2 ml-2'
+          >
+            {isConnected && !!availableRewards ? Format.token(availableRewardsFormatted, 'compact') : '0.0000'}
+          </Text>
+        </div>
+      </Condition>
       <div
         ref={toggleRef}
         onClick={onOpen}

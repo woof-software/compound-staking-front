@@ -55,7 +55,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
       className='relative w-full'
     >
       <div
-        className='border-color-6 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-2xl border border-solid p-3'
+        className='border-color-6 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3'
         onClick={onSelectorOpen}
       >
         {!selectedAddressDelegate ? (

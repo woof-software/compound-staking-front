@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { formatUnits } from 'viem'; // parseUnits понадобится ниже (если захочешь bigint обратно)
+import { useEffect, useEffectEvent, useMemo, useState } from 'react';
+import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
@@ -21,11 +21,14 @@ import { Format } from '@/lib/utils/format';
 import { RewardsTable, type RewardsTableItem } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useRewardStore } from '@/stores/useRewardStore';
+import { useWalletStore } from '@/stores/useWalletStore';
 
 export function RewardsFlowBlock() {
   const [claimAmount, setClaimAmount] = useState<bigint>(0n);
 
   const { isConnected, address } = useConnection();
+
+  const { setIsPendingToggle } = useWalletStore();
   const { needRefresh: needRewardRefresh, resetRefresh: resetRewardRefresh } = useRewardStore();
 
   const { isEnabled: isVestingOpen, enable: onVestingOpen, disable: onVestingClose } = useSwitch();
@@ -105,16 +108,26 @@ export function RewardsFlowBlock() {
   };
 
   const onClaimModalClose = () => {
+    setIsPendingToggle(false);
     setClaimAmount(0n);
     onClaimClose();
   };
 
+  const onVestingModalClose = () => {
+    setIsPendingToggle(false);
+    onVestingClose();
+  };
+
+  const onRefetchData = useEffectEvent(() => {
+    refetchVestingPositions();
+    resetRewardRefresh();
+  });
+
   useEffect(() => {
     if (!isConnected || !needRewardRefresh) return;
 
-    refetchVestingPositions();
-    resetRewardRefresh();
-  }, [needRewardRefresh, isConnected, refetchVestingPositions, resetRewardRefresh]);
+    onRefetchData();
+  }, [needRewardRefresh, isConnected]);
 
   const longestDurationTs = rows.reduce((acc, { endDate }) => {
     return acc > endDate ? acc : endDate;
@@ -352,7 +365,7 @@ export function RewardsFlowBlock() {
       </Card>
       <VestingModal
         isOpen={isVestingOpen}
-        onClose={onVestingClose}
+        onClose={onVestingModalClose}
         onVestingConfirmed={onVestingConfirmed}
       />
       <ClaimModal

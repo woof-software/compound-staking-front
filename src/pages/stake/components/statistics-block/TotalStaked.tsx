@@ -42,7 +42,7 @@ export function TotalStaked() {
       </Text>
       <Skeleton loading={isLoading}>
         <div className='flex items-start gap-3'>
-          <CompoundBlackCircle className='text-compound-icon-bg mt-1 size-10' />
+          <CompoundBlackCircle className='text-compound-icon-bg size-10' />
           <Text
             size='40'
             weight='500'
