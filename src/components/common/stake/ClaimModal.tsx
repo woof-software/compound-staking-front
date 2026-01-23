@@ -197,7 +197,7 @@ export function ClaimModal(props: ClaimModalProps) {
             lineHeight='18'
             className={cn('text-white', {
               'text-color-6': isClaimButtonDisabled,
-              'after-animate-loadingDots text-white': isVestingLoading
+              'after-animate-loading-dots text-white': isVestingLoading
             })}
           >
             {isVestingLoading ? 'Pending' : 'Confirm'}

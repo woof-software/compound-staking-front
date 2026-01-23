@@ -162,7 +162,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
             lineHeight='18'
             className={cn('text-white', {
               'text-color-6': isVestButtonDisabled,
-              'after-animate-loadingDots text-white': isVestingLoading
+              'after-animate-loading-dots text-white': isVestingLoading
             })}
           >
             {isVestingLoading ? 'Pending' : 'Confirm'}

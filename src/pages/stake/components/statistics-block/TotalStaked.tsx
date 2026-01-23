@@ -47,9 +47,7 @@ export function TotalStaked() {
             size='40'
             weight='500'
           >
-            {isConnected && !isLoading
-              ? Format.token(totalStakedFormatted, 'compact', undefined, 2).slice(0, -1)
-              : '0.00'}
+            {Format.token(totalStakedFormatted, 'compact', undefined, 2).slice(0, -1)}
             <Condition if={isConnected && !!unit}>
               <Text
                 tag='span'

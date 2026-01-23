@@ -86,7 +86,6 @@ export function StakeFlowBlock() {
     refetchMultiplier();
     refetchAvailableRewards();
 
-    // triggerWalletRefresh();
     triggerStatisticRefresh();
     triggerDelegateRefresh();
     triggerRewardRefresh();

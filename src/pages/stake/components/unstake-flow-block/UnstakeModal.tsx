@@ -141,7 +141,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
           lineHeight='18'
           className={cn('text-white', {
             'text-color-6': isButtonDisabled,
-            'after-animate-loadingDots text-white': isLoading
+            'after-animate-loading-dots text-white': isLoading
           })}
         >
           {isLoading ? 'Pending' : 'Confirm'}

@@ -232,12 +232,12 @@
   will-change: transform, opacity;
 }
 
-.after-animate-loadingDots {
+.after-animate-loading-dots {
   min-width: 3.75rem;
 }
 
-.after-animate-loadingDots::after {
-  animation: loadingDots 3s steps(1, end) infinite;
+.after-animate-loading-dots::after {
+  animation: loading-dots 3s steps(1, end) infinite;
   content: "";
 }
 
@@ -302,7 +302,7 @@
   }
 }
 
-@keyframes loadingDots {
+@keyframes loading-dots {
   0%   { content: ""; }
   25%  { content: "."; }
   50%  { content: ".."; }

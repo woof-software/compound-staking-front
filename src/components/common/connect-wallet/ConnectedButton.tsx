@@ -79,7 +79,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             lineHeight='16'
             className='text-color-2 ml-2'
           >
-            {isConnected && !!availableRewards ? Format.token(availableRewardsFormatted, 'compact') : '0.0000'}
+            {Format.token(availableRewardsFormatted, 'compact')}
           </Text>
         </div>
       </Condition>

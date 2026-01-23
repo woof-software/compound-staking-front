@@ -92,7 +92,7 @@ export function DelegateModal(props: DelegateModalProps) {
           lineHeight='18'
           className={cn('text-white', {
             'text-color-6': isConfirmDisabled,
-            'after-animate-loadingDots text-white': isDelegateLoading
+            'after-animate-loading-dots text-white': isDelegateLoading
           })}
         >
           {isDelegateLoading ? 'Pending' : 'Confirm'}

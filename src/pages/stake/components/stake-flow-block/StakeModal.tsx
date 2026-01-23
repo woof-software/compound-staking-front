@@ -227,7 +227,7 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='18'
               className={cn('text-white', {
                 'text-color-6': isApproveDisabled,
-                'after-animate-loadingDots text-white': isApproveLoading
+                'after-animate-loading-dots text-white': isApproveLoading
               })}
             >
               {isApproveLoading ? 'Pending' : 'Approve'}
@@ -258,7 +258,7 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='18'
               className={cn('text-white', {
                 'text-color-6': isConfirmDisabled,
-                'after-animate-loadingDots text-white': isStakeLoading
+                'after-animate-loading-dots text-white': isStakeLoading
               })}
             >
               {isStakeLoading ? 'Pending' : 'Confirm'}
