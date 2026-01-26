@@ -13,9 +13,9 @@ import { useStatisticStore } from '@/stores/useStatisticStore';
 import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
 export function TotalStaked() {
-  const { isConnected } = useConnection();
+  const { isConnected, chainId } = useConnection();
 
-  const { data: totalStaked, isLoading: isTotalStakedLoading, refetch: refetchTotalStaked } = useTotalStaked();
+  const { data: totalStaked, isLoading: isTotalStakedLoading, refetch: refetchTotalStaked } = useTotalStaked(chainId);
 
   const needTotalStakedRefresh = useStatisticStore(({ needRefresh }) => needRefresh);
 

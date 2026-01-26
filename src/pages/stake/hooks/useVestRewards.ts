@@ -1,28 +1,34 @@
-import { useCallback } from 'react';
-import { encodeFunctionData } from 'viem';
-import { useSendTransaction } from 'wagmi';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { ENV } from '@/consts/env';
-import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
+import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useVestRewards() {
-  const { sendTransactionAsync, ...query } = useSendTransaction();
+export function useVestRewards(chainId?: number) {
+  const queryClient = useQueryClient();
 
-  const _sendTransactionAsync = useCallback(async () => {
-    const vestRewardsData = encodeFunctionData({
-      abi: StakingVaultAbi,
-      functionName: 'vestRewards'
-    });
+  const { write } = useStakingVaultContract(chainId);
 
-    return sendTransactionAsync({
-      to: ENV.STAKING_VAULT_ADDRESS,
-      data: vestRewardsData
-    });
-  }, []);
+  const { mutateAsync, isPending, isSuccess } = useMutation({
+    mutationFn: async () => {
+      const contract = await write();
+      if (!contract) return;
+
+      const tx = await contract.vestRewards();
+
+      const receipt = await tx.wait();
+
+      return {
+        receipt
+      };
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });
+    }
+  });
 
   return {
-    sendTransactionAsync: _sendTransactionAsync,
-    ...query,
-    sendTransaction: undefined
+    isPending,
+    isSuccess,
+    sendTransactionAsync: mutateAsync
   };
 }

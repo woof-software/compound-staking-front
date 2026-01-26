@@ -24,7 +24,7 @@ import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function DelegateFlowBlock() {
-  const { isConnected, address } = useConnection();
+  const { isConnected, address, chainId } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
   const { needRefresh: needDelegateRefresh, resetRefresh: resetDelegateRefresh } = useDelegateStore();
@@ -33,7 +33,7 @@ export function DelegateFlowBlock() {
 
   const { isEnabled: isCooldownFinished, enable: setCooldownFinished, disable: resetCooldownFinished } = useSwitch();
 
-  const { data: stakedTokenBalance } = useStakedBalance(address);
+  const { data: stakedTokenBalance } = useStakedBalance(chainId, address);
   const { data: lockedTokenBalance } = useLockedBalance(address);
 
   const { data: delegateDuration, isLoading: isDurationLoading } = useDelegateDuration();

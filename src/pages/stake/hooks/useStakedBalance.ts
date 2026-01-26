@@ -1,26 +1,38 @@
 import type { Address } from 'viem';
-import { useReadContract } from 'wagmi';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 
-import { ENV } from '@/consts/env';
-import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
+import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useStakedBalance(address?: Address) {
-  const { data, ...query } = useReadContract({
-    address: ENV.STAKING_VAULT_ADDRESS,
-    abi: StakingVaultAbi,
-    functionName: 'stakeInfoOf',
-    args: address ? [address] : undefined,
-    query: { enabled: !!address }
+const schema = z
+  .object({
+    principal: z.bigint(),
+    stakeTimestamp: z.bigint(),
+    lastClaimTime: z.bigint()
+  })
+  .optional();
+
+export type StakeInfoDto = z.infer<typeof schema>;
+
+export function useStakedBalance(chainId?: number, address?: Address) {
+  const { read } = useStakingVaultContract(chainId);
+
+  const { data, ...query } = useQuery<StakeInfoDto | undefined>({
+    queryKey: queryKeys.stakingVault.stakeInfoOf([chainId, address]),
+    enabled: !!address,
+    queryFn: async () => {
+      if (!address) return undefined;
+
+      const res = await read.stakeInfoOf(address);
+
+      return {
+        principal: res[0],
+        stakeTimestamp: res[1],
+        lastClaimTime: res[2]
+      };
+    }
   });
-
-  const schema = z
-    .object({
-      principal: z.bigint(),
-      stakeTimestamp: z.number().int().nonnegative(),
-      lastClaimTime: z.number().int().nonnegative()
-    })
-    .optional();
 
   return {
     data: schema.parse(data),
