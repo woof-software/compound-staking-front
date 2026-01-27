@@ -23,7 +23,7 @@ export function TotalStaked() {
 
   const totalStakedFormatted = Format.token(totalStakedFormat, 'compact', undefined, 2);
 
-  const unit = FormatUnits.parse(Number(totalStakedFormatted));
+  const unit = FormatUnits.parse(Number(totalStaked ?? 0));
 
   const isLoading = isConnected ? isTotalStakedLoading : false;
 
