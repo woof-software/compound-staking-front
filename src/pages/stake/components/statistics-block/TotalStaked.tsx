@@ -19,19 +19,23 @@ export function TotalStaked() {
 
   const needTotalStakedRefresh = useStatisticStore(({ needRefresh }) => needRefresh);
 
+  const isLoading = isConnected ? isTotalStakedLoading : false;
+
+  const hasUnit = (totalStaked ?? 0n) >= 1000n;
+
   const totalStakedFormat = formatUnits(totalStaked ?? 0n, ENV.BASE_TOKEN_DECIMALS);
 
-  const totalStakedFormatted = Format.token(totalStakedFormat, 'compact', undefined, 2);
+  const totalStakedFormatted = Format.token(Number(totalStakedFormat), 'compact', undefined, 2);
 
-  const unit = FormatUnits.parse(Number(totalStaked ?? 0));
+  const unit = hasUnit ? FormatUnits.parse(Number(totalStakedFormat)) : undefined;
 
-  const isLoading = isConnected ? isTotalStakedLoading : false;
+  const totalValue =
+    unit && totalStakedFormatted.endsWith(unit) ? totalStakedFormatted.slice(0, -unit.length) : totalStakedFormatted;
 
   useEffect(() => {
     if (!isConnected || !needTotalStakedRefresh) return;
-
     refetchTotalStaked();
-  }, [needTotalStakedRefresh, isConnected]);
+  }, [needTotalStakedRefresh, isConnected, refetchTotalStaked]);
 
   return (
     <div className='flex w-1/2 flex-col items-start gap-1.5'>
@@ -49,7 +53,7 @@ export function TotalStaked() {
             size='40'
             weight='500'
           >
-            {Format.token(totalStakedFormatted, 'compact', undefined, 2).slice(0, -1)}
+            {totalValue}
             <Condition if={!!unit}>
               <Text
                 tag='span'

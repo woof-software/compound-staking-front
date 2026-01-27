@@ -13,6 +13,7 @@ import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { sliceAddress } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
+import { getAddressContracts } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
@@ -31,6 +32,8 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
   const { address, isConnected, chainId } = useConnection();
   const { disconnect } = useDisconnect();
 
+  const { BASE_TOKEN_ADDRESS } = getAddressContracts(chainId);
+
   const { isEnabled: isOpen, toggle: onOpen, disable: onClose } = useSwitch();
 
   const {
@@ -43,7 +46,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
     data: walletBalance,
     refetch: refetchWalletBalance,
     isLoading: isWalletBalanceLoading
-  } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
+  } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
 
   const balance = (availableRewards ?? 0n) + (walletBalance ?? 0n);
 

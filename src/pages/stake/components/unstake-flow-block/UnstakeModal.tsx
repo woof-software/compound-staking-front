@@ -45,7 +45,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
   );
 
   const hasPosition = !!vestingPositions?.length;
-  const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions) : false;
+  const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions ?? 0n) : false;
 
   const isButtonDisabled = isLoading || isVestingPositionsLoading || hasMaxPosition;
 
@@ -88,7 +88,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
           weight='500'
           lineHeight='20'
         >
-          {FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))}
+          {FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0n))}
         </Text>
       </div>
       <Condition if={hasMaxPosition}>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useEffectEvent, useMemo } from 'react';
 import { useConnection } from 'wagmi';
 
 import { ExternalLinkIcon } from '@/assets/svg';
@@ -92,6 +92,12 @@ export function DelegateFlowBlock() {
     onClose();
   };
 
+  const onRefetchData = useEffectEvent(async () => {
+    await Promise.allSettled([refetchSubAccountAddress, refetchSubAccountAddress]);
+
+    resetDelegateRefresh();
+  });
+
   useEffect(() => {
     if (!isConnected || isLoading || !hasCooldownRequest || hasActiveLock) {
       setCooldownFinished();
@@ -108,10 +114,7 @@ export function DelegateFlowBlock() {
   useEffect(() => {
     if (!isConnected || !needDelegateRefresh) return;
 
-    refetchSubAccountAddress();
-    refetchDelegate();
-
-    resetDelegateRefresh();
+    onRefetchData();
   }, [needDelegateRefresh, isConnected]);
 
   useExecuteAtTime(setCooldownFinished, hasActiveLock ? 0 : cooldownEndMs);
