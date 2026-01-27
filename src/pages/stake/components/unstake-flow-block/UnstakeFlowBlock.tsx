@@ -134,11 +134,13 @@ export function UnstakeFlowBlock() {
   };
 
   const onRequestSuccess = useEffectEvent(async () => {
-    await refetchStakedTokenBalance();
-    await refetchVirtualTokenBalance();
-    await refetchMultiplier();
-    await refetchAvailableRewards();
-    await refetchLockedTokenBalance();
+    await Promise.allSettled([
+      refetchStakedTokenBalance,
+      refetchVirtualTokenBalance,
+      refetchMultiplier,
+      refetchAvailableRewards,
+      refetchLockedTokenBalance
+    ]);
 
     triggerDelegateRefresh();
     triggerRewardRefresh();

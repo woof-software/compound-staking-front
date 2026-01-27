@@ -24,12 +24,12 @@ export function useStakedBalance(chainId?: number, address?: Address) {
     queryFn: async () => {
       if (!address || !read) return undefined;
 
-      const res = await read.stakeInfoOf(address);
+      const [principal, stakeTimestamp, lastClaimTime] = await read.stakeInfoOf(address);
 
       return {
-        principal: res[0],
-        stakeTimestamp: res[1],
-        lastClaimTime: res[2]
+        principal,
+        stakeTimestamp,
+        lastClaimTime
       };
     }
   });
