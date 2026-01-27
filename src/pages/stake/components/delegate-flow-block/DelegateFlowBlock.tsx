@@ -58,8 +58,6 @@ export function DelegateFlowBlock() {
     return Number(executableAt);
   }, [delegateData?.executableAt]);
 
-  const isLoading = isSubAccountLoading || isDelegateLoading || isDurationLoading;
-
   const hasOpenPosition = (stakedTokenBalance?.principal ?? 0n) > 0n || (lockedTokenBalance?.amount ?? 0n) > 0n;
 
   const hasActiveLock = (lockedTokenBalance?.amount ?? 0n) > 0n;
@@ -69,6 +67,8 @@ export function DelegateFlowBlock() {
   const canShowDelegation = isConnected && hasOpenPosition && !hasActiveLock;
 
   const isCooldownBlocked = isConnected && !isCooldownFinished;
+
+  const isLoading = hasOpenPosition ? isSubAccountLoading || isDelegateLoading || isDurationLoading : false;
 
   const isDelegateButtonDisabled =
     !isConnected || isOpen || isLoading || isCooldownBlocked || !hasOpenPosition || hasActiveLock;

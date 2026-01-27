@@ -74,7 +74,7 @@ export function StakeModal(props: StakeModalProps) {
   const isLoadingTransaction = isApproveLoading || isStakeLoading;
 
   /* Disabled */
-  const isApproveDisabled = noAmount || !needsApprove || !isAmountExceedsBalance;
+  const isApproveDisabled = noAmount || !needsApprove || !isAmountExceedsBalance || isApproveLoading;
   const isConfirmDisabled = noAmount || noDelegate || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
 
   /* Calculate input value in USD */
@@ -134,7 +134,7 @@ export function StakeModal(props: StakeModalProps) {
       <Divider orientation='horizontal' />
       <div className='flex flex-col gap-1'>
         <Skeleton loading={isPriceOrBalanceLoading}>
-          <div className='flex items-center justify-between gap-5'>
+          <div className='flex items-center justify-between'>
             <div className='flex max-w-72 items-center gap-2'>
               <img
                 src={COMP_AVIF}
@@ -142,7 +142,10 @@ export function StakeModal(props: StakeModalProps) {
                 className='size-6.75 shrink-0 rounded-full'
               />
               <AmountInput
-                className='min-h-12 max-w-60 min-w-55'
+                className={cn('min-h-12 max-w-60 min-w-55', {
+                  'caret-color-30': isAmountExceedsBalance,
+                  'caret-color-31': !isAmountExceedsBalance
+                })}
                 disabled={isLoadingTransaction}
                 value={amountValue}
                 onChange={setAmountValue}
@@ -150,7 +153,7 @@ export function StakeModal(props: StakeModalProps) {
             </div>
             <Button
               disabled={isLoadingTransaction}
-              className={cn('bg-color-16 h-8 w-14 min-w-[55px] text-[11px] font-medium', {
+              className={cn('bg-color-16 h-9 w-[56.24px] text-[11px] font-medium', {
                 'bg-color-28': isLoadingTransaction
               })}
               onClick={onMaxButtonClick}
@@ -188,7 +191,7 @@ export function StakeModal(props: StakeModalProps) {
             lineHeight='16'
             className='text-color-22'
           >
-            Amount Exceeds Wallet Balance
+            Amount Exceeds Wallet Balance.
           </Text>
         </div>
       </Condition>
