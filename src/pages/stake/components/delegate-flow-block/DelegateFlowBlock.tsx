@@ -127,7 +127,6 @@ export function DelegateFlowBlock() {
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
-              weight='500'
               className='text-color-24'
             >
               Name of Delegatee
@@ -142,7 +141,6 @@ export function DelegateFlowBlock() {
                 >
                   <Text
                     size='17'
-                    weight='500'
                     lineHeight='17'
                     className={cn('text-color-2 max-w-36 truncate')}
                   >
@@ -153,7 +151,6 @@ export function DelegateFlowBlock() {
               ) : (
                 <Text
                   size='17'
-                  weight='500'
                   lineHeight='17'
                   className='text-color-6'
                 >
@@ -165,7 +162,6 @@ export function DelegateFlowBlock() {
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
-              weight='500'
               className='text-color-24'
             >
               Cooldown
@@ -177,7 +173,6 @@ export function DelegateFlowBlock() {
                 render={(seconds) => (
                   <Text
                     size='17'
-                    weight='500'
                     lineHeight='17'
                     className={cn('text-color-2 tabular-nums', { 'text-color-6': !canShowDelegation })}
                   >
@@ -190,7 +185,6 @@ export function DelegateFlowBlock() {
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
-              weight='500'
               className='text-color-24'
             >
               End Date
@@ -198,7 +192,6 @@ export function DelegateFlowBlock() {
             <Skeleton loading={isLoading}>
               <Text
                 size='17'
-                weight='500'
                 lineHeight='17'
                 className={cn('text-color-2', { 'text-color-6': !canShowDelegation })}
               >
@@ -219,7 +212,6 @@ export function DelegateFlowBlock() {
             <Text
               tag='p'
               size='11'
-              weight='500'
               align='center'
               className={cn('text-color-6', { 'text-white': !isDelegateButtonDisabled })}
             >

@@ -101,7 +101,6 @@ export function StakeFlowBlock() {
         <div className='flex flex-col gap-3'>
           <Text
             size='11'
-            weight='500'
             className='text-color-24'
           >
             Staked
@@ -110,7 +109,6 @@ export function StakeFlowBlock() {
             <Skeleton loading={isLoading}>
               <Text
                 size='17'
-                weight='500'
                 className={cn('text-color-2 tabular-nums', {
                   'text-color-6': !isConnected
                 })}
@@ -133,7 +131,6 @@ export function StakeFlowBlock() {
         <div className='flex flex-col gap-3'>
           <Text
             size='11'
-            weight='500'
             className='text-color-24'
           >
             stCOMP balance
@@ -141,7 +138,6 @@ export function StakeFlowBlock() {
           <Skeleton loading={isLoading}>
             <Text
               size='17'
-              weight='500'
               className={cn('text-color-2 tabular-nums', {
                 'text-color-6': !isConnected
               })}
@@ -153,7 +149,6 @@ export function StakeFlowBlock() {
         <div className='flex flex-col gap-3'>
           <Text
             size='11'
-            weight='500'
             className='text-color-24'
           >
             Multiplier
@@ -161,7 +156,6 @@ export function StakeFlowBlock() {
           <Skeleton loading={isLoading}>
             <Text
               size='17'
-              weight='500'
               className={cn('text-color-2 tabular-nums', {
                 'text-color-6': !isConnected
               })}
@@ -173,7 +167,6 @@ export function StakeFlowBlock() {
         <div className='flex flex-col gap-3'>
           <Text
             size='11'
-            weight='500'
             className='text-color-24'
           >
             Available Rewards
@@ -182,7 +175,6 @@ export function StakeFlowBlock() {
             <Skeleton loading={isLoading}>
               <Text
                 size='17'
-                weight='500'
                 className={cn('text-color-2 tabular-nums', {
                   'text-color-6': !isConnected
                 })}
@@ -205,7 +197,6 @@ export function StakeFlowBlock() {
         <div className='flex flex-col gap-3'>
           <Text
             size='11'
-            weight='500'
             className='text-color-24'
           >
             APR
@@ -213,7 +204,6 @@ export function StakeFlowBlock() {
           <Skeleton loading={isLoading}>
             <Text
               size='17'
-              weight='500'
               className={cn('text-color-2 tabular-nums', {
                 'text-color-6': !isConnected
               })}
@@ -234,7 +224,6 @@ export function StakeFlowBlock() {
             <Text
               tag='p'
               size='11'
-              weight='500'
               align='center'
               className={cn('text-color-6', {
                 'text-white': !isStakeButtonDisabled
