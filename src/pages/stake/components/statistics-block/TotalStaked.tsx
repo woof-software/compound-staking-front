@@ -34,7 +34,7 @@ export function TotalStaked() {
   }, [needTotalStakedRefresh, isConnected]);
 
   return (
-    <div className='flex flex-col items-start gap-1.5'>
+    <div className='flex w-1/2 flex-col items-start gap-1.5'>
       <Text
         size='13'
         weight='500'
@@ -49,8 +49,8 @@ export function TotalStaked() {
             size='40'
             weight='500'
           >
-            {totalStakedFormatted.replace(/[KMBT]$/i, '')}
-            <Condition if={isConnected && !!unit}>
+            {Format.token(totalStakedFormatted, 'compact', undefined, 2).slice(0, -1)}
+            <Condition if={!!unit}>
               <Text
                 tag='span'
                 size='40'

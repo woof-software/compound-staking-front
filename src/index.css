@@ -69,6 +69,8 @@
   --color-27: #11D976;
   --color-28: #E1E6EB;
   --color-29: #E05A00;
+  --color-30: #00AD79;
+  --color-31: #F54E59;
 
   --color-border-1: rgba(13, 19, 26, 0.15);
 }
@@ -82,7 +84,7 @@
   --color-5: #17212B;
   --color-6: #516070;
   --color-7: #00AD79;
-  --color-8: #FFFFFF26;
+  --color-8: #F9FAFB26;
   --color-9: #2B3947;
   --color-10: #19232E;
   --color-11: #17212B;
@@ -104,6 +106,8 @@
   --color-27: #11D976;
   --color-28: rgba(16, 23, 31, 0.5);
   --color-29: #E05A00;
+  --color-30: #00C289;
+  --color-31: #F54E59;
 
   --color-border-1: rgba(249, 250, 251, 0.15);
 }
@@ -138,6 +142,8 @@
   --color-color-27: var(--color-27);
   --color-color-28: var(--color-28);
   --color-color-29: var(--color-29);
+  --color-color-30: var(--color-30);
+  --color-color-31: var(--color-31);
 
   --color-border-1: var(--color-border-1);
   --color-modal-bg: #0f171f99;

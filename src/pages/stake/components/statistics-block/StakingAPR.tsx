@@ -9,7 +9,7 @@ export function StakingAPR() {
   const { stakingAPR } = useStatisticStakingAPR();
 
   return (
-    <div className='flex flex-col items-start gap-1.5'>
+    <div className='flex w-1/2 flex-col items-end gap-1.5'>
       <Text
         size='13'
         weight='500'

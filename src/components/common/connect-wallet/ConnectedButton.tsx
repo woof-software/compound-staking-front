@@ -10,6 +10,7 @@ import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useOutsideClick } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
+import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { sliceAddress } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 import { useWalletStore } from '@/stores/useWalletStore';
@@ -38,7 +39,15 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
     isLoading: isAvailableRewardsLoading
   } = useAvailableRewards(chainId, address);
 
-  const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
+  const {
+    data: walletBalance,
+    refetch: refetchWalletBalance,
+    isLoading: isWalletBalanceLoading
+  } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
+
+  const balance = (availableRewards ?? 0n) + (walletBalance ?? 0n);
+
+  const balanceFormatted = formatUnits(balance, ENV.STAKED_TOKEN_DECIMALS);
 
   const onDisconnect = () => {
     onClose();
@@ -58,6 +67,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   const onRefetchAvailableRewards = useEffectEvent(() => {
     refetchAvailableRewards();
+    refetchWalletBalance();
   });
 
   useEffect(() => {
@@ -70,8 +80,8 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   return (
     <div className='relative'>
-      <Condition if={!isAvailableRewardsLoading}>
-        <div className='rounded-64 bg-color-11 border-color-8 absolute right-[68%] flex h-11 min-w-[6.45rem] items-center border-[0.25px] py-2 pr-11 pl-4 hover:brightness-90'>
+      <Condition if={!isAvailableRewardsLoading || !isWalletBalanceLoading}>
+        <div className='rounded-64 bg-color-11 border-color-8 absolute right-[68%] flex h-11 min-w-[6.45rem] cursor-pointer items-center border-[0.25px] py-2 pr-11 pl-4 hover:brightness-90'>
           <CompoundWalletIcon className='size-6 flex-shrink-0' />
           <Text
             size='11'
@@ -79,7 +89,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             lineHeight='16'
             className='text-color-2 ml-2'
           >
-            {Format.token(availableRewardsFormatted, 'compact')}
+            {Format.token(balanceFormatted, 'compact')}
           </Text>
         </div>
       </Condition>
@@ -131,7 +141,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             <div className='flex items-center justify-start gap-2'>
               <div className='bg-color-24 size-[9px] rounded-full' />
               <Text
-                size='13'
+                size='11'
                 weight='500'
                 lineHeight='16'
                 className='text-color-2'
@@ -146,7 +156,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
               />
             </div>
           </div>
-          <div className='flex flex-col gap-3'>
+          <div className='mt-1 flex flex-col gap-3'>
             <Button
               onClick={onDisconnect}
               className='bg-color-16 h-8.5 text-[11px] leading-4 font-medium'
