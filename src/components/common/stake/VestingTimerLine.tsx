@@ -16,7 +16,6 @@ export function VestingTimerLine(props: VestingTimerProps) {
     <div className='flex items-center gap-5'>
       <Text
         size='11'
-        weight='500'
         lineHeight='16'
         className='text-color-24 shrink-0'
       >
@@ -29,7 +28,6 @@ export function VestingTimerLine(props: VestingTimerProps) {
         />
         <Text
           size='11'
-          weight='500'
           lineHeight='16'
           className='animate-vesting-text shrink-0 tabular-nums'
         >
@@ -41,7 +39,6 @@ export function VestingTimerLine(props: VestingTimerProps) {
         />
         <Text
           size='11'
-          weight='500'
           lineHeight='16'
           className='shrink-0 tabular-nums'
         >

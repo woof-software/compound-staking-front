@@ -145,7 +145,6 @@ export function RewardsFlowBlock() {
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
-                weight='500'
                 className='text-color-24'
               >
                 Total vesting
@@ -154,7 +153,6 @@ export function RewardsFlowBlock() {
                 <Skeleton loading={isLoading}>
                   <Text
                     size='17'
-                    weight='500'
                     className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                   >
                     {Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP')}
@@ -175,7 +173,6 @@ export function RewardsFlowBlock() {
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
-                weight='500'
                 className='text-color-24'
               >
                 Total to claim
@@ -184,7 +181,6 @@ export function RewardsFlowBlock() {
                 <Skeleton loading={isLoading}>
                   <Text
                     size='17'
-                    weight='500'
                     className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                   >
                     <Duration
@@ -265,7 +261,6 @@ export function RewardsFlowBlock() {
                 <Text
                   tag='p'
                   size='11'
-                  weight='500'
                   align='center'
                   className={cn('text-color-6', { 'text-white': !isClaimButtonDisabled })}
                 >
@@ -278,7 +273,6 @@ export function RewardsFlowBlock() {
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
-              weight='500'
               className='text-color-24'
             >
               Available Rewards
@@ -287,7 +281,6 @@ export function RewardsFlowBlock() {
               <Skeleton loading={isLoading}>
                 <Text
                   size='17'
-                  weight='500'
                   className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                 >
                   {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
@@ -317,7 +310,6 @@ export function RewardsFlowBlock() {
               <Text
                 tag='p'
                 size='11'
-                weight='500'
                 align='center'
                 className={cn('text-color-6', { 'text-white': !isVestButtonDisabled })}
               >
@@ -332,14 +324,12 @@ export function RewardsFlowBlock() {
               <div className='no-position-yet h-20 w-44' />
               <Text
                 size='15'
-                weight='500'
                 lineHeight='16'
               >
                 No Positions Yet
               </Text>
               <Text
                 size='15'
-                weight='500'
                 lineHeight='21'
                 className='text-color-24'
               >
