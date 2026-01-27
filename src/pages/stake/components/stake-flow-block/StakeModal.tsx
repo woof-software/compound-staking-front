@@ -21,6 +21,7 @@ import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
+import { getAddressContracts } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export type StakeModalProps = {
@@ -36,7 +37,9 @@ export function StakeModal(props: StakeModalProps) {
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
 
-  const { address } = useConnection();
+  const { address, chainId } = useConnection();
+
+  const { BASE_TOKEN_ADDRESS, STAKING_VAULT_ADDRESS } = getAddressContracts(chainId);
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
@@ -44,9 +47,9 @@ export function StakeModal(props: StakeModalProps) {
     data: walletBalance,
     refetch: refetchWalletBalance,
     isLoading: isWalletBalanceLoading
-  } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
+  } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
 
-  const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(address);
+  const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(chainId, address);
 
   const { sendTransactionAsync: approve, data: approveHash, isPending: isApprovePending } = useApproveTransaction();
 
@@ -54,7 +57,11 @@ export function StakeModal(props: StakeModalProps) {
     hash: approveHash
   });
 
-  const { sendTransactionAsync: stake, isPending: isStakePending, isSuccess: isStakeSuccess } = useStakeTransaction();
+  const {
+    sendTransactionAsync: stake,
+    isPending: isStakePending,
+    isSuccess: isStakeSuccess
+  } = useStakeTransaction(chainId);
 
   const parseAmount = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
   const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
@@ -91,9 +98,9 @@ export function StakeModal(props: StakeModalProps) {
   };
 
   const onApprove = async () => {
-    if (isApproveDisabled) return;
+    if (isApproveDisabled || !BASE_TOKEN_ADDRESS || !STAKING_VAULT_ADDRESS) return;
 
-    await approve({ token: ENV.BASE_TOKEN_ADDRESS, spender: ENV.STAKING_VAULT_ADDRESS, value: parseAmount });
+    await approve({ token: BASE_TOKEN_ADDRESS, spender: STAKING_VAULT_ADDRESS, value: parseAmount });
   };
 
   const onConfirm = async () => {

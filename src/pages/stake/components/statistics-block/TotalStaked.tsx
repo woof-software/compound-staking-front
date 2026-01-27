@@ -19,7 +19,9 @@ export function TotalStaked() {
 
   const needTotalStakedRefresh = useStatisticStore(({ needRefresh }) => needRefresh);
 
-  const totalStakedFormatted = formatUnits(totalStaked ?? 0n, ENV.BASE_TOKEN_DECIMALS);
+  const totalStakedFormat = formatUnits(totalStaked ?? 0n, ENV.BASE_TOKEN_DECIMALS);
+
+  const totalStakedFormatted = Format.token(totalStakedFormat, 'compact', undefined, 2);
 
   const unit = FormatUnits.parse(Number(totalStakedFormatted));
 
@@ -47,7 +49,7 @@ export function TotalStaked() {
             size='40'
             weight='500'
           >
-            {Format.token(totalStakedFormatted, 'compact', undefined, 2).slice(0, -1)}
+            {totalStakedFormatted.replace(/[KMBT]$/i, '')}
             <Condition if={isConnected && !!unit}>
               <Text
                 tag='span'

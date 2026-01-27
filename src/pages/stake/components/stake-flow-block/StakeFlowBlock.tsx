@@ -16,6 +16,7 @@ import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useVirtualBalance } from '@/hooks/useVirtualBalance';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
+import { getAddressContracts } from '@/lib/utils/helpers';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
@@ -34,6 +35,8 @@ export function StakeFlowBlock() {
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
+  const { BASE_TOKEN_ADDRESS } = getAddressContracts(chainId);
+
   const {
     data: stakedBalance,
     isLoading: isStakedBalanceLoading,
@@ -47,10 +50,10 @@ export function StakeFlowBlock() {
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
-  const { data: lockedTokenBalance } = useLockedBalance(address);
+  const { data: lockedTokenBalance } = useLockedBalance(chainId, address);
 
   const { isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
-  const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
+  const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
 
   /* Loading */
   const isPriceOrBalanceLoading = isStakedTokenPrice || isStakedTokenWalletBalance;

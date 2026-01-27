@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useState } from 'react';
-import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import { useConnection } from 'wagmi';
 
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { Button } from '@/components/ui/Button';
@@ -21,27 +21,23 @@ export type DelegateModalProps = {
 export function DelegateModal(props: DelegateModalProps) {
   const { delegate, onClose = noop, onDelegateConfirmed = noop } = props;
 
-  const { address } = useConnection();
+  const { address, chainId } = useConnection();
 
-  const { data: subAccountAddress, isLoading: isSubAccountLoading } = useDelegateSubAccount(address);
+  const { data: subAccountAddress, isLoading: isSubAccountLoading } = useDelegateSubAccount(chainId, address);
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const {
     sendTransactionAsync: delegateTransaction,
-    data: delegateHash,
-    isPending: isDelegatePending
-  } = useDelegateTransaction();
-
-  const { isLoading: isDelegateConfirming, isSuccess: isDelegateSuccess } = useWaitForTransactionReceipt({
-    hash: delegateHash
-  });
+    isPending: isDelegatePending,
+    isSuccess: isDelegateSuccess
+  } = useDelegateTransaction(chainId, subAccountAddress);
 
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
 
   const isConfirmDisabled = selectedAddressDelegate?.address === delegate?.address;
 
-  const isDelegateLoading = isDelegatePending || isDelegateConfirming || isSubAccountLoading;
+  const isDelegateLoading = isDelegatePending || isSubAccountLoading;
 
   const onDelegateSelect = (addressDelegate: Delegate | null) => {
     setSelectedAddressDelegate(addressDelegate);
@@ -52,7 +48,7 @@ export function DelegateModal(props: DelegateModalProps) {
 
     setIsPendingToggle(true);
 
-    await delegateTransaction({ subAddress: subAccountAddress, delegate: selectedAddressDelegate.address });
+    await delegateTransaction(selectedAddressDelegate.address);
   };
 
   const onDelegateSuccess = useEffectEvent(() => {

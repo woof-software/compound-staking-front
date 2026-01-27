@@ -18,6 +18,7 @@ export function useStakeTransaction(chainId?: number) {
   const { mutateAsync, isPending, isSuccess } = useMutation({
     mutationFn: async ({ amount, delegatee }: StakeArgs) => {
       const contract = await write();
+
       if (!contract) return;
 
       const tx = await contract.stake(delegatee ?? ZeroAddress, amount);

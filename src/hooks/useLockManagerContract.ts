@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
-import { type MockStakingVault, MockStakingVault__factory } from '@woof-software/compound-staked-comp-artifacts/types';
+import { type LockManager, LockManager__factory } from '@woof-software/compound-staked-comp-artifacts/types';
 
 import { getAddressContracts } from '@/lib/utils/helpers';
 import { getEthersProvider, getEthersSigner } from '@/lib/utils/wagmi';
 import { config } from '@/shared/config/wagmiConfig';
 
-export function useStakingVaultContract(chainId?: number) {
-  const { STAKING_VAULT_ADDRESS } = getAddressContracts(chainId);
+export function useLockManagerContract(chainId?: number) {
+  const { LOCK_MANAGER_ADDRESS } = getAddressContracts(chainId);
 
   const provider = useMemo(() => {
     const params = chainId === undefined ? {} : { chainId };
@@ -15,19 +15,19 @@ export function useStakingVaultContract(chainId?: number) {
   }, [chainId]);
 
   const readContract = useMemo(() => {
-    if (!STAKING_VAULT_ADDRESS) return null;
+    if (!LOCK_MANAGER_ADDRESS) return null;
 
-    return MockStakingVault__factory.connect(STAKING_VAULT_ADDRESS, provider);
-  }, [STAKING_VAULT_ADDRESS, provider]);
+    return LockManager__factory.connect(LOCK_MANAGER_ADDRESS, provider);
+  }, [provider, LOCK_MANAGER_ADDRESS]);
 
-  const writeContract = async (): Promise<MockStakingVault | null> => {
+  const writeContract = async (): Promise<LockManager | null> => {
     try {
       const params = chainId === undefined ? {} : { chainId };
       const signer = await getEthersSigner(config, params);
 
-      if (!signer || !STAKING_VAULT_ADDRESS) return null;
+      if (!signer || !LOCK_MANAGER_ADDRESS) return null;
 
-      return MockStakingVault__factory.connect(STAKING_VAULT_ADDRESS, signer);
+      return LockManager__factory.connect(LOCK_MANAGER_ADDRESS, signer);
     } catch {
       return null;
     }

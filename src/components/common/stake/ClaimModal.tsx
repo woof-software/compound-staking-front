@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 import { formatUnits, isAddress } from 'viem';
-import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import { useConnection } from 'wagmi';
 
 import { CrossIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -31,7 +31,7 @@ export function ClaimModal(props: ClaimModalProps) {
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
-  const { isConnected, address } = useConnection();
+  const { isConnected, address, chainId } = useConnection();
 
   const [walletAddress, setWalletAddress] = useState<string>('');
 
@@ -39,11 +39,11 @@ export function ClaimModal(props: ClaimModalProps) {
 
   const isValidAddress = !isChangeWallet || isAddress(walletAddress);
 
-  const { sendTransactionAsync: claimRequest, data: claimHash, isPending: isClaimPending } = useVestingClaim();
-
-  const { isLoading: isClaimConfirming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({
-    hash: claimHash
-  });
+  const {
+    sendTransactionAsync: claimRequest,
+    isPending: isClaimPending,
+    isSuccess: isClaimSuccess
+  } = useVestingClaim(chainId);
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
@@ -57,9 +57,8 @@ export function ClaimModal(props: ClaimModalProps) {
   );
 
   const isLoading = isConnected ? isBaseTokenPriceLoading : false;
-  const isVestingLoading = isClaimPending || isClaimConfirming;
 
-  const isClaimButtonDisabled = isLoading || isVestingLoading || !isValidAddress;
+  const isClaimButtonDisabled = isLoading || isClaimPending || !isValidAddress;
 
   const onWalletAddressChange = (value: string) => {
     setWalletAddress(value);
@@ -186,7 +185,7 @@ export function ClaimModal(props: ClaimModalProps) {
         </Condition>
         <Button
           className={cn('h-14 flex-col', {
-            'bg-color-7': isVestingLoading
+            'bg-color-7': isClaimPending
           })}
           disabled={isClaimButtonDisabled}
           onClick={onConfirm}
@@ -197,10 +196,10 @@ export function ClaimModal(props: ClaimModalProps) {
             lineHeight='18'
             className={cn('text-white', {
               'text-color-6': isClaimButtonDisabled,
-              'after-animate-loading-dots text-white': isVestingLoading
+              'after-animate-loading-dots text-white': isClaimPending
             })}
           >
-            {isVestingLoading ? 'Pending' : 'Confirm'}
+            {isClaimPending ? 'Pending' : 'Confirm'}
           </Text>
         </Button>
       </div>

@@ -1,35 +1,39 @@
-import { useCallback } from 'react';
-import { type Address, encodeFunctionData } from 'viem';
-import { useSendTransaction } from 'wagmi';
+import { type Address, isAddress } from 'viem';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { SubAccountAbi } from '@/shared/abis/SubAccountAbi';
+import { useSubAccountContract } from '@/hooks/useSubAccountContract';
+import { queryKeys } from '@/shared/query-keys';
 
-type SendApproveArgs = {
-  subAddress: Address;
-  delegate: Address;
-};
+export function useDelegateTransaction(chainId?: number, address?: Address) {
+  const queryClient = useQueryClient();
 
-export function useDelegateTransaction() {
-  const { sendTransactionAsync, ...query } = useSendTransaction();
+  const { write } = useSubAccountContract(chainId, address);
 
-  const _sendTransactionAsync = useCallback(async (args: SendApproveArgs) => {
-    const { subAddress, delegate } = args;
+  const { mutateAsync, isPending, isSuccess } = useMutation({
+    mutationFn: async (delegate: Address) => {
+      const contract = await write();
 
-    const delegateData = encodeFunctionData({
-      abi: SubAccountAbi,
-      functionName: 'requestDelegation',
-      args: [delegate]
-    });
+      if (!contract) return;
 
-    return sendTransactionAsync({
-      to: subAddress,
-      data: delegateData
-    });
-  }, []);
+      const tx = await contract.requestDelegation(delegate);
+
+      const hash = isAddress(tx.hash) ? tx.hash : undefined;
+
+      const receipt = await tx.wait();
+
+      return {
+        hash,
+        receipt
+      };
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.subAccount.root() });
+    }
+  });
 
   return {
-    sendTransactionAsync: _sendTransactionAsync,
-    ...query,
-    sendTransaction: undefined
+    isPending,
+    isSuccess,
+    sendTransactionAsync: mutateAsync
   };
 }

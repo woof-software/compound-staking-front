@@ -22,7 +22,7 @@ export function useStakedBalance(chainId?: number, address?: Address) {
     queryKey: queryKeys.stakingVault.stakeInfoOf([chainId, address]),
     enabled: !!address,
     queryFn: async () => {
-      if (!address) return undefined;
+      if (!address || !read) return undefined;
 
       const res = await read.stakeInfoOf(address);
 

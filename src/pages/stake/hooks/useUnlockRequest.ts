@@ -1,27 +1,39 @@
-import { useCallback } from 'react';
-import { type Address, encodeFunctionData } from 'viem';
-import { useSendTransaction } from 'wagmi';
+import { isAddress } from 'viem';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { LockManagerAbi } from '@/shared/abis/LockManagerAbi';
+import { useLockManagerContract } from '@/hooks/useLockManagerContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useUnlockRequest() {
-  const { sendTransactionAsync, ...query } = useSendTransaction();
+export function useUnlockRequest(chainId?: number) {
+  const queryClient = useQueryClient();
 
-  const _sendTransactionAsync = useCallback(async (token: Address) => {
-    const unlockRequestData = encodeFunctionData({
-      abi: LockManagerAbi,
-      functionName: 'unlock'
-    });
+  const { write } = useLockManagerContract(chainId);
 
-    return sendTransactionAsync({
-      to: token,
-      data: unlockRequestData
-    });
-  }, []);
+  const { mutateAsync, isPending, isSuccess } = useMutation({
+    mutationFn: async () => {
+      const contract = await write();
+
+      if (!contract) return;
+
+      const tx = await contract.unlock();
+
+      const hash = isAddress(tx.hash) ? tx.hash : undefined;
+
+      const receipt = await tx.wait();
+
+      return {
+        hash,
+        receipt
+      };
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.lockManager.root() });
+    }
+  });
 
   return {
-    sendTransactionAsync: _sendTransactionAsync,
-    ...query,
-    sendTransaction: undefined
+    isPending,
+    isSuccess,
+    sendTransactionAsync: mutateAsync
   };
 }

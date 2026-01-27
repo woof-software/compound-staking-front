@@ -1,7 +1,17 @@
 import dayjs from 'dayjs';
-import type { Address } from 'viem';
+import { type Address, getAddress } from 'viem';
+import { getDeployment } from '@woof-software/compound-staked-comp-artifacts/deployments';
 
 import { ENV } from '@/consts/env';
+
+type Contracts = {
+  BASE_TOKEN_ADDRESS: Address | undefined;
+  STAKED_TOKEN_ADDRESS: Address | undefined;
+  STAKING_VAULT_ADDRESS: Address | undefined;
+  LOCK_MANAGER_ADDRESS: Address | undefined;
+  SUBACCOUNT_MANAGER_ADDRESS: Address | undefined;
+  VESTING_MANAGER_ADDRESS: Address | undefined;
+};
 
 export function getImgPath(src: string) {
   return `/src/assets${src}`;
@@ -71,4 +81,33 @@ export function getRemainingSeconds(unlockTimestampSec: number, nowUnix = dayjs(
 
 export function normalizeUnixSeconds(ts: number): number {
   return ts > 1e12 ? Math.floor(ts / 1000) : Math.floor(ts);
+}
+
+export function getAddressContracts(chainId?: number): Contracts {
+  if (!chainId) {
+    return {
+      BASE_TOKEN_ADDRESS: undefined,
+      STAKED_TOKEN_ADDRESS: undefined,
+      STAKING_VAULT_ADDRESS: undefined,
+      LOCK_MANAGER_ADDRESS: undefined,
+      SUBACCOUNT_MANAGER_ADDRESS: undefined,
+      VESTING_MANAGER_ADDRESS: undefined
+    };
+  }
+
+  const BASE_TOKEN_ADDRESS = getAddress(getDeployment(chainId, 'MockComp').address);
+  const STAKED_TOKEN_ADDRESS = getAddress(getDeployment(chainId, 'MockStComp').address);
+  const STAKING_VAULT_ADDRESS = getAddress(getDeployment(chainId, 'MockStakingVault').address);
+  const LOCK_MANAGER_ADDRESS = getAddress(getDeployment(chainId, 'LockManager').address);
+  const SUBACCOUNT_MANAGER_ADDRESS = getAddress(getDeployment(chainId, 'SubAccountManager').address);
+  const VESTING_MANAGER_ADDRESS = getAddress(getDeployment(chainId, 'VestingManager').address);
+
+  return {
+    BASE_TOKEN_ADDRESS,
+    STAKED_TOKEN_ADDRESS,
+    STAKING_VAULT_ADDRESS,
+    LOCK_MANAGER_ADDRESS,
+    SUBACCOUNT_MANAGER_ADDRESS,
+    VESTING_MANAGER_ADDRESS
+  };
 }

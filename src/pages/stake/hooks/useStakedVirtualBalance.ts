@@ -11,7 +11,7 @@ export function useStakedVirtualBalance(chainId?: number, address?: Address) {
     queryKey: ['multiplierOf', chainId, address],
     enabled: !!address,
     queryFn: async () => {
-      if (!address) return undefined;
+      if (!address || !read) return undefined;
 
       return await read.virtualBalanceOf(address);
     }

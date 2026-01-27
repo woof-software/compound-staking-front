@@ -13,6 +13,7 @@ import { useVestingPerUser } from '@/hooks/useVestingPerUser';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format, FormatTime } from '@/lib/utils/format';
+import { getAddressContracts } from '@/lib/utils/helpers';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 
@@ -26,15 +27,17 @@ export function UnstakeModal(props: UnstakeModalProps) {
 
   const { address, chainId } = useConnection();
 
-  const { data: lockDuration } = useUnstakeLockDuration(ENV.LOCK_MANAGER_ADDRESS);
+  const { LOCK_MANAGER_ADDRESS } = getAddressContracts(chainId);
+
+  const { data: lockDuration } = useUnstakeLockDuration(chainId, LOCK_MANAGER_ADDRESS);
 
   const { data: stakedTokenBalance } = useStakedBalance(chainId, address);
 
   const { data: stakedTokenPriceUsdData } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
-  const { data: maxVestingPositions } = useVestingPerUser();
+  const { data: maxVestingPositions } = useVestingPerUser(chainId);
 
-  const { data: vestingPositions, isLoading: isVestingPositionsLoading } = useVestingPosition(address);
+  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(chainId, address);
 
   const baseTokenPriceFormatted = formatUnits(
     (stakedTokenBalance?.principal ?? 0n) * (stakedTokenPriceUsdData ?? 0n),
@@ -42,7 +45,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
   );
 
   const hasPosition = !!vestingPositions?.length;
-  const hasMaxPosition = hasPosition ? vestingPositions?.length === maxVestingPositions : false;
+  const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions) : false;
 
   const isButtonDisabled = isLoading || isVestingPositionsLoading || hasMaxPosition;
 
@@ -85,7 +88,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
           weight='500'
           lineHeight='20'
         >
-          {FormatTime.cooldownFromSeconds(lockDuration ?? 0)}
+          {FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))}
         </Text>
       </div>
       <Condition if={hasMaxPosition}>

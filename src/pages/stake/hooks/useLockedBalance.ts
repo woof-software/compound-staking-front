@@ -1,26 +1,38 @@
 import type { Address } from 'viem';
-import { useReadContract } from 'wagmi';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 
-import { ENV } from '@/consts/env';
-import { LockManagerAbi } from '@/shared/abis/LockManagerAbi';
+import { useLockManagerContract } from '@/hooks/useLockManagerContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useLockedBalance(address?: Address) {
-  const { data, ...query } = useReadContract({
-    address: ENV.LOCK_MANAGER_ADDRESS,
-    abi: LockManagerAbi,
-    functionName: 'getActiveLock',
-    args: address ? [address] : undefined,
-    query: { enabled: !!address }
+const schema = z
+  .object({
+    amount: z.bigint(),
+    duration: z.bigint(),
+    startTime: z.bigint()
+  })
+  .optional();
+
+export type LockedInfoDto = z.infer<typeof schema>;
+
+export function useLockedBalance(chainId?: number, address?: Address) {
+  const { read } = useLockManagerContract(chainId);
+
+  const { data, ...query } = useQuery<LockedInfoDto | undefined>({
+    queryKey: queryKeys.lockManager.lockDuration([chainId, address]),
+    enabled: !!address,
+    queryFn: async () => {
+      if (!address || !read) return undefined;
+
+      const res = await read.getActiveLock(address);
+
+      return {
+        amount: res[0],
+        duration: res[1],
+        startTime: res[2]
+      };
+    }
   });
-
-  const schema = z
-    .object({
-      amount: z.bigint(),
-      duration: z.number().int().nonnegative(),
-      startTime: z.number().int().nonnegative()
-    })
-    .optional();
 
   return {
     data: schema.parse(data),

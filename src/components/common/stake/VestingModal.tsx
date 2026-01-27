@@ -35,15 +35,15 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
 
   const { data: availableRewards, isLoading: isAvailableRewardsLoading } = useAvailableRewards(chainId, address);
 
-  const { data: maxVestingPositions } = useVestingPerUser();
+  const { data: maxVestingPositions } = useVestingPerUser(chainId);
 
-  const { data: vestingPositions, isLoading: isVestingPositionsLoading } = useVestingPosition(address);
+  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(chainId, address);
 
   const {
     sendTransactionAsync: vestRewardsRequest,
     isPending: isVestRewardsPending,
     isSuccess: isVestRewardsSuccess
-  } = useVestRewards();
+  } = useVestRewards(chainId);
 
   const baseTokenPriceValue = baseTokenPrice ?? 0n;
   const availableRewardsPriceFormatted = formatUnits(
@@ -54,7 +54,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
   const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
   const hasPosition = !!vestingPositions?.length;
-  const hasMaxPosition = hasPosition ? vestingPositions?.length === maxVestingPositions : false;
+  const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions) : false;
 
   const isVestingLoading = isVestingPositionsLoading || isVestRewardsPending;
   const isLoading = isConnected ? isAvailableRewardsLoading || isBaseTokenPriceLoading : false;

@@ -47,7 +47,7 @@ export function RewardsFlowBlock() {
     data: vestingPositions = [],
     refetch: refetchVestingPositions,
     isLoading: isVestingLoading
-  } = useVestingPosition(address);
+  } = useVestingPosition(chainId, address);
 
   const rows = useMemo(() => {
     return vestingPositions.map(({ amount, claimedAmount, startTime, duration }) => {
@@ -58,8 +58,8 @@ export function RewardsFlowBlock() {
       return {
         vestingAmount: amount,
         claimedAmount: claimedAmount,
-        endDate: endDate,
-        startDate: startTime,
+        endDate: Number(endDate),
+        startDate: Number(startTime),
         toClaim: (amount * elapsed) / (BigInt(duration) || 1n) - claimedAmount
       } satisfies RewardsTableItem;
     });
@@ -89,13 +89,13 @@ export function RewardsFlowBlock() {
   const isClaimButtonDisabled = !isConnected || isLoading || !hasPosition || isClaimOpen;
   const isVestButtonDisabled = !isConnected || isLoading || !hasAvailableRewards || isVestingOpen;
 
-  const onVestingConfirmed = () => {
-    refetchAvailableRewards();
-    refetchVestingPositions();
+  const onVestingConfirmed = async () => {
+    await refetchAvailableRewards();
+    await refetchVestingPositions();
   };
 
-  const onClaimConfirmed = () => {
-    refetchVestingPositions();
+  const onClaimConfirmed = async () => {
+    await refetchVestingPositions();
   };
 
   const onClaimModalOpen = () => {

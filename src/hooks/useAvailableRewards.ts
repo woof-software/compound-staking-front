@@ -13,7 +13,7 @@ export function useAvailableRewards(chainId?: number, address?: Address) {
     queryKey: queryKeys.stakingVault.availableRewardsOf([chainId, address]),
     enabled: !!address,
     queryFn: async () => {
-      if (!address) return undefined;
+      if (!address || !read) return undefined;
 
       return await read.availableRewardsOf(address);
     },

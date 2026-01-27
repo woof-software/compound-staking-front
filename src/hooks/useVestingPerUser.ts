@@ -1,17 +1,22 @@
-import { useReadContract } from 'wagmi';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 
-import { ENV } from '@/consts/env';
-import { VestingManagerAbi } from '@/shared/abis/VestingManagerAbi';
+import { useVestingManagerContract } from '@/hooks/useVestingManagerContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useVestingPerUser() {
-  const { data, ...query } = useReadContract({
-    address: ENV.VESTING_MANAGER_ADDRESS,
-    abi: VestingManagerAbi,
-    functionName: 'MAX_VESTINGS_PER_USER'
+export function useVestingPerUser(chainId?: number) {
+  const { read } = useVestingManagerContract(chainId);
+
+  const { data, ...query } = useQuery<bigint | undefined>({
+    queryKey: queryKeys.vestingManager.MAX_VESTINGS_PER_USER([chainId]),
+    queryFn: async () => {
+      if (!read) return undefined;
+
+      return await read.MAX_VESTINGS_PER_USER();
+    }
   });
 
-  const schema = z.number().int().nonnegative().optional();
+  const schema = z.bigint().optional();
 
   return {
     data: schema.parse(data),

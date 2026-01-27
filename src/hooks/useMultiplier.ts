@@ -12,7 +12,7 @@ export function useMultiplier(chainId?: number, address?: Address) {
     queryKey: queryKeys.stakingVault.multiplierOf([chainId, address]),
     enabled: !!address,
     queryFn: async () => {
-      if (!address) return undefined;
+      if (!address || !read) return undefined;
 
       return await read.multiplierOf(address);
     }

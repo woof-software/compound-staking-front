@@ -11,6 +11,7 @@ export function useVestRewards(chainId?: number) {
   const { mutateAsync, isPending, isSuccess } = useMutation({
     mutationFn: async () => {
       const contract = await write();
+
       if (!contract) return;
 
       const tx = await contract.vestRewards();

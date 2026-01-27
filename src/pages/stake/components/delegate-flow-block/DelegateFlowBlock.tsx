@@ -34,21 +34,21 @@ export function DelegateFlowBlock() {
   const { isEnabled: isCooldownFinished, enable: setCooldownFinished, disable: resetCooldownFinished } = useSwitch();
 
   const { data: stakedTokenBalance } = useStakedBalance(chainId, address);
-  const { data: lockedTokenBalance } = useLockedBalance(address);
+  const { data: lockedTokenBalance } = useLockedBalance(chainId, address);
 
-  const { data: delegateDuration, isLoading: isDurationLoading } = useDelegateDuration();
+  const { data: delegateDuration, isLoading: isDurationLoading } = useDelegateDuration(chainId);
 
   const {
     data: subAccountAddress,
     isLoading: isSubAccountLoading,
     refetch: refetchSubAccountAddress
-  } = useDelegateSubAccount(address);
+  } = useDelegateSubAccount(chainId, address);
 
   const {
     data: delegateData,
     isLoading: isDelegateLoading,
     refetch: refetchDelegate
-  } = useSubAccount(subAccountAddress);
+  } = useSubAccount(chainId, subAccountAddress);
 
   const executableAtSec = useMemo(() => {
     const executableAt = delegateData?.executableAt;
@@ -120,7 +120,7 @@ export function DelegateFlowBlock() {
     <Card
       isLoading={isLoading}
       title='Delegation'
-      tooltip={`Cooldown period for redelegation process is ${FormatTime.cooldownFromSeconds(delegateDuration ?? 0)}`}
+      tooltip={`Cooldown period for redelegation process is ${FormatTime.cooldownFromSeconds(Number(delegateDuration ?? 0n))}`}
     >
       <div className='flex justify-between p-10'>
         <div className='flex gap-15'>
