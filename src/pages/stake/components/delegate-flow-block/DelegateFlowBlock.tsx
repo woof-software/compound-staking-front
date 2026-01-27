@@ -83,8 +83,8 @@ export function DelegateFlowBlock() {
 
   const delegateLabel = !canShowDelegation ? '-' : delegate?.name || delegate?.address || '-';
 
-  const onDelegateConfirmed = () => {
-    refetchDelegate();
+  const onDelegateConfirmed = async () => {
+    await refetchDelegate();
   };
 
   const onModalClose = () => {
@@ -93,7 +93,7 @@ export function DelegateFlowBlock() {
   };
 
   const onRefetchData = useEffectEvent(async () => {
-    await Promise.allSettled([refetchSubAccountAddress, refetchSubAccountAddress]);
+    await Promise.allSettled([refetchSubAccountAddress(), refetchSubAccountAddress()]);
 
     resetDelegateRefresh();
   });
@@ -229,6 +229,7 @@ export function DelegateFlowBlock() {
         onClose={onModalClose}
       >
         <DelegateModal
+          subAccountAddress={subAccountAddress}
           delegate={delegate}
           onClose={onClose}
           onDelegateConfirmed={onDelegateConfirmed}

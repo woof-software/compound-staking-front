@@ -110,10 +110,14 @@ export function StakeModal(props: StakeModalProps) {
   };
 
   useEffect(() => {
-    if (isStakeSuccess) {
+    if (!isStakeSuccess) return;
+
+    (async () => {
+      await Promise.allSettled([refetchWalletBalance(), refetchAllowance()]).then((res) => console.log('res=>', res));
+
       onStakeConfirmed();
       onClose();
-    }
+    })();
   }, [isStakeSuccess]);
 
   useEffect(() => {

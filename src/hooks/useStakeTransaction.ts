@@ -34,6 +34,8 @@ export function useStakeTransaction(chainId?: number) {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.subAccount.root() });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.subAccountManager.root() });
     }
   });
 

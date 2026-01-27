@@ -90,7 +90,7 @@ export function RewardsFlowBlock() {
   const isVestButtonDisabled = !isConnected || isLoading || !hasAvailableRewards || isVestingOpen;
 
   const onVestingConfirmed = async () => {
-    await Promise.allSettled([refetchAvailableRewards, refetchVestingPositions]);
+    await Promise.allSettled([refetchAvailableRewards(), refetchVestingPositions()]);
   };
 
   const onClaimConfirmed = async () => {

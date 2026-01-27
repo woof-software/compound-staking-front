@@ -34,6 +34,7 @@ export function TotalStaked() {
 
   useEffect(() => {
     if (!isConnected || !needTotalStakedRefresh) return;
+
     refetchTotalStaked();
   }, [needTotalStakedRefresh, isConnected, refetchTotalStaked]);
 

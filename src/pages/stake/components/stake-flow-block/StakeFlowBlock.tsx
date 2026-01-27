@@ -84,16 +84,16 @@ export function StakeFlowBlock() {
   };
 
   const onStakeConfirmed = async () => {
-    await Promise.allSettled([
-      refetchStakedBalanceFormatted,
-      refetchVirtualBalance,
-      refetchMultiplier,
-      refetchAvailableRewards
-    ]);
-
     triggerStatisticRefresh();
     triggerDelegateRefresh();
     triggerRewardRefresh();
+
+    await Promise.allSettled([
+      refetchStakedBalanceFormatted(),
+      refetchVirtualBalance(),
+      refetchMultiplier(),
+      refetchAvailableRewards()
+    ]);
   };
 
   return (

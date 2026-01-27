@@ -1,4 +1,5 @@
 import { useEffect, useEffectEvent, useState } from 'react';
+import type { Address } from 'viem';
 import { useConnection } from 'wagmi';
 
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
@@ -6,24 +7,22 @@ import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
 import { type Delegate } from '@/consts/common';
-import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useDelegateTransaction } from '@/hooks/useDelegateTransaction';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export type DelegateModalProps = {
+  subAccountAddress?: Address | undefined;
   delegate?: Delegate | undefined;
   onClose?: () => void;
   onDelegateConfirmed?: () => void;
 };
 
 export function DelegateModal(props: DelegateModalProps) {
-  const { delegate, onClose = noop, onDelegateConfirmed = noop } = props;
+  const { delegate, subAccountAddress, onClose = noop, onDelegateConfirmed = noop } = props;
 
-  const { address, chainId } = useConnection();
-
-  const { data: subAccountAddress, isLoading: isSubAccountLoading } = useDelegateSubAccount(chainId, address);
+  const { chainId } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
@@ -33,11 +32,9 @@ export function DelegateModal(props: DelegateModalProps) {
     isSuccess: isDelegateSuccess
   } = useDelegateTransaction(chainId, subAccountAddress);
 
-  const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
+  const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(() => delegate ?? null);
 
-  const isConfirmDisabled = selectedAddressDelegate?.address === delegate?.address;
-
-  const isDelegateLoading = isDelegatePending || isSubAccountLoading;
+  const isConfirmDisabled = !selectedAddressDelegate || selectedAddressDelegate.address === delegate?.address;
 
   const onDelegateSelect = (addressDelegate: Delegate | null) => {
     setSelectedAddressDelegate(addressDelegate);
@@ -47,7 +44,6 @@ export function DelegateModal(props: DelegateModalProps) {
     if (!selectedAddressDelegate || !subAccountAddress) return;
 
     setIsPendingToggle(true);
-
     await delegateTransaction(selectedAddressDelegate.address);
   };
 
@@ -71,15 +67,15 @@ export function DelegateModal(props: DelegateModalProps) {
     <div className='mt-8 flex w-full flex-col gap-8'>
       <Divider orientation='horizontal' />
       <DelegateSelector
-        disabled={isDelegateLoading}
+        disabled={isDelegatePending}
         selectedAddressDelegate={selectedAddressDelegate}
         onSelect={onDelegateSelect}
       />
       <Button
         className={cn('h-14 flex-col', {
-          'bg-color-7': isDelegateLoading
+          'bg-color-7': isDelegatePending
         })}
-        disabled={isConfirmDisabled || isDelegateLoading}
+        disabled={isConfirmDisabled || isDelegatePending}
         onClick={onConfirm}
       >
         <Text
@@ -88,10 +84,10 @@ export function DelegateModal(props: DelegateModalProps) {
           lineHeight='18'
           className={cn('text-white', {
             'text-color-6': isConfirmDisabled,
-            'after-animate-loading-dots text-white': isDelegateLoading
+            'after-animate-loading-dots text-white': isDelegatePending
           })}
         >
-          {isDelegateLoading ? 'Pending' : 'Confirm'}
+          {isDelegatePending ? 'Pending' : 'Confirm'}
         </Text>
       </Button>
     </div>
