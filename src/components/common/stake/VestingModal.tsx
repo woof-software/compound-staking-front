@@ -54,7 +54,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
   const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
   const hasPosition = !!vestingPositions?.length;
-  const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions) : false;
+  const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions ?? 0n) : false;
 
   const isVestingLoading = isVestingPositionsLoading || isVestRewardsPending;
   const isLoading = isConnected ? isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
