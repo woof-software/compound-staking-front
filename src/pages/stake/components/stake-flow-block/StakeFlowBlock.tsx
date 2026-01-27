@@ -146,7 +146,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {Format.token(virtualBalanceFormatted, 'compact', 'COMP')}
+              {Format.token(virtualBalanceFormatted, 'compact', 'stCOMP')}
             </Text>
           </Skeleton>
         </div>
