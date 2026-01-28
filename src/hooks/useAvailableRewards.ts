@@ -12,10 +12,10 @@ export function useAvailableRewards(chainId?: number, address?: Address) {
   const { data, ...query } = useQuery<bigint | undefined>({
     queryKey: queryKeys.stakingVault.availableRewardsOf([chainId, address]),
     enabled: !!address,
-    queryFn: async () => {
-      if (!address) return undefined;
+    queryFn: () => {
+      if (!address) return;
 
-      return await read.availableRewardsOf(address);
+      return read.availableRewardsOf(address);
     },
     refetchInterval: REFETCH_TIME_MS
   });

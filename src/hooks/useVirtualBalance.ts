@@ -11,10 +11,10 @@ export function useVirtualBalance(chainId?: number, address?: Address) {
   const { data, ...query } = useQuery<bigint | undefined>({
     queryKey: queryKeys.stakingVault.virtualBalanceOf([chainId, address]),
     enabled: !!address,
-    queryFn: async () => {
-      if (!address) return undefined;
+    queryFn: () => {
+      if (!address) return;
 
-      return await read.virtualBalanceOf(address);
+      return read.virtualBalanceOf(address);
     }
   });
 
