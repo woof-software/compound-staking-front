@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { formatUnits, parseUnits } from 'viem';
+import { type Address, formatUnits, parseUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import COMP_AVIF from '@/assets/comp.avif';
@@ -15,22 +15,24 @@ import { type Delegate } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useApproveTransaction } from '@/hooks/useApproveTransaction';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
+import { useIncreaseStakeTransaction } from '@/hooks/useIncreaseStakeTransaction';
 import { useStakeTransaction } from '@/hooks/useStakeTransaction';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
-import { getAddressContracts } from '@/lib/utils/helpers';
+import { getAddressContracts, getDelegateByAddress } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export type StakeModalProps = {
-  onClose?: () => void;
+  delegateAddress?: Address | undefined;
+  stakedBalance?: bigint | undefined;
   onStakeConfirmed?: () => void;
 };
 
 export function StakeModal(props: StakeModalProps) {
-  const { onClose = noop, onStakeConfirmed = noop } = props;
+  const { stakedBalance, delegateAddress, onStakeConfirmed = noop } = props;
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
@@ -51,17 +53,18 @@ export function StakeModal(props: StakeModalProps) {
 
   const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(chainId, address);
 
+  console.log('allowance=>', allowance);
+
   const { sendTransactionAsync: approve, data: approveHash, isPending: isApprovePending } = useApproveTransaction();
 
   const { isLoading: isApproveConfirming, isSuccess: isApproveSuccess } = useWaitForTransactionReceipt({
     hash: approveHash
   });
 
-  const {
-    sendTransactionAsync: stake,
-    isPending: isStakePending,
-    isSuccess: isStakeSuccess
-  } = useStakeTransaction(chainId);
+  const { sendTransactionAsync: stake, isPending: isStakePending } = useStakeTransaction(chainId);
+
+  const { sendTransactionAsync: increaseStake, isPending: isIncreaseStakePending } =
+    useIncreaseStakeTransaction(chainId);
 
   const parseAmount = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
   const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
@@ -73,7 +76,7 @@ export function StakeModal(props: StakeModalProps) {
   /* Loading */
   const isPriceOrBalanceLoading = isBaseTokenPriceLoading || isWalletBalanceLoading;
   const isApproveLoading = isApprovePending || isApproveConfirming;
-  const isLoadingTransaction = isApproveLoading || isStakePending;
+  const isLoadingTransaction = isApproveLoading || isStakePending || isIncreaseStakePending;
 
   /* Disabled */
   const isApproveDisabled = noAmount || !needsApprove || !isAmountExceedsBalance || isApproveLoading;
@@ -89,6 +92,8 @@ export function StakeModal(props: StakeModalProps) {
   );
   const walletBalanceFormatted = formatUnits(walletBalanceValue, ENV.BASE_TOKEN_DECIMALS);
 
+  const showWarningForAdditionalStake = (stakedBalance ?? 0n) > 0n;
+
   const onMaxButtonClick = () => {
     setAmountValue(walletBalanceFormatted);
   };
@@ -103,22 +108,33 @@ export function StakeModal(props: StakeModalProps) {
     await approve({ token: BASE_TOKEN_ADDRESS, spender: STAKING_VAULT_ADDRESS, value: parseAmount });
   };
 
+  const refetchData = async () => {
+    await Promise.allSettled([refetchWalletBalance(), refetchAllowance()]);
+
+    onStakeConfirmed();
+  };
+
   const onConfirm = async () => {
     if (isConfirmDisabled) return;
 
-    await stake({ amount: parseAmount, delegatee: selectedAddressDelegate?.address });
+    if (!showWarningForAdditionalStake) {
+      await stake({ amount: parseAmount, delegatee: selectedAddressDelegate?.address });
+    } else {
+      await increaseStake({ amount: parseAmount, delegatee: selectedAddressDelegate?.address });
+    }
+
+    await refetchData();
   };
 
   useEffect(() => {
-    if (!isStakeSuccess) return;
+    if (selectedAddressDelegate?.address) return;
 
-    (async () => {
-      await Promise.allSettled([refetchWalletBalance(), refetchAllowance()]).then((res) => console.log('res=>', res));
+    if (!delegateAddress) return;
 
-      onStakeConfirmed();
-      onClose();
-    })();
-  }, [isStakeSuccess]);
+    const delegate = getDelegateByAddress(delegateAddress) ?? null;
+
+    setSelectedAddressDelegate(delegate);
+  }, [delegateAddress, selectedAddressDelegate?.address]);
 
   useEffect(() => {
     setIsPendingToggle(isLoadingTransaction);
@@ -209,18 +225,18 @@ export function StakeModal(props: StakeModalProps) {
         />
       </Skeleton>
       {/*TODO: add warning for additional stake */}
-      {/*<Condition if={showWarningForAdditionalStake}>*/}
-      {/*  <div className='bg-color-21 rounded-lg p-5 flex items-center gap-2.5'>*/}
-      {/*    <InfoIcon className='size-4 text-color-22' />*/}
-      {/*    <Text*/}
-      {/*      size='11'*/}
-      {/*      lineHeight='16'*/}
-      {/*      className='text-color-22'*/}
-      {/*    >*/}
-      {/*      Multiplier reverts to 1x after staking more COMP. All available rewards get vested.*/}
-      {/*    </Text>*/}
-      {/*  </div>*/}
-      {/*</Condition>*/}
+      <Condition if={showWarningForAdditionalStake}>
+        <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
+          <InfoIcon className='text-color-22 size-4' />
+          <Text
+            size='11'
+            lineHeight='16'
+            className='text-color-22'
+          >
+            Multiplier reverts to 1x after staking more COMP. All available rewards get vested.
+          </Text>
+        </div>
+      </Condition>
       <div className='flex flex-col gap-2.5'>
         <Skeleton loading={isPriceOrBalanceLoading}>
           <Button
@@ -256,9 +272,9 @@ export function StakeModal(props: StakeModalProps) {
         <Skeleton loading={isPriceOrBalanceLoading}>
           <Button
             className={cn('h-14 flex-col', {
-              'bg-color-7': isStakePending
+              'bg-color-7': isStakePending || isIncreaseStakePending
             })}
-            disabled={isConfirmDisabled || isStakePending}
+            disabled={isConfirmDisabled || isStakePending || isIncreaseStakePending}
             onClick={onConfirm}
           >
             <Text
@@ -267,17 +283,17 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='18'
               className={cn('text-white', {
                 'text-color-6': isConfirmDisabled,
-                'after-animate-loading-dots text-white': isStakePending
+                'after-animate-loading-dots text-white': isStakePending || isIncreaseStakePending
               })}
             >
-              {isStakePending ? 'Pending' : 'Confirm'}
+              {isStakePending || isIncreaseStakePending ? 'Pending' : 'Confirm'}
             </Text>
             <Text
               size='11'
               lineHeight='16'
               className={cn('text-white', {
                 'text-color-6': isConfirmDisabled,
-                'text-white': isStakePending
+                'text-white': isStakePending || isIncreaseStakePending
               })}
             >
               Step 2

@@ -9,7 +9,9 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
+import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useMultiplier } from '@/hooks/useMultiplier';
+import { useSubAccount } from '@/hooks/useSubAccount';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -42,6 +44,10 @@ export function StakeFlowBlock() {
     isLoading: isStakedBalanceLoading,
     refetch: refetchStakedBalanceFormatted
   } = useStakedBalance(chainId, address);
+
+  const { data: subAccountAddress } = useDelegateSubAccount(chainId, address);
+
+  const { data: delegateData } = useSubAccount(chainId, subAccountAddress);
 
   const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(chainId, address);
 
@@ -78,22 +84,26 @@ export function StakeFlowBlock() {
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
 
+  const delegateAddress = (stakedBalance?.principal ?? 0n) > 0n ? delegateData?.delegatee : undefined;
+
   const onModalClose = () => {
     setIsPendingToggle(false);
     onClose();
   };
 
   const onStakeConfirmed = async () => {
-    triggerStatisticRefresh();
-    triggerDelegateRefresh();
-    triggerRewardRefresh();
-
     await Promise.allSettled([
       refetchStakedBalanceFormatted(),
       refetchVirtualBalance(),
       refetchMultiplier(),
       refetchAvailableRewards()
     ]);
+
+    triggerStatisticRefresh();
+    triggerDelegateRefresh();
+    triggerRewardRefresh();
+
+    onClose();
   };
 
   return (
@@ -245,8 +255,9 @@ export function StakeFlowBlock() {
         onClose={onModalClose}
       >
         <StakeModal
+          delegateAddress={delegateAddress}
+          stakedBalance={stakedBalance?.principal}
           onStakeConfirmed={onStakeConfirmed}
-          onClose={onClose}
         />
       </Modal>
     </Card>

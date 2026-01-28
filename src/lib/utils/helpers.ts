@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { type Address, getAddress } from 'viem';
 import { getDeployment } from '@woof-software/compound-staked-comp-artifacts/deployments';
 
+import { type Delegate, DELEGATES } from '@/consts/common';
 import { ENV } from '@/consts/env';
 
 type Contracts = {
@@ -110,4 +111,12 @@ export function getAddressContracts(chainId?: number): Contracts {
     SUBACCOUNT_MANAGER_ADDRESS,
     VESTING_MANAGER_ADDRESS
   };
+}
+
+export function getDelegateByAddress(delegateAddress: Address | undefined, delegates: Delegate[] = DELEGATES) {
+  if (!delegateAddress) return undefined;
+
+  const target = delegates.find((d) => d.address.toLowerCase() === delegateAddress.toLowerCase());
+
+  return target ?? { name: undefined, address: delegateAddress };
 }

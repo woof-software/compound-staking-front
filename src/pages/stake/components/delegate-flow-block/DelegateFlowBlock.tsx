@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-import { useDelegateByAddress } from '@/hooks/useDelegateByAddress';
 import { useDelegateDuration } from '@/hooks/useDelegateDuration';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
@@ -16,7 +15,7 @@ import { useSubAccount } from '@/hooks/useSubAccount';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { FormatTime } from '@/lib/utils/format';
-import { getExplorerAddressUrl, getRemainingSeconds } from '@/lib/utils/helpers';
+import { getDelegateByAddress, getExplorerAddressUrl, getRemainingSeconds } from '@/lib/utils/helpers';
 import { DelegateModal } from '@/pages/stake/components/delegate-flow-block/DelegateModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
@@ -79,7 +78,7 @@ export function DelegateFlowBlock() {
 
   const endDateLabel = !canShowDelegation || !hasCooldownRequest ? '-' : FormatTime.endDate(executableAtSec);
 
-  const delegate = useDelegateByAddress(delegateData?.delegatee);
+  const delegate = getDelegateByAddress(delegateData?.delegatee);
 
   const delegateLabel = !canShowDelegation ? '-' : delegate?.name || delegate?.address || '-';
 
