@@ -28,7 +28,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   const isPending = useWalletStore(({ isPending }) => isPending);
 
-  const { address, isConnected } = useConnection();
+  const { address, isConnected, chainId } = useConnection();
   const { disconnect } = useDisconnect();
 
   const { isEnabled: isOpen, toggle: onOpen, disable: onClose } = useSwitch();
@@ -37,7 +37,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
     data: availableRewards,
     refetch: refetchAvailableRewards,
     isLoading: isAvailableRewardsLoading
-  } = useAvailableRewards(address);
+  } = useAvailableRewards(chainId, address);
 
   const {
     data: walletBalance,

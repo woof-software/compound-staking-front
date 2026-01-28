@@ -1,18 +1,20 @@
 import { type Address } from 'viem';
-import { useReadContract } from 'wagmi';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 
-import { ENV } from '@/consts/env';
-import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
+import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useStakedVirtualBalance(address?: Address) {
-  const { data, ...query } = useReadContract({
-    address: ENV.STAKING_VAULT_ADDRESS,
-    abi: StakingVaultAbi,
-    functionName: 'virtualBalanceOf',
-    args: address ? [address] : undefined,
-    query: {
-      enabled: !!address
+export function useStakedVirtualBalance(chainId?: number, address?: Address) {
+  const { read } = useStakingVaultContract(chainId);
+
+  const { data, ...query } = useQuery<bigint | undefined>({
+    queryKey: queryKeys.stakingVault.virtualBalanceOf([chainId, address]),
+    enabled: !!address,
+    queryFn: () => {
+      if (!address) return;
+
+      return read.virtualBalanceOf(address);
     }
   });
 

@@ -25,7 +25,7 @@ import { useStatisticStore } from '@/stores/useStatisticStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function StakeFlowBlock() {
-  const { isConnected, address } = useConnection();
+  const { isConnected, address, chainId } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
@@ -38,12 +38,12 @@ export function StakeFlowBlock() {
     data: stakedBalance,
     isLoading: isStakedBalanceLoading,
     refetch: refetchStakedBalanceFormatted
-  } = useStakedBalance(address);
+  } = useStakedBalance(chainId, address);
 
-  const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(address);
+  const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(chainId, address);
 
-  const { data: multiplier, refetch: refetchMultiplier } = useMultiplier(address);
-  const { data: availableRewards, refetch: refetchAvailableRewards } = useAvailableRewards(address);
+  const { data: multiplier, refetch: refetchMultiplier } = useMultiplier(chainId, address);
+  const { data: availableRewards, refetch: refetchAvailableRewards } = useAvailableRewards(chainId, address);
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
@@ -80,11 +80,13 @@ export function StakeFlowBlock() {
     onClose();
   };
 
-  const onStakeConfirmed = () => {
-    refetchStakedBalanceFormatted();
-    refetchVirtualBalance();
-    refetchMultiplier();
-    refetchAvailableRewards();
+  const onStakeConfirmed = async () => {
+    await Promise.allSettled([
+      refetchStakedBalanceFormatted,
+      refetchVirtualBalance,
+      refetchMultiplier,
+      refetchAvailableRewards
+    ]);
 
     triggerStatisticRefresh();
     triggerDelegateRefresh();

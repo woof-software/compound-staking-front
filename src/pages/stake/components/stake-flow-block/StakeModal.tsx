@@ -54,11 +54,7 @@ export function StakeModal(props: StakeModalProps) {
     hash: approveHash
   });
 
-  const { sendTransactionAsync: stake, data: stakeHash, isPending: isStakePending } = useStakeTransaction();
-
-  const { isLoading: isStakeConfirming, isSuccess: isStakeSuccess } = useWaitForTransactionReceipt({
-    hash: stakeHash
-  });
+  const { sendTransactionAsync: stake, isPending: isStakePending, isSuccess: isStakeSuccess } = useStakeTransaction();
 
   const parseAmount = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
   const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
@@ -70,8 +66,7 @@ export function StakeModal(props: StakeModalProps) {
   /* Loading */
   const isPriceOrBalanceLoading = isBaseTokenPriceLoading || isWalletBalanceLoading;
   const isApproveLoading = isApprovePending || isApproveConfirming;
-  const isStakeLoading = isStakePending || isStakeConfirming;
-  const isLoadingTransaction = isApproveLoading || isStakeLoading;
+  const isLoadingTransaction = isApproveLoading || isStakePending;
 
   /* Disabled */
   const isApproveDisabled = noAmount || !needsApprove || !isAmountExceedsBalance || isApproveLoading;
@@ -104,7 +99,7 @@ export function StakeModal(props: StakeModalProps) {
   const onConfirm = async () => {
     if (isConfirmDisabled) return;
 
-    await stake(parseAmount, selectedAddressDelegate?.address);
+    await stake({ amount: parseAmount, delegatee: selectedAddressDelegate?.address });
   };
 
   useEffect(() => {
@@ -250,9 +245,9 @@ export function StakeModal(props: StakeModalProps) {
         <Skeleton loading={isPriceOrBalanceLoading}>
           <Button
             className={cn('h-14 flex-col', {
-              'bg-color-7': isStakeLoading
+              'bg-color-7': isStakePending
             })}
-            disabled={isConfirmDisabled || isStakeLoading}
+            disabled={isConfirmDisabled || isStakePending}
             onClick={onConfirm}
           >
             <Text
@@ -261,17 +256,17 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='18'
               className={cn('text-white', {
                 'text-color-6': isConfirmDisabled,
-                'after-animate-loading-dots text-white': isStakeLoading
+                'after-animate-loading-dots text-white': isStakePending
               })}
             >
-              {isStakeLoading ? 'Pending' : 'Confirm'}
+              {isStakePending ? 'Pending' : 'Confirm'}
             </Text>
             <Text
               size='11'
               lineHeight='16'
               className={cn('text-white', {
                 'text-color-6': isConfirmDisabled,
-                'text-white': isStakeLoading
+                'text-white': isStakePending
               })}
             >
               Step 2

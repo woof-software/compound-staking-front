@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
-import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import { useConnection } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -27,13 +27,13 @@ export type VestingModalProps = {
 };
 
 export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirmed = noop }: VestingModalProps) {
-  const { isConnected, address } = useConnection();
+  const { isConnected, address, chainId } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
-  const { data: availableRewards, isLoading: isAvailableRewardsLoading } = useAvailableRewards(address);
+  const { data: availableRewards, isLoading: isAvailableRewardsLoading } = useAvailableRewards(chainId, address);
 
   const { data: maxVestingPositions } = useVestingPerUser();
 
@@ -41,13 +41,9 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
 
   const {
     sendTransactionAsync: vestRewardsRequest,
-    data: vestRewardsHash,
-    isPending: isVestRewardsPending
+    isPending: isVestRewardsPending,
+    isSuccess: isVestRewardsSuccess
   } = useVestRewards();
-
-  const { isLoading: isVestRewardsConfirming, isSuccess: isVestRewardsSuccess } = useWaitForTransactionReceipt({
-    hash: vestRewardsHash
-  });
 
   const baseTokenPriceValue = baseTokenPrice ?? 0n;
   const availableRewardsPriceFormatted = formatUnits(
@@ -60,7 +56,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
   const hasPosition = !!vestingPositions?.length;
   const hasMaxPosition = hasPosition ? vestingPositions?.length === maxVestingPositions : false;
 
-  const isVestingLoading = isVestingPositionsLoading || isVestRewardsPending || isVestRewardsConfirming;
+  const isVestingLoading = isVestingPositionsLoading || isVestRewardsPending;
   const isLoading = isConnected ? isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
 
   const isVestButtonDisabled = isLoading || isVestingLoading || hasMaxPosition;

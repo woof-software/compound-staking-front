@@ -24,11 +24,11 @@ export type UnstakeModalProps = {
 export function UnstakeModal(props: UnstakeModalProps) {
   const { isLoading = false, onClick = noop } = props;
 
-  const { address } = useConnection();
+  const { address, chainId } = useConnection();
 
   const { data: lockDuration } = useUnstakeLockDuration(ENV.LOCK_MANAGER_ADDRESS);
 
-  const { data: stakedTokenBalance } = useStakedBalance(address);
+  const { data: stakedTokenBalance } = useStakedBalance(chainId, address);
 
   const { data: stakedTokenPriceUsdData } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 

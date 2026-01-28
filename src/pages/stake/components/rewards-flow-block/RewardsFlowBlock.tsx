@@ -26,7 +26,7 @@ import { useWalletStore } from '@/stores/useWalletStore';
 export function RewardsFlowBlock() {
   const [claimAmount, setClaimAmount] = useState<bigint>(0n);
 
-  const { isConnected, address } = useConnection();
+  const { isConnected, address, chainId } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
@@ -41,7 +41,7 @@ export function RewardsFlowBlock() {
     data: availableRewards,
     refetch: refetchAvailableRewards,
     isLoading: isAvailableRewardsLoading
-  } = useAvailableRewards(address);
+  } = useAvailableRewards(chainId, address);
 
   const {
     data: vestingPositions = [],

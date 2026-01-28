@@ -44,16 +44,16 @@ export function UnstakeFlowBlock() {
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
 
-  const { isConnected, address } = useConnection();
+  const { isConnected, address, chainId } = useConnection();
 
   const { data: lockDuration } = useUnstakeLockDuration(ENV.LOCK_MANAGER_ADDRESS);
 
   const { refetch: refetchAllowance } = useBaseTokenAllowance(address);
 
-  const { data: stakedTokenBalance, refetch: refetchStakedTokenBalance } = useStakedBalance(address);
-  const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(address);
-  const { refetch: refetchMultiplier } = useMultiplier(address);
-  const { refetch: refetchAvailableRewards } = useAvailableRewards(address);
+  const { data: stakedTokenBalance, refetch: refetchStakedTokenBalance } = useStakedBalance(chainId, address);
+  const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(chainId, address);
+  const { refetch: refetchMultiplier } = useMultiplier(chainId, address);
+  const { refetch: refetchAvailableRewards } = useAvailableRewards(chainId, address);
 
   const {
     data: lockedTokenBalance,
@@ -65,13 +65,9 @@ export function UnstakeFlowBlock() {
 
   const {
     sendTransactionAsync: unstakeRequest,
-    data: unstakeRequestHash,
-    isPending: isUnstakePending
-  } = useUnstakeRequest();
-
-  const { isLoading: isUnstakeRequestConfirming, isSuccess: isUnstakeRequestSuccess } = useWaitForTransactionReceipt({
-    hash: unstakeRequestHash
-  });
+    isPending: isUnstakePending,
+    isSuccess: isUnstakeRequestSuccess
+  } = useUnstakeRequest(chainId);
 
   const {
     sendTransactionAsync: unlockRequest,
@@ -110,8 +106,7 @@ export function UnstakeFlowBlock() {
 
   /* Loading */
   const isLoading = isConnected ? isLockedTokenBalanceLoading : false;
-  const isTransactionLoading =
-    isUnstakePending || isUnstakeRequestConfirming || isUnlockPending || isUnlockRequestConfirming;
+  const isTransactionLoading = isUnstakePending || isUnlockPending || isUnlockRequestConfirming;
 
   const isUnstakeButtonDisabled =
     !isConnected || isOpen || isTransactionLoading || isBalancesLoading || !hasSomethingToUnstake || isCooldownBlocked;
@@ -119,7 +114,7 @@ export function UnstakeFlowBlock() {
   const onUnstakeRequest = async () => {
     setIsPendingToggle(true);
     try {
-      await unstakeRequest(ENV.STAKING_VAULT_ADDRESS);
+      await unstakeRequest();
     } finally {
       setIsPendingToggle(false);
     }
@@ -138,12 +133,14 @@ export function UnstakeFlowBlock() {
     onClose();
   };
 
-  const onRequestSuccess = useEffectEvent(() => {
-    refetchStakedTokenBalance();
-    refetchVirtualTokenBalance();
-    refetchMultiplier();
-    refetchAvailableRewards();
-    refetchLockedTokenBalance();
+  const onRequestSuccess = useEffectEvent(async () => {
+    await Promise.allSettled([
+      refetchStakedTokenBalance,
+      refetchVirtualTokenBalance,
+      refetchMultiplier,
+      refetchAvailableRewards,
+      refetchLockedTokenBalance
+    ]);
 
     triggerDelegateRefresh();
     triggerRewardRefresh();
@@ -300,7 +297,7 @@ export function UnstakeFlowBlock() {
         onClose={onModalClose}
       >
         <UnstakeModal
-          isLoading={isUnstakePending || isUnstakeRequestConfirming}
+          isLoading={isUnstakePending}
           onClick={onUnstakeRequest}
         />
       </Modal>

@@ -1,26 +1,29 @@
-import { useCallback } from 'react';
-import { type Address, encodeFunctionData } from 'viem';
-import { useSendTransaction } from 'wagmi';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
+import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useUnstakeRequest() {
-  const { sendTransactionAsync, ...query } = useSendTransaction();
+export function useUnstakeRequest(chainId?: number) {
+  const queryClient = useQueryClient();
 
-  const _sendTransactionAsync = useCallback(async (token: Address) => {
-    const unstakeRequestData = encodeFunctionData({
-      abi: StakingVaultAbi,
-      functionName: 'unstake'
-    });
+  const { write } = useStakingVaultContract(chainId);
 
-    return sendTransactionAsync({
-      to: token,
-      data: unstakeRequestData
-    });
-  }, []);
+  const { mutateAsync, ...query } = useMutation({
+    mutationFn: async () => {
+      const contract = await write();
+      if (!contract) return;
+
+      const tx = await contract.unstake();
+
+      return tx.hash;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });
+    }
+  });
 
   return {
-    sendTransactionAsync: _sendTransactionAsync,
+    sendTransactionAsync: mutateAsync,
     ...query,
     sendTransaction: undefined
   };

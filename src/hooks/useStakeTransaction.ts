@@ -1,30 +1,36 @@
 import { ZeroAddress } from 'ethers';
-import { type Address, encodeFunctionData } from 'viem';
-import { useSendTransaction } from 'wagmi';
+import { type Address } from 'viem';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { ENV } from '@/consts/env';
-import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
+import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useStakeTransaction() {
-  const { sendTransactionAsync, ...query } = useSendTransaction();
+type StakeArgs = {
+  amount: bigint;
+  delegatee?: Address;
+};
 
-  const _sendTransactionAsync = async (amount: bigint, delegatee?: Address) => {
-    const delegateeAddress = delegatee ? delegatee : ZeroAddress;
+export function useStakeTransaction(chainId?: number) {
+  const queryClient = useQueryClient();
 
-    const stakeData = encodeFunctionData({
-      abi: StakingVaultAbi,
-      functionName: 'stake',
-      args: [delegateeAddress, amount]
-    });
+  const { write } = useStakingVaultContract(chainId);
 
-    return sendTransactionAsync({
-      to: ENV.STAKING_VAULT_ADDRESS,
-      data: stakeData
-    });
-  };
+  const { mutateAsync, ...query } = useMutation({
+    mutationFn: async ({ amount, delegatee }: StakeArgs) => {
+      const contract = await write();
+      if (!contract) return;
+
+      const tx = await contract.stake(delegatee ?? ZeroAddress, amount);
+
+      return tx.hash;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });
+    }
+  });
 
   return {
-    sendTransactionAsync: _sendTransactionAsync,
+    sendTransactionAsync: mutateAsync,
     ...query,
     sendTransaction: undefined
   };

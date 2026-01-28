@@ -1,14 +1,17 @@
-import { useReadContract } from 'wagmi';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 
-import { ENV } from '@/consts/env';
-import { StakingVaultAbi } from '@/shared/abis/StakingVaultAbi';
+import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useTotalStaked() {
-  const { data, ...query } = useReadContract({
-    address: ENV.STAKING_VAULT_ADDRESS,
-    abi: StakingVaultAbi,
-    functionName: 'totalStaked'
+export function useTotalStaked(chainId?: number) {
+  const { read } = useStakingVaultContract(chainId);
+
+  const { data, ...query } = useQuery<bigint | undefined>({
+    queryKey: queryKeys.stakingVault.totalStaked([chainId]),
+    queryFn: () => {
+      return read.totalStaked();
+    }
   });
 
   return {
