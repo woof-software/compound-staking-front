@@ -113,7 +113,7 @@ export function StakeModal(props: StakeModalProps) {
     if (!isStakeSuccess) return;
 
     (async () => {
-      await Promise.allSettled([refetchWalletBalance(), refetchAllowance()]).then((res) => console.log('res=>', res));
+      await Promise.allSettled([refetchWalletBalance(), refetchAllowance()]);
 
       onStakeConfirmed();
       onClose();
