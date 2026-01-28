@@ -11,10 +11,10 @@ export function useMultiplier(chainId?: number, address?: Address) {
   const { data, ...query } = useQuery<bigint | undefined>({
     queryKey: queryKeys.stakingVault.multiplierOf([chainId, address]),
     enabled: !!address,
-    queryFn: async () => {
-      if (!address || !read) return undefined;
+    queryFn: () => {
+      if (!address || !read) return;
 
-      return await read.multiplierOf(address);
+      return read.multiplierOf(address);
     }
   });
 
