@@ -1,4 +1,3 @@
-import { isAddress } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useLockManagerContract } from '@/hooks/useLockManagerContract';
@@ -9,7 +8,7 @@ export function useUnlockRequest(chainId?: number) {
 
   const { write } = useLockManagerContract(chainId);
 
-  const { mutateAsync, isPending, isSuccess } = useMutation({
+  const { mutateAsync, ...query } = useMutation({
     mutationFn: async () => {
       const contract = await write();
 
@@ -17,14 +16,7 @@ export function useUnlockRequest(chainId?: number) {
 
       const tx = await contract.unlock();
 
-      const hash = isAddress(tx.hash) ? tx.hash : undefined;
-
-      const receipt = await tx.wait();
-
-      return {
-        hash,
-        receipt
-      };
+      return tx.hash;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.lockManager.root() });
@@ -32,8 +24,8 @@ export function useUnlockRequest(chainId?: number) {
   });
 
   return {
-    isPending,
-    isSuccess,
-    sendTransactionAsync: mutateAsync
+    sendTransactionAsync: mutateAsync,
+    ...query,
+    sendTransaction: undefined
   };
 }

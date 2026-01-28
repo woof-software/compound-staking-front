@@ -24,14 +24,14 @@ export function useSubAccount(chainId?: number, owner?: Address) {
     queryKey: queryKeys.subAccount.delegationRequest([chainId, owner]),
     enabled: !!owner,
     queryFn: async () => {
-      if (!read) return undefined;
+      if (!read) return;
 
-      const res = await read.delegationRequest();
+      const [delegatee, executableAt, executed] = await read.delegationRequest();
 
       return {
-        delegatee: isAddress(res[0]) ? res[0] : undefined,
-        executableAt: res[1],
-        executed: res[2]
+        delegatee: isAddress(delegatee) ? delegatee : undefined,
+        executableAt,
+        executed
       };
     }
   });

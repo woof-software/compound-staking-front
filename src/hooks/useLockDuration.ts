@@ -11,10 +11,10 @@ export function useUnstakeLockDuration(chainId?: number, address?: Address) {
   const { data, ...query } = useQuery<bigint | undefined>({
     queryKey: queryKeys.lockManager.lockDuration([chainId, address]),
     enabled: !!address,
-    queryFn: async () => {
-      if (!address || !read) return undefined;
+    queryFn: () => {
+      if (!address || !read) return;
 
-      return await read.lockDuration();
+      return read.lockDuration();
     }
   });
 

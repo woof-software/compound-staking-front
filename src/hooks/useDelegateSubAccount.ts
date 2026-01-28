@@ -11,10 +11,10 @@ export function useDelegateSubAccount(chainId?: number, owner?: Address) {
   const { data, ...query } = useQuery<string | undefined>({
     queryKey: queryKeys.subAccountManager.subAccountOf([chainId, owner]),
     enabled: !!owner,
-    queryFn: async () => {
-      if (!owner || !read) return undefined;
+    queryFn: () => {
+      if (!owner || !read) return;
 
-      return await read.subAccountOf(owner);
+      return read.subAccountOf(owner);
     }
   });
 

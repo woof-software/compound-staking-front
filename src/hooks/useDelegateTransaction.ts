@@ -1,4 +1,4 @@
-import { type Address, isAddress } from 'viem';
+import { type Address } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useSubAccountContract } from '@/hooks/useSubAccountContract';
@@ -9,7 +9,7 @@ export function useDelegateTransaction(chainId?: number, address?: Address) {
 
   const { write } = useSubAccountContract(chainId, address);
 
-  const { mutateAsync, isPending, isSuccess } = useMutation({
+  const { mutateAsync, ...query } = useMutation({
     mutationFn: async (delegate: Address) => {
       const contract = await write();
 
@@ -17,14 +17,7 @@ export function useDelegateTransaction(chainId?: number, address?: Address) {
 
       const tx = await contract.requestDelegation(delegate);
 
-      const hash = isAddress(tx.hash) ? tx.hash : undefined;
-
-      const receipt = await tx.wait();
-
-      return {
-        hash,
-        receipt
-      };
+      return tx.hash;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.subAccount.root() });
@@ -32,8 +25,8 @@ export function useDelegateTransaction(chainId?: number, address?: Address) {
   });
 
   return {
-    isPending,
-    isSuccess,
-    sendTransactionAsync: mutateAsync
+    sendTransactionAsync: mutateAsync,
+    ...query,
+    sendTransaction: undefined
   };
 }

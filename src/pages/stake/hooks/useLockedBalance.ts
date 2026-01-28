@@ -24,12 +24,12 @@ export function useLockedBalance(chainId?: number, address?: Address) {
     queryFn: async () => {
       if (!address || !read) return undefined;
 
-      const res = await read.getActiveLock(address);
+      const [amount, duration, startTime] = await read.getActiveLock(address);
 
       return {
-        amount: res[0],
-        duration: res[1],
-        startTime: res[2]
+        amount,
+        duration,
+        startTime
       };
     }
   });
