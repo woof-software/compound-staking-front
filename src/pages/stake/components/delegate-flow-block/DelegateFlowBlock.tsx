@@ -92,7 +92,7 @@ export function DelegateFlowBlock() {
   };
 
   const onRefetchData = useEffectEvent(async () => {
-    await Promise.allSettled([refetchSubAccountAddress(), refetchSubAccountAddress()]);
+    await Promise.allSettled([refetchSubAccountAddress(), refetchDelegate()]);
 
     resetDelegateRefresh();
   });

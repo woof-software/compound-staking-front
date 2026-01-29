@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useMemo } from 'react';
 import { formatUnits } from 'viem';
-import { useConnection } from 'wagmi';
+import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -69,16 +69,24 @@ export function UnstakeFlowBlock() {
   const { data: stakedTokenPrice, isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
   const {
+    data: unstakeHash,
     sendTransactionAsync: unstakeRequest,
-    isPending: isUnstakePending,
-    isSuccess: isUnstakeRequestSuccess
+    isPending: isUnstakePending
   } = useUnstakeRequest(chainId);
 
+  const { isLoading: isUnstakeRequestConfirming, isSuccess: isUnstakeRequestSuccess } = useWaitForTransactionReceipt({
+    hash: unstakeHash
+  });
+
   const {
+    data: unlockHash,
     sendTransactionAsync: unlockRequest,
-    isPending: isUnlockPending,
-    isSuccess: isUnlockRequestSuccess
+    isPending: isUnlockPending
   } = useUnlockRequest(chainId);
+
+  const { isLoading: isUnlockRequesConfirming, isSuccess: isUnlockRequestSuccess } = useWaitForTransactionReceipt({
+    hash: unlockHash
+  });
 
   const lockedStakedBalanceFormatted = formatUnits(lockedTokenBalance?.amount ?? 0n, ENV.BASE_TOKEN_DECIMALS);
   const lockedStakedBalancePriceFormatted = formatUnits(
@@ -107,7 +115,8 @@ export function UnstakeFlowBlock() {
 
   /* Loading */
   const isLoading = isConnected ? isLockedTokenBalanceLoading : false;
-  const isTransactionLoading = isUnstakePending || isUnlockPending;
+  const isTransactionLoading =
+    isUnstakePending || isUnlockPending || isUnstakeRequestConfirming || isUnlockRequesConfirming;
 
   const isUnstakeButtonDisabled =
     !isConnected || isOpen || isTransactionLoading || isBalancesLoading || !hasSomethingToUnstake || isCooldownBlocked;
@@ -301,7 +310,7 @@ export function UnstakeFlowBlock() {
         onClose={onModalClose}
       >
         <UnstakeModal
-          isLoading={isUnstakePending}
+          isLoading={isTransactionLoading}
           onClick={onUnstakeRequest}
         />
       </Modal>

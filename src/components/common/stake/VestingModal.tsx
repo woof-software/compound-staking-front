@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
-import { useConnection } from 'wagmi';
+import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -40,10 +40,14 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
   const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(chainId, address);
 
   const {
+    data: vestRewardsHash,
     sendTransactionAsync: vestRewardsRequest,
-    isPending: isVestRewardsPending,
-    isSuccess: isVestRewardsSuccess
+    isPending: isVestRewardsPending
   } = useVestRewards(chainId);
+
+  const { isLoading: isVestRewardsConfirming, isSuccess: isVestRewardsSuccess } = useWaitForTransactionReceipt({
+    hash: vestRewardsHash
+  });
 
   const baseTokenPriceValue = baseTokenPrice ?? 0n;
   const availableRewardsPriceFormatted = formatUnits(
@@ -56,7 +60,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
   const hasPosition = !!vestingPositions?.length;
   const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions ?? 0n) : false;
 
-  const isVestingLoading = isVestingPositionsLoading || isVestRewardsPending;
+  const isVestingLoading = isVestingPositionsLoading || isVestRewardsConfirming || isVestRewardsPending;
   const isLoading = isConnected ? isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
 
   const isVestButtonDisabled = isLoading || isVestingLoading || hasMaxPosition;

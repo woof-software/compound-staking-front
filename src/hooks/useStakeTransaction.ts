@@ -1,5 +1,5 @@
 import { ZeroAddress } from 'ethers';
-import { type Address } from 'viem';
+import { type Address, isHash } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
@@ -23,7 +23,9 @@ export function useStakeTransaction(chainId?: number) {
 
       const tx = await contract.stake(delegatee ?? ZeroAddress, amount);
 
-      return tx.hash;
+      const hash = tx.hash;
+
+      return isHash(hash) ? hash : undefined;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });

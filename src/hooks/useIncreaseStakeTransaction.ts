@@ -1,5 +1,5 @@
 import { ZeroAddress } from 'ethers';
-import { type Address, isAddress } from 'viem';
+import { type Address, isHash } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
@@ -15,7 +15,7 @@ export function useIncreaseStakeTransaction(chainId?: number) {
 
   const { write } = useStakingVaultContract(chainId);
 
-  const { mutateAsync, isPending, isSuccess } = useMutation({
+  const { mutateAsync, ...query } = useMutation({
     mutationFn: async ({ amount, delegatee }: StakeArgs) => {
       const contract = await write();
 
@@ -23,14 +23,9 @@ export function useIncreaseStakeTransaction(chainId?: number) {
 
       const tx = await contract.increaseStake(delegatee ?? ZeroAddress, amount);
 
-      const hash = isAddress(tx.hash) ? tx.hash : undefined;
+      const hash = tx.hash;
 
-      const receipt = await tx.wait();
-
-      return {
-        hash,
-        receipt
-      };
+      return isHash(hash) ? hash : undefined;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });
@@ -41,8 +36,8 @@ export function useIncreaseStakeTransaction(chainId?: number) {
   });
 
   return {
-    isPending,
-    isSuccess,
-    sendTransactionAsync: mutateAsync
+    sendTransactionAsync: mutateAsync,
+    ...query,
+    sendTransaction: undefined
   };
 }

@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 import type { Address } from 'viem';
-import { useConnection } from 'wagmi';
+import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { Button } from '@/components/ui/Button';
@@ -22,17 +22,23 @@ export type DelegateModalProps = {
 export function DelegateModal(props: DelegateModalProps) {
   const { delegate, subAccountAddress, onClose = noop, onDelegateConfirmed = noop } = props;
 
+  const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(() => delegate ?? null);
+
   const { chainId } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const {
+    data: delegateHash,
     sendTransactionAsync: delegateTransaction,
-    isPending: isDelegatePending,
-    isSuccess: isDelegateSuccess
+    isPending: isDelegatePending
   } = useDelegateTransaction(chainId, subAccountAddress);
 
-  const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(() => delegate ?? null);
+  const { isLoading: isDelegateConfirming, isSuccess: isDelegateSuccess } = useWaitForTransactionReceipt({
+    hash: delegateHash
+  });
+
+  const isDelegateLoading = isDelegatePending || isDelegateConfirming;
 
   const isConfirmDisabled = !selectedAddressDelegate || selectedAddressDelegate.address === delegate?.address;
 
@@ -67,15 +73,15 @@ export function DelegateModal(props: DelegateModalProps) {
     <div className='mt-8 flex w-full flex-col gap-8'>
       <Divider orientation='horizontal' />
       <DelegateSelector
-        disabled={isDelegatePending}
+        disabled={isDelegateLoading}
         selectedAddressDelegate={selectedAddressDelegate}
         onSelect={onDelegateSelect}
       />
       <Button
         className={cn('h-14 flex-col', {
-          'bg-color-7': isDelegatePending
+          'bg-color-7': isDelegateLoading
         })}
-        disabled={isConfirmDisabled || isDelegatePending}
+        disabled={isConfirmDisabled || isDelegateLoading}
         onClick={onConfirm}
       >
         <Text
@@ -84,10 +90,10 @@ export function DelegateModal(props: DelegateModalProps) {
           lineHeight='18'
           className={cn('text-white', {
             'text-color-6': isConfirmDisabled,
-            'after-animate-loading-dots text-white': isDelegatePending
+            'after-animate-loading-dots text-white': isDelegateLoading
           })}
         >
-          {isDelegatePending ? 'Pending' : 'Confirm'}
+          {isDelegateLoading ? 'Pending' : 'Confirm'}
         </Text>
       </Button>
     </div>
