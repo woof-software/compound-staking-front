@@ -1,17 +1,40 @@
-import { useChainId } from 'wagmi';
+import { useEffect, useRef } from 'react';
+import { useConnection, useSwitchChain } from 'wagmi';
 
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Text } from '@/components/ui/Text';
-import { getChainLogo, getChainName, getImgPath } from '@/lib/utils/helpers';
+import { APPLICATION_CHAIN } from '@/consts/common';
+import { cn } from '@/lib/utils/cn';
+import { getChainLogo, getChainName } from '@/lib/utils/helpers';
 
 export function SwitchNetworkModal() {
-  const chainId = useChainId();
+  const { isConnected, chainId } = useConnection();
+  const { switchChainAsync, isPending } = useSwitchChain();
+
+  const shouldReloadRef = useRef(false);
+
+  const isOpen = isConnected ? chainId !== APPLICATION_CHAIN : false;
+
+  const onSwitch = async () => {
+    shouldReloadRef.current = true;
+
+    await switchChainAsync({ chainId: APPLICATION_CHAIN });
+  };
+
+  useEffect(() => {
+    if (!shouldReloadRef.current) return;
+
+    if (chainId === APPLICATION_CHAIN) {
+      shouldReloadRef.current = false;
+      window.location.reload();
+    }
+  }, [chainId]);
 
   return (
     <Modal
       title='Confirm Network Switch'
-      open={false}
+      open={isOpen}
     >
       <div className='mt-10 mb-5 flex items-center justify-center gap-2.5'>
         <img
@@ -19,14 +42,9 @@ export function SwitchNetworkModal() {
           alt='chain-logo'
           className='size-16 rounded-full'
         />
-        <img
-          src={getImgPath('/comp.avif')}
-          alt='comp'
-          className='size-6.75 shrink-0 rounded-full'
-        />
         <div className='chain-slide inline-block size-6 shrink-0' />
         <img
-          src={getChainLogo(1)}
+          src={getChainLogo(APPLICATION_CHAIN)}
           alt='chain-logo'
           className='size-16 rounded-full'
         />
@@ -38,10 +56,17 @@ export function SwitchNetworkModal() {
         className='text-color-2 mt-5 max-w-75'
       >
         Your wallet is currently connected to the {getChainName(chainId)} network. Please switch your wallet to{' '}
-        {getChainName(1)}
-        to complete.
+        {getChainName(APPLICATION_CHAIN)} to complete.
       </Text>
-      <Button className='rounded-100 bg-color-16 mt-15 h-14 text-[13px] font-medium'>Switch Network</Button>
+      <Button
+        disabled={isPending}
+        onClick={onSwitch}
+        className={cn('rounded-100 bg-color-16 mt-15 h-14 text-[13px] font-medium', {
+          'after-animate-loading-dots': isPending
+        })}
+      >
+        {isPending ? 'Switching' : 'Switch Network'}
+      </Button>
     </Modal>
   );
 }
