@@ -19,10 +19,12 @@ import { useIncreaseStakeTransaction } from '@/hooks/useIncreaseStakeTransaction
 import { useStakeTransaction } from '@/hooks/useStakeTransaction';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
+import { useVestingPerUser } from '@/hooks/useVestingPerUser';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 import { getAddressContracts, getDelegateByAddress } from '@/lib/utils/helpers';
+import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export type StakeModalProps = {
@@ -50,6 +52,10 @@ export function StakeModal(props: StakeModalProps) {
     refetch: refetchWalletBalance,
     isLoading: isWalletBalanceLoading
   } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
+
+  const { data: maxVestingPositions } = useVestingPerUser(chainId);
+
+  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(chainId, address);
 
   const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(chainId, address);
 
@@ -84,6 +90,10 @@ export function StakeModal(props: StakeModalProps) {
   const noDelegate = !selectedAddressDelegate?.address;
   const isAmountExceedsBalance = parseAmount <= (walletBalance ?? 0n);
 
+  const showWarningForAdditionalStake = (stakedBalance ?? 0n) > 0n;
+  const hasPosition = !!vestingPositions?.length;
+  const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions ?? 0n) : false;
+
   /* Loading */
   const isPriceOrBalanceLoading = isBaseTokenPriceLoading || isWalletBalanceLoading;
   const isApproveLoading = isApprovePending || isApproveConfirming;
@@ -91,8 +101,22 @@ export function StakeModal(props: StakeModalProps) {
   const isLoadingTransaction = isApproveLoading || isStakeLoading || isIncreaseStakePending;
 
   /* Disabled */
-  const isApproveDisabled = noAmount || !needsApprove || !isAmountExceedsBalance || isApproveLoading;
-  const isConfirmDisabled = noAmount || noDelegate || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
+  const isApproveDisabled =
+    noAmount ||
+    !needsApprove ||
+    !isAmountExceedsBalance ||
+    isApproveLoading ||
+    isVestingPositionsLoading ||
+    hasMaxPosition;
+
+  const isConfirmDisabled =
+    noAmount ||
+    noDelegate ||
+    needsApprove ||
+    isLoadingTransaction ||
+    !isAmountExceedsBalance ||
+    isVestingPositionsLoading ||
+    hasMaxPosition;
 
   /* Success */
   const isStakeSuccessConfirmed = isStakeSuccess || isIncreaseStakeSuccess;
@@ -106,8 +130,6 @@ export function StakeModal(props: StakeModalProps) {
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
   const walletBalanceFormatted = formatUnits(walletBalanceValue, ENV.BASE_TOKEN_DECIMALS);
-
-  const showWarningForAdditionalStake = (stakedBalance ?? 0n) > 0n;
 
   const onMaxButtonClick = () => {
     setAmountValue(walletBalanceFormatted);
@@ -187,13 +209,13 @@ export function StakeModal(props: StakeModalProps) {
                   'caret-color-30': isAmountExceedsBalance,
                   'caret-color-31': !isAmountExceedsBalance
                 })}
-                disabled={isLoadingTransaction}
+                disabled={isLoadingTransaction || hasMaxPosition}
                 value={amountValue}
                 onChange={setAmountValue}
               />
             </div>
             <Button
-              disabled={isLoadingTransaction}
+              disabled={isLoadingTransaction || hasMaxPosition}
               className={cn('bg-color-16 h-9 w-[56.24px] text-[11px] font-medium', {
                 'bg-color-28': isLoadingTransaction
               })}
@@ -226,11 +248,11 @@ export function StakeModal(props: StakeModalProps) {
       </div>
       <Condition if={!isAmountExceedsBalance}>
         <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
-          <InfoIcon className='text-color-22 size-4' />
+          <InfoIcon className='text-color-31 size-4' />
           <Text
             size='11'
             lineHeight='16'
-            className='text-color-22'
+            className='text-color-31'
           >
             Amount Exceeds Wallet Balance.
           </Text>
@@ -238,12 +260,24 @@ export function StakeModal(props: StakeModalProps) {
       </Condition>
       <Skeleton loading={isPriceOrBalanceLoading}>
         <DelegateSelector
-          disabled={isLoadingTransaction}
+          disabled={isLoadingTransaction || hasMaxPosition}
           selectedAddressDelegate={selectedAddressDelegate}
           onSelect={onDelegateSelect}
         />
       </Skeleton>
-      <Condition if={showWarningForAdditionalStake}>
+      <Condition if={hasMaxPosition}>
+        <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
+          <InfoIcon className='text-color-22 size-4 shrink-0' />
+          <Text
+            size='11'
+            lineHeight='16'
+            className='text-color-22'
+          >
+            {`You have reached the maximum limit (${maxVestingPositions}) for Vesting entries. You need to close completed entries or wait until they are finished.`}
+          </Text>
+        </div>
+      </Condition>
+      <Condition if={!hasMaxPosition && showWarningForAdditionalStake}>
         <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
           <InfoIcon className='text-color-22 size-4' />
           <Text

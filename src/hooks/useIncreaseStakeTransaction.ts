@@ -1,4 +1,3 @@
-import { ZeroAddress } from 'ethers';
 import { type Address, isHash } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -7,7 +6,7 @@ import { queryKeys } from '@/shared/query-keys';
 
 type StakeArgs = {
   amount: bigint;
-  delegatee?: Address;
+  delegatee: Address;
 };
 
 export function useIncreaseStakeTransaction(chainId?: number) {
@@ -21,7 +20,7 @@ export function useIncreaseStakeTransaction(chainId?: number) {
 
       if (!contract) return;
 
-      const tx = await contract.increaseStake(delegatee ?? ZeroAddress, amount);
+      const tx = await contract.increaseStake(delegatee, amount);
 
       const hash = tx.hash;
 
