@@ -1,4 +1,4 @@
-import { type Address } from 'viem';
+import { type Address, isHash } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useVestingManagerContract } from '@/hooks/useVestingManagerContract';
@@ -17,7 +17,9 @@ export function useVestingClaim(chainId?: number) {
 
       const tx = await contract.claim(address);
 
-      return tx.hash;
+      const hash = tx.hash;
+
+      return isHash(hash) ? hash : undefined;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.vestingManager.root() });

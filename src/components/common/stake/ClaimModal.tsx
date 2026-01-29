@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 import { formatUnits, isAddress } from 'viem';
-import { useConnection } from 'wagmi';
+import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import { CrossIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -39,11 +39,11 @@ export function ClaimModal(props: ClaimModalProps) {
 
   const isValidAddress = !isChangeWallet || isAddress(walletAddress);
 
-  const {
-    sendTransactionAsync: claimRequest,
-    isPending: isClaimPending,
-    isSuccess: isClaimSuccess
-  } = useVestingClaim(chainId);
+  const { data: claimHash, sendTransactionAsync: claimRequest, isPending: isClaimPending } = useVestingClaim(chainId);
+
+  const { isLoading: isClaimConfirming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({
+    hash: claimHash
+  });
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
@@ -57,8 +57,9 @@ export function ClaimModal(props: ClaimModalProps) {
   );
 
   const isLoading = isConnected ? isBaseTokenPriceLoading : false;
+  const isClaiming = isClaimPending || isClaimConfirming;
 
-  const isClaimButtonDisabled = isLoading || isClaimPending || !isValidAddress;
+  const isClaimButtonDisabled = isLoading || !isValidAddress;
 
   const onWalletAddressChange = (value: string) => {
     setWalletAddress(value);
@@ -185,7 +186,7 @@ export function ClaimModal(props: ClaimModalProps) {
         </Condition>
         <Button
           className={cn('h-14 flex-col', {
-            'bg-color-7': isClaimPending
+            'bg-color-7': isClaiming
           })}
           disabled={isClaimButtonDisabled}
           onClick={onConfirm}
@@ -196,10 +197,10 @@ export function ClaimModal(props: ClaimModalProps) {
             lineHeight='18'
             className={cn('text-white', {
               'text-color-6': isClaimButtonDisabled,
-              'after-animate-loading-dots text-white': isClaimPending
+              'after-animate-loading-dots text-white': isClaiming
             })}
           >
-            {isClaimPending ? 'Pending' : 'Confirm'}
+            {isClaiming ? 'Pending' : 'Confirm'}
           </Text>
         </Button>
       </div>

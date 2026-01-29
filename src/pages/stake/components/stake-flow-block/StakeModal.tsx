@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import { type Address, formatUnits, parseUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
@@ -61,10 +61,21 @@ export function StakeModal(props: StakeModalProps) {
     hash: approveHash
   });
 
-  const { sendTransactionAsync: stake, isPending: isStakePending } = useStakeTransaction(chainId);
+  const { data: stakeHash, sendTransactionAsync: stake, isPending: isStakePending } = useStakeTransaction(chainId);
 
-  const { sendTransactionAsync: increaseStake, isPending: isIncreaseStakePending } =
-    useIncreaseStakeTransaction(chainId);
+  const { isLoading: isStakeConfirming, isSuccess: isStakeSuccess } = useWaitForTransactionReceipt({
+    hash: stakeHash
+  });
+
+  const {
+    data: increaseStakeHash,
+    sendTransactionAsync: increaseStake,
+    isPending: isIncreaseStakePending
+  } = useIncreaseStakeTransaction(chainId);
+
+  const { isLoading: isIncreaseStakeConfirming, isSuccess: isIncreaseStakeSuccess } = useWaitForTransactionReceipt({
+    hash: increaseStakeHash
+  });
 
   const parseAmount = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
   const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
@@ -76,11 +87,15 @@ export function StakeModal(props: StakeModalProps) {
   /* Loading */
   const isPriceOrBalanceLoading = isBaseTokenPriceLoading || isWalletBalanceLoading;
   const isApproveLoading = isApprovePending || isApproveConfirming;
-  const isLoadingTransaction = isApproveLoading || isStakePending || isIncreaseStakePending;
+  const isStakeLoading = isStakePending || isStakeConfirming || isIncreaseStakePending || isIncreaseStakeConfirming;
+  const isLoadingTransaction = isApproveLoading || isStakeLoading || isIncreaseStakePending;
 
   /* Disabled */
   const isApproveDisabled = noAmount || !needsApprove || !isAmountExceedsBalance || isApproveLoading;
   const isConfirmDisabled = noAmount || noDelegate || needsApprove || isLoadingTransaction || !isAmountExceedsBalance;
+
+  /* Success */
+  const isStakeSuccessConfirmed = isStakeSuccess || isIncreaseStakeSuccess;
 
   /* Calculate input value in USD */
   const baseTokenPriceValue = baseTokenPrice ?? 0n;
@@ -108,11 +123,11 @@ export function StakeModal(props: StakeModalProps) {
     await approve({ token: BASE_TOKEN_ADDRESS, spender: STAKING_VAULT_ADDRESS, value: parseAmount });
   };
 
-  const refetchData = async () => {
+  const refetchData = useEffectEvent(async () => {
     await Promise.allSettled([refetchWalletBalance(), refetchAllowance()]);
 
     onStakeConfirmed();
-  };
+  });
 
   const onConfirm = async () => {
     if (isConfirmDisabled) return;
@@ -122,8 +137,6 @@ export function StakeModal(props: StakeModalProps) {
     } else {
       await increaseStake({ amount: parseAmount, delegatee: selectedAddressDelegate?.address });
     }
-
-    await refetchData();
   };
 
   useEffect(() => {
@@ -135,6 +148,12 @@ export function StakeModal(props: StakeModalProps) {
 
     setSelectedAddressDelegate(delegate);
   }, [delegateAddress, selectedAddressDelegate?.address]);
+
+  useEffect(() => {
+    if (!isStakeSuccessConfirmed) return;
+
+    refetchData();
+  }, [isStakeSuccessConfirmed]);
 
   useEffect(() => {
     setIsPendingToggle(isLoadingTransaction);
@@ -271,9 +290,9 @@ export function StakeModal(props: StakeModalProps) {
         <Skeleton loading={isPriceOrBalanceLoading}>
           <Button
             className={cn('h-14 flex-col', {
-              'bg-color-7': isStakePending || isIncreaseStakePending
+              'bg-color-7': isStakeLoading
             })}
-            disabled={isConfirmDisabled || isStakePending || isIncreaseStakePending}
+            disabled={isConfirmDisabled}
             onClick={onConfirm}
           >
             <Text
@@ -282,17 +301,17 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='18'
               className={cn('text-white', {
                 'text-color-6': isConfirmDisabled,
-                'after-animate-loading-dots text-white': isStakePending || isIncreaseStakePending
+                'after-animate-loading-dots text-white': isStakeLoading
               })}
             >
-              {isStakePending || isIncreaseStakePending ? 'Pending' : 'Confirm'}
+              {isStakeLoading ? 'Pending' : 'Confirm'}
             </Text>
             <Text
               size='11'
               lineHeight='16'
               className={cn('text-white', {
                 'text-color-6': isConfirmDisabled,
-                'text-white': isStakePending || isIncreaseStakePending
+                'text-white': isStakeLoading
               })}
             >
               Step 2

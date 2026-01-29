@@ -1,3 +1,4 @@
+import { isHash } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
@@ -16,7 +17,9 @@ export function useVestRewards(chainId?: number) {
 
       const tx = await contract.vestRewards();
 
-      return tx.hash;
+      const hash = tx.hash;
+
+      return isHash(hash) ? hash : undefined;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });

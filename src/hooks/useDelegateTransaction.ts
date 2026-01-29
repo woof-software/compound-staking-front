@@ -1,4 +1,4 @@
-import { type Address } from 'viem';
+import { type Address, isHash } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useSubAccountContract } from '@/hooks/useSubAccountContract';
@@ -17,7 +17,9 @@ export function useDelegateTransaction(chainId?: number, address?: Address) {
 
       const tx = await contract.requestDelegation(delegate);
 
-      return tx.hash;
+      const hash = tx.hash;
+
+      return isHash(hash) ? hash : undefined;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.subAccount.root() });
