@@ -39,7 +39,7 @@ export function Modal(props: ModalProps) {
       >
         <div className='bg-color-5 modal-content-in relative flex w-full max-w-105 flex-col items-center rounded-lg p-10'>
           <div className='flex w-full justify-end'>
-            <Condition if={title}>
+            <Condition if={!!title}>
               <Text
                 size='17'
                 lineHeight='20'
@@ -49,7 +49,7 @@ export function Modal(props: ModalProps) {
                 {title}
               </Text>
             </Condition>
-            <Condition if={onClose}>
+            <Condition if={!!onClose}>
               <Button
                 onClick={onClose}
                 className='size-auto bg-transparent p-0'

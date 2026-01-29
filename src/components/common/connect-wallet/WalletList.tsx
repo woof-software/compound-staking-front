@@ -71,7 +71,7 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
               >
                 {title}
               </Text>
-              <Condition if={description}>
+              <Condition if={!!description}>
                 <Text
                   size='11'
                   lineHeight='16'
