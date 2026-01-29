@@ -5,37 +5,35 @@ import { useQuery } from '@tanstack/react-query';
 import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
 import { queryKeys } from '@/shared/query-keys';
 
-const schema = z
-  .object({
-    principal: z.bigint(),
-    stakeTimestamp: z.bigint(),
-    lastClaimTime: z.bigint()
-  })
-  .optional();
+export const StakeInfoSchema = z.object({
+  principal: z.bigint(),
+  stakeTimestamp: z.bigint(),
+  lastClaimTime: z.bigint()
+});
 
-export type StakeInfoDto = z.infer<typeof schema>;
+export const schemaFlexible = z.union([
+  StakeInfoSchema,
+  z.tuple([z.bigint(), z.bigint(), z.bigint()]).transform(([principal, stakeTimestamp, lastClaimTime]) => ({
+    principal,
+    stakeTimestamp,
+    lastClaimTime
+  }))
+]);
+
+export type StakeInfo = z.infer<typeof StakeInfoSchema>;
 
 export function useStakedBalance(chainId?: number, address?: Address) {
   const { read } = useStakingVaultContract(chainId);
 
-  const { data, ...query } = useQuery<StakeInfoDto | undefined>({
+  return useQuery<StakeInfo | undefined>({
     queryKey: queryKeys.stakingVault.stakeInfoOf([chainId, address]),
     enabled: !!address,
     queryFn: async () => {
-      if (!address || !read) return undefined;
+      if (!read || !address) return;
 
-      const [principal, stakeTimestamp, lastClaimTime] = await read.stakeInfoOf(address);
+      const res = await read.stakeInfoOf(address);
 
-      return {
-        principal,
-        stakeTimestamp,
-        lastClaimTime
-      };
+      return schemaFlexible.parse(res);
     }
   });
-
-  return {
-    data: schema.parse(data),
-    ...query
-  };
 }

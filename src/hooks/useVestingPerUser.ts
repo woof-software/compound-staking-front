@@ -9,10 +9,10 @@ export function useVestingPerUser(chainId?: number) {
 
   const { data, ...query } = useQuery<bigint | undefined>({
     queryKey: queryKeys.vestingManager.MAX_VESTINGS_PER_USER([chainId]),
-    queryFn: async () => {
-      if (!read) return undefined;
+    queryFn: () => {
+      if (!read) return;
 
-      return await read.MAX_VESTINGS_PER_USER();
+      return read.MAX_VESTINGS_PER_USER();
     }
   });
 

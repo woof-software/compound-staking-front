@@ -1,4 +1,4 @@
-import { type Address, isAddress } from 'viem';
+import { type Address } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useVestingManagerContract } from '@/hooks/useVestingManagerContract';
@@ -9,7 +9,7 @@ export function useVestingClaim(chainId?: number) {
 
   const { write } = useVestingManagerContract(chainId);
 
-  const { mutateAsync, isPending, isSuccess } = useMutation({
+  const { mutateAsync, ...query } = useMutation({
     mutationFn: async (address: Address) => {
       const contract = await write();
 
@@ -17,14 +17,7 @@ export function useVestingClaim(chainId?: number) {
 
       const tx = await contract.claim(address);
 
-      const hash = isAddress(tx.hash) ? tx.hash : undefined;
-
-      const receipt = await tx.wait();
-
-      return {
-        hash,
-        receipt
-      };
+      return tx.hash;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.vestingManager.root() });
@@ -32,8 +25,8 @@ export function useVestingClaim(chainId?: number) {
   });
 
   return {
-    isPending,
-    isSuccess,
-    sendTransactionAsync: mutateAsync
+    sendTransactionAsync: mutateAsync,
+    ...query,
+    sendTransaction: undefined
   };
 }

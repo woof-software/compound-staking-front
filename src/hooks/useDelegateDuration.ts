@@ -9,10 +9,10 @@ export function useDelegateDuration(chainId?: number) {
 
   const { data, ...query } = useQuery<bigint | undefined>({
     queryKey: queryKeys.subAccountManager.delegationDelay([chainId]),
-    queryFn: async () => {
-      if (!read) return undefined;
+    queryFn: () => {
+      if (!read) return;
 
-      return await read.delegationDelay();
+      return read.delegationDelay();
     }
   });
 

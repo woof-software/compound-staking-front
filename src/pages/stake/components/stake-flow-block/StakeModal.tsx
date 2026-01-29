@@ -224,7 +224,6 @@ export function StakeModal(props: StakeModalProps) {
           onSelect={onDelegateSelect}
         />
       </Skeleton>
-      {/*TODO: add warning for additional stake */}
       <Condition if={showWarningForAdditionalStake}>
         <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
           <InfoIcon className='text-color-22 size-4' />

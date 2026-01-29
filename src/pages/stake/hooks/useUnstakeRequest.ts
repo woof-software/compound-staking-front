@@ -8,18 +8,14 @@ export function useUnstakeRequest(chainId?: number) {
 
   const { write } = useStakingVaultContract(chainId);
 
-  const { mutateAsync, isPending, isSuccess } = useMutation({
+  const { mutateAsync, ...query } = useMutation({
     mutationFn: async () => {
       const contract = await write();
       if (!contract) return;
 
       const tx = await contract.unstake();
 
-      const receipt = await tx.wait();
-
-      return {
-        receipt
-      };
+      return tx.hash;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });
@@ -27,8 +23,8 @@ export function useUnstakeRequest(chainId?: number) {
   });
 
   return {
-    isPending,
-    isSuccess,
-    sendTransactionAsync: mutateAsync
+    sendTransactionAsync: mutateAsync,
+    ...query,
+    sendTransaction: undefined
   };
 }
