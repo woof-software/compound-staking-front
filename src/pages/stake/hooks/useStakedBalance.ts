@@ -25,18 +25,15 @@ export type StakeInfo = z.infer<typeof StakeInfoSchema>;
 export function useStakedBalance(chainId?: number, address?: Address) {
   const { read } = useStakingVaultContract(chainId);
 
-  const { data, ...query } = useQuery<StakeInfo | undefined>({
+  return useQuery<StakeInfo | undefined>({
     queryKey: queryKeys.stakingVault.stakeInfoOf([chainId, address]),
     enabled: !!address,
-    queryFn: () => {
-      if (!address || !read) return;
+    queryFn: async () => {
+      if (!read || !address) return;
 
-      return read.stakeInfoOf(address);
+      const res = await read.stakeInfoOf(address);
+
+      return schemaFlexible.parse(res);
     }
   });
-
-  return {
-    data: schemaFlexible.parse(data),
-    ...query
-  };
 }
