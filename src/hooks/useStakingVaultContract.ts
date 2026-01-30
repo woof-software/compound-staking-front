@@ -6,7 +6,7 @@ import { getEthersProvider, getEthersSigner } from '@/lib/utils/wagmi';
 import { config } from '@/shared/config/wagmiConfig';
 
 export function useStakingVaultContract(chainId?: number) {
-  const { STAKING_VAULT_ADDRESS } = getAddressContracts(chainId);
+  const { stakingVaultAddress } = getAddressContracts(chainId);
 
   const provider = useMemo(() => {
     const params = chainId === undefined ? {} : { chainId };
@@ -15,19 +15,19 @@ export function useStakingVaultContract(chainId?: number) {
   }, [chainId]);
 
   const readContract = useMemo(() => {
-    if (!STAKING_VAULT_ADDRESS) return null;
+    if (!stakingVaultAddress) return null;
 
-    return MockStakingVault__factory.connect(STAKING_VAULT_ADDRESS, provider);
-  }, [STAKING_VAULT_ADDRESS, provider]);
+    return MockStakingVault__factory.connect(stakingVaultAddress, provider);
+  }, [stakingVaultAddress, provider]);
 
   const writeContract = async (): Promise<MockStakingVault | null> => {
     try {
       const params = chainId === undefined ? {} : { chainId };
       const signer = await getEthersSigner(config, params);
 
-      if (!signer || !STAKING_VAULT_ADDRESS) return null;
+      if (!signer || !stakingVaultAddress) return null;
 
-      return MockStakingVault__factory.connect(STAKING_VAULT_ADDRESS, signer);
+      return MockStakingVault__factory.connect(stakingVaultAddress, signer);
     } catch {
       return null;
     }

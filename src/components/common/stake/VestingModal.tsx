@@ -133,7 +133,8 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
               lineHeight='16'
               className='text-color-22'
             >
-              {`You have reached the maximum limit (${maxVestingPositions}) for Vesting entries. You need to close completed entries or wait until they are finished.`}
+              You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close
+              completed entries or wait until they are finished.
             </Text>
           </div>
         </Condition>

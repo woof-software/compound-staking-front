@@ -21,13 +21,11 @@ export function TotalStaked() {
 
   const isLoading = isConnected ? isTotalStakedLoading : false;
 
-  const hasUnit = (totalStaked ?? 0n) >= 1000n;
-
   const totalStakedFormat = formatUnits(totalStaked ?? 0n, ENV.BASE_TOKEN_DECIMALS);
 
   const totalStakedFormatted = Format.token(Number(totalStakedFormat), 'compact', undefined, 2);
 
-  const unit = hasUnit ? FormatUnits.parse(Number(totalStakedFormat)) : undefined;
+  const unit = FormatUnits.parse(Number(totalStakedFormat));
 
   const totalValue =
     unit && totalStakedFormatted.endsWith(unit) ? totalStakedFormatted.slice(0, -unit.length) : totalStakedFormatted;
@@ -55,7 +53,7 @@ export function TotalStaked() {
             weight='500'
           >
             {totalValue}
-            <Condition if={!!unit}>
+            <Condition if={unit}>
               <Text
                 tag='span'
                 size='40'

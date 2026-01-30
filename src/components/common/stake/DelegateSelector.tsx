@@ -127,7 +127,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
               </div>
             </Condition>
           </div>
-          <Condition if={!!filteredDelegates.length}>
+          <Condition if={filteredDelegates.length}>
             <div className='hide-scrollbar max-h-392 overflow-y-auto'>
               {filteredDelegates.map((el) => (
                 <div

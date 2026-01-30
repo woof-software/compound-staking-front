@@ -91,8 +91,9 @@ export function DelegateFlowBlock() {
     onClose();
   };
 
-  const onRefetchData = useEffectEvent(async () => {
-    await Promise.allSettled([refetchSubAccountAddress(), refetchDelegate()]);
+  const onRefetchData = useEffectEvent(() => {
+    refetchSubAccountAddress();
+    refetchDelegate();
 
     resetDelegateRefresh();
   });

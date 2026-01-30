@@ -7,7 +7,7 @@ import { getEthersProvider, getEthersSigner } from '@/lib/utils/wagmi';
 import { config } from '@/shared/config/wagmiConfig';
 
 export function useVestingManagerContract(chainId?: number) {
-  const { VESTING_MANAGER_ADDRESS } = getAddressContracts(chainId);
+  const { vestingManagerAddress } = getAddressContracts(chainId);
 
   const provider = useMemo(() => {
     const params = chainId === undefined ? {} : { chainId };
@@ -16,19 +16,19 @@ export function useVestingManagerContract(chainId?: number) {
   }, [chainId]);
 
   const readContract = useMemo(() => {
-    if (!VESTING_MANAGER_ADDRESS) return null;
+    if (!vestingManagerAddress) return null;
 
-    return VestingManager__factory.connect(VESTING_MANAGER_ADDRESS, provider);
-  }, [VESTING_MANAGER_ADDRESS, provider]);
+    return VestingManager__factory.connect(vestingManagerAddress, provider);
+  }, [vestingManagerAddress, provider]);
 
   const writeContract = async (): Promise<VestingManager | null> => {
     try {
       const params = chainId === undefined ? {} : { chainId };
       const signer = await getEthersSigner(config, params);
 
-      if (!signer || !VESTING_MANAGER_ADDRESS) return null;
+      if (!signer || !vestingManagerAddress) return null;
 
-      return VestingManager__factory.connect(VESTING_MANAGER_ADDRESS, signer);
+      return VestingManager__factory.connect(vestingManagerAddress, signer);
     } catch {
       return null;
     }

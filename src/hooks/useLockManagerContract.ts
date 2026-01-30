@@ -6,7 +6,7 @@ import { getEthersProvider, getEthersSigner } from '@/lib/utils/wagmi';
 import { config } from '@/shared/config/wagmiConfig';
 
 export function useLockManagerContract(chainId?: number) {
-  const { LOCK_MANAGER_ADDRESS } = getAddressContracts(chainId);
+  const { lockManagerAddress } = getAddressContracts(chainId);
 
   const provider = useMemo(() => {
     const params = chainId === undefined ? {} : { chainId };
@@ -15,19 +15,19 @@ export function useLockManagerContract(chainId?: number) {
   }, [chainId]);
 
   const readContract = useMemo(() => {
-    if (!LOCK_MANAGER_ADDRESS) return null;
+    if (!lockManagerAddress) return null;
 
-    return LockManager__factory.connect(LOCK_MANAGER_ADDRESS, provider);
-  }, [provider, LOCK_MANAGER_ADDRESS]);
+    return LockManager__factory.connect(lockManagerAddress, provider);
+  }, [provider, lockManagerAddress]);
 
   const writeContract = async (): Promise<LockManager | null> => {
     try {
       const params = chainId === undefined ? {} : { chainId };
       const signer = await getEthersSigner(config, params);
 
-      if (!signer || !LOCK_MANAGER_ADDRESS) return null;
+      if (!signer || !lockManagerAddress) return null;
 
-      return LockManager__factory.connect(LOCK_MANAGER_ADDRESS, signer);
+      return LockManager__factory.connect(lockManagerAddress, signer);
     } catch {
       return null;
     }

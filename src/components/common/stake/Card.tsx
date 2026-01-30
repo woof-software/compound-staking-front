@@ -27,7 +27,7 @@ export function Card(props: CardProps) {
             {title}
           </Text>
         </Skeleton>
-        <Condition if={!!tooltip}>
+        <Condition if={tooltip}>
           <Tooltip content={tooltip}>
             <Skeleton loading={isLoading}>
               <InfoIcon className='text-color-18 size-4 cursor-pointer' />

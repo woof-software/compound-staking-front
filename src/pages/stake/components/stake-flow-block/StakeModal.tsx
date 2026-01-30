@@ -43,7 +43,7 @@ export function StakeModal(props: StakeModalProps) {
 
   const { address, chainId } = useConnection();
 
-  const { BASE_TOKEN_ADDRESS, STAKING_VAULT_ADDRESS } = getAddressContracts(chainId);
+  const { baseTokenAddress, stakingVaultAddress } = getAddressContracts(chainId);
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
@@ -51,15 +51,13 @@ export function StakeModal(props: StakeModalProps) {
     data: walletBalance,
     refetch: refetchWalletBalance,
     isLoading: isWalletBalanceLoading
-  } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
+  } = useTokenBalance(address, baseTokenAddress);
 
   const { data: maxVestingPositions } = useVestingPerUser(chainId);
 
   const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(chainId, address);
 
   const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(chainId, address);
-
-  console.log('allowance=>', allowance);
 
   const { sendTransactionAsync: approve, data: approveHash, isPending: isApprovePending } = useApproveTransaction();
 
@@ -140,13 +138,14 @@ export function StakeModal(props: StakeModalProps) {
   };
 
   const onApprove = async () => {
-    if (isApproveDisabled || !BASE_TOKEN_ADDRESS || !STAKING_VAULT_ADDRESS) return;
+    if (isApproveDisabled || !baseTokenAddress || !stakingVaultAddress) return;
 
-    await approve({ token: BASE_TOKEN_ADDRESS, spender: STAKING_VAULT_ADDRESS, value: parseAmount });
+    await approve({ token: baseTokenAddress, spender: stakingVaultAddress, value: parseAmount });
   };
 
   const refetchData = useEffectEvent(async () => {
-    await Promise.allSettled([refetchWalletBalance(), refetchAllowance()]);
+    refetchWalletBalance();
+    refetchAllowance();
 
     onStakeConfirmed();
   });
@@ -273,7 +272,8 @@ export function StakeModal(props: StakeModalProps) {
             lineHeight='16'
             className='text-color-22'
           >
-            {`You have reached the maximum limit (${maxVestingPositions}) for Vesting entries. You need to close completed entries or wait until they are finished.`}
+            You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close completed
+            entries or wait until they are finished.
           </Text>
         </div>
       </Condition>

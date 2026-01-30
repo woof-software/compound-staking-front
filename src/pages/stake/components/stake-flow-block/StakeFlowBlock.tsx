@@ -37,7 +37,7 @@ export function StakeFlowBlock() {
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
-  const { BASE_TOKEN_ADDRESS } = getAddressContracts(chainId);
+  const { baseTokenAddress } = getAddressContracts(chainId);
 
   const {
     data: stakedBalance,
@@ -59,7 +59,7 @@ export function StakeFlowBlock() {
   const { data: lockedTokenBalance } = useLockedBalance(chainId, address);
 
   const { isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
-  const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
+  const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, baseTokenAddress);
 
   /* Loading */
   const isPriceOrBalanceLoading = isStakedTokenPrice || isStakedTokenWalletBalance;
@@ -91,13 +91,11 @@ export function StakeFlowBlock() {
     onClose();
   };
 
-  const onStakeConfirmed = async () => {
-    await Promise.allSettled([
-      refetchStakedBalanceFormatted(),
-      refetchVirtualBalance(),
-      refetchMultiplier(),
-      refetchAvailableRewards()
-    ]);
+  const onStakeConfirmed = () => {
+    refetchStakedBalanceFormatted();
+    refetchVirtualBalance();
+    refetchMultiplier();
+    refetchAvailableRewards();
 
     triggerStatisticRefresh();
     triggerDelegateRefresh();

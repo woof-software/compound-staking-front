@@ -1,7 +1,8 @@
-import { type Address, isHash } from 'viem';
+import { type Address } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
+import { getHash } from '@/lib/utils/helpers';
 import { queryKeys } from '@/shared/query-keys';
 
 type StakeArgs = {
@@ -24,7 +25,7 @@ export function useStakeTransaction(chainId?: number) {
 
       const hash = tx.hash;
 
-      return isHash(hash) ? hash : undefined;
+      return getHash(hash);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });

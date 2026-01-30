@@ -1,7 +1,7 @@
-import { isHash } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useLockManagerContract } from '@/hooks/useLockManagerContract';
+import { getHash } from '@/lib/utils/helpers';
 import { queryKeys } from '@/shared/query-keys';
 
 export function useUnlockRequest(chainId?: number) {
@@ -19,7 +19,7 @@ export function useUnlockRequest(chainId?: number) {
 
       const hash = tx.hash;
 
-      return isHash(hash) ? hash : undefined;
+      return getHash(hash);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.lockManager.root() });

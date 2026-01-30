@@ -166,7 +166,7 @@ export function ClaimModal(props: ClaimModalProps) {
             onChange={onWalletAddressChange}
             addonRight={
               <>
-                <Condition if={!!walletAddress.length}>
+                <Condition if={walletAddress.length}>
                   <CrossIcon
                     onClick={onClear}
                     className='text-color-25 size-4 shrink-0 cursor-pointer'

@@ -21,7 +21,7 @@ export function WalletButton() {
           Connect Wallet
         </Button>
       </Condition>
-      <Condition if={!!address}>
+      <Condition if={address}>
         <ConnectedButton onChangeWallet={onOpen} />
       </Condition>
       <ConnectorsModal

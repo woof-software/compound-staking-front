@@ -47,9 +47,9 @@ export function UnstakeFlowBlock() {
 
   const { isConnected, address, chainId } = useConnection();
 
-  const { BASE_TOKEN_ADDRESS, LOCK_MANAGER_ADDRESS } = getAddressContracts(chainId);
+  const { baseTokenAddress, lockManagerAddress } = getAddressContracts(chainId);
 
-  const { data: lockDuration } = useUnstakeLockDuration(chainId, LOCK_MANAGER_ADDRESS);
+  const { data: lockDuration } = useUnstakeLockDuration(chainId, lockManagerAddress);
 
   const { refetch: refetchAllowance } = useBaseTokenAllowance(chainId, address);
 
@@ -58,7 +58,7 @@ export function UnstakeFlowBlock() {
   const { refetch: refetchMultiplier } = useMultiplier(chainId, address);
   const { refetch: refetchAvailableRewards } = useAvailableRewards(chainId, address);
 
-  const { refetch: refetchWalletBalance } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
+  const { refetch: refetchWalletBalance } = useTokenBalance(address, baseTokenAddress);
 
   const {
     data: lockedTokenBalance,
@@ -131,7 +131,7 @@ export function UnstakeFlowBlock() {
   };
 
   const onButtonClick = async () => {
-    if (!LOCK_MANAGER_ADDRESS) return;
+    if (!lockManagerAddress) return;
 
     if (hasActiveLock) {
       await unlockRequest();
@@ -149,14 +149,12 @@ export function UnstakeFlowBlock() {
     triggerDelegateRefresh();
     triggerRewardRefresh();
 
-    await Promise.allSettled([
-      refetchWalletBalance(),
-      refetchStakedTokenBalance(),
-      refetchVirtualTokenBalance(),
-      refetchMultiplier(),
-      refetchAvailableRewards(),
-      refetchLockedTokenBalance()
-    ]);
+    refetchWalletBalance();
+    refetchStakedTokenBalance();
+    refetchVirtualTokenBalance();
+    refetchMultiplier();
+    refetchAvailableRewards();
+    refetchLockedTokenBalance();
   });
 
   useEffect(() => {

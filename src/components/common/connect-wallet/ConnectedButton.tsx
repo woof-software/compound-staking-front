@@ -32,7 +32,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
   const { address, isConnected, chainId } = useConnection();
   const { disconnect } = useDisconnect();
 
-  const { BASE_TOKEN_ADDRESS } = getAddressContracts(chainId);
+  const { baseTokenAddress } = getAddressContracts(chainId);
 
   const { isEnabled: isOpen, toggle: onOpen, disable: onClose } = useSwitch();
 
@@ -46,7 +46,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
     data: walletBalance,
     refetch: refetchWalletBalance,
     isLoading: isWalletBalanceLoading
-  } = useTokenBalance(address, BASE_TOKEN_ADDRESS);
+  } = useTokenBalance(address, baseTokenAddress);
 
   const balance = (availableRewards ?? 0n) + (walletBalance ?? 0n);
 

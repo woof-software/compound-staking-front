@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 
 export type ConditionProps = PropsWithChildren<{
-  if: boolean;
+  if: any;
 }>;
 
 export function Condition({ if: condition, children }: ConditionProps) {

@@ -7,7 +7,7 @@ import { getEthersProvider, getEthersSigner } from '@/lib/utils/wagmi';
 import { config } from '@/shared/config/wagmiConfig';
 
 export function useSubAccountManagerContract(chainId?: number) {
-  const { SUBACCOUNT_MANAGER_ADDRESS } = getAddressContracts(chainId);
+  const { subaccountManagerAddress } = getAddressContracts(chainId);
 
   const provider = useMemo(() => {
     const params = chainId === undefined ? {} : { chainId };
@@ -16,19 +16,19 @@ export function useSubAccountManagerContract(chainId?: number) {
   }, [chainId]);
 
   const readContract = useMemo(() => {
-    if (!SUBACCOUNT_MANAGER_ADDRESS) return null;
+    if (!subaccountManagerAddress) return null;
 
-    return SubAccountManager__factory.connect(SUBACCOUNT_MANAGER_ADDRESS, provider);
-  }, [SUBACCOUNT_MANAGER_ADDRESS, provider]);
+    return SubAccountManager__factory.connect(subaccountManagerAddress, provider);
+  }, [subaccountManagerAddress, provider]);
 
   const writeContract = async (): Promise<SubAccountManager | null> => {
     try {
       const params = chainId === undefined ? {} : { chainId };
       const signer = await getEthersSigner(config, params);
 
-      if (!signer || !SUBACCOUNT_MANAGER_ADDRESS) return null;
+      if (!signer || !subaccountManagerAddress) return null;
 
-      return SubAccountManager__factory.connect(SUBACCOUNT_MANAGER_ADDRESS, signer);
+      return SubAccountManager__factory.connect(subaccountManagerAddress, signer);
     } catch {
       return null;
     }
