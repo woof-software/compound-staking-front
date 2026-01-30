@@ -222,6 +222,10 @@
   transition: width .1s linear;
 }
 
+.no-available-mobile {
+  background-image: url('./assets/no-available-mobile-light.svg');
+}
+
 .no-position-yet {
   background-image: url('./assets/no-position-yet-light.svg');
 }
@@ -229,6 +233,10 @@
 .dark {
   .no-position-yet {
     background-image: url('./assets/no-position-yet.svg');
+  }
+
+  .no-available-mobile {
+    background-image: url('./assets/no-available-mobile.svg');
   }
 }
 

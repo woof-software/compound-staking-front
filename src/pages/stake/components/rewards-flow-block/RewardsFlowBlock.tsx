@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useSwitch } from '@/hooks/useSwitch';
@@ -26,7 +27,7 @@ import { useWalletStore } from '@/stores/useWalletStore';
 export function RewardsFlowBlock() {
   const [claimAmount, setClaimAmount] = useState<bigint>(0n);
 
-  const { isConnected, address, chainId } = useConnection();
+  const { isConnected, address } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
@@ -41,13 +42,13 @@ export function RewardsFlowBlock() {
     data: availableRewards,
     refetch: refetchAvailableRewards,
     isLoading: isAvailableRewardsLoading
-  } = useAvailableRewards(chainId, address);
+  } = useAvailableRewards(APPLICATION_CHAIN, address);
 
   const {
     data: vestingPositions = [],
     refetch: refetchVestingPositions,
     isLoading: isVestingLoading
-  } = useVestingPosition(address);
+  } = useVestingPosition(APPLICATION_CHAIN, address);
 
   const rows = useMemo(() => {
     return vestingPositions.map(({ amount, claimedAmount, startTime, duration }) => {
@@ -58,8 +59,8 @@ export function RewardsFlowBlock() {
       return {
         vestingAmount: amount,
         claimedAmount: claimedAmount,
-        endDate: endDate,
-        startDate: startTime,
+        endDate: Number(endDate),
+        startDate: Number(startTime),
         toClaim: (amount * elapsed) / (BigInt(duration) || 1n) - claimedAmount
       } satisfies RewardsTableItem;
     });
@@ -94,8 +95,8 @@ export function RewardsFlowBlock() {
     refetchVestingPositions();
   };
 
-  const onClaimConfirmed = () => {
-    refetchVestingPositions();
+  const onClaimConfirmed = async () => {
+    await refetchVestingPositions();
   };
 
   const onClaimModalOpen = () => {

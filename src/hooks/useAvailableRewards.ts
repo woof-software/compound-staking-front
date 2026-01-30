@@ -13,7 +13,7 @@ export function useAvailableRewards(chainId?: number, address?: Address) {
     queryKey: queryKeys.stakingVault.availableRewardsOf([chainId, address]),
     enabled: !!address,
     queryFn: () => {
-      if (!address) return;
+      if (!address || !read) return;
 
       return read.availableRewardsOf(address);
     },

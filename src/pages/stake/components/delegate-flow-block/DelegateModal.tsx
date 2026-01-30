@@ -1,47 +1,44 @@
 import { useEffect, useEffectEvent, useState } from 'react';
-import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import type { Address } from 'viem';
+import { useWaitForTransactionReceipt } from 'wagmi';
 
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
-import { type Delegate } from '@/consts/common';
-import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
+import { APPLICATION_CHAIN, type Delegate } from '@/consts/common';
 import { useDelegateTransaction } from '@/hooks/useDelegateTransaction';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export type DelegateModalProps = {
+  subAccountAddress?: Address | undefined;
   delegate?: Delegate | undefined;
   onClose?: () => void;
   onDelegateConfirmed?: () => void;
 };
 
 export function DelegateModal(props: DelegateModalProps) {
-  const { delegate, onClose = noop, onDelegateConfirmed = noop } = props;
+  const { delegate, subAccountAddress, onClose = noop, onDelegateConfirmed = noop } = props;
 
-  const { address } = useConnection();
-
-  const { data: subAccountAddress, isLoading: isSubAccountLoading } = useDelegateSubAccount(address);
+  const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(() => delegate ?? null);
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const {
-    sendTransactionAsync: delegateTransaction,
     data: delegateHash,
+    sendTransactionAsync: delegateTransaction,
     isPending: isDelegatePending
-  } = useDelegateTransaction();
+  } = useDelegateTransaction(APPLICATION_CHAIN, subAccountAddress);
 
   const { isLoading: isDelegateConfirming, isSuccess: isDelegateSuccess } = useWaitForTransactionReceipt({
     hash: delegateHash
   });
 
-  const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
+  const isDelegateLoading = isDelegatePending || isDelegateConfirming;
 
-  const isConfirmDisabled = selectedAddressDelegate?.address === delegate?.address;
-
-  const isDelegateLoading = isDelegatePending || isDelegateConfirming || isSubAccountLoading;
+  const isConfirmDisabled = !selectedAddressDelegate || selectedAddressDelegate.address === delegate?.address;
 
   const onDelegateSelect = (addressDelegate: Delegate | null) => {
     setSelectedAddressDelegate(addressDelegate);
@@ -51,8 +48,7 @@ export function DelegateModal(props: DelegateModalProps) {
     if (!selectedAddressDelegate || !subAccountAddress) return;
 
     setIsPendingToggle(true);
-
-    await delegateTransaction({ subAddress: subAccountAddress, delegate: selectedAddressDelegate.address });
+    await delegateTransaction(selectedAddressDelegate.address);
   };
 
   const onDelegateSuccess = useEffectEvent(() => {

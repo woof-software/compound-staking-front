@@ -1,28 +1,34 @@
-import { useCallback } from 'react';
-import { type Address, encodeFunctionData } from 'viem';
-import { useSendTransaction } from 'wagmi';
+import { type Address } from 'viem';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { ENV } from '@/consts/env';
-import { VestingManagerAbi } from '@/shared/abis/VestingManagerAbi';
+import { useVestingManagerContract } from '@/hooks/useVestingManagerContract';
+import { getHash } from '@/lib/utils/helpers';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useVestingClaim() {
-  const { sendTransactionAsync, ...query } = useSendTransaction();
+export function useVestingClaim(chainId?: number) {
+  const queryClient = useQueryClient();
 
-  const _sendTransactionAsync = useCallback(async (recipient: Address) => {
-    const vestingData = encodeFunctionData({
-      abi: VestingManagerAbi,
-      functionName: 'claim',
-      args: [recipient]
-    });
+  const { write } = useVestingManagerContract(chainId);
 
-    return sendTransactionAsync({
-      to: ENV.VESTING_MANAGER_ADDRESS,
-      data: vestingData
-    });
-  }, []);
+  const { mutateAsync, ...query } = useMutation({
+    mutationFn: async (address: Address) => {
+      const contract = await write();
+
+      if (!contract) return;
+
+      const tx = await contract.claim(address);
+
+      const hash = tx.hash;
+
+      return getHash(hash);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.vestingManager.root() });
+    }
+  });
 
   return {
-    sendTransactionAsync: _sendTransactionAsync,
+    sendTransactionAsync: mutateAsync,
     ...query,
     sendTransaction: undefined
   };

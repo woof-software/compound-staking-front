@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
-import { useConnection } from 'wagmi';
+import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -9,6 +9,7 @@ import { Divider } from '@/components/ui/Divider';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -27,23 +28,33 @@ export type VestingModalProps = {
 };
 
 export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirmed = noop }: VestingModalProps) {
-  const { isConnected, address, chainId } = useConnection();
+  const { isConnected, address } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
-  const { data: availableRewards, isLoading: isAvailableRewardsLoading } = useAvailableRewards(chainId, address);
+  const { data: availableRewards, isLoading: isAvailableRewardsLoading } = useAvailableRewards(
+    APPLICATION_CHAIN,
+    address
+  );
 
-  const { data: maxVestingPositions } = useVestingPerUser();
+  const { data: maxVestingPositions } = useVestingPerUser(APPLICATION_CHAIN);
 
-  const { data: vestingPositions, isLoading: isVestingPositionsLoading } = useVestingPosition(address);
+  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(
+    APPLICATION_CHAIN,
+    address
+  );
 
   const {
+    data: vestRewardsHash,
     sendTransactionAsync: vestRewardsRequest,
-    isPending: isVestRewardsPending,
-    isSuccess: isVestRewardsSuccess
-  } = useVestRewards();
+    isPending: isVestRewardsPending
+  } = useVestRewards(APPLICATION_CHAIN);
+
+  const { isLoading: isVestRewardsConfirming, isSuccess: isVestRewardsSuccess } = useWaitForTransactionReceipt({
+    hash: vestRewardsHash
+  });
 
   const baseTokenPriceValue = baseTokenPrice ?? 0n;
   const availableRewardsPriceFormatted = formatUnits(
@@ -54,9 +65,9 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
   const availableRewardsFormatted = formatUnits(availableRewards ?? 0n, ENV.STAKED_TOKEN_DECIMALS);
 
   const hasPosition = !!vestingPositions?.length;
-  const hasMaxPosition = hasPosition ? vestingPositions?.length === maxVestingPositions : false;
+  const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions ?? 0n) : false;
 
-  const isVestingLoading = isVestingPositionsLoading || isVestRewardsPending;
+  const isVestingLoading = isVestingPositionsLoading || isVestRewardsConfirming || isVestRewardsPending;
   const isLoading = isConnected ? isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
 
   const isVestButtonDisabled = isLoading || isVestingLoading || hasMaxPosition;
@@ -129,7 +140,8 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
               lineHeight='16'
               className='text-color-22'
             >
-              {`You have reached the maximum limit (${maxVestingPositions}) for Vesting entries. You need to close completed entries or wait until they are finished.`}
+              You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close
+              completed entries or wait until they are finished.
             </Text>
           </div>
         </Condition>

@@ -1,29 +1,42 @@
 import type { Address } from 'viem';
-import { useReadContract } from 'wagmi';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 
-import { ENV } from '@/consts/env';
-import { VestingManagerAbi } from '@/shared/abis/VestingManagerAbi';
+import { useVestingManagerContract } from '@/hooks/useVestingManagerContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useVestingPosition(address?: Address) {
-  const { data, ...query } = useReadContract({
-    address: ENV.VESTING_MANAGER_ADDRESS,
-    abi: VestingManagerAbi,
-    functionName: 'getActiveVestings',
-    args: address ? [address] : undefined,
-    query: { enabled: !!address }
+const schema = z
+  .array(
+    z.object({
+      amount: z.bigint(),
+      claimedAmount: z.bigint(),
+      startTime: z.bigint(),
+      duration: z.bigint()
+    })
+  )
+  .optional();
+
+export type VestingPositionInfoDto = z.infer<typeof schema>;
+
+export function useVestingPosition(chainId?: number, address?: Address) {
+  const { read } = useVestingManagerContract(chainId);
+
+  const { data, ...query } = useQuery<VestingPositionInfoDto | undefined>({
+    queryKey: queryKeys.vestingManager.activeVestingsOf([chainId]),
+    enabled: !!address,
+    queryFn: async () => {
+      if (!address || !read) return undefined;
+
+      const res = await read.activeVestingsOf(address);
+
+      return res.map((v) => ({
+        amount: v.amount,
+        claimedAmount: v.claimedAmount,
+        startTime: v.startTime,
+        duration: v.duration
+      }));
+    }
   });
-
-  const schema = z
-    .array(
-      z.object({
-        amount: z.bigint(),
-        claimedAmount: z.bigint(),
-        duration: z.number().int().nonnegative(),
-        startTime: z.number().int().nonnegative()
-      })
-    )
-    .optional();
 
   return {
     data: schema.parse(data),

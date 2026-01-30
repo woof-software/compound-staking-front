@@ -6,6 +6,7 @@ import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useUnstakeLockDuration } from '@/hooks/useLockDuration';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -13,6 +14,7 @@ import { useVestingPerUser } from '@/hooks/useVestingPerUser';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 import { Format, FormatTime } from '@/lib/utils/format';
+import { getAddressContracts } from '@/lib/utils/helpers';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 
@@ -24,17 +26,22 @@ export type UnstakeModalProps = {
 export function UnstakeModal(props: UnstakeModalProps) {
   const { isLoading = false, onClick = noop } = props;
 
-  const { address, chainId } = useConnection();
+  const { address } = useConnection();
 
-  const { data: lockDuration } = useUnstakeLockDuration(ENV.LOCK_MANAGER_ADDRESS);
+  const { lockManagerAddress } = getAddressContracts(APPLICATION_CHAIN);
 
-  const { data: stakedTokenBalance } = useStakedBalance(chainId, address);
+  const { data: lockDuration } = useUnstakeLockDuration(APPLICATION_CHAIN, lockManagerAddress);
+
+  const { data: stakedTokenBalance } = useStakedBalance(APPLICATION_CHAIN, address);
 
   const { data: stakedTokenPriceUsdData } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
-  const { data: maxVestingPositions } = useVestingPerUser();
+  const { data: maxVestingPositions } = useVestingPerUser(APPLICATION_CHAIN);
 
-  const { data: vestingPositions, isLoading: isVestingPositionsLoading } = useVestingPosition(address);
+  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(
+    APPLICATION_CHAIN,
+    address
+  );
 
   const baseTokenPriceFormatted = formatUnits(
     (stakedTokenBalance?.principal ?? 0n) * (stakedTokenPriceUsdData ?? 0n),
@@ -42,7 +49,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
   );
 
   const hasPosition = !!vestingPositions?.length;
-  const hasMaxPosition = hasPosition ? vestingPositions?.length === maxVestingPositions : false;
+  const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions ?? 0n) : false;
 
   const isButtonDisabled = isLoading || isVestingPositionsLoading || hasMaxPosition;
 
@@ -85,7 +92,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
           weight='500'
           lineHeight='20'
         >
-          {FormatTime.cooldownFromSeconds(lockDuration ?? 0)}
+          {FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0n))}
         </Text>
       </div>
       <Condition if={hasMaxPosition}>
@@ -96,7 +103,8 @@ export function UnstakeModal(props: UnstakeModalProps) {
             lineHeight='16'
             className='text-color-22'
           >
-            {`You have reached the maximum limit (${maxVestingPositions}) for Vesting entries. You need to close completed entries or wait until they are finished.`}
+            You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close completed
+            entries or wait until they are finished.
           </Text>
         </div>
       </Condition>

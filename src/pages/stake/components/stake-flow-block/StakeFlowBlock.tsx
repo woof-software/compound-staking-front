@@ -7,15 +7,19 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
+import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useMultiplier } from '@/hooks/useMultiplier';
+import { useSubAccount } from '@/hooks/useSubAccount';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useVirtualBalance } from '@/hooks/useVirtualBalance';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
+import { getAddressContracts } from '@/lib/utils/helpers';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
@@ -25,7 +29,7 @@ import { useStatisticStore } from '@/stores/useStatisticStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function StakeFlowBlock() {
-  const { isConnected, address, chainId } = useConnection();
+  const { isConnected, address } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
@@ -34,23 +38,29 @@ export function StakeFlowBlock() {
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
+  const { baseTokenAddress } = getAddressContracts(APPLICATION_CHAIN);
+
   const {
     data: stakedBalance,
     isLoading: isStakedBalanceLoading,
     refetch: refetchStakedBalanceFormatted
-  } = useStakedBalance(chainId, address);
+  } = useStakedBalance(APPLICATION_CHAIN, address);
 
-  const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(chainId, address);
+  const { data: subAccountAddress } = useDelegateSubAccount(APPLICATION_CHAIN, address);
 
-  const { data: multiplier, refetch: refetchMultiplier } = useMultiplier(chainId, address);
-  const { data: availableRewards, refetch: refetchAvailableRewards } = useAvailableRewards(chainId, address);
+  const { data: delegateData } = useSubAccount(APPLICATION_CHAIN, subAccountAddress);
+
+  const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(APPLICATION_CHAIN, address);
+
+  const { data: multiplier, refetch: refetchMultiplier } = useMultiplier(APPLICATION_CHAIN, address);
+  const { data: availableRewards, refetch: refetchAvailableRewards } = useAvailableRewards(APPLICATION_CHAIN, address);
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
-  const { data: lockedTokenBalance } = useLockedBalance(address);
+  const { data: lockedTokenBalance } = useLockedBalance(APPLICATION_CHAIN, address);
 
   const { isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
-  const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, ENV.BASE_TOKEN_ADDRESS);
+  const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, baseTokenAddress);
 
   /* Loading */
   const isPriceOrBalanceLoading = isStakedTokenPrice || isStakedTokenWalletBalance;
@@ -75,22 +85,24 @@ export function StakeFlowBlock() {
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
 
+  const delegateAddress = (stakedBalance?.principal ?? 0n) > 0n ? delegateData?.delegatee : undefined;
+
   const onModalClose = () => {
     setIsPendingToggle(false);
     onClose();
   };
 
-  const onStakeConfirmed = async () => {
-    await Promise.allSettled([
-      refetchStakedBalanceFormatted,
-      refetchVirtualBalance,
-      refetchMultiplier,
-      refetchAvailableRewards
-    ]);
+  const onStakeConfirmed = () => {
+    refetchStakedBalanceFormatted();
+    refetchVirtualBalance();
+    refetchMultiplier();
+    refetchAvailableRewards();
 
     triggerStatisticRefresh();
     triggerDelegateRefresh();
     triggerRewardRefresh();
+
+    onClose();
   };
 
   return (
@@ -242,8 +254,9 @@ export function StakeFlowBlock() {
         onClose={onModalClose}
       >
         <StakeModal
+          delegateAddress={delegateAddress}
+          stakedBalance={stakedBalance?.principal}
           onStakeConfirmed={onStakeConfirmed}
-          onClose={onClose}
         />
       </Modal>
     </Card>
