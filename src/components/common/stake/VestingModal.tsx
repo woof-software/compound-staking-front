@@ -9,6 +9,7 @@ import { Divider } from '@/components/ui/Divider';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -27,23 +28,29 @@ export type VestingModalProps = {
 };
 
 export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirmed = noop }: VestingModalProps) {
-  const { isConnected, address, chainId } = useConnection();
+  const { isConnected, address } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
-  const { data: availableRewards, isLoading: isAvailableRewardsLoading } = useAvailableRewards(chainId, address);
+  const { data: availableRewards, isLoading: isAvailableRewardsLoading } = useAvailableRewards(
+    APPLICATION_CHAIN,
+    address
+  );
 
-  const { data: maxVestingPositions } = useVestingPerUser(chainId);
+  const { data: maxVestingPositions } = useVestingPerUser(APPLICATION_CHAIN);
 
-  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(chainId, address);
+  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(
+    APPLICATION_CHAIN,
+    address
+  );
 
   const {
     data: vestRewardsHash,
     sendTransactionAsync: vestRewardsRequest,
     isPending: isVestRewardsPending
-  } = useVestRewards(chainId);
+  } = useVestRewards(APPLICATION_CHAIN);
 
   const { isLoading: isVestRewardsConfirming, isSuccess: isVestRewardsSuccess } = useWaitForTransactionReceipt({
     hash: vestRewardsHash

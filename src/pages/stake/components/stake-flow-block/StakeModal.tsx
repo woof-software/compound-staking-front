@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-import { type Delegate } from '@/consts/common';
+import { APPLICATION_CHAIN, type Delegate } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useApproveTransaction } from '@/hooks/useApproveTransaction';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
@@ -41,9 +41,9 @@ export function StakeModal(props: StakeModalProps) {
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
 
-  const { address, chainId } = useConnection();
+  const { address } = useConnection();
 
-  const { baseTokenAddress, stakingVaultAddress } = getAddressContracts(chainId);
+  const { baseTokenAddress, stakingVaultAddress } = getAddressContracts(APPLICATION_CHAIN);
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
@@ -53,11 +53,14 @@ export function StakeModal(props: StakeModalProps) {
     isLoading: isWalletBalanceLoading
   } = useTokenBalance(address, baseTokenAddress);
 
-  const { data: maxVestingPositions } = useVestingPerUser(chainId);
+  const { data: maxVestingPositions } = useVestingPerUser(APPLICATION_CHAIN);
 
-  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(chainId, address);
+  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(
+    APPLICATION_CHAIN,
+    address
+  );
 
-  const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(chainId, address);
+  const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(APPLICATION_CHAIN, address);
 
   const { sendTransactionAsync: approve, data: approveHash, isPending: isApprovePending } = useApproveTransaction();
 
@@ -65,7 +68,11 @@ export function StakeModal(props: StakeModalProps) {
     hash: approveHash
   });
 
-  const { data: stakeHash, sendTransactionAsync: stake, isPending: isStakePending } = useStakeTransaction(chainId);
+  const {
+    data: stakeHash,
+    sendTransactionAsync: stake,
+    isPending: isStakePending
+  } = useStakeTransaction(APPLICATION_CHAIN);
 
   const { isLoading: isStakeConfirming, isSuccess: isStakeSuccess } = useWaitForTransactionReceipt({
     hash: stakeHash
@@ -75,7 +82,7 @@ export function StakeModal(props: StakeModalProps) {
     data: increaseStakeHash,
     sendTransactionAsync: increaseStake,
     isPending: isIncreaseStakePending
-  } = useIncreaseStakeTransaction(chainId);
+  } = useIncreaseStakeTransaction(APPLICATION_CHAIN);
 
   const { isLoading: isIncreaseStakeConfirming, isSuccess: isIncreaseStakeSuccess } = useWaitForTransactionReceipt({
     hash: increaseStakeHash

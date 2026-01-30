@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
@@ -45,18 +46,18 @@ export function UnstakeFlowBlock() {
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
 
-  const { isConnected, address, chainId } = useConnection();
+  const { isConnected, address } = useConnection();
 
-  const { baseTokenAddress, lockManagerAddress } = getAddressContracts(chainId);
+  const { baseTokenAddress, lockManagerAddress } = getAddressContracts(APPLICATION_CHAIN);
 
-  const { data: lockDuration } = useUnstakeLockDuration(chainId, lockManagerAddress);
+  const { data: lockDuration } = useUnstakeLockDuration(APPLICATION_CHAIN, lockManagerAddress);
 
-  const { refetch: refetchAllowance } = useBaseTokenAllowance(chainId, address);
+  const { refetch: refetchAllowance } = useBaseTokenAllowance(APPLICATION_CHAIN, address);
 
-  const { data: stakedTokenBalance, refetch: refetchStakedTokenBalance } = useStakedBalance(chainId, address);
-  const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(chainId, address);
-  const { refetch: refetchMultiplier } = useMultiplier(chainId, address);
-  const { refetch: refetchAvailableRewards } = useAvailableRewards(chainId, address);
+  const { data: stakedTokenBalance, refetch: refetchStakedTokenBalance } = useStakedBalance(APPLICATION_CHAIN, address);
+  const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(APPLICATION_CHAIN, address);
+  const { refetch: refetchMultiplier } = useMultiplier(APPLICATION_CHAIN, address);
+  const { refetch: refetchAvailableRewards } = useAvailableRewards(APPLICATION_CHAIN, address);
 
   const { refetch: refetchWalletBalance } = useTokenBalance(address, baseTokenAddress);
 
@@ -64,7 +65,7 @@ export function UnstakeFlowBlock() {
     data: lockedTokenBalance,
     refetch: refetchLockedTokenBalance,
     isLoading: isLockedTokenBalanceLoading
-  } = useLockedBalance(chainId, address);
+  } = useLockedBalance(APPLICATION_CHAIN, address);
 
   const { data: stakedTokenPrice, isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
@@ -72,7 +73,7 @@ export function UnstakeFlowBlock() {
     data: unstakeHash,
     sendTransactionAsync: unstakeRequest,
     isPending: isUnstakePending
-  } = useUnstakeRequest(chainId);
+  } = useUnstakeRequest(APPLICATION_CHAIN);
 
   const { isLoading: isUnstakeRequestConfirming, isSuccess: isUnstakeRequestSuccess } = useWaitForTransactionReceipt({
     hash: unstakeHash
@@ -82,7 +83,7 @@ export function UnstakeFlowBlock() {
     data: unlockHash,
     sendTransactionAsync: unlockRequest,
     isPending: isUnlockPending
-  } = useUnlockRequest(chainId);
+  } = useUnlockRequest(APPLICATION_CHAIN);
 
   const { isLoading: isUnlockRequesConfirming, isSuccess: isUnlockRequestSuccess } = useWaitForTransactionReceipt({
     hash: unlockHash

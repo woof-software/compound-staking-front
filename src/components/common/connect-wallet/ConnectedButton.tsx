@@ -6,6 +6,7 @@ import { CopyIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useOutsideClick } from '@/hooks/useOnClickOutside';
@@ -29,10 +30,10 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
 
   const isPending = useWalletStore(({ isPending }) => isPending);
 
-  const { address, isConnected, chainId } = useConnection();
+  const { address, isConnected } = useConnection();
   const { disconnect } = useDisconnect();
 
-  const { baseTokenAddress } = getAddressContracts(chainId);
+  const { baseTokenAddress } = getAddressContracts(APPLICATION_CHAIN);
 
   const { isEnabled: isOpen, toggle: onOpen, disable: onClose } = useSwitch();
 
@@ -40,7 +41,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
     data: availableRewards,
     refetch: refetchAvailableRewards,
     isLoading: isAvailableRewardsLoading
-  } = useAvailableRewards(chainId, address);
+  } = useAvailableRewards(APPLICATION_CHAIN, address);
 
   const {
     data: walletBalance,
