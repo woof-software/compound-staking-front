@@ -27,11 +27,11 @@ export function useIncreaseStakeTransaction(chainId?: number) {
 
       return getHash(hash);
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.subAccount.root() });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.subAccountManager.root() });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.vestingManager.root() });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.subAccount.root() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.subAccountManager.root() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.vestingManager.root() });
     }
   });
 

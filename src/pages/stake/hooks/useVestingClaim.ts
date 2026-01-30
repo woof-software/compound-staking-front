@@ -22,8 +22,8 @@ export function useVestingClaim(chainId?: number) {
 
       return getHash(hash);
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.vestingManager.root() });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.vestingManager.root() });
     }
   });
 

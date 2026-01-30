@@ -21,8 +21,8 @@ export function useUnlockRequest(chainId?: number) {
 
       return getHash(hash);
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.lockManager.root() });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.lockManager.root() });
     }
   });
 

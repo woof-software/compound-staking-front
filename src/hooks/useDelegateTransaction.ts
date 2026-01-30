@@ -22,8 +22,8 @@ export function useDelegateTransaction(chainId?: number, address?: Address) {
 
       return getHash(hash);
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.subAccount.root() });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.subAccount.root() });
     }
   });
 

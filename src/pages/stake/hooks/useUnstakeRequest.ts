@@ -20,8 +20,8 @@ export function useUnstakeRequest(chainId?: number) {
 
       return getHash(hash);
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });
     }
   });
 
