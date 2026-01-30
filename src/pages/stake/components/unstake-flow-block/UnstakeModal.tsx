@@ -6,6 +6,7 @@ import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useUnstakeLockDuration } from '@/hooks/useLockDuration';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -25,19 +26,22 @@ export type UnstakeModalProps = {
 export function UnstakeModal(props: UnstakeModalProps) {
   const { isLoading = false, onClick = noop } = props;
 
-  const { address, chainId } = useConnection();
+  const { address } = useConnection();
 
-  const { lockManagerAddress } = getAddressContracts(chainId);
+  const { lockManagerAddress } = getAddressContracts(APPLICATION_CHAIN);
 
-  const { data: lockDuration } = useUnstakeLockDuration(chainId, lockManagerAddress);
+  const { data: lockDuration } = useUnstakeLockDuration(APPLICATION_CHAIN, lockManagerAddress);
 
-  const { data: stakedTokenBalance } = useStakedBalance(chainId, address);
+  const { data: stakedTokenBalance } = useStakedBalance(APPLICATION_CHAIN, address);
 
   const { data: stakedTokenPriceUsdData } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
-  const { data: maxVestingPositions } = useVestingPerUser(chainId);
+  const { data: maxVestingPositions } = useVestingPerUser(APPLICATION_CHAIN);
 
-  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(chainId, address);
+  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(
+    APPLICATION_CHAIN,
+    address
+  );
 
   const baseTokenPriceFormatted = formatUnits(
     (stakedTokenBalance?.principal ?? 0n) * (stakedTokenPriceUsdData ?? 0n),

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { useDelegateDuration } from '@/hooks/useDelegateDuration';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
@@ -23,7 +24,7 @@ import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function DelegateFlowBlock() {
-  const { isConnected, address, chainId } = useConnection();
+  const { isConnected, address } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
   const { needRefresh: needDelegateRefresh, resetRefresh: resetDelegateRefresh } = useDelegateStore();
@@ -32,22 +33,22 @@ export function DelegateFlowBlock() {
 
   const { isEnabled: isCooldownFinished, enable: setCooldownFinished, disable: resetCooldownFinished } = useSwitch();
 
-  const { data: stakedTokenBalance } = useStakedBalance(chainId, address);
-  const { data: lockedTokenBalance } = useLockedBalance(chainId, address);
+  const { data: stakedTokenBalance } = useStakedBalance(APPLICATION_CHAIN, address);
+  const { data: lockedTokenBalance } = useLockedBalance(APPLICATION_CHAIN, address);
 
-  const { data: delegateDuration, isLoading: isDurationLoading } = useDelegateDuration(chainId);
+  const { data: delegateDuration, isLoading: isDurationLoading } = useDelegateDuration(APPLICATION_CHAIN);
 
   const {
     data: subAccountAddress,
     isLoading: isSubAccountLoading,
     refetch: refetchSubAccountAddress
-  } = useDelegateSubAccount(chainId, address);
+  } = useDelegateSubAccount(APPLICATION_CHAIN, address);
 
   const {
     data: delegateData,
     isLoading: isDelegateLoading,
     refetch: refetchDelegate
-  } = useSubAccount(chainId, subAccountAddress);
+  } = useSubAccount(APPLICATION_CHAIN, subAccountAddress);
 
   const executableAtSec = useMemo(() => {
     const executableAt = delegateData?.executableAt;

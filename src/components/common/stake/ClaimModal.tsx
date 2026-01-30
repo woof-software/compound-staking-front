@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Switch } from '@/components/ui/Switch';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
@@ -31,7 +32,7 @@ export function ClaimModal(props: ClaimModalProps) {
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
-  const { isConnected, address, chainId } = useConnection();
+  const { isConnected, address } = useConnection();
 
   const [walletAddress, setWalletAddress] = useState<string>('');
 
@@ -39,7 +40,11 @@ export function ClaimModal(props: ClaimModalProps) {
 
   const isValidAddress = !isChangeWallet || isAddress(walletAddress);
 
-  const { data: claimHash, sendTransactionAsync: claimRequest, isPending: isClaimPending } = useVestingClaim(chainId);
+  const {
+    data: claimHash,
+    sendTransactionAsync: claimRequest,
+    isPending: isClaimPending
+  } = useVestingClaim(APPLICATION_CHAIN);
 
   const { isLoading: isClaimConfirming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({
     hash: claimHash

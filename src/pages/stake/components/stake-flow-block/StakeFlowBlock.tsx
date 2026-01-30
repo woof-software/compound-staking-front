@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
@@ -43,20 +44,20 @@ export function StakeFlowBlock() {
     data: stakedBalance,
     isLoading: isStakedBalanceLoading,
     refetch: refetchStakedBalanceFormatted
-  } = useStakedBalance(chainId, address);
+  } = useStakedBalance(APPLICATION_CHAIN, address);
 
-  const { data: subAccountAddress } = useDelegateSubAccount(chainId, address);
+  const { data: subAccountAddress } = useDelegateSubAccount(APPLICATION_CHAIN, address);
 
-  const { data: delegateData } = useSubAccount(chainId, subAccountAddress);
+  const { data: delegateData } = useSubAccount(APPLICATION_CHAIN, subAccountAddress);
 
-  const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(chainId, address);
+  const { data: virtualBalance, refetch: refetchVirtualBalance } = useVirtualBalance(APPLICATION_CHAIN, address);
 
-  const { data: multiplier, refetch: refetchMultiplier } = useMultiplier(chainId, address);
-  const { data: availableRewards, refetch: refetchAvailableRewards } = useAvailableRewards(chainId, address);
+  const { data: multiplier, refetch: refetchMultiplier } = useMultiplier(APPLICATION_CHAIN, address);
+  const { data: availableRewards, refetch: refetchAvailableRewards } = useAvailableRewards(APPLICATION_CHAIN, address);
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
-  const { data: lockedTokenBalance } = useLockedBalance(chainId, address);
+  const { data: lockedTokenBalance } = useLockedBalance(APPLICATION_CHAIN, address);
 
   const { isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
   const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, baseTokenAddress);

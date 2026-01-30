@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-import { type Delegate } from '@/consts/common';
+import { APPLICATION_CHAIN, type Delegate } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useApproveTransaction } from '@/hooks/useApproveTransaction';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
@@ -53,11 +53,14 @@ export function StakeModal(props: StakeModalProps) {
     isLoading: isWalletBalanceLoading
   } = useTokenBalance(address, baseTokenAddress);
 
-  const { data: maxVestingPositions } = useVestingPerUser(chainId);
+  const { data: maxVestingPositions } = useVestingPerUser(APPLICATION_CHAIN);
 
-  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(chainId, address);
+  const { data: vestingPositions = [], isLoading: isVestingPositionsLoading } = useVestingPosition(
+    APPLICATION_CHAIN,
+    address
+  );
 
-  const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(chainId, address);
+  const { data: allowance, refetch: refetchAllowance } = useBaseTokenAllowance(APPLICATION_CHAIN, address);
 
   const { sendTransactionAsync: approve, data: approveHash, isPending: isApprovePending } = useApproveTransaction();
 

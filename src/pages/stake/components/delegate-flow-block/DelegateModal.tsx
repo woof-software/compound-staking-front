@@ -1,12 +1,12 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 import type { Address } from 'viem';
-import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import { useWaitForTransactionReceipt } from 'wagmi';
 
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
-import { type Delegate } from '@/consts/common';
+import { APPLICATION_CHAIN, type Delegate } from '@/consts/common';
 import { useDelegateTransaction } from '@/hooks/useDelegateTransaction';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
@@ -24,15 +24,13 @@ export function DelegateModal(props: DelegateModalProps) {
 
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(() => delegate ?? null);
 
-  const { chainId } = useConnection();
-
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const {
     data: delegateHash,
     sendTransactionAsync: delegateTransaction,
     isPending: isDelegatePending
-  } = useDelegateTransaction(chainId, subAccountAddress);
+  } = useDelegateTransaction(APPLICATION_CHAIN, subAccountAddress);
 
   const { isLoading: isDelegateConfirming, isSuccess: isDelegateSuccess } = useWaitForTransactionReceipt({
     hash: delegateHash
