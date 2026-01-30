@@ -15,12 +15,10 @@ const schema = z
   })
   .optional();
 
-export type SubAccountInfoDto = z.infer<typeof schema>;
-
 export function useSubAccount(chainId?: number, owner?: Address) {
   const { read } = useSubAccountContract(chainId, owner);
 
-  const { data, ...query } = useQuery<SubAccountInfoDto | undefined>({
+  const { data, ...query } = useQuery({
     queryKey: queryKeys.subAccount.delegationRequest([chainId, owner]),
     enabled: !!owner,
     queryFn: async () => {
@@ -29,7 +27,7 @@ export function useSubAccount(chainId?: number, owner?: Address) {
       const [delegatee, executableAt, executed] = await read.delegationRequest();
 
       return {
-        delegatee: isAddress(delegatee) ? delegatee : undefined,
+        delegatee,
         executableAt,
         executed
       };
