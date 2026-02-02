@@ -6,21 +6,27 @@ import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
 import { cn } from '@/lib/utils/cn';
 import { getChainLogo, getChainName } from '@/lib/utils/helpers';
+import { useSwitchNetworkModalStore } from '@/stores/useSwitchNetworkModalStore';
 
 export function SwitchNetworkModal() {
   const { isConnected, chainId } = useConnection();
   const { switchChainAsync, isPending } = useSwitchChain();
 
-  const isOpen = isConnected ? chainId !== APPLICATION_CHAIN : false;
+  const isOpen = useSwitchNetworkModalStore((s) => s.isOpen);
+  const close = useSwitchNetworkModalStore((s) => s.close);
+
+  const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
 
   const onSwitch = async () => {
     await switchChainAsync({ chainId: APPLICATION_CHAIN });
+    close();
   };
 
   return (
     <Modal
       title='Confirm Network Switch'
-      open={isOpen}
+      open={isOpen && isWrongNetwork}
+      onClose={close}
     >
       <div className='mt-10 mb-5 flex items-center justify-center gap-2.5'>
         <img

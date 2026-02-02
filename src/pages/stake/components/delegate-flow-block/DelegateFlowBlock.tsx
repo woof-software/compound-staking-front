@@ -21,12 +21,15 @@ import { DelegateModal } from '@/pages/stake/components/delegate-flow-block/Dele
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
+import { useSwitchNetworkModalStore } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function DelegateFlowBlock() {
-  const { isConnected, address } = useConnection();
+  const { isConnected, address, chainId } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
+  const openSwitchModal = useSwitchNetworkModalStore((s) => s.open);
+
   const { needRefresh: needDelegateRefresh, resetRefresh: resetDelegateRefresh } = useDelegateStore();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
@@ -98,6 +101,16 @@ export function DelegateFlowBlock() {
 
     resetDelegateRefresh();
   });
+
+  const onModalOpen = () => {
+    const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
+
+    if (isWrongNetwork) {
+      openSwitchModal();
+    } else {
+      onOpen();
+    }
+  };
 
   useEffect(() => {
     if (!isConnected || isLoading || !hasCooldownRequest || hasActiveLock) {
@@ -205,7 +218,7 @@ export function DelegateFlowBlock() {
           </div>
         </div>
         <Button
-          onClick={onOpen}
+          onClick={onModalOpen}
           disabled={isDelegateButtonDisabled}
           className='max-w-32.5'
         >
