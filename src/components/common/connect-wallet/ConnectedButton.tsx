@@ -29,6 +29,8 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
   const toggleRef = useRef<HTMLDivElement>(null);
 
   const isPending = useWalletStore(({ isPending }) => isPending);
+  const needRefresh = useWalletStore(({ needRefresh }) => needRefresh);
+  const resetRefresh = useWalletStore(({ resetRefresh }) => resetRefresh);
 
   const { address, isConnected } = useConnection();
   const { disconnect } = useDisconnect();
@@ -72,13 +74,15 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
   const onRefetchAvailableRewards = useEffectEvent(() => {
     refetchAvailableRewards();
     refetchWalletBalance();
+
+    resetRefresh();
   });
 
   useEffect(() => {
-    if (!isConnected) return;
+    if (!isConnected || !needRefresh) return;
 
     onRefetchAvailableRewards();
-  }, [isConnected]);
+  }, [isConnected, needRefresh]);
 
   useOutsideClick(() => [ref.current, toggleRef.current], onClose);
 

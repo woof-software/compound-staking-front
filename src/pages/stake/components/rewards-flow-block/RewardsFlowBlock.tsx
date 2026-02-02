@@ -16,7 +16,7 @@ import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
-import { vestingToClaimCalc } from '@/lib/rewards';
+import { vestingToClaimCalc, vestingToClaimNow } from '@/lib/rewards';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
 import { RewardsTable, type RewardsTableItem } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
@@ -100,8 +100,10 @@ export function RewardsFlowBlock() {
   };
 
   const onClaimModalOpen = () => {
+    const nowSec = Math.floor(Date.now() / 1000);
+
     const toClaim = rows.reduce((acc, row) => {
-      return acc + vestingToClaimCalc(row);
+      return acc + vestingToClaimNow(row, nowSec);
     }, 0n);
 
     setClaimAmount(toClaim);

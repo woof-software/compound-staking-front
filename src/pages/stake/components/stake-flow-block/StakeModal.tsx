@@ -266,6 +266,9 @@ export function StakeModal(props: StakeModalProps) {
       </Condition>
       <Skeleton loading={isPriceOrBalanceLoading}>
         <DelegateSelector
+          error={{
+            message: !needsApprove && noDelegate ? 'Choose delegate' : undefined
+          }}
           disabled={isLoadingTransaction || hasMaxPosition}
           selectedAddressDelegate={selectedAddressDelegate}
           onSelect={onDelegateSelect}
