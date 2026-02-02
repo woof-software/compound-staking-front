@@ -14,15 +14,13 @@ import { getExplorerAddressUrl } from '@/lib/utils/helpers';
 
 export type DelegateSelectorProps = {
   disabled?: boolean;
-  error?: {
-    message?: string | undefined;
-  };
+  isError?: boolean;
   selectedAddressDelegate: Delegate | null;
   onSelect?: (addressDelegate: Delegate | null) => void;
 };
 
 export function DelegateSelector(props: DelegateSelectorProps) {
-  const { disabled, selectedAddressDelegate, error, onSelect = noop } = props;
+  const { disabled, selectedAddressDelegate, isError, onSelect = noop } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const [searchValue, setSearchValue] = useState('');
@@ -61,7 +59,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
         className={cn(
           'border-color-6 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
           {
-            'border-color-32': !!error?.message
+            'border-color-32': isError
           }
         )}
         onClick={onSelectorOpen}
@@ -183,14 +181,6 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             </div>
           </Condition>
         </div>
-      </Condition>
-      <Condition if={error?.message}>
-        <Text
-          size='11'
-          className='text-color-31 mt-2.5'
-        >
-          {error?.message}
-        </Text>
       </Condition>
     </div>
   );

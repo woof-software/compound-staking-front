@@ -8,7 +8,13 @@ const ANKR_RPC = `https://rpc.ankr.com/eth_sepolia/${ENV.ANKR_RPC_KEY}`;
 
 export const config = createConfig({
   chains: [sepolia],
-  connectors: [metaMask(), walletConnect({ projectId: ENV.WALLET_CONNECT_PROJECT_ID }), coinbaseWallet()],
+  connectors: [
+    metaMask(),
+    walletConnect({ projectId: ENV.WALLET_CONNECT_PROJECT_ID }),
+    coinbaseWallet({
+      appName: 'Compound III'
+    })
+  ],
   transports: {
     [sepolia.id]: http(ANKR_RPC)
   }

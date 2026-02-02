@@ -37,7 +37,6 @@ export function TotalStaked() {
 
   useEffect(() => {
     if (!isConnected || !needTotalStakedRefresh) return;
-
     refetchTotalStaked();
   }, [needTotalStakedRefresh, isConnected, refetchTotalStaked]);
 
@@ -53,23 +52,26 @@ export function TotalStaked() {
       <Skeleton loading={isLoading}>
         <div className='flex items-start gap-3'>
           <CompoundBlackCircle className='text-compound-icon-bg size-10' />
-          <Text
-            size='40'
-            weight='500'
-          >
-            {totalValue}
+          <div className='inline-flex items-baseline gap-1'>
+            <Text
+              tag='span'
+              size='40'
+              weight='500'
+              className='leading-none'
+            >
+              {totalValue}
+            </Text>
             <Condition if={unit}>
               <Text
                 tag='span'
                 size='40'
                 weight='700'
-                lineHeight='38'
-                className='text-color-25'
+                className='text-color-25 leading-none'
               >
                 {unit}
               </Text>
             </Condition>
-          </Text>
+          </div>
         </div>
       </Skeleton>
     </div>

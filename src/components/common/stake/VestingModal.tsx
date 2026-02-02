@@ -107,18 +107,21 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
             Amount to be vested
           </Text>
           <div className='flex shrink-0 flex-col items-end'>
-            <Skeleton loading={isLoading}>
-              <Text
-                size='15'
-                weight='500'
-                lineHeight='20'
-                className={cn('text-color-2', {
-                  'text-color-6': !isConnected
-                })}
-              >
-                {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
-              </Text>
-            </Skeleton>
+            <div className='flex shrink-0 items-end'>
+              <Skeleton loading={isLoading}>
+                <Text
+                  size='15'
+                  weight='500'
+                  lineHeight='20'
+                  className={cn('text-color-2', {
+                    'text-color-6': !isConnected
+                  })}
+                >
+                  {(availableRewards ?? 0n) > 0n && '≈'}
+                  {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
+                </Text>
+              </Skeleton>
+            </div>
             <Condition if={isConnected}>
               <Skeleton loading={isLoading}>
                 <Text

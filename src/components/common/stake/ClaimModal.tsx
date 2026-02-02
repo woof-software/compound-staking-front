@@ -7,7 +7,6 @@ import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Switch } from '@/components/ui/Switch';
 import { Text } from '@/components/ui/Text';
@@ -21,14 +20,13 @@ import { useVestingClaim } from '@/pages/stake/hooks/useVestingClaim';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export type ClaimModalProps = {
-  isOpen?: boolean;
   totalToClaim?: bigint;
   onClose?: () => void;
   onClaimConfirmed?: () => void;
 };
 
 export function ClaimModal(props: ClaimModalProps) {
-  const { isOpen = false, totalToClaim = 0n, onClose = noop, onClaimConfirmed = noop } = props;
+  const { totalToClaim = 0n, onClose = noop, onClaimConfirmed = noop } = props;
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
@@ -114,57 +112,53 @@ export function ClaimModal(props: ClaimModalProps) {
   }, [isClaimSuccess]);
 
   return (
-    <Modal
-      title='Claim COMP'
-      open={isOpen}
-      onClose={onClose}
-    >
-      <div className='mt-8 flex w-full flex-col gap-8'>
-        <Divider orientation='horizontal' />
-        <div className='flex'>
-          <Text
-            size='15'
-            lineHeight='20'
-            className='w-full'
-          >
-            Amount to be claimed
-          </Text>
-          <div className='flex shrink-0 flex-col items-end'>
-            <Skeleton loading={isLoading}>
-              <Text
-                size='15'
-                weight='500'
-                lineHeight='20'
-              >
-                {totalToClaim > 0 && '≈'}
-                {Format.token(totalClaimFormatted, 'compact', 'COMP')}
-              </Text>
-            </Skeleton>
-            <Skeleton loading={isLoading}>
-              <Text
-                size='11'
-                lineHeight='16'
-                className='text-color-24'
-              >
-                {Format.price(totalClaimPriceFormatted, 'standard')}
-              </Text>
-            </Skeleton>
-          </div>
+    <div className='mt-8 flex w-full flex-col gap-8'>
+      <Divider orientation='horizontal' />
+      <div className='flex'>
+        <Text
+          size='15'
+          lineHeight='20'
+          className='w-full'
+        >
+          Amount to be claimed
+        </Text>
+        <div className='flex shrink-0 flex-col items-end'>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='15'
+              weight='500'
+              lineHeight='20'
+            >
+              {totalToClaim > 0 && '≈'}
+              {Format.token(totalClaimFormatted, 'compact', 'COMP')}
+            </Text>
+          </Skeleton>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              lineHeight='16'
+              className='text-color-24'
+            >
+              {Format.price(totalClaimPriceFormatted, 'standard')}
+            </Text>
+          </Skeleton>
         </div>
-        <div className='flex items-center justify-center gap-3'>
-          <Text
-            size='11'
-            weight='500'
-            className='text-color-24'
-          >
-            Change wallet address
-          </Text>
-          <Switch
-            checked={isChangeWallet}
-            onChange={onSwitchChange}
-          />
-        </div>
-        <Condition if={isChangeWallet}>
+      </div>
+      <div className='flex items-center justify-center gap-3'>
+        <Text
+          size='11'
+          weight='500'
+          className='text-color-24'
+        >
+          Change wallet address
+        </Text>
+        <Switch
+          checked={isChangeWallet}
+          onChange={onSwitchChange}
+        />
+      </div>
+      <Condition if={isChangeWallet}>
+        <div>
           <Input
             placeholder='Wallet address'
             value={walletAddress}
@@ -188,27 +182,36 @@ export function ClaimModal(props: ClaimModalProps) {
               </>
             }
           />
-        </Condition>
-        <Button
-          className={cn('h-14 flex-col', {
-            'bg-color-7': isClaiming
+          <Condition if={walletAddress.length > 0 && !isAddress(walletAddress)}>
+            <Text
+              size='11'
+              lineHeight='16'
+              className='text-color-31 mt-2.5'
+            >
+              Invalid address.
+            </Text>
+          </Condition>
+        </div>
+      </Condition>
+      <Button
+        className={cn('h-14 flex-col', {
+          'bg-color-7': isClaiming
+        })}
+        disabled={isClaimButtonDisabled}
+        onClick={onConfirm}
+      >
+        <Text
+          size='13'
+          weight='500'
+          lineHeight='18'
+          className={cn('text-white', {
+            'text-color-6': isClaimButtonDisabled,
+            'after-animate-loading-dots text-white': isClaiming
           })}
-          disabled={isClaimButtonDisabled}
-          onClick={onConfirm}
         >
-          <Text
-            size='13'
-            weight='500'
-            lineHeight='18'
-            className={cn('text-white', {
-              'text-color-6': isClaimButtonDisabled,
-              'after-animate-loading-dots text-white': isClaiming
-            })}
-          >
-            {isClaiming ? 'Pending' : 'Confirm'}
-          </Text>
-        </Button>
-      </div>
-    </Modal>
+          {isClaiming ? 'Pending' : 'Confirm'}
+        </Text>
+      </Button>
+    </div>
   );
 }

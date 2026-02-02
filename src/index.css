@@ -46,7 +46,7 @@
   --color-4: #FFFFFF;
   --color-5: #F0F2F5;
   --color-6: #A7B4C2;
-  --color-7: #00AD79;
+  --color-7: #00C289;
   --color-8: #0D131A26;
   --color-9: #D8DFE5;
   --color-10: #FFFFFF;
@@ -158,6 +158,7 @@
   --shadow-25: 0px 2px 4px rgba(15, 23, 31, .02), 0px 4px 8px rgba(15, 23, 31, .02);
 
   --radius-64: 64px;
+  --radius-72: 72px;
   --radius-100: 100px;
 }
 
@@ -193,6 +194,17 @@
 }
 
 .hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+body.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+body.hide-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
   display: none;
 }
 
