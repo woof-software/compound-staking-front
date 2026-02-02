@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useEffectEvent, useMemo } from 'react';
 import { useConnection } from 'wagmi';
 
 import { ExternalLinkIcon } from '@/assets/svg';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-import { useDelegateByAddress } from '@/hooks/useDelegateByAddress';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { useDelegateDuration } from '@/hooks/useDelegateDuration';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
@@ -16,7 +16,7 @@ import { useSubAccount } from '@/hooks/useSubAccount';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { FormatTime } from '@/lib/utils/format';
-import { getExplorerAddressUrl, getRemainingSeconds } from '@/lib/utils/helpers';
+import { getDelegateByAddress, getExplorerAddressUrl, getRemainingSeconds } from '@/lib/utils/helpers';
 import { DelegateModal } from '@/pages/stake/components/delegate-flow-block/DelegateModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
@@ -24,7 +24,7 @@ import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function DelegateFlowBlock() {
-  const { isConnected, address, chainId } = useConnection();
+  const { isConnected, address } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
   const { needRefresh: needDelegateRefresh, resetRefresh: resetDelegateRefresh } = useDelegateStore();
@@ -33,22 +33,22 @@ export function DelegateFlowBlock() {
 
   const { isEnabled: isCooldownFinished, enable: setCooldownFinished, disable: resetCooldownFinished } = useSwitch();
 
-  const { data: stakedTokenBalance } = useStakedBalance(chainId, address);
-  const { data: lockedTokenBalance } = useLockedBalance(address);
+  const { data: stakedTokenBalance } = useStakedBalance(APPLICATION_CHAIN, address);
+  const { data: lockedTokenBalance } = useLockedBalance(APPLICATION_CHAIN, address);
 
-  const { data: delegateDuration, isLoading: isDurationLoading } = useDelegateDuration();
+  const { data: delegateDuration, isLoading: isDurationLoading } = useDelegateDuration(APPLICATION_CHAIN);
 
   const {
     data: subAccountAddress,
     isLoading: isSubAccountLoading,
     refetch: refetchSubAccountAddress
-  } = useDelegateSubAccount(address);
+  } = useDelegateSubAccount(APPLICATION_CHAIN, address);
 
   const {
     data: delegateData,
     isLoading: isDelegateLoading,
     refetch: refetchDelegate
-  } = useSubAccount(subAccountAddress);
+  } = useSubAccount(APPLICATION_CHAIN, subAccountAddress);
 
   const executableAtSec = useMemo(() => {
     const executableAt = delegateData?.executableAt;
@@ -79,18 +79,25 @@ export function DelegateFlowBlock() {
 
   const endDateLabel = !canShowDelegation || !hasCooldownRequest ? '-' : FormatTime.endDate(executableAtSec);
 
-  const delegate = useDelegateByAddress(delegateData?.delegatee);
+  const delegate = getDelegateByAddress(delegateData?.delegatee);
 
   const delegateLabel = !canShowDelegation ? '-' : delegate?.name || delegate?.address || '-';
 
-  const onDelegateConfirmed = () => {
-    refetchDelegate();
+  const onDelegateConfirmed = async () => {
+    await refetchDelegate();
   };
 
   const onModalClose = () => {
     setIsPendingToggle(false);
     onClose();
   };
+
+  const onRefetchData = useEffectEvent(() => {
+    refetchSubAccountAddress();
+    refetchDelegate();
+
+    resetDelegateRefresh();
+  });
 
   useEffect(() => {
     if (!isConnected || isLoading || !hasCooldownRequest || hasActiveLock) {
@@ -108,10 +115,7 @@ export function DelegateFlowBlock() {
   useEffect(() => {
     if (!isConnected || !needDelegateRefresh) return;
 
-    refetchSubAccountAddress();
-    refetchDelegate();
-
-    resetDelegateRefresh();
+    onRefetchData();
   }, [needDelegateRefresh, isConnected]);
 
   useExecuteAtTime(setCooldownFinished, hasActiveLock ? 0 : cooldownEndMs);
@@ -120,7 +124,7 @@ export function DelegateFlowBlock() {
     <Card
       isLoading={isLoading}
       title='Delegation'
-      tooltip={`Cooldown period for redelegation process is ${FormatTime.cooldownFromSeconds(delegateDuration ?? 0)}`}
+      tooltip={`Cooldown period for redelegation process is ${FormatTime.cooldownFromSeconds(Number(delegateDuration ?? 0n))}`}
     >
       <div className='flex justify-between p-10'>
         <div className='flex gap-15'>
@@ -226,6 +230,7 @@ export function DelegateFlowBlock() {
         onClose={onModalClose}
       >
         <DelegateModal
+          subAccountAddress={subAccountAddress}
           delegate={delegate}
           onClose={onClose}
           onDelegateConfirmed={onDelegateConfirmed}

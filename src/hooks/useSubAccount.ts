@@ -1,29 +1,41 @@
 import { type Address, isAddress } from 'viem';
-import { useReadContract } from 'wagmi';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 
-import { SubAccountAbi } from '@/shared/abis/SubAccountAbi';
+import { useSubAccountContract } from '@/hooks/useSubAccountContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useSubAccount(owner?: Address) {
-  const { data, ...query } = useReadContract({
-    address: owner,
-    abi: SubAccountAbi,
-    functionName: 'delegationRequest',
-    query: { enabled: !!owner }
+const addressSchema = z.string().refine((v): v is Address => isAddress(v), { message: 'Invalid address' });
+
+const schema = z
+  .object({
+    delegatee: addressSchema.optional(),
+    executableAt: z.bigint().optional(),
+    executed: z.boolean().optional()
+  })
+  .optional();
+
+export function useSubAccount(chainId?: number, owner?: Address) {
+  const { read } = useSubAccountContract(chainId, owner);
+
+  const { data, ...query } = useQuery({
+    queryKey: queryKeys.subAccount.delegationRequest([chainId, owner]),
+    enabled: !!owner,
+    queryFn: async () => {
+      if (!read) return;
+
+      const [delegatee, executableAt, executed] = await read.delegationRequest();
+
+      return {
+        delegatee,
+        executableAt,
+        executed
+      };
+    }
   });
 
-  const addressSchema = z.string().refine((v): v is Address => isAddress(v), { message: 'Invalid address' });
-
-  const shema = z
-    .object({
-      delegatee: addressSchema.optional(),
-      executableAt: z.bigint().optional(),
-      executed: z.boolean().optional()
-    })
-    .optional();
-
   return {
-    data: shema.parse(data),
+    data: schema.parse(data),
     ...query
   };
 }

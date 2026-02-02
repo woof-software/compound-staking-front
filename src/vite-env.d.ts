@@ -13,21 +13,12 @@ interface ImportMetaEnv {
   readonly VITE_ETHERSCAN_URL?: string;
 
   // CONTRACTS
-  readonly VITE_BASE_TOKEN_ADDRESS?: string;
   readonly VITE_BASE_TOKEN_PRICE_FEED_ADDRESS?: string;
-  readonly VITE_BASE_TOKEN_DECIMALS?: string;
   readonly VITE_BASE_TOKEN_PRICE_FEED_DECIMALS?: string;
 
-  readonly VITE_STAKED_TOKEN_ADDRESS?: string;
+  readonly VITE_BASE_TOKEN_DECIMALS?: string;
+
   readonly VITE_STAKED_TOKEN_DECIMALS?: string;
-
-  readonly VITE_STAKING_VAULT_ADDRESS?: string;
-
-  readonly VITE_LOCK_MANAGER_ADDRESS?: string;
-
-  readonly VITE_SUBACCOUNT_MANAGER_ADDRESS?: string;
-
-  readonly VITE_VESTING_MANAGER_ADDRESS?: string;
 }
 
 interface ImportMeta {

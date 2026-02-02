@@ -1,7 +1,18 @@
 import dayjs from 'dayjs';
-import type { Address } from 'viem';
+import { type Address, getAddress, type Hash, isHash } from 'viem';
+import { getDeployment } from '@woof-software/compound-staked-comp-artifacts/deployments';
 
+import { type Delegate, DELEGATES } from '@/consts/common';
 import { ENV } from '@/consts/env';
+
+type Contracts = {
+  baseTokenAddress: Address | undefined;
+  stakedTokenAddress: Address | undefined;
+  stakingVaultAddress: Address | undefined;
+  lockManagerAddress: Address | undefined;
+  subaccountManagerAddress: Address | undefined;
+  vestingManagerAddress: Address | undefined;
+};
 
 export function getChainLogo(chainId?: number) {
   if (!chainId) return '/assets/chains/fallback-chain.svg';
@@ -75,4 +86,49 @@ export function getRemainingSeconds(unlockTimestampSec: number, nowUnix = dayjs(
 
 export function normalizeUnixSeconds(ts: number): number {
   return ts > 1e12 ? Math.floor(ts / 1000) : Math.floor(ts);
+}
+
+export function getAddressContracts(chainId?: number): Contracts {
+  if (!chainId) {
+    return {
+      baseTokenAddress: undefined,
+      stakedTokenAddress: undefined,
+      stakingVaultAddress: undefined,
+      lockManagerAddress: undefined,
+      subaccountManagerAddress: undefined,
+      vestingManagerAddress: undefined
+    };
+  }
+
+  const baseTokenAddress = getAddress(getDeployment(chainId, 'MockComp').address);
+  const stakedTokenAddress = getAddress(getDeployment(chainId, 'MockStComp').address);
+  const stakingVaultAddress = getAddress(getDeployment(chainId, 'MockStakingVault').address);
+  const lockManagerAddress = getAddress(getDeployment(chainId, 'LockManager').address);
+  const subaccountManagerAddress = getAddress(getDeployment(chainId, 'SubAccountManager').address);
+  const vestingManagerAddress = getAddress(getDeployment(chainId, 'VestingManager').address);
+
+  return {
+    baseTokenAddress,
+    stakedTokenAddress,
+    stakingVaultAddress,
+    lockManagerAddress,
+    subaccountManagerAddress,
+    vestingManagerAddress
+  };
+}
+
+export function getDelegateByAddress(delegateAddress: Address | undefined, delegates: Delegate[] = DELEGATES) {
+  if (!delegateAddress) return;
+
+  const target = delegates.find((d) => d.address.toLowerCase() === delegateAddress.toLowerCase());
+
+  return target ?? { name: undefined, address: delegateAddress };
+}
+
+export function getHash(hash: string): Hash {
+  if (!isHash(hash)) {
+    throw new Error('Invalid hash');
+  }
+
+  return hash as Hash;
 }

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
@@ -17,10 +18,11 @@ import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
 import { useUnstakeLockDuration } from '@/hooks/useLockDuration';
 import { useMultiplier } from '@/hooks/useMultiplier';
 import { useSwitch } from '@/hooks/useSwitch';
+import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
 import { Format, FormatTime } from '@/lib/utils/format';
-import { getRemainingSeconds, normalizeUnixSeconds } from '@/lib/utils/helpers';
+import { getAddressContracts, getRemainingSeconds, normalizeUnixSeconds } from '@/lib/utils/helpers';
 import { UnstakeModal } from '@/pages/stake/components/unstake-flow-block/UnstakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
@@ -44,39 +46,47 @@ export function UnstakeFlowBlock() {
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
 
-  const { isConnected, address, chainId } = useConnection();
+  const { isConnected, address } = useConnection();
 
-  const { data: lockDuration } = useUnstakeLockDuration(ENV.LOCK_MANAGER_ADDRESS);
+  const { baseTokenAddress, lockManagerAddress } = getAddressContracts(APPLICATION_CHAIN);
 
-  const { refetch: refetchAllowance } = useBaseTokenAllowance(address);
+  const { data: lockDuration } = useUnstakeLockDuration(APPLICATION_CHAIN, lockManagerAddress);
 
-  const { data: stakedTokenBalance, refetch: refetchStakedTokenBalance } = useStakedBalance(chainId, address);
-  const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(chainId, address);
-  const { refetch: refetchMultiplier } = useMultiplier(chainId, address);
-  const { refetch: refetchAvailableRewards } = useAvailableRewards(chainId, address);
+  const { refetch: refetchAllowance } = useBaseTokenAllowance(APPLICATION_CHAIN, address);
+
+  const { data: stakedTokenBalance, refetch: refetchStakedTokenBalance } = useStakedBalance(APPLICATION_CHAIN, address);
+  const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(APPLICATION_CHAIN, address);
+  const { refetch: refetchMultiplier } = useMultiplier(APPLICATION_CHAIN, address);
+  const { refetch: refetchAvailableRewards } = useAvailableRewards(APPLICATION_CHAIN, address);
+
+  const { refetch: refetchWalletBalance } = useTokenBalance(address, baseTokenAddress);
 
   const {
     data: lockedTokenBalance,
     refetch: refetchLockedTokenBalance,
     isLoading: isLockedTokenBalanceLoading
-  } = useLockedBalance(address);
+  } = useLockedBalance(APPLICATION_CHAIN, address);
 
   const { data: stakedTokenPrice, isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
   const {
+    data: unstakeHash,
     sendTransactionAsync: unstakeRequest,
-    isPending: isUnstakePending,
-    isSuccess: isUnstakeRequestSuccess
-  } = useUnstakeRequest(chainId);
+    isPending: isUnstakePending
+  } = useUnstakeRequest(APPLICATION_CHAIN);
+
+  const { isLoading: isUnstakeRequestConfirming, isSuccess: isUnstakeRequestSuccess } = useWaitForTransactionReceipt({
+    hash: unstakeHash
+  });
 
   const {
+    data: unlockHash,
     sendTransactionAsync: unlockRequest,
-    data: unlockRequestHash,
     isPending: isUnlockPending
-  } = useUnlockRequest();
+  } = useUnlockRequest(APPLICATION_CHAIN);
 
-  const { isLoading: isUnlockRequestConfirming, isSuccess: isUnlockRequestSuccess } = useWaitForTransactionReceipt({
-    hash: unlockRequestHash
+  const { isLoading: isUnlockRequesConfirming, isSuccess: isUnlockRequestSuccess } = useWaitForTransactionReceipt({
+    hash: unlockHash
   });
 
   const lockedStakedBalanceFormatted = formatUnits(lockedTokenBalance?.amount ?? 0n, ENV.BASE_TOKEN_DECIMALS);
@@ -87,7 +97,7 @@ export function UnstakeFlowBlock() {
 
   const hasActiveLock = (lockedTokenBalance?.amount ?? 0n) > 0n;
   const unlockTimestampSec = hasActiveLock
-    ? normalizeUnixSeconds(lockedTokenBalance?.startTime ?? 0) + (lockedTokenBalance?.duration ?? 0)
+    ? normalizeUnixSeconds(Number(lockedTokenBalance?.startTime ?? 0n)) + Number(lockedTokenBalance?.duration ?? 0n)
     : 0;
   const remainingSeconds = hasActiveLock ? getRemainingSeconds(unlockTimestampSec) : 0;
 
@@ -106,7 +116,8 @@ export function UnstakeFlowBlock() {
 
   /* Loading */
   const isLoading = isConnected ? isLockedTokenBalanceLoading : false;
-  const isTransactionLoading = isUnstakePending || isUnlockPending || isUnlockRequestConfirming;
+  const isTransactionLoading =
+    isUnstakePending || isUnlockPending || isUnstakeRequestConfirming || isUnlockRequesConfirming;
 
   const isUnstakeButtonDisabled =
     !isConnected || isOpen || isTransactionLoading || isBalancesLoading || !hasSomethingToUnstake || isCooldownBlocked;
@@ -121,8 +132,10 @@ export function UnstakeFlowBlock() {
   };
 
   const onButtonClick = async () => {
+    if (!lockManagerAddress) return;
+
     if (hasActiveLock) {
-      await unlockRequest(ENV.LOCK_MANAGER_ADDRESS);
+      await unlockRequest();
     } else {
       onOpen();
     }
@@ -134,16 +147,15 @@ export function UnstakeFlowBlock() {
   };
 
   const onRequestSuccess = useEffectEvent(async () => {
-    await Promise.allSettled([
-      refetchStakedTokenBalance,
-      refetchVirtualTokenBalance,
-      refetchMultiplier,
-      refetchAvailableRewards,
-      refetchLockedTokenBalance
-    ]);
-
     triggerDelegateRefresh();
     triggerRewardRefresh();
+
+    refetchWalletBalance();
+    refetchStakedTokenBalance();
+    refetchVirtualTokenBalance();
+    refetchMultiplier();
+    refetchAvailableRewards();
+    refetchLockedTokenBalance();
   });
 
   useEffect(() => {
@@ -189,7 +201,7 @@ export function UnstakeFlowBlock() {
       <Card
         isLoading={isLoading}
         title='Unstake'
-        tooltip={`Cooldown period for unstaking process is ${FormatTime.cooldownFromSeconds(lockDuration ?? 0)}`}
+        tooltip={`Cooldown period for unstaking process is ${FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))}`}
       >
         <div className='flex items-start justify-between p-10'>
           <div className='flex gap-15'>
@@ -297,7 +309,7 @@ export function UnstakeFlowBlock() {
         onClose={onModalClose}
       >
         <UnstakeModal
-          isLoading={isUnstakePending}
+          isLoading={isTransactionLoading}
           onClick={onUnstakeRequest}
         />
       </Modal>

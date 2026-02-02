@@ -116,18 +116,18 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             />
             <Condition if={!filteredDelegates.length}>
               <div className='bg-color-21 flex items-center gap-2.5 rounded-lg px-5 py-4.5'>
-                <InfoIcon className='text-color-22' />
+                <InfoIcon className='text-color-31' />
                 <Text
                   size='11'
                   lineHeight='16'
-                  className='text-color-22'
+                  className='text-color-31'
                 >
                   No delegate found
                 </Text>
               </div>
             </Condition>
           </div>
-          <Condition if={!!filteredDelegates.length}>
+          <Condition if={filteredDelegates.length}>
             <div className='hide-scrollbar max-h-392 overflow-y-auto'>
               {filteredDelegates.map((el) => (
                 <div

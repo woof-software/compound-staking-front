@@ -57,7 +57,6 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
             onClick={() => onConnectorSelect(connector)}
           >
             <img
-              // src={`/assets/${icon}.avif`}
               src={ICONS[icon]}
               alt='wallet-icon'
               className='size-10 flex-shrink-0 rounded-[8px]'

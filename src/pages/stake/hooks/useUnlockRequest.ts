@@ -1,26 +1,33 @@
-import { useCallback } from 'react';
-import { type Address, encodeFunctionData } from 'viem';
-import { useSendTransaction } from 'wagmi';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { LockManagerAbi } from '@/shared/abis/LockManagerAbi';
+import { useLockManagerContract } from '@/hooks/useLockManagerContract';
+import { getHash } from '@/lib/utils/helpers';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useUnlockRequest() {
-  const { sendTransactionAsync, ...query } = useSendTransaction();
+export function useUnlockRequest(chainId?: number) {
+  const queryClient = useQueryClient();
 
-  const _sendTransactionAsync = useCallback(async (token: Address) => {
-    const unlockRequestData = encodeFunctionData({
-      abi: LockManagerAbi,
-      functionName: 'unlock'
-    });
+  const { write } = useLockManagerContract(chainId);
 
-    return sendTransactionAsync({
-      to: token,
-      data: unlockRequestData
-    });
-  }, []);
+  const { mutateAsync, ...query } = useMutation({
+    mutationFn: async () => {
+      const contract = await write();
+
+      if (!contract) return;
+
+      const tx = await contract.unlock();
+
+      const hash = tx.hash;
+
+      return getHash(hash);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.lockManager.root() });
+    }
+  });
 
   return {
-    sendTransactionAsync: _sendTransactionAsync,
+    sendTransactionAsync: mutateAsync,
     ...query,
     sendTransaction: undefined
   };

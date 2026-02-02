@@ -1,17 +1,21 @@
 import { type Address, isAddress } from 'viem';
-import { useReadContract } from 'wagmi';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 
-import { ENV } from '@/consts/env';
-import { SubAccountManagerAbi } from '@/shared/abis/SubAccountManagerAbi';
+import { useSubAccountManagerContract } from '@/hooks/useSubAccountManagerContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useDelegateSubAccount(owner?: Address) {
-  const { data, ...query } = useReadContract({
-    address: ENV.SUBACCOUNT_MANAGER_ADDRESS,
-    abi: SubAccountManagerAbi,
-    functionName: 'subAccountOf',
-    args: owner ? [owner] : undefined,
-    query: { enabled: !!owner }
+export function useDelegateSubAccount(chainId?: number, owner?: Address) {
+  const { read } = useSubAccountManagerContract(chainId);
+
+  const { data, ...query } = useQuery<string | undefined>({
+    queryKey: queryKeys.subAccountManager.subAccountOf([chainId, owner]),
+    enabled: !!owner,
+    queryFn: () => {
+      if (!owner || !read) return;
+
+      return read.subAccountOf(owner);
+    }
   });
 
   const addressSchema = z

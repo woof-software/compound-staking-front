@@ -12,7 +12,7 @@ export function useStakedVirtualBalance(chainId?: number, address?: Address) {
     queryKey: queryKeys.stakingVault.virtualBalanceOf([chainId, address]),
     enabled: !!address,
     queryFn: () => {
-      if (!address) return;
+      if (!address || !read) return;
 
       return read.virtualBalanceOf(address);
     }

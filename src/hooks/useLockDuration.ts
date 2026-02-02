@@ -1,18 +1,25 @@
 import type { Address } from 'viem';
-import { useReadContract } from 'wagmi';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 
-import { LockManagerAbi } from '@/shared/abis/LockManagerAbi';
+import { useLockManagerContract } from '@/hooks/useLockManagerContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useUnstakeLockDuration(address?: Address) {
-  const { data, ...query } = useReadContract({
-    address: address,
-    abi: LockManagerAbi,
-    functionName: 'lockDuration'
+export function useUnstakeLockDuration(chainId?: number, address?: Address) {
+  const { read } = useLockManagerContract(chainId);
+
+  const { data, ...query } = useQuery<bigint | undefined>({
+    queryKey: queryKeys.lockManager.lockDuration([chainId, address]),
+    enabled: !!address,
+    queryFn: () => {
+      if (!address || !read) return;
+
+      return read.lockDuration();
+    }
   });
 
   return {
-    data: z.number().optional().parse(data),
+    data: z.bigint().optional().parse(data),
     ...query
   };
 }

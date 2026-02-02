@@ -1,17 +1,22 @@
-import { useReadContract } from 'wagmi';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 
-import { ENV } from '@/consts/env';
-import { SubAccountManagerAbi } from '@/shared/abis/SubAccountManagerAbi';
+import { useSubAccountManagerContract } from '@/hooks/useSubAccountManagerContract';
+import { queryKeys } from '@/shared/query-keys';
 
-export function useDelegateDuration() {
-  const { data, ...query } = useReadContract({
-    address: ENV.SUBACCOUNT_MANAGER_ADDRESS,
-    abi: SubAccountManagerAbi,
-    functionName: 'delegationDelay'
+export function useDelegateDuration(chainId?: number) {
+  const { read } = useSubAccountManagerContract(chainId);
+
+  const { data, ...query } = useQuery<bigint | undefined>({
+    queryKey: queryKeys.subAccountManager.delegationDelay([chainId]),
+    queryFn: () => {
+      if (!read) return;
+
+      return read.delegationDelay();
+    }
   });
 
-  const schema = z.number().int().nonnegative().optional();
+  const schema = z.bigint().optional();
 
   return {
     data: schema.parse(data),

@@ -1,20 +1,27 @@
+import { type Address } from 'viem';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
 import { getHash } from '@/lib/utils/helpers';
 import { queryKeys } from '@/shared/query-keys';
 
-export function useUnstakeRequest(chainId?: number) {
+type StakeArgs = {
+  amount: bigint;
+  delegatee: Address;
+};
+
+export function useIncreaseStakeTransaction(chainId?: number) {
   const queryClient = useQueryClient();
 
   const { write } = useStakingVaultContract(chainId);
 
   const { mutateAsync, ...query } = useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({ amount, delegatee }: StakeArgs) => {
       const contract = await write();
+
       if (!contract) return;
 
-      const tx = await contract.unstake();
+      const tx = await contract.increaseStake(delegatee, amount);
 
       const hash = tx.hash;
 
@@ -22,6 +29,9 @@ export function useUnstakeRequest(chainId?: number) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.stakingVault.root() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.subAccount.root() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.subAccountManager.root() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.vestingManager.root() });
     }
   });
 

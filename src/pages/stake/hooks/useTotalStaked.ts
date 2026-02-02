@@ -10,6 +10,8 @@ export function useTotalStaked(chainId?: number) {
   const { data, ...query } = useQuery<bigint | undefined>({
     queryKey: queryKeys.stakingVault.totalStaked([chainId]),
     queryFn: () => {
+      if (!read) return;
+
       return read.totalStaked();
     }
   });

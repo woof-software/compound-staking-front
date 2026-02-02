@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Switch } from '@/components/ui/Switch';
 import { Text } from '@/components/ui/Text';
+import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
@@ -39,7 +40,11 @@ export function ClaimModal(props: ClaimModalProps) {
 
   const isValidAddress = !isChangeWallet || isAddress(walletAddress);
 
-  const { sendTransactionAsync: claimRequest, data: claimHash, isPending: isClaimPending } = useVestingClaim();
+  const {
+    data: claimHash,
+    sendTransactionAsync: claimRequest,
+    isPending: isClaimPending
+  } = useVestingClaim(APPLICATION_CHAIN);
 
   const { isLoading: isClaimConfirming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({
     hash: claimHash
@@ -57,9 +62,9 @@ export function ClaimModal(props: ClaimModalProps) {
   );
 
   const isLoading = isConnected ? isBaseTokenPriceLoading : false;
-  const isVestingLoading = isClaimPending || isClaimConfirming;
+  const isClaiming = isClaimPending || isClaimConfirming;
 
-  const isClaimButtonDisabled = isLoading || isVestingLoading || !isValidAddress;
+  const isClaimButtonDisabled = isLoading || !isValidAddress;
 
   const onWalletAddressChange = (value: string) => {
     setWalletAddress(value);
@@ -166,7 +171,7 @@ export function ClaimModal(props: ClaimModalProps) {
             onChange={onWalletAddressChange}
             addonRight={
               <>
-                <Condition if={!!walletAddress.length}>
+                <Condition if={walletAddress.length}>
                   <CrossIcon
                     onClick={onClear}
                     className='text-color-25 size-4 shrink-0 cursor-pointer'
@@ -186,7 +191,7 @@ export function ClaimModal(props: ClaimModalProps) {
         </Condition>
         <Button
           className={cn('h-14 flex-col', {
-            'bg-color-7': isVestingLoading
+            'bg-color-7': isClaiming
           })}
           disabled={isClaimButtonDisabled}
           onClick={onConfirm}
@@ -197,10 +202,10 @@ export function ClaimModal(props: ClaimModalProps) {
             lineHeight='18'
             className={cn('text-white', {
               'text-color-6': isClaimButtonDisabled,
-              'after-animate-loading-dots text-white': isVestingLoading
+              'after-animate-loading-dots text-white': isClaiming
             })}
           >
-            {isVestingLoading ? 'Pending' : 'Confirm'}
+            {isClaiming ? 'Pending' : 'Confirm'}
           </Text>
         </Button>
       </div>
