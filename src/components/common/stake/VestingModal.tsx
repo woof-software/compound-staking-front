@@ -161,7 +161,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
           </div>
         </Condition>
         <Button
-          className={cn('h-14 flex-col', {
+          className={cn('h-14 w-85 flex-col', {
             'bg-color-7': isVestingLoading
           })}
           disabled={isVestButtonDisabled}

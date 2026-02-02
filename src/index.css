@@ -47,7 +47,7 @@
   --color-5: #F0F2F5;
   --color-6: #A7B4C2;
   --color-7: #00C289;
-  --color-8: #0D131A26;
+  --color-8: rgba(13, 19, 26, 0.15);
   --color-9: #D8DFE5;
   --color-10: #FFFFFF;
   --color-11: #F9FAFB;
@@ -85,7 +85,7 @@
   --color-5: #17212B;
   --color-6: #516070;
   --color-7: #00AD79;
-  --color-8: #F9FAFB26;
+  --color-8: rgb(255 255 255 / 15%);
   --color-9: #2B3947;
   --color-10: #19232E;
   --color-11: #17212B;
