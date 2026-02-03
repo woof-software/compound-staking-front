@@ -12,8 +12,8 @@ export function SwitchNetworkModal() {
   const { isConnected, chainId } = useConnection();
   const { switchChainAsync, isPending } = useSwitchChain();
 
-  const isOpen = useSwitchNetworkModalStore((s) => s.isOpen);
-  const close = useSwitchNetworkModalStore((s) => s.close);
+  const isOpen = useSwitchNetworkModalStore(({ isOpen }) => isOpen);
+  const close = useSwitchNetworkModalStore(({ close }) => close);
 
   const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
 

@@ -22,7 +22,7 @@ import { Format } from '@/lib/utils/format';
 import { RewardsTable, type RewardsTableItem } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useRewardStore } from '@/stores/useRewardStore';
-import { useSwitchNetworkModalStore } from '@/stores/useSwitchNetworkModalStore';
+import { checkCorrectNetwork } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function RewardsFlowBlock() {
@@ -31,7 +31,6 @@ export function RewardsFlowBlock() {
   const { isConnected, address, chainId } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
-  const openSwitchModal = useSwitchNetworkModalStore((s) => s.open);
 
   const { needRefresh: needRewardRefresh, resetRefresh: resetRewardRefresh } = useRewardStore();
 
@@ -128,23 +127,15 @@ export function RewardsFlowBlock() {
   });
 
   const onClaimClick = () => {
-    const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
+    if (!checkCorrectNetwork({ chainId, isConnected })) return;
 
-    if (isWrongNetwork) {
-      openSwitchModal();
-    } else {
-      onClaimModalOpen();
-    }
+    onClaimModalOpen();
   };
 
   const onVestingClick = () => {
-    const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
+    if (!checkCorrectNetwork({ chainId, isConnected })) return;
 
-    if (isWrongNetwork) {
-      openSwitchModal();
-    } else {
-      onVestingOpen();
-    }
+    onVestingOpen();
   };
 
   useEffect(() => {
