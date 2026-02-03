@@ -10,7 +10,7 @@ import { Text } from '../../ui/Text';
 
 const CONNECTORS = [
   {
-    id: 'metaMaskSDK',
+    id: 'injected',
     title: 'Metamask',
     description: 'And other browser wallets',
     icon: 'metamask-and-browsers'
