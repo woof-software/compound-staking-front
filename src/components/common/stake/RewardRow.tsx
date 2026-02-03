@@ -26,7 +26,7 @@ export function RewardRow(props: RewardRowProps) {
   );
 
   return (
-    <div className='even:bg-color-5 flex flex-col gap-5 rounded-sm px-8 py-6'>
+    <div className='even:bg-color-5 flex flex-col gap-5 rounded-sm px-8 py-12'>
       <div className='grid grid-cols-5'>
         <div>
           <Skeleton loading={isLoading}>

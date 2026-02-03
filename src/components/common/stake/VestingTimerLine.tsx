@@ -1,3 +1,4 @@
+import { Condition } from '@/components/common/Condition';
 import { Text } from '@/components/ui/Text';
 import { FormatTime } from '@/lib/utils/format';
 import { clamp } from '@/lib/utils/numeric';
@@ -26,13 +27,15 @@ export function VestingTimerLine(props: VestingTimerProps) {
           className='bg-color-7 transition-width h-1 w-full rounded-xs'
           style={{ width: `${clamp(completedProgress, 0, 100)}%` }}
         />
-        <Text
-          size='11'
-          lineHeight='16'
-          className='animate-vesting-text shrink-0 tabular-nums'
-        >
-          {FormatTime.cooldownFromSeconds(leftSec)}
-        </Text>
+        <Condition if={leftSec}>
+          <Text
+            size='11'
+            lineHeight='16'
+            className='animate-vesting-text shrink-0 tabular-nums'
+          >
+            {FormatTime.cooldownFromSeconds(leftSec)}
+          </Text>
+        </Condition>
         <div
           className='bg-color-9 transition-width h-1 w-full rounded-xs'
           style={{ width: `${clamp(remainingProgress, 0, 100)}%` }}

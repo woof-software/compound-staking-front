@@ -14,12 +14,13 @@ import { getExplorerAddressUrl } from '@/lib/utils/helpers';
 
 export type DelegateSelectorProps = {
   disabled?: boolean;
+  isError?: boolean;
   selectedAddressDelegate: Delegate | null;
   onSelect?: (addressDelegate: Delegate | null) => void;
 };
 
 export function DelegateSelector(props: DelegateSelectorProps) {
-  const { disabled, selectedAddressDelegate, onSelect = noop } = props;
+  const { disabled, selectedAddressDelegate, isError, onSelect = noop } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const [searchValue, setSearchValue] = useState('');
@@ -55,7 +56,12 @@ export function DelegateSelector(props: DelegateSelectorProps) {
       className='relative w-full'
     >
       <div
-        className='border-color-6 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3'
+        className={cn(
+          'border-color-6 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
+          {
+            'border-color-32': isError
+          }
+        )}
         onClick={onSelectorOpen}
       >
         {!selectedAddressDelegate ? (
@@ -133,7 +139,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 <div
                   key={el.address}
                   className={cn(
-                    'hover:bg-color-5 flex cursor-pointer items-center justify-between rounded-lg px-3 py-4',
+                    'hover:bg-color-5 flex h-13 cursor-pointer items-center justify-between rounded-lg px-3 py-4',
                     {
                       'bg-color-5':
                         selectedAddressDelegate?.address.toLocaleLowerCase() === el.address.toLocaleLowerCase()

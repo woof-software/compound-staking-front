@@ -69,7 +69,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
     await navigator.clipboard.writeText(address!);
   };
 
-  const onRefetchAvailableRewards = useEffectEvent(() => {
+  const onRefetchData = useEffectEvent(() => {
     refetchAvailableRewards();
     refetchWalletBalance();
   });
@@ -77,7 +77,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
   useEffect(() => {
     if (!isConnected) return;
 
-    onRefetchAvailableRewards();
+    onRefetchData();
   }, [isConnected]);
 
   useOutsideClick(() => [ref.current, toggleRef.current], onClose);

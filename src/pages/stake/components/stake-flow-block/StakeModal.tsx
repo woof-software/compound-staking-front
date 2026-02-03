@@ -211,7 +211,7 @@ export function StakeModal(props: StakeModalProps) {
                 className='size-6.75 shrink-0 rounded-full'
               />
               <AmountInput
-                className={cn('min-h-12 max-w-60 min-w-55', {
+                className={cn('h-9 max-w-60 min-w-55', {
                   'caret-color-30': isAmountExceedsBalance,
                   'caret-color-31': !isAmountExceedsBalance
                 })}
@@ -252,25 +252,32 @@ export function StakeModal(props: StakeModalProps) {
           </Skeleton>
         </div>
       </div>
-      <Condition if={!isAmountExceedsBalance}>
-        <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
-          <InfoIcon className='text-color-31 size-4' />
+      <div>
+        <Skeleton loading={isPriceOrBalanceLoading}>
+          <DelegateSelector
+            isError={!needsApprove && noDelegate}
+            disabled={isLoadingTransaction || hasMaxPosition}
+            selectedAddressDelegate={selectedAddressDelegate}
+            onSelect={onDelegateSelect}
+          />
+          <Condition if={!needsApprove && noDelegate}>
+            <Text
+              size='11'
+              className='text-color-31 mt-2.5'
+            >
+              Choose delegate.
+            </Text>
+          </Condition>
+        </Skeleton>
+        <Condition if={!isAmountExceedsBalance}>
           <Text
             size='11'
-            lineHeight='16'
-            className='text-color-31'
+            className='text-color-31 mt-2.5'
           >
             Amount Exceeds Wallet Balance.
           </Text>
-        </div>
-      </Condition>
-      <Skeleton loading={isPriceOrBalanceLoading}>
-        <DelegateSelector
-          disabled={isLoadingTransaction || hasMaxPosition}
-          selectedAddressDelegate={selectedAddressDelegate}
-          onSelect={onDelegateSelect}
-        />
-      </Skeleton>
+        </Condition>
+      </div>
       <Condition if={hasMaxPosition}>
         <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
           <InfoIcon className='text-color-22 size-4 shrink-0' />

@@ -9,6 +9,7 @@ import { ClaimModal } from '@/components/common/stake/ClaimModal';
 import { VestingModal } from '@/components/common/stake/VestingModal';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
+import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
@@ -100,8 +101,10 @@ export function RewardsFlowBlock() {
   };
 
   const onClaimModalOpen = () => {
+    const nowSec = Math.floor(Date.now() / 1000);
+
     const toClaim = rows.reduce((acc, row) => {
-      return acc + vestingToClaimCalc(row);
+      return acc + vestingToClaimCalc({ ...row, secondsNow: nowSec });
     }, 0n);
 
     setClaimAmount(toClaim);
@@ -348,12 +351,17 @@ export function RewardsFlowBlock() {
         onClose={onVestingModalClose}
         onVestingConfirmed={onVestingConfirmed}
       />
-      <ClaimModal
-        totalToClaim={claimAmount}
-        isOpen={isClaimOpen}
+      <Modal
+        title='Claim COMP'
+        open={isClaimOpen}
         onClose={onClaimModalClose}
-        onClaimConfirmed={onClaimConfirmed}
-      />
+      >
+        <ClaimModal
+          totalToClaim={claimAmount}
+          onClose={onClaimModalClose}
+          onClaimConfirmed={onClaimConfirmed}
+        />
+      </Modal>
     </>
   );
 }

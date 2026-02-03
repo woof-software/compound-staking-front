@@ -44,7 +44,7 @@ export function Modal(props: ModalProps) {
                 size='17'
                 lineHeight='20'
                 align='center'
-                className='w-full'
+                className='ml-5 w-full'
               >
                 {title}
               </Text>
