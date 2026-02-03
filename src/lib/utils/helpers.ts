@@ -2,8 +2,9 @@ import dayjs from 'dayjs';
 import { type Address, getAddress, type Hash, isHash } from 'viem';
 import { getDeployment } from '@woof-software/compound-staked-comp-artifacts/deployments';
 
-import { type Delegate, DELEGATES } from '@/consts/common';
+import { APPLICATION_CHAIN, type Delegate, DELEGATES } from '@/consts/common';
 import { ENV } from '@/consts/env';
+import { openSwitchNetworkModal } from '@/stores/useSwitchNetworkModalStore';
 
 type Contracts = {
   baseTokenAddress: Address | undefined;
@@ -129,4 +130,11 @@ export function getHash(hash: string): Hash {
   }
 
   return hash as Hash;
+}
+
+export function trySwitchToApplicationChain(chainId?: number) {
+  if (chainId !== APPLICATION_CHAIN) {
+    openSwitchNetworkModal();
+    throw new Error(`Expected chainId=${APPLICATION_CHAIN}, got ${chainId}`);
+  }
 }

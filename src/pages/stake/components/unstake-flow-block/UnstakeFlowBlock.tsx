@@ -22,7 +22,12 @@ import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
 import { Format, FormatTime } from '@/lib/utils/format';
-import { getAddressContracts, getRemainingSeconds, normalizeUnixSeconds } from '@/lib/utils/helpers';
+import {
+  getAddressContracts,
+  getRemainingSeconds,
+  normalizeUnixSeconds,
+  trySwitchToApplicationChain
+} from '@/lib/utils/helpers';
 import { UnstakeModal } from '@/pages/stake/components/unstake-flow-block/UnstakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
@@ -31,7 +36,6 @@ import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
 import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
-import { checkCorrectNetwork } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function UnstakeFlowBlock() {
@@ -135,7 +139,7 @@ export function UnstakeFlowBlock() {
   const onButtonClick = async () => {
     if (!lockManagerAddress) return;
 
-    if (!checkCorrectNetwork({ chainId, isConnected })) return;
+    trySwitchToApplicationChain(chainId);
 
     if (hasActiveLock) {
       await unlockRequest();

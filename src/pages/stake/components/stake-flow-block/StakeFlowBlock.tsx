@@ -19,14 +19,13 @@ import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useVirtualBalance } from '@/hooks/useVirtualBalance';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
-import { getAddressContracts } from '@/lib/utils/helpers';
+import { getAddressContracts, trySwitchToApplicationChain } from '@/lib/utils/helpers';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { useStatisticStore } from '@/stores/useStatisticStore';
-import { checkCorrectNetwork } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function StakeFlowBlock() {
@@ -107,7 +106,7 @@ export function StakeFlowBlock() {
   };
 
   const onStakeModalOpen = () => {
-    if (!checkCorrectNetwork({ chainId, isConnected })) return;
+    trySwitchToApplicationChain(chainId);
 
     onOpen();
   };
