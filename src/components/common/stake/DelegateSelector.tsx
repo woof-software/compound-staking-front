@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon, InfoIcon } from '@/assets/svg';
+import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/Text';
@@ -121,16 +121,13 @@ export function DelegateSelector(props: DelegateSelectorProps) {
               onChange={setSearchValue}
             />
             <Condition if={!filteredDelegates.length}>
-              <div className='bg-color-21 flex items-center gap-2.5 rounded-lg px-5 py-4.5'>
-                <InfoIcon className='text-color-31' />
-                <Text
-                  size='11'
-                  lineHeight='16'
-                  className='text-color-31'
-                >
-                  No delegate found
-                </Text>
-              </div>
+              <Text
+                size='11'
+                lineHeight='16'
+                className='text-color-31'
+              >
+                No delegate found.
+              </Text>
             </Condition>
           </div>
           <Condition if={filteredDelegates.length}>

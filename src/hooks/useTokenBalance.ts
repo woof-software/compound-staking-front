@@ -4,6 +4,7 @@ import { useReadContract } from 'wagmi';
 import { readContractQueryKey } from 'wagmi/query';
 import { z } from 'zod';
 import { useQueryClient } from '@tanstack/react-query';
+
 export function useTokenBalance(address?: Address, tokenAddress?: Address) {
   const { data, ...query } = useReadContract({
     address: tokenAddress,
