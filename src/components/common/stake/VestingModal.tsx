@@ -156,7 +156,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
               lineHeight='16'
               className='text-color-7'
             >
-              The whole amount will be added to your Claim balance
+              The whole amount will be added to your Claim balance.
             </Text>
           </div>
         </Condition>

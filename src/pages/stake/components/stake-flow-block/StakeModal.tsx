@@ -211,7 +211,7 @@ export function StakeModal(props: StakeModalProps) {
                 className='size-6.75 shrink-0 rounded-full'
               />
               <AmountInput
-                className={cn('min-h-12 max-w-60 min-w-55', {
+                className={cn('h-9 max-w-60 min-w-55', {
                   'caret-color-30': isAmountExceedsBalance,
                   'caret-color-31': !isAmountExceedsBalance
                 })}

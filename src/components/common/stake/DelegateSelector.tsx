@@ -139,7 +139,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 <div
                   key={el.address}
                   className={cn(
-                    'hover:bg-color-5 flex cursor-pointer items-center justify-between rounded-lg px-3 py-4',
+                    'hover:bg-color-5 flex h-13 cursor-pointer items-center justify-between rounded-lg px-3 py-4',
                     {
                       'bg-color-5':
                         selectedAddressDelegate?.address.toLocaleLowerCase() === el.address.toLocaleLowerCase()
