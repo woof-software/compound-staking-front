@@ -27,8 +27,6 @@ export function getChainLogo(chainId?: number) {
 }
 
 export function getChainName(chainId?: number) {
-  if (!chainId) return 'Unknown';
-
   switch (chainId) {
     case 1:
       return 'Ethereum';

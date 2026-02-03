@@ -21,14 +21,13 @@ import { DelegateModal } from '@/pages/stake/components/delegate-flow-block/Dele
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
-import { useSwitchNetworkModalStore } from '@/stores/useSwitchNetworkModalStore';
+import { checkCorrectNetwork } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function DelegateFlowBlock() {
   const { isConnected, address, chainId } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
-  const openSwitchModal = useSwitchNetworkModalStore((s) => s.open);
 
   const { needRefresh: needDelegateRefresh, resetRefresh: resetDelegateRefresh } = useDelegateStore();
 
@@ -103,13 +102,9 @@ export function DelegateFlowBlock() {
   });
 
   const onModalOpen = () => {
-    const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
+    if (!checkCorrectNetwork({ chainId, isConnected })) return;
 
-    if (isWrongNetwork) {
-      openSwitchModal();
-    } else {
-      onOpen();
-    }
+    onOpen();
   };
 
   useEffect(() => {

@@ -31,7 +31,7 @@ import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
 import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
-import { useSwitchNetworkModalStore } from '@/stores/useSwitchNetworkModalStore';
+import { checkCorrectNetwork } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function UnstakeFlowBlock() {
@@ -46,7 +46,6 @@ export function UnstakeFlowBlock() {
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
-  const openSwitchModal = useSwitchNetworkModalStore((s) => s.open);
 
   const { isConnected, address, chainId } = useConnection();
 
@@ -136,12 +135,7 @@ export function UnstakeFlowBlock() {
   const onButtonClick = async () => {
     if (!lockManagerAddress) return;
 
-    const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
-
-    if (isWrongNetwork) {
-      openSwitchModal();
-      return;
-    }
+    if (!checkCorrectNetwork({ chainId, isConnected })) return;
 
     if (hasActiveLock) {
       await unlockRequest();

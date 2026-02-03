@@ -26,7 +26,7 @@ import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { useStatisticStore } from '@/stores/useStatisticStore';
-import { useSwitchNetworkModalStore } from '@/stores/useSwitchNetworkModalStore';
+import { checkCorrectNetwork } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function StakeFlowBlock() {
@@ -40,8 +40,6 @@ export function StakeFlowBlock() {
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
   const { baseTokenAddress } = getAddressContracts(APPLICATION_CHAIN);
-
-  const openSwitchModal = useSwitchNetworkModalStore((s) => s.open);
 
   const {
     data: stakedBalance,
@@ -109,13 +107,9 @@ export function StakeFlowBlock() {
   };
 
   const onStakeModalOpen = () => {
-    const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
+    if (!checkCorrectNetwork({ chainId, isConnected })) return;
 
-    if (isWrongNetwork) {
-      openSwitchModal();
-    } else {
-      onOpen();
-    }
+    onOpen();
   };
 
   return (
