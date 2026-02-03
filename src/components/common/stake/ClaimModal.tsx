@@ -182,7 +182,7 @@ export function ClaimModal(props: ClaimModalProps) {
               </>
             }
           />
-          <Condition if={walletAddress.length > 0 && !isAddress(walletAddress)}>
+          <Condition if={walletAddress && !isAddress(walletAddress)}>
             <Text
               size='11'
               lineHeight='16'

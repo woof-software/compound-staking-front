@@ -117,7 +117,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
                     'text-color-6': !isConnected
                   })}
                 >
-                  {(availableRewards ?? 0n) > 0n && '≈'}
+                  {availableRewards && '≈'}
                   {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
                 </Text>
               </Skeleton>
