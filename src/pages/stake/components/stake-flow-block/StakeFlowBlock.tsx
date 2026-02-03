@@ -14,7 +14,7 @@ import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useMultiplier } from '@/hooks/useMultiplier';
 import { useSubAccount } from '@/hooks/useSubAccount';
 import { useSwitch } from '@/hooks/useSwitch';
-import { useTokenBalance } from '@/hooks/useTokenBalance';
+import { useInvalidateTokenBalance, useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useVirtualBalance } from '@/hooks/useVirtualBalance';
 import { cn } from '@/lib/utils/cn';
@@ -36,8 +36,9 @@ export function StakeFlowBlock() {
   const triggerStatisticRefresh = useStatisticStore(({ triggerRefresh }) => triggerRefresh);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
-  const triggerWalletRefresh = useWalletStore(({ triggerRefresh }) => triggerRefresh);
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
+
+  const invalidateTokenBalance = useInvalidateTokenBalance();
 
   const { baseTokenAddress } = getAddressContracts(APPLICATION_CHAIN);
 
@@ -99,10 +100,17 @@ export function StakeFlowBlock() {
     refetchMultiplier();
     refetchAvailableRewards();
 
-    triggerWalletRefresh();
     triggerStatisticRefresh();
     triggerDelegateRefresh();
     triggerRewardRefresh();
+
+    if (address && baseTokenAddress) {
+      invalidateTokenBalance({
+        chainId: APPLICATION_CHAIN,
+        owner: address,
+        token: baseTokenAddress
+      });
+    }
 
     onClose();
   };
