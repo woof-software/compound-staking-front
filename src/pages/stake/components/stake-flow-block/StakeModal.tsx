@@ -222,7 +222,7 @@ export function StakeModal(props: StakeModalProps) {
             </div>
             <Button
               disabled={isLoadingTransaction || hasMaxPosition}
-              className={cn('bg-color-16 h-9 w-[56.24px] text-[11px] font-medium', {
+              className={cn('bg-color-16 h-[33.243px] w-[55.47px] text-[11px] font-medium', {
                 'bg-color-28': isLoadingTransaction
               })}
               onClick={onMaxButtonClick}
