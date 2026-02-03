@@ -31,6 +31,7 @@ import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
 import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
+import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function UnstakeFlowBlock() {
@@ -46,7 +47,7 @@ export function UnstakeFlowBlock() {
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
 
-  const { isConnected, address } = useConnection();
+  const { isConnected, address, chainId } = useConnection();
 
   const { baseTokenAddress, lockManagerAddress } = getAddressContracts(APPLICATION_CHAIN);
 
@@ -133,6 +134,8 @@ export function UnstakeFlowBlock() {
 
   const onButtonClick = async () => {
     if (!lockManagerAddress) return;
+
+    trySwitchToApplicationChain(chainId);
 
     if (hasActiveLock) {
       await unlockRequest();

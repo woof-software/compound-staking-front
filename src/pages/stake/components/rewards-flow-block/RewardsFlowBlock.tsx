@@ -23,12 +23,13 @@ import { Format } from '@/lib/utils/format';
 import { RewardsTable, type RewardsTableItem } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useRewardStore } from '@/stores/useRewardStore';
+import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function RewardsFlowBlock() {
   const [claimAmount, setClaimAmount] = useState<bigint>(0n);
 
-  const { isConnected, address } = useConnection();
+  const { isConnected, address, chainId } = useConnection();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
@@ -127,6 +128,18 @@ export function RewardsFlowBlock() {
     refetchVestingPositions();
     resetRewardRefresh();
   });
+
+  const onClaimClick = () => {
+    trySwitchToApplicationChain(chainId);
+
+    onClaimModalOpen();
+  };
+
+  const onVestingClick = () => {
+    trySwitchToApplicationChain(chainId);
+
+    onVestingOpen();
+  };
 
   useEffect(() => {
     if (!isConnected || !needRewardRefresh) return;
@@ -255,7 +268,7 @@ export function RewardsFlowBlock() {
             </div>
             <Button
               disabled={isClaimButtonDisabled}
-              onClick={onClaimModalOpen}
+              onClick={onClaimClick}
               className='max-w-32.5 text-[11px] font-medium'
             >
               <Skeleton
@@ -304,7 +317,7 @@ export function RewardsFlowBlock() {
           </div>
           <Button
             disabled={isVestButtonDisabled}
-            onClick={onVestingOpen}
+            onClick={onVestingClick}
             className='max-w-32.5 text-[11px] font-medium'
           >
             <Skeleton
