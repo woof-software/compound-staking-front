@@ -136,7 +136,7 @@ export function StakeFlowBlock() {
           >
             Staked
           </Text>
-          <div className='flex flex-col gap-2'>
+          <div className='flex flex-col gap-1'>
             <Skeleton loading={isLoading}>
               <Text
                 size='17'
@@ -202,7 +202,7 @@ export function StakeFlowBlock() {
           >
             Available Rewards
           </Text>
-          <div className='flex flex-col gap-2'>
+          <div className='flex flex-col gap-1'>
             <Skeleton loading={isLoading}>
               <Text
                 size='17'

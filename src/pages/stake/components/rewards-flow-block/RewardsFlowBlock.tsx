@@ -166,7 +166,7 @@ export function RewardsFlowBlock() {
               >
                 Total vesting
               </Text>
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1'>
                 <Skeleton loading={isLoading}>
                   <Text
                     size='17'
@@ -194,7 +194,7 @@ export function RewardsFlowBlock() {
               >
                 Total to claim
               </Text>
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1'>
                 <Skeleton loading={isLoading}>
                   <Text
                     size='17'
@@ -294,7 +294,7 @@ export function RewardsFlowBlock() {
             >
               Available Rewards
             </Text>
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1'>
               <Skeleton loading={isLoading}>
                 <Text
                   size='17'
