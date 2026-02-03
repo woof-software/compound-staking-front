@@ -26,10 +26,11 @@ import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { useStatisticStore } from '@/stores/useStatisticStore';
+import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function StakeFlowBlock() {
-  const { isConnected, address } = useConnection();
+  const { isConnected, address, chainId } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
@@ -113,6 +114,12 @@ export function StakeFlowBlock() {
     }
 
     onClose();
+  };
+
+  const onStakeModalOpen = () => {
+    trySwitchToApplicationChain(chainId);
+
+    onOpen();
   };
 
   return (
@@ -239,7 +246,7 @@ export function StakeFlowBlock() {
         <Button
           disabled={isStakeButtonDisabled}
           className='max-w-32.5'
-          onClick={onOpen}
+          onClick={onStakeModalOpen}
         >
           <Skeleton
             loading={isLoading}
