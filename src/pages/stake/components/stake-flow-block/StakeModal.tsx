@@ -203,32 +203,42 @@ export function StakeModal(props: StakeModalProps) {
       <Divider orientation='horizontal' />
       <div className='flex flex-col gap-1'>
         <Skeleton loading={isPriceOrBalanceLoading}>
-          <div className='flex items-center justify-between'>
-            <div className='flex max-w-72 items-center gap-2'>
-              <img
-                src={COMP_AVIF}
-                alt='comp'
-                className='size-6.75 shrink-0 rounded-full'
-              />
-              <AmountInput
-                className={cn('h-9 max-w-60 min-w-55', {
-                  'caret-color-30': isAmountExceedsBalance,
-                  'caret-color-31': !isAmountExceedsBalance
-                })}
+          <div>
+            <div className='flex items-center justify-between'>
+              <div className='flex max-w-72 items-center gap-2'>
+                <img
+                  src={COMP_AVIF}
+                  alt='comp'
+                  className='size-6.75 shrink-0 rounded-full'
+                />
+                <AmountInput
+                  className={cn('h-9 max-w-60 min-w-55', {
+                    'caret-color-30': isAmountExceedsBalance,
+                    'caret-color-31': !isAmountExceedsBalance
+                  })}
+                  disabled={isLoadingTransaction || hasMaxPosition}
+                  value={amountValue}
+                  onChange={setAmountValue}
+                />
+              </div>
+              <Button
                 disabled={isLoadingTransaction || hasMaxPosition}
-                value={amountValue}
-                onChange={setAmountValue}
-              />
+                className={cn('bg-color-16 h-[33.243px] w-[55.47px] text-[11px] font-medium', {
+                  'bg-color-28': isLoadingTransaction
+                })}
+                onClick={onMaxButtonClick}
+              >
+                Max
+              </Button>
             </div>
-            <Button
-              disabled={isLoadingTransaction || hasMaxPosition}
-              className={cn('bg-color-16 h-[33.243px] w-[55.47px] text-[11px] font-medium', {
-                'bg-color-28': isLoadingTransaction
-              })}
-              onClick={onMaxButtonClick}
-            >
-              Max
-            </Button>
+            <Condition if={!isAmountExceedsBalance}>
+              <Text
+                size='11'
+                className='text-color-31 mt-2.5'
+              >
+                Amount Exceeds Wallet Balance
+              </Text>
+            </Condition>
           </div>
         </Skeleton>
         <div className='flex w-full items-center justify-between'>
@@ -252,32 +262,22 @@ export function StakeModal(props: StakeModalProps) {
           </Skeleton>
         </div>
       </div>
-      <div>
-        <Skeleton loading={isPriceOrBalanceLoading}>
-          <DelegateSelector
-            isError={!needsApprove && noDelegate}
-            disabled={isLoadingTransaction || hasMaxPosition}
-            selectedAddressDelegate={selectedAddressDelegate}
-            onSelect={onDelegateSelect}
-          />
-          <Condition if={!needsApprove && noDelegate}>
-            <Text
-              size='11'
-              className='text-color-31 mt-2.5'
-            >
-              Choose delegate.
-            </Text>
-          </Condition>
-        </Skeleton>
-        <Condition if={!isAmountExceedsBalance}>
+      <Skeleton loading={isPriceOrBalanceLoading}>
+        <DelegateSelector
+          isError={!needsApprove && noDelegate}
+          disabled={isLoadingTransaction || hasMaxPosition}
+          selectedAddressDelegate={selectedAddressDelegate}
+          onSelect={onDelegateSelect}
+        />
+        <Condition if={!needsApprove && noDelegate}>
           <Text
             size='11'
             className='text-color-31 mt-2.5'
           >
-            Amount Exceeds Wallet Balance.
+            Choose delegate.
           </Text>
         </Condition>
-      </div>
+      </Skeleton>
       <Condition if={hasMaxPosition}>
         <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
           <InfoIcon className='text-color-22 size-4 shrink-0' />
@@ -287,7 +287,7 @@ export function StakeModal(props: StakeModalProps) {
             className='text-color-22'
           >
             You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close completed
-            entries or wait until they are finished.
+            entries or wait until they are finished
           </Text>
         </div>
       </Condition>
@@ -299,7 +299,7 @@ export function StakeModal(props: StakeModalProps) {
             lineHeight='16'
             className='text-color-22'
           >
-            Multiplier reverts to 1x after staking more COMP. All available rewards get vested.
+            Multiplier reverts to 1x after staking more COMP. All available rewards get vested
           </Text>
         </div>
       </Condition>

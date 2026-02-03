@@ -43,10 +43,7 @@ export function StatisticsBlock() {
       </div>
       <section className='flex items-center justify-center gap-25'>
         <StakingAPR />
-        <Divider
-          orientation='vertical'
-          thickness={1}
-        />
+        <Divider orientation='vertical' />
         <TotalStaked />
       </section>
     </>

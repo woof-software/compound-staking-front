@@ -84,7 +84,7 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
 
   return (
     <div>
-      <div className='border-color-8 grid grid-cols-5 items-center border-b-1 border-solid px-10 py-6'>
+      <div className='border-color-8 grid grid-cols-5 items-center border-b-[0.5px] border-solid px-10 py-6'>
         {columns.map(({ accessorKey, header }) => {
           const active = sortBy === accessorKey;
 

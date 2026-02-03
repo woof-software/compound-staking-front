@@ -131,7 +131,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
       <Condition if={isOpen}>
         <div
           ref={ref}
-          className='bg-color-4 border-color-8 animate-bounce-smooth absolute top-12 right-0 flex h-auto min-h-44.75 min-w-80 flex-col gap-3 rounded-2xl border-[0.25px] p-5'
+          className='bg-color-4 border-color-8 animate-bounce-smooth absolute top-12 right-0 flex h-auto max-h-44.75 min-w-80 flex-col gap-3 rounded-2xl border-[0.25px] p-5'
         >
           <Text
             size='11'
@@ -143,7 +143,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
           </Text>
           <div className='flex items-center justify-between gap-2'>
             <div className='flex items-center justify-start gap-2'>
-              <div className='bg-color-24 size-[9px] rounded-full' />
+              <div className='bg-color-33 size-[9px] rounded-full' />
               <Text
                 size='11'
                 weight='500'

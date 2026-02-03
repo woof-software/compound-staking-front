@@ -104,7 +104,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
             className='text-color-22'
           >
             You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close completed
-            entries or wait until they are finished.
+            entries or wait until they are finished
           </Text>
         </div>
       </Condition>
@@ -117,21 +117,21 @@ export function UnstakeModal(props: UnstakeModalProps) {
               lineHeight='16'
               className='text-color-22'
             >
-              All the COMP will be unstaked.
+              All the COMP will be unstaked
             </Text>
             <Text
               size='11'
               lineHeight='16'
               className='text-color-22'
             >
-              All the rewards get vested.
+              All the rewards get vested
             </Text>
             <Text
               size='11'
               lineHeight='16'
               className='text-color-22'
             >
-              The X.XX% rewards will be gone.
+              The X.XX% rewards will be gone
             </Text>
           </div>
         </div>
