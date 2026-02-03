@@ -19,10 +19,10 @@ import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { vestingToClaimCalc } from '@/lib/rewards';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
-import { trySwitchToApplicationChain } from '@/lib/utils/helpers';
 import { RewardsTable, type RewardsTableItem } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useRewardStore } from '@/stores/useRewardStore';
+import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function RewardsFlowBlock() {

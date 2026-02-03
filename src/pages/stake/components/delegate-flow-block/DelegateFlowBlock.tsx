@@ -16,16 +16,12 @@ import { useSubAccount } from '@/hooks/useSubAccount';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { FormatTime } from '@/lib/utils/format';
-import {
-  getDelegateByAddress,
-  getExplorerAddressUrl,
-  getRemainingSeconds,
-  trySwitchToApplicationChain
-} from '@/lib/utils/helpers';
+import { getDelegateByAddress, getExplorerAddressUrl, getRemainingSeconds } from '@/lib/utils/helpers';
 import { DelegateModal } from '@/pages/stake/components/delegate-flow-block/DelegateModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
+import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function DelegateFlowBlock() {
