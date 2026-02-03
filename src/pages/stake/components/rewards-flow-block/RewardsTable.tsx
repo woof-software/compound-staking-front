@@ -99,6 +99,7 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
               <Text
                 tag='span'
                 size='11'
+                weight='500'
                 lineHeight='16'
                 className='text-color-24'
               >

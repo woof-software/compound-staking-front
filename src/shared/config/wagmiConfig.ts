@@ -1,4 +1,4 @@
-import { createConfig, http, injected } from 'wagmi';
+import { createConfig, http } from 'wagmi';
 import { sepolia } from 'wagmi/chains';
 import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors';
 

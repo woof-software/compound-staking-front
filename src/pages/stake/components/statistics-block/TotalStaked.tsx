@@ -42,13 +42,15 @@ export function TotalStaked() {
 
   return (
     <div className='flex w-1/2 flex-col items-start gap-1.5'>
-      <Text
-        size='13'
-        weight='500'
-        className='text-color-24'
-      >
-        Total staked
-      </Text>
+      <Skeleton loading={isLoading}>
+        <Text
+          size='13'
+          weight='500'
+          className='text-color-24'
+        >
+          Total staked
+        </Text>
+      </Skeleton>
       <Skeleton loading={isLoading}>
         <div className='flex items-start gap-3'>
           <CompoundBlackCircle className='text-compound-icon-bg size-10' />
