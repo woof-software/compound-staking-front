@@ -114,7 +114,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             <Input
               autoFocus
               className={cn('min-h-13', {
-                'border-color-29': !filteredDelegates.length && !!searchValue.length
+                'border-color-31': !filteredDelegates.length && !!searchValue.length
               })}
               placeholder='Delegatee name or address'
               value={searchValue}
@@ -126,7 +126,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 lineHeight='16'
                 className='text-color-31'
               >
-                No delegate found.
+                No delegate found
               </Text>
             </Condition>
           </div>

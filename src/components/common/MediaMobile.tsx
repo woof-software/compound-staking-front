@@ -12,6 +12,8 @@ export function MediaMobile(props: PropsWithChildren) {
         <div className='no-available-mobile h-20 w-44' />
         <Text
           size='15'
+          weight='500'
+          lineHeight='140'
           className='text-color-2'
         >
           Not available on mobile yet
@@ -19,6 +21,8 @@ export function MediaMobile(props: PropsWithChildren) {
         <Text
           size='15'
           align='center'
+          weight='500'
+          lineHeight='140'
           className='text-color-24 max-w-43'
         >
           Please use the desktop version for now

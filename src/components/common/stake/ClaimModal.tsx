@@ -62,7 +62,7 @@ export function ClaimModal(props: ClaimModalProps) {
   const isLoading = isConnected ? isBaseTokenPriceLoading : false;
   const isClaiming = isClaimPending || isClaimConfirming;
 
-  const isClaimButtonDisabled = isLoading || !isValidAddress;
+  const isClaimButtonDisabled = isLoading || isClaiming || !isValidAddress;
 
   const onWalletAddressChange = (value: string) => {
     setWalletAddress(value);
@@ -124,14 +124,24 @@ export function ClaimModal(props: ClaimModalProps) {
         </Text>
         <div className='flex shrink-0 flex-col items-end'>
           <Skeleton loading={isLoading}>
-            <Text
-              size='15'
-              weight='500'
-              lineHeight='20'
-            >
-              {totalToClaim > 0 && '≈'}
-              {Format.token(totalClaimFormatted, 'compact', 'COMP')}
-            </Text>
+            <div className='flex gap-1'>
+              <Condition if={totalToClaim > 0}>
+                <Text
+                  size='15'
+                  weight='500'
+                  lineHeight='20'
+                >
+                  ≈
+                </Text>
+              </Condition>
+              <Text
+                size='15'
+                weight='500'
+                lineHeight='20'
+              >
+                {Format.token(totalClaimFormatted, 'compact', 'COMP')}
+              </Text>
+            </div>
           </Skeleton>
           <Skeleton loading={isLoading}>
             <Text
@@ -160,6 +170,9 @@ export function ClaimModal(props: ClaimModalProps) {
       <Condition if={isChangeWallet}>
         <div>
           <Input
+            className={cn({
+              'border-color-31': walletAddress && !isAddress(walletAddress)
+            })}
             placeholder='Wallet address'
             value={walletAddress}
             onChange={onWalletAddressChange}
@@ -188,7 +201,7 @@ export function ClaimModal(props: ClaimModalProps) {
               lineHeight='16'
               className='text-color-31 mt-2.5'
             >
-              Invalid address.
+              Invalid address
             </Text>
           </Condition>
         </div>

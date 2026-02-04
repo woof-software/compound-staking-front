@@ -157,7 +157,7 @@ export function RewardsFlowBlock() {
         isLoading={isLoading}
         title='Rewards'
       >
-        <div className='border-color-8 flex justify-between border-b-1 p-10'>
+        <div className='border-color-8 flex justify-between border-b-[0.5px] p-10'>
           <div className='flex w-full max-w-120 justify-between'>
             <div className='flex flex-col gap-3'>
               <Text

@@ -109,17 +109,30 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
           <div className='flex shrink-0 flex-col items-end'>
             <div className='flex shrink-0 items-end'>
               <Skeleton loading={isLoading}>
-                <Text
-                  size='15'
-                  weight='500'
-                  lineHeight='20'
-                  className={cn('text-color-2', {
-                    'text-color-6': !isConnected
-                  })}
-                >
-                  {availableRewards && '≈'}
-                  {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
-                </Text>
+                <div className='flex gap-1'>
+                  <Condition if={availableRewards}>
+                    <Text
+                      size='15'
+                      weight='500'
+                      lineHeight='20'
+                      className={cn('text-color-2', {
+                        'text-color-6': !isConnected
+                      })}
+                    >
+                      ≈
+                    </Text>
+                  </Condition>
+                  <Text
+                    size='15'
+                    weight='500'
+                    lineHeight='20'
+                    className={cn('text-color-2', {
+                      'text-color-6': !isConnected
+                    })}
+                  >
+                    {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
+                  </Text>
+                </div>
               </Skeleton>
             </div>
             <Condition if={isConnected}>
@@ -144,7 +157,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
               className='text-color-22'
             >
               You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close
-              completed entries or wait until they are finished.
+              completed entries or wait until they are finished
             </Text>
           </div>
         </Condition>
@@ -156,7 +169,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
               lineHeight='16'
               className='text-color-7'
             >
-              The whole amount will be added to your Claim balance.
+              The whole amount will be added to your Claim balance
             </Text>
           </div>
         </Condition>

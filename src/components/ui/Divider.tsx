@@ -7,7 +7,7 @@ export type DividerProps = {
 };
 
 export function Divider(props: DividerProps) {
-  const { orientation = 'horizontal', thickness = 1, className = '' } = props;
+  const { orientation = 'horizontal', thickness = 0.5, className = '' } = props;
 
   const style = orientation === 'vertical' ? { width: `${thickness}px` } : { height: `${thickness}px`, width: '100%' };
 
