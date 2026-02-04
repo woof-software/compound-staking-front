@@ -5,7 +5,7 @@ export const TERMS_URL = `${V2_URL}/#terms`;
 export const TALLY_GOV_URL = 'https://www.tally.xyz/gov/compound';
 export const COMPOUND_FINANCE_URL = 'https://compound.finance';
 
-export const APPLICATION_CHAIN = 111555111;
+export const APPLICATION_CHAIN = 11155111;
 
 export const REFETCH_TIME_MS = 1000 * 60 * 5;
 
