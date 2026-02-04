@@ -16,7 +16,7 @@ export function WalletButton() {
       <Condition if={!address}>
         <Button
           className='bg-color-4 rounded-64 text-color-2 border-color-7 w-auto max-w-30.5 border-[0.25px] px-5 py-[13.5px] text-[11px] font-medium'
-          onClick={onOpen}
+          onClick={() => window.location.reload()}
         >
           Connect Wallet
         </Button>
