@@ -124,6 +124,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
               <Text
                 size='11'
                 lineHeight='16'
+                weight='500'
                 className='text-color-31'
               >
                 No delegate found

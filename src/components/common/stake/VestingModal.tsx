@@ -154,6 +154,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
             <Text
               size='11'
               lineHeight='16'
+              weight='500'
               className='text-color-22'
             >
               You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close

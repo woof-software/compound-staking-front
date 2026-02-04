@@ -300,6 +300,7 @@ export function UnstakeFlowBlock() {
           <Text
             size='11'
             lineHeight='16'
+            weight='500'
             className='text-color-7'
           >
             Your funds are ready to be unstaked

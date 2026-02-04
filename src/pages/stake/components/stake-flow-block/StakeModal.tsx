@@ -234,6 +234,7 @@ export function StakeModal(props: StakeModalProps) {
             <Condition if={!isAmountExceedsBalance}>
               <Text
                 size='11'
+                weight='500'
                 className='text-color-31 mt-2.5'
               >
                 Amount Exceeds Wallet Balance
@@ -272,6 +273,7 @@ export function StakeModal(props: StakeModalProps) {
         <Condition if={!needsApprove && noDelegate}>
           <Text
             size='11'
+            weight='500'
             className='text-color-31 mt-2.5'
           >
             Choose delegate.
@@ -284,6 +286,7 @@ export function StakeModal(props: StakeModalProps) {
           <Text
             size='11'
             lineHeight='16'
+            weight='500'
             className='text-color-22'
           >
             You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close completed
@@ -293,13 +296,15 @@ export function StakeModal(props: StakeModalProps) {
       </Condition>
       <Condition if={!hasMaxPosition && showWarningForAdditionalStake}>
         <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
-          <InfoIcon className='text-color-22 size-4' />
+          <InfoIcon className='text-color-22 size-4 shrink-0' />
           <Text
             size='11'
             lineHeight='16'
+            weight='500'
             className='text-color-22'
           >
-            Multiplier reverts to 1x after staking more COMP. All available rewards get vested
+            Multiplier reverts to 1x after staking more COMP. All available rewards get vested. Voting power goes to
+            another delegate
           </Text>
         </div>
       </Condition>
