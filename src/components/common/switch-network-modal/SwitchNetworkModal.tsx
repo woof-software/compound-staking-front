@@ -56,7 +56,7 @@ export function SwitchNetworkModal() {
               align='center'
               weight='600'
               font='font-grot-disp'
-              className='ml-5 w-full'
+              className='mr-4 ml-10 w-full'
             >
               Confirm Network Switch
             </Text>
