@@ -8,6 +8,13 @@ dayjs.extend(duration);
 export namespace Format {
   export type FormatView = 'standard' | 'compact';
 
+  export type FormatTokenOptions = {
+    symbol?: string;
+    view?: FormatView;
+    fractionDigits?: number;
+    useGrouping?: boolean;
+  };
+
   const LOCALE = 'en-US';
 
   /**
@@ -36,26 +43,26 @@ export namespace Format {
   /**
    * Formats a number as a token amount with a symbol.
    * @example
-   * e.g., token(12345, tokenSymbol: 'ETH' ) -> '12,345 ETH'
-   * e.g., token(12345, tokenSymbol: 'ETH', view: 'compact' ) -> '12.35K ETH'
-   * e.g., token(123.45678, tokenSymbol: 'ETH', view: 'full') -> '123.4568 ETH'
+   * e.g., token(12345, { symbol: 'ETH' } ) -> '12,345 ETH'
+   * e.g., token(12345, { symbol: 'ETH', view: 'compact' } ) -> '12.35K ETH'
+   * e.g., token(123.45678, { symbol: 'ETH', view: 'full' }) -> '123.4568 ETH'
    */
-  export function token(value: number | string, tokenSymbol?: string, view?: FormatView, fractionDigits = 4) {
+  export function token(value: number | string, options?: FormatTokenOptions) {
     let numberValue = Number(value);
-    const options: Intl.NumberFormatOptions = {};
+    const formatOptions: Intl.NumberFormatOptions = {};
 
     if (isNaN(numberValue) || !isFinite(numberValue)) {
       numberValue = 0;
     }
 
-    options.notation = view;
-    options.minimumFractionDigits = fractionDigits;
-    options.maximumFractionDigits = fractionDigits;
-    options.style = 'decimal';
-    options.useGrouping = true;
+    formatOptions.notation = options?.view;
+    formatOptions.minimumFractionDigits = options?.fractionDigits || 4;
+    formatOptions.maximumFractionDigits = options?.fractionDigits || 4;
+    formatOptions.style = 'decimal';
+    formatOptions.useGrouping = options?.useGrouping;
 
-    const formattedNumber = new Intl.NumberFormat(LOCALE, options).format(numberValue);
-    return tokenSymbol ? `${formattedNumber} ${tokenSymbol}` : formattedNumber;
+    const formattedNumber = new Intl.NumberFormat(LOCALE, formatOptions).format(numberValue);
+    return options?.symbol ? `${formattedNumber} ${options?.symbol}` : formattedNumber;
   }
 
   /**
@@ -92,13 +99,16 @@ export namespace Format {
   export function withCommas(value: string) {
     if (!value) return '';
 
-    const parts = value.split('.');
-    const integer = parts[0] ?? '';
-    const fraction = parts[1];
+    const [integerPart = '', ...fractionPart] = value.split('.');
 
-    const formattedInteger = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const formattedInteger = new Intl.NumberFormat('en-US', {
+      useGrouping: true,
+      maximumFractionDigits: 0
+    }).format(Number(integerPart) || 0);
 
-    return fraction !== undefined ? `${formattedInteger}.${fraction}` : formattedInteger;
+    const hasDecimalSeparator = value.includes('.');
+
+    return hasDecimalSeparator ? `${formattedInteger}.${fractionPart.join('')}` : formattedInteger;
   }
 }
 
