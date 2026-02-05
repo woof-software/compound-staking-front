@@ -21,3 +21,19 @@ export function noop() {}
 export function sliceAddress(address: string, limit = 4) {
   return `${address.slice(0, limit + 2)}...${address.slice(limit * -1)}`;
 }
+
+export function debounce<F extends (...args: any[]) => void>(func: F, timeout = 300) {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+
+  const debounced = (...args: Parameters<F>) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => func(...args), timeout);
+  };
+
+  debounced.cancel = () => {
+    if (timer) clearTimeout(timer);
+    timer = undefined;
+  };
+
+  return debounced as ((...args: Parameters<F>) => void) & { cancel: () => void };
+}
