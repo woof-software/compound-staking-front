@@ -173,7 +173,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {Format.token(virtualBalanceFormatted, { symbol: 'stCOMP' })}
+              {Format.token(virtualBalanceFormatted, 'stCOMP')}
             </Text>
           </Skeleton>
         </div>
@@ -210,7 +210,7 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
+                {Format.token(availableRewardsFormatted, 'COMP')}
               </Text>
             </Skeleton>
             <Condition if={isConnected && !!availableRewards}>
