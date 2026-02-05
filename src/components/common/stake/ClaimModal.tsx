@@ -139,7 +139,7 @@ export function ClaimModal(props: ClaimModalProps) {
                 weight='500'
                 lineHeight='20'
               >
-                {Format.token(totalClaimFormatted, 'COMP')}
+                {Format.token(totalClaimFormatted, { symbol: 'COMP' })}
               </Text>
             </div>
           </Skeleton>

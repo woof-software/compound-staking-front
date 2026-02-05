@@ -258,7 +258,7 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='16'
               className='text-color-24'
             >
-              {Format.token(walletBalanceFormatted, 'COMP')}
+              {Format.token(walletBalanceFormatted, { symbol: 'COMP' })}
             </Text>
           </Skeleton>
         </div>

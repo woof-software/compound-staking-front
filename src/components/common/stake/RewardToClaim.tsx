@@ -47,7 +47,7 @@ export function RewardToClaim(props: RewardToClaimProps) {
                 lineHeight='20'
                 className='tabular-nums'
               >
-                {Format.token(toClaimFormatted, 'COMP')}
+                {Format.token(toClaimFormatted, { symbol: 'COMP' })}
               </Text>
             </Skeleton>
             <Skeleton loading={isLoading}>

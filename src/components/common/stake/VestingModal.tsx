@@ -130,7 +130,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
                       'text-color-6': !isConnected
                     })}
                   >
-                    {Format.token(availableRewardsFormatted, 'COMP')}
+                    {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
                   </Text>
                 </div>
               </Skeleton>

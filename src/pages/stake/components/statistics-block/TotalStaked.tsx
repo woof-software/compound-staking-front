@@ -28,7 +28,7 @@ export function TotalStaked() {
 
   const totalStakedFormat = formatUnits(totalStaked ?? 0n, ENV.BASE_TOKEN_DECIMALS);
 
-  const totalStakedFormatted = Format.token(Number(totalStakedFormat), undefined, undefined, 2);
+  const totalStakedFormatted = Format.token(Number(totalStakedFormat), { fractionDigits: 2 });
 
   const unit = FormatUnits.parse(Number(totalStakedFormat));
 
