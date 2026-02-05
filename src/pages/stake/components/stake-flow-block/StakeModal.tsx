@@ -110,6 +110,7 @@ export function StakeModal(props: StakeModalProps) {
   /* Disabled */
   const isApproveDisabled =
     noAmount ||
+    noDelegate ||
     !needsApprove ||
     !isAmountExceedsBalance ||
     isApproveLoading ||
@@ -125,7 +126,7 @@ export function StakeModal(props: StakeModalProps) {
     isVestingPositionsLoading ||
     hasMaxPosition;
 
-  const requireDelegate = !needsApprove && noDelegate && !noAmount;
+  const requireDelegate = noDelegate && !noAmount;
 
   /* Success */
   const isStakeSuccessConfirmed = isStakeSuccess || isIncreaseStakeSuccess;
