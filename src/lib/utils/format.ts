@@ -36,10 +36,11 @@ export namespace Format {
   /**
    * Formats a number as a token amount with a symbol.
    * @example
+   * e.g., token(12345, tokenSymbol: 'ETH' ) -> '12,345 ETH'
    * e.g., token(12345, tokenSymbol: 'ETH', view: 'compact' ) -> '12.35K ETH'
    * e.g., token(123.45678, tokenSymbol: 'ETH', view: 'full') -> '123.4568 ETH'
    */
-  export function token(value: number | string, view?: FormatView, tokenSymbol?: string, fractionDigits = 4) {
+  export function token(value: number | string, tokenSymbol?: string, view?: FormatView, fractionDigits = 4) {
     let numberValue = Number(value);
     const options: Intl.NumberFormatOptions = {};
 
@@ -51,6 +52,7 @@ export namespace Format {
     options.minimumFractionDigits = fractionDigits;
     options.maximumFractionDigits = fractionDigits;
     options.style = 'decimal';
+    options.useGrouping = true;
 
     const formattedNumber = new Intl.NumberFormat(LOCALE, options).format(numberValue);
     return tokenSymbol ? `${formattedNumber} ${tokenSymbol}` : formattedNumber;
@@ -75,6 +77,28 @@ export namespace Format {
       maximumFractionDigits: 2,
       minimumFractionDigits: 2
     })}`;
+  }
+
+  /**
+   * Formats a string number by adding thousand separators (commas).
+   * Designed for input fields to keep formatting while typing.
+   * * @param value - The string value to format.
+   * @returns A string with commas as thousand separators.
+   * * @example
+   * withCommas('1000') // -> "1,000"
+   * withCommas('1234567.89') // -> "1,234,567.89"
+   * withCommas('0.6789456') // -> "0.6789456"
+   */
+  export function withCommas(value: string) {
+    if (!value) return '';
+
+    const parts = value.split('.');
+    const integer = parts[0] ?? '';
+    const fraction = parts[1];
+
+    const formattedInteger = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    return fraction !== undefined ? `${formattedInteger}.${fraction}` : formattedInteger;
   }
 }
 

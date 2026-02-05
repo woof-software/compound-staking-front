@@ -69,7 +69,7 @@ export function UnstakeModal(props: UnstakeModalProps) {
             weight='500'
             lineHeight='20'
           >
-            {Format.token(formatUnits(stakedTokenBalance?.principal ?? 0n, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP')}
+            {Format.token(formatUnits(stakedTokenBalance?.principal ?? 0n, ENV.BASE_TOKEN_DECIMALS), 'COMP')}
           </Text>
           <Text
             size='11'

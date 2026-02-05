@@ -130,3 +130,5 @@ export function getHash(hash: string): Hash {
 
   return hash as Hash;
 }
+
+export const cleanCommas = (value: string) => value.replace(/,/g, '');
