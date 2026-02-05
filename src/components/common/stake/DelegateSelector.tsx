@@ -57,7 +57,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
     >
       <div
         className={cn(
-          'border-color-6 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
+          'border-color-8 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
           {
             'border-color-32': isError
           }
