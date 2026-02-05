@@ -39,7 +39,7 @@ export function DemoTimeControls() {
       {!isOpen && (
         <Button
           className={
-            'fixed right-4 bottom-4 z-5 h-[74px] w-[74px] rounded-full p-1 text-5xl text-xs text-white dark:bg-gray-600'
+            'fixed right-4 bottom-4 z-5 h-[72px] w-[72px] rounded-full p-1 text-4xl text-white dark:bg-gray-600'
           }
           onClick={() => setIsOpen(true)}
         >
