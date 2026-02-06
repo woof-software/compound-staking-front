@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { type ChangeEvent, type InputHTMLAttributes } from 'react';
 
 import { useAutoFocus } from '@/hooks/useAutoFocus';
@@ -32,15 +32,38 @@ function formatWithCommas(raw: string, decimals: number) {
 
   const fracDigits = frac.replace(/\D/g, '').slice(0, decimals);
 
+  const hasDot = idx !== -1;
   const hasLeadingDot = raw.startsWith(dot);
+  const dotAtEnd = raw.endsWith(dot);
 
   const wholeFormatted = wholeDigits === '' ? '' : wholeNum.toLocaleString('en');
 
-  if (idx === -1) return wholeFormatted;
-  if (raw.endsWith(dot)) return (wholeFormatted || '0') + dot;
+  if (!hasDot) return wholeFormatted;
+  if (dotAtEnd) return (wholeFormatted || '0') + dot;
   if (hasLeadingDot) return dot + fracDigits;
 
   return (wholeFormatted || '0') + dot + fracDigits;
+}
+
+function countCommasBeforePos(s: string, pos: number) {
+  let n = 0;
+  for (let i = 0; i < Math.min(pos, s.length); i++) if (s[i] === ',') n++;
+  return n;
+}
+
+function caretFromNoCommaIndex(display: string, noCommaIndex: number) {
+  let seen = 0;
+
+  for (let i = 0; i <= display.length; i++) {
+    if (i === display.length) return display.length;
+
+    if (display[i] !== ',') {
+      if (seen === noCommaIndex) return i;
+      seen++;
+    }
+  }
+
+  return display.length;
 }
 
 export function AmountInput(props: AmountInputProps) {
@@ -52,6 +75,49 @@ export function AmountInput(props: AmountInputProps) {
   const getInputFontSize = useFontSizeFitting({ border: 0.85 });
 
   const displayValue = formatWithCommas(value, decimals);
+
+  const _onKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key !== 'Backspace') return;
+
+      const el = e.currentTarget;
+      const start = el.selectionStart ?? 0;
+      const end = el.selectionEnd ?? 0;
+
+      if (start !== end) return;
+
+      const before = el.value;
+
+      if (start > 0 && before[start - 1] === ',') {
+        e.preventDefault();
+
+        const raw = value;
+
+        const commasBefore = countCommasBeforePos(before, start);
+        const caretNoComma = start - commasBefore;
+
+        const removeIndex = caretNoComma - 1;
+        if (removeIndex < 0) return;
+
+        const nextRaw = raw.slice(0, removeIndex) + raw.slice(removeIndex + 1);
+        onChange(nextRaw);
+
+        requestAnimationFrame(() => {
+          const input = ref.current;
+          if (!input) return;
+
+          const nextDisplay = formatWithCommas(nextRaw, decimals);
+
+          const nextCaretNoComma = Math.max(0, removeIndex);
+          const nextCaret = caretFromNoCommaIndex(nextDisplay, nextCaretNoComma);
+
+          input.selectionStart = nextCaret;
+          input.selectionEnd = nextCaret;
+        });
+      }
+    },
+    [value, onChange, decimals]
+  );
 
   const _onChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -87,7 +153,6 @@ export function AmountInput(props: AmountInputProps) {
         let nextCaret = caret;
 
         if (nextCommas > beforeCommas) nextCaret += 1;
-
         if (nextCommas < beforeCommas) nextCaret -= 1;
 
         nextCaret = Math.max(0, Math.min(nextCaret, nextDisplay.length));
@@ -102,9 +167,7 @@ export function AmountInput(props: AmountInputProps) {
   useEffect(() => {
     const input = ref.current;
     if (!input) return;
-
     const fontSize = getInputFontSize(input);
-
     setAdjustedFontSize(fontSize);
   }, [displayValue, getInputFontSize]);
 
@@ -115,12 +178,10 @@ export function AmountInput(props: AmountInputProps) {
       {...rest}
       ref={ref}
       style={{ fontSize: `${adjustedFontSize}px` }}
-      className={cn(
-        'font-grot-disp focus:border-none focus:outline-none focus-visible:border-none focus-visible:outline-none',
-        className
-      )}
+      className={cn('font-grot-disp focus:outline-none focus-visible:outline-none', className)}
       placeholder='0'
-      value={displayValue} // показываем с запятыми
+      value={displayValue}
+      onKeyDown={_onKeyDown}
       onChange={_onChange}
       autoComplete='off'
       inputMode='decimal'
