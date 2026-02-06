@@ -29,6 +29,8 @@ export function DelegateSelector(props: DelegateSelectorProps) {
 
   const filteredDelegates = useDelegateSelector(searchValue);
 
+  const hasValue = !!selectedAddressDelegate;
+
   const onClose = useCallback(() => {
     close();
     setSearchValue('');
@@ -53,12 +55,16 @@ export function DelegateSelector(props: DelegateSelectorProps) {
   return (
     <div
       ref={ref}
-      className='relative w-full'
+      className={cn('relative w-full', {
+        'shadow-30 shadow-30-pulse rounded-lg': !hasValue
+      })}
     >
       <div
         className={cn(
-          'border-color-8 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
+          'flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
           {
+            'border-color-white': !hasValue,
+            'border-color-8': hasValue,
             'border-color-32': isError
           }
         )}
