@@ -4,7 +4,6 @@ import { type ChangeEvent, type InputHTMLAttributes } from 'react';
 import { useAutoFocus } from '@/hooks/useAutoFocus';
 import { useFontSizeFitting } from '@/hooks/useFontSizeFitting';
 import { cn } from '@/lib/utils/cn';
-import { cleanCommas } from '@/lib/utils/helpers';
 import { spawnFloatRegex } from '@/lib/utils/regex';
 
 export type AmountInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
@@ -14,6 +13,36 @@ export type AmountInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'valu
   onChange: (value: string) => void;
 };
 
+function formatWithCommas(raw: string, decimals: number) {
+  if (!raw) return '';
+
+  const dot = '.';
+  const idx = raw.indexOf(dot);
+
+  let whole = raw;
+  let frac = '';
+
+  if (idx >= 0) {
+    whole = raw.slice(0, idx);
+    frac = raw.slice(idx + 1);
+  }
+
+  const wholeDigits = whole.replace(/\D/g, '');
+  const wholeNum = parseInt(wholeDigits || '0', 10);
+
+  const fracDigits = frac.replace(/\D/g, '').slice(0, decimals);
+
+  const hasLeadingDot = raw.startsWith(dot);
+
+  const wholeFormatted = wholeDigits === '' ? '' : wholeNum.toLocaleString('en');
+
+  if (idx === -1) return wholeFormatted;
+  if (raw.endsWith(dot)) return (wholeFormatted || '0') + dot;
+  if (hasLeadingDot) return dot + fracDigits;
+
+  return (wholeFormatted || '0') + dot + fracDigits;
+}
+
 export function AmountInput(props: AmountInputProps) {
   const { integerPartLength = 16, decimals = 18, value, className, onChange, autoFocus, ...rest } = props;
 
@@ -22,9 +51,17 @@ export function AmountInput(props: AmountInputProps) {
 
   const getInputFontSize = useFontSizeFitting({ border: 0.85 });
 
+  const displayValue = formatWithCommas(value, decimals);
+
   const _onChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      let rawValue = cleanCommas(event.target.value);
+      const inputEl = event.target;
+      const caret = inputEl.selectionStart ?? 0;
+
+      const before = inputEl.value;
+      const beforeCommas = (before.match(/,/g) || []).length;
+
+      let rawValue = before.replace(/,/g, '');
 
       const regex = spawnFloatRegex(integerPartLength, decimals);
       const m = regex.exec(rawValue);
@@ -38,17 +75,38 @@ export function AmountInput(props: AmountInputProps) {
         }
       }
 
+      const nextDisplay = formatWithCommas(rawValue, decimals);
+      const nextCommas = (nextDisplay.match(/,/g) || []).length;
+
       onChange(rawValue);
+
+      requestAnimationFrame(() => {
+        const el = ref.current;
+        if (!el) return;
+
+        let nextCaret = caret;
+
+        if (nextCommas > beforeCommas) nextCaret += 1;
+
+        if (nextCommas < beforeCommas) nextCaret -= 1;
+
+        nextCaret = Math.max(0, Math.min(nextCaret, nextDisplay.length));
+
+        el.selectionStart = nextCaret;
+        el.selectionEnd = nextCaret;
+      });
     },
     [onChange, decimals, integerPartLength]
   );
 
   useEffect(() => {
-    const input = ref?.current;
+    const input = ref.current;
     if (!input) return;
+
     const fontSize = getInputFontSize(input);
+
     setAdjustedFontSize(fontSize);
-  }, [value, getInputFontSize]);
+  }, [displayValue, getInputFontSize]);
 
   useAutoFocus(ref, autoFocus);
 
@@ -62,9 +120,10 @@ export function AmountInput(props: AmountInputProps) {
         className
       )}
       placeholder='0'
-      value={value}
+      value={displayValue} // показываем с запятыми
       onChange={_onChange}
       autoComplete='off'
+      inputMode='decimal'
     />
   );
 }
