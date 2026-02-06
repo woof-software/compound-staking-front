@@ -87,8 +87,11 @@ export function AmountInput(props: AmountInputProps) {
       if (start !== end) return;
 
       const before = el.value;
+      if (start <= 0) return;
 
-      if (start > 0 && before[start - 1] === ',') {
+      const leftChar = before[start - 1];
+
+      if (leftChar === ',') {
         e.preventDefault();
 
         const raw = value;
@@ -114,6 +117,56 @@ export function AmountInput(props: AmountInputProps) {
           input.selectionStart = nextCaret;
           input.selectionEnd = nextCaret;
         });
+
+        return;
+      }
+
+      if (leftChar === '.') {
+        e.preventDefault();
+
+        const raw = value;
+        const dotIndex = raw.indexOf('.');
+        if (dotIndex === -1) return;
+
+        const commasBefore = countCommasBeforePos(before, start);
+        const rawCaret = start - commasBefore;
+
+        if (rawCaret <= 0 || raw[rawCaret - 1] !== '.') return;
+
+        if (dotIndex === 1 && raw.startsWith('0.') && rawCaret === 2) {
+          const nextRaw = raw.slice(2);
+          onChange(nextRaw);
+
+          requestAnimationFrame(() => {
+            const input = ref.current;
+            if (!input) return;
+            input.selectionStart = 0;
+            input.selectionEnd = 0;
+          });
+
+          return;
+        }
+
+        const digitIndex = dotIndex - 1;
+        if (digitIndex < 0) return;
+
+        const nextRaw = raw.slice(0, digitIndex) + raw.slice(digitIndex + 1);
+        onChange(nextRaw);
+
+        requestAnimationFrame(() => {
+          const input = ref.current;
+          if (!input) return;
+
+          const nextDisplay = formatWithCommas(nextRaw, decimals);
+          const nextDot = nextDisplay.indexOf('.');
+
+          const nextCaret = nextDot >= 0 ? nextDot + 1 : Math.min(start - 1, nextDisplay.length);
+
+          input.selectionStart = nextCaret;
+          input.selectionEnd = nextCaret;
+        });
+
+        return;
       }
     },
     [value, onChange, decimals]
