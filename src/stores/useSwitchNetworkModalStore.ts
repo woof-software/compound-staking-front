@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import { APPLICATION_CHAIN } from '@/consts/common';
+
 type State = {
   isOpen: boolean;
   open: () => void;

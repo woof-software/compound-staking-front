@@ -1,6 +1,6 @@
-import { useEffect, useEffectEvent, useMemo, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import { type Address, formatUnits, parseUnits } from 'viem';
-import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
 import COMP_AVIF from '@/assets/comp.avif';
 import { InfoIcon } from '@/assets/svg';
@@ -21,7 +21,7 @@ import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useVestingPerUser } from '@/hooks/useVestingPerUser';
 import { cn } from '@/lib/utils/cn';
-import { debounce, noop } from '@/lib/utils/common';
+import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 import { getAddressContracts, getDelegateByAddress } from '@/lib/utils/helpers';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
@@ -41,9 +41,8 @@ export function StakeModal(props: StakeModalProps) {
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
 
-  const [isRequireDelegate, setIsRequireDelegate] = useState<boolean>(false);
-
-  const { address } = useConnection();
+  const { address, isConnected, chainId } = useConnection();
+  const { switchChainAsync, isPending: isSwitchPending } = useSwitchChain();
 
   const { baseTokenAddress, stakingVaultAddress } = getAddressContracts(APPLICATION_CHAIN);
 
@@ -90,6 +89,8 @@ export function StakeModal(props: StakeModalProps) {
     hash: increaseStakeHash
   });
 
+  const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
+
   const parseAmount = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
   const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
   const needsApprove = parseAmount > 0n && !hasEnoughAllowance;
@@ -103,8 +104,9 @@ export function StakeModal(props: StakeModalProps) {
 
   /* Loading */
   const isPriceOrBalanceLoading = isBaseTokenPriceLoading || isWalletBalanceLoading;
-  const isApproveLoading = isApprovePending || isApproveConfirming;
-  const isStakeLoading = isStakePending || isStakeConfirming || isIncreaseStakePending || isIncreaseStakeConfirming;
+  const isApproveLoading = isSwitchPending || isApprovePending || isApproveConfirming;
+  const isStakeLoading =
+    isSwitchPending || isStakePending || isStakeConfirming || isIncreaseStakePending || isIncreaseStakeConfirming;
   const isLoadingTransaction = isApproveLoading || isStakeLoading || isIncreaseStakePending;
 
   /* Disabled */
@@ -126,8 +128,6 @@ export function StakeModal(props: StakeModalProps) {
     isVestingPositionsLoading ||
     hasMaxPosition;
 
-  const requireDelegate = noDelegate && !noAmount;
-
   /* Success */
   const isStakeSuccessConfirmed = isStakeSuccess || isIncreaseStakeSuccess;
 
@@ -141,8 +141,6 @@ export function StakeModal(props: StakeModalProps) {
   );
   const walletBalanceFormatted = formatUnits(walletBalanceValue, ENV.BASE_TOKEN_DECIMALS);
 
-  const setRequireDelegateDebounced = useMemo(() => debounce((value: boolean) => setIsRequireDelegate(value)), []);
-
   const onMaxButtonClick = () => {
     setAmountValue(walletBalanceFormatted);
   };
@@ -153,6 +151,10 @@ export function StakeModal(props: StakeModalProps) {
 
   const onApprove = async () => {
     if (isApproveDisabled || !baseTokenAddress || !stakingVaultAddress) return;
+
+    if (isWrongNetwork) {
+      await switchChainAsync({ chainId: APPLICATION_CHAIN });
+    }
 
     await approve({ token: baseTokenAddress, spender: stakingVaultAddress, value: parseAmount });
   };
@@ -167,17 +169,16 @@ export function StakeModal(props: StakeModalProps) {
   const onConfirm = async () => {
     if (isConfirmDisabled) return;
 
+    if (isWrongNetwork) {
+      await switchChainAsync({ chainId: APPLICATION_CHAIN });
+    }
+
     if (!showWarningForAdditionalStake) {
       await stake({ amount: parseAmount, delegatee: selectedAddressDelegate?.address });
     } else {
       await increaseStake({ amount: parseAmount, delegatee: selectedAddressDelegate?.address });
     }
   };
-
-  useMemo(() => {
-    setRequireDelegateDebounced(requireDelegate);
-    return null;
-  }, [requireDelegate]);
 
   useEffect(() => {
     if (selectedAddressDelegate?.address) return;
@@ -277,7 +278,6 @@ export function StakeModal(props: StakeModalProps) {
       </div>
       <Skeleton loading={isPriceOrBalanceLoading}>
         <DelegateSelector
-          isError={isRequireDelegate}
           disabled={isLoadingTransaction || hasMaxPosition}
           selectedAddressDelegate={selectedAddressDelegate}
           onSelect={onDelegateSelect}
@@ -285,9 +285,7 @@ export function StakeModal(props: StakeModalProps) {
         <Text
           size='11'
           weight='500'
-          className={cn('text-color-6 mt-2.5', {
-            'text-color-31': isRequireDelegate
-          })}
+          className='text-color-6 mt-2.5'
         >
           Delegate is required
         </Text>

@@ -14,13 +14,12 @@ import { getExplorerAddressUrl } from '@/lib/utils/helpers';
 
 export type DelegateSelectorProps = {
   disabled?: boolean;
-  isError?: boolean;
   selectedAddressDelegate: Delegate | null;
   onSelect?: (addressDelegate: Delegate | null) => void;
 };
 
 export function DelegateSelector(props: DelegateSelectorProps) {
-  const { disabled, selectedAddressDelegate, isError, onSelect = noop } = props;
+  const { disabled, selectedAddressDelegate, onSelect = noop } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const [searchValue, setSearchValue] = useState('');
@@ -64,8 +63,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
           'flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
           {
             'border-color-white': !hasValue,
-            'border-color-8': hasValue,
-            'border-color-32': isError
+            'border-color-8': hasValue
           }
         )}
         onClick={onSelectorOpen}

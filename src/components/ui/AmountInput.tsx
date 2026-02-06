@@ -4,7 +4,6 @@ import { type ChangeEvent, type InputHTMLAttributes } from 'react';
 import { useAutoFocus } from '@/hooks/useAutoFocus';
 import { useFontSizeFitting } from '@/hooks/useFontSizeFitting';
 import { cn } from '@/lib/utils/cn';
-import { Format } from '@/lib/utils/format';
 import { cleanCommas } from '@/lib/utils/helpers';
 import { spawnFloatRegex } from '@/lib/utils/regex';
 
@@ -17,6 +16,7 @@ export type AmountInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'valu
 
 export function AmountInput(props: AmountInputProps) {
   const { integerPartLength = 16, decimals = 18, value, className, onChange, autoFocus, ...rest } = props;
+
   const ref = useRef<HTMLInputElement>(null);
   const [adjustedFontSize, setAdjustedFontSize] = useState<number>();
 
@@ -52,8 +52,6 @@ export function AmountInput(props: AmountInputProps) {
 
   useAutoFocus(ref, autoFocus);
 
-  const displayValue = Format.withCommas(value);
-
   return (
     <input
       {...rest}
@@ -64,7 +62,7 @@ export function AmountInput(props: AmountInputProps) {
         className
       )}
       placeholder='0'
-      value={displayValue}
+      value={value}
       onChange={_onChange}
       autoComplete='off'
     />

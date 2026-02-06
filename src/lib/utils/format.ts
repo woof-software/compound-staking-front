@@ -85,31 +85,6 @@ export namespace Format {
       minimumFractionDigits: 2
     })}`;
   }
-
-  /**
-   * Formats a string number by adding thousand separators (commas).
-   * Designed for input fields to keep formatting while typing.
-   * * @param value - The string value to format.
-   * @returns A string with commas as thousand separators.
-   * * @example
-   * withCommas('1000') // -> "1,000"
-   * withCommas('1234567.89') // -> "1,234,567.89"
-   * withCommas('0.6789456') // -> "0.6789456"
-   */
-  export function withCommas(value: string) {
-    if (!value) return '';
-
-    const [integerPart = '', ...fractionPart] = value.split('.');
-
-    const formattedInteger = new Intl.NumberFormat('en-US', {
-      useGrouping: true,
-      maximumFractionDigits: 0
-    }).format(Number(integerPart) || 0);
-
-    const hasDecimalSeparator = value.includes('.');
-
-    return hasDecimalSeparator ? `${formattedInteger}.${fractionPart.join('')}` : formattedInteger;
-  }
 }
 
 export namespace FormatUnits {

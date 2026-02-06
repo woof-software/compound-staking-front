@@ -1,5 +1,5 @@
 import { formatUnits } from 'viem';
-import { useConnection } from 'wagmi';
+import { useConnection, useSwitchChain } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -26,7 +26,9 @@ export type UnstakeModalProps = {
 export function UnstakeModal(props: UnstakeModalProps) {
   const { isLoading = false, onClick = noop } = props;
 
-  const { address } = useConnection();
+  const { address, isConnected, chainId } = useConnection();
+
+  const { switchChainAsync, isPending } = useSwitchChain();
 
   const { lockManagerAddress } = getAddressContracts(APPLICATION_CHAIN);
 
@@ -48,10 +50,22 @@ export function UnstakeModal(props: UnstakeModalProps) {
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
 
+  const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
+
   const hasPosition = !!vestingPositions?.length;
   const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions ?? 0n) : false;
 
   const isButtonDisabled = isLoading || isVestingPositionsLoading || hasMaxPosition;
+
+  const isConfirmLoading = isLoading || isPending;
+
+  const onConfirm = async () => {
+    if (isWrongNetwork) {
+      await switchChainAsync({ chainId: APPLICATION_CHAIN });
+    }
+
+    onClick();
+  };
 
   return (
     <div className='mt-8 flex w-full flex-col gap-8'>
@@ -145,9 +159,9 @@ export function UnstakeModal(props: UnstakeModalProps) {
       <Button
         disabled={isButtonDisabled}
         className={cn('h-14 flex-col', {
-          'bg-color-7': isLoading
+          'bg-color-7': isConfirmLoading
         })}
-        onClick={onClick}
+        onClick={onConfirm}
       >
         <Text
           size='13'
@@ -155,10 +169,10 @@ export function UnstakeModal(props: UnstakeModalProps) {
           lineHeight='18'
           className={cn('text-white', {
             'text-color-6': isButtonDisabled,
-            'after-animate-loading-dots text-white': isLoading
+            'after-animate-loading-dots text-white': isConfirmLoading
           })}
         >
-          {isLoading ? 'Pending' : 'Confirm'}
+          {isConfirmLoading ? 'Pending' : 'Confirm'}
         </Text>
       </Button>
     </div>

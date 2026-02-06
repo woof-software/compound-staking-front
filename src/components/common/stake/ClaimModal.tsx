@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 import { formatUnits, isAddress } from 'viem';
-import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
 import { CrossIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -30,7 +30,8 @@ export function ClaimModal(props: ClaimModalProps) {
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
-  const { isConnected, address } = useConnection();
+  const { address, isConnected, chainId } = useConnection();
+  const { switchChainAsync, isPending: isSwitchPending } = useSwitchChain();
 
   const [walletAddress, setWalletAddress] = useState<string>('');
 
@@ -60,9 +61,11 @@ export function ClaimModal(props: ClaimModalProps) {
   );
 
   const isLoading = isConnected ? isBaseTokenPriceLoading : false;
-  const isClaiming = isClaimPending || isClaimConfirming;
+  const isClaiming = isSwitchPending || isClaimPending || isClaimConfirming;
 
   const isClaimButtonDisabled = isLoading || isClaiming || !isValidAddress;
+
+  const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
 
   const onWalletAddressChange = (value: string) => {
     setWalletAddress(value);
@@ -86,6 +89,10 @@ export function ClaimModal(props: ClaimModalProps) {
   };
 
   const onConfirm = async () => {
+    if (isWrongNetwork) {
+      await switchChainAsync({ chainId: APPLICATION_CHAIN });
+    }
+
     if (isAddress(walletAddress)) {
       await claimRequest(walletAddress);
       return;

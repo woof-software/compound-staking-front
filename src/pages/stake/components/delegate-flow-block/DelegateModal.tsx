@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 import type { Address } from 'viem';
-import { useWaitForTransactionReceipt } from 'wagmi';
+import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
 import { Button } from '@/components/ui/Button';
@@ -26,6 +26,9 @@ export function DelegateModal(props: DelegateModalProps) {
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
+  const { isConnected, chainId } = useConnection();
+  const { switchChainAsync, isPending } = useSwitchChain();
+
   const {
     data: delegateHash,
     sendTransactionAsync: delegateTransaction,
@@ -36,9 +39,11 @@ export function DelegateModal(props: DelegateModalProps) {
     hash: delegateHash
   });
 
-  const isDelegateLoading = isDelegatePending || isDelegateConfirming;
+  const isDelegateLoading = isPending || isDelegatePending || isDelegateConfirming;
 
   const isConfirmDisabled = !selectedAddressDelegate || selectedAddressDelegate.address === delegate?.address;
+
+  const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
 
   const onDelegateSelect = (addressDelegate: Delegate | null) => {
     setSelectedAddressDelegate(addressDelegate);
@@ -46,6 +51,10 @@ export function DelegateModal(props: DelegateModalProps) {
 
   const onConfirm = async () => {
     if (!selectedAddressDelegate || !subAccountAddress) return;
+
+    if (isWrongNetwork) {
+      await switchChainAsync({ chainId: APPLICATION_CHAIN });
+    }
 
     setIsPendingToggle(true);
     await delegateTransaction(selectedAddressDelegate.address);
