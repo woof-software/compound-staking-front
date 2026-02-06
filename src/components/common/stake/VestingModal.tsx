@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
-import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -28,7 +28,8 @@ export type VestingModalProps = {
 };
 
 export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirmed = noop }: VestingModalProps) {
-  const { isConnected, address } = useConnection();
+  const { address, isConnected, chainId } = useConnection();
+  const { switchChainAsync, isPending: isSwitchPending } = useSwitchChain();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
@@ -67,13 +68,20 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
   const hasPosition = !!vestingPositions?.length;
   const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions ?? 0n) : false;
 
-  const isVestingLoading = isVestingPositionsLoading || isVestRewardsConfirming || isVestRewardsPending;
+  const isVestingLoading =
+    isSwitchPending || isVestingPositionsLoading || isVestRewardsConfirming || isVestRewardsPending;
   const isLoading = isConnected ? isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
 
   const isVestButtonDisabled = isLoading || isVestingLoading || hasMaxPosition;
 
+  const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
+
   const onConfirm = async () => {
     if (!address) return;
+
+    if (isWrongNetwork) {
+      await switchChainAsync({ chainId: APPLICATION_CHAIN });
+    }
 
     await vestRewardsRequest();
   };
@@ -130,7 +138,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
                       'text-color-6': !isConnected
                     })}
                   >
-                    {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
+                    {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
                   </Text>
                 </div>
               </Skeleton>
@@ -154,6 +162,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
             <Text
               size='11'
               lineHeight='16'
+              weight='500'
               className='text-color-22'
             >
               You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close

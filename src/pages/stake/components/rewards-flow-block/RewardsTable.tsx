@@ -60,7 +60,7 @@ const columns: Column<RewardsTableItem>[] = [
 export function RewardsTable(props: { rows: RewardsTableItem[] }) {
   const { rows } = props;
 
-  const [sortBy, setSortBy] = useState<SortKey>('vestingAmount');
+  const [sortBy, setSortBy] = useState<SortKey>('startDate');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);

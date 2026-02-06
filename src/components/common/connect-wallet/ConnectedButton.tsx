@@ -93,7 +93,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
             lineHeight='16'
             className='text-color-2 ml-2'
           >
-            {Format.token(balanceFormatted, 'compact')}
+            {Format.token(balanceFormatted)}
           </Text>
         </div>
       </Condition>

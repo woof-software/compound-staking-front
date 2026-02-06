@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 import { type Address, formatUnits, parseUnits } from 'viem';
-import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
 import COMP_AVIF from '@/assets/comp.avif';
 import { InfoIcon } from '@/assets/svg';
@@ -41,7 +41,8 @@ export function StakeModal(props: StakeModalProps) {
   const [amountValue, setAmountValue] = useState<string>('');
   const [selectedAddressDelegate, setSelectedAddressDelegate] = useState<Delegate | null>(null);
 
-  const { address } = useConnection();
+  const { address, isConnected, chainId } = useConnection();
+  const { switchChainAsync, isPending: isSwitchPending } = useSwitchChain();
 
   const { baseTokenAddress, stakingVaultAddress } = getAddressContracts(APPLICATION_CHAIN);
 
@@ -88,6 +89,8 @@ export function StakeModal(props: StakeModalProps) {
     hash: increaseStakeHash
   });
 
+  const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
+
   const parseAmount = parseUnits(amountValue, ENV.BASE_TOKEN_DECIMALS);
   const hasEnoughAllowance = allowance ? allowance >= parseAmount : false;
   const needsApprove = parseAmount > 0n && !hasEnoughAllowance;
@@ -101,13 +104,15 @@ export function StakeModal(props: StakeModalProps) {
 
   /* Loading */
   const isPriceOrBalanceLoading = isBaseTokenPriceLoading || isWalletBalanceLoading;
-  const isApproveLoading = isApprovePending || isApproveConfirming;
-  const isStakeLoading = isStakePending || isStakeConfirming || isIncreaseStakePending || isIncreaseStakeConfirming;
+  const isApproveLoading = isSwitchPending || isApprovePending || isApproveConfirming;
+  const isStakeLoading =
+    isSwitchPending || isStakePending || isStakeConfirming || isIncreaseStakePending || isIncreaseStakeConfirming;
   const isLoadingTransaction = isApproveLoading || isStakeLoading || isIncreaseStakePending;
 
   /* Disabled */
   const isApproveDisabled =
     noAmount ||
+    noDelegate ||
     !needsApprove ||
     !isAmountExceedsBalance ||
     isApproveLoading ||
@@ -147,6 +152,10 @@ export function StakeModal(props: StakeModalProps) {
   const onApprove = async () => {
     if (isApproveDisabled || !baseTokenAddress || !stakingVaultAddress) return;
 
+    if (isWrongNetwork) {
+      await switchChainAsync({ chainId: APPLICATION_CHAIN });
+    }
+
     await approve({ token: baseTokenAddress, spender: stakingVaultAddress, value: parseAmount });
   };
 
@@ -159,6 +168,10 @@ export function StakeModal(props: StakeModalProps) {
 
   const onConfirm = async () => {
     if (isConfirmDisabled) return;
+
+    if (isWrongNetwork) {
+      await switchChainAsync({ chainId: APPLICATION_CHAIN });
+    }
 
     if (!showWarningForAdditionalStake) {
       await stake({ amount: parseAmount, delegatee: selectedAddressDelegate?.address });
@@ -234,6 +247,7 @@ export function StakeModal(props: StakeModalProps) {
             <Condition if={!isAmountExceedsBalance}>
               <Text
                 size='11'
+                weight='500'
                 className='text-color-31 mt-2.5'
               >
                 Amount Exceeds Wallet Balance
@@ -257,26 +271,24 @@ export function StakeModal(props: StakeModalProps) {
               lineHeight='16'
               className='text-color-24'
             >
-              {Format.token(walletBalanceFormatted, 'standard', 'COMP')}
+              {Format.token(walletBalanceFormatted, { symbol: 'COMP' })}
             </Text>
           </Skeleton>
         </div>
       </div>
       <Skeleton loading={isPriceOrBalanceLoading}>
         <DelegateSelector
-          isError={!needsApprove && noDelegate}
           disabled={isLoadingTransaction || hasMaxPosition}
           selectedAddressDelegate={selectedAddressDelegate}
           onSelect={onDelegateSelect}
         />
-        <Condition if={!needsApprove && noDelegate}>
-          <Text
-            size='11'
-            className='text-color-31 mt-2.5'
-          >
-            Choose delegate.
-          </Text>
-        </Condition>
+        <Text
+          size='11'
+          weight='500'
+          className='text-color-6 mt-2.5'
+        >
+          Delegate is required
+        </Text>
       </Skeleton>
       <Condition if={hasMaxPosition}>
         <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
@@ -284,6 +296,7 @@ export function StakeModal(props: StakeModalProps) {
           <Text
             size='11'
             lineHeight='16'
+            weight='500'
             className='text-color-22'
           >
             You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close completed
@@ -293,13 +306,15 @@ export function StakeModal(props: StakeModalProps) {
       </Condition>
       <Condition if={!hasMaxPosition && showWarningForAdditionalStake}>
         <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
-          <InfoIcon className='text-color-22 size-4' />
+          <InfoIcon className='text-color-22 size-4 shrink-0' />
           <Text
             size='11'
             lineHeight='16'
+            weight='500'
             className='text-color-22'
           >
-            Multiplier reverts to 1x after staking more COMP. All available rewards get vested
+            Multiplier reverts to 1x after staking more COMP. All available rewards get vested. Voting power goes to
+            another delegate
           </Text>
         </div>
       </Condition>

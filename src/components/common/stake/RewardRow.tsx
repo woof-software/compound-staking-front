@@ -35,7 +35,7 @@ export function RewardRow(props: RewardRowProps) {
               lineHeight='20'
               className='tabular-nums'
             >
-              {Format.token(formatUnits(vestingAmount, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP')}
+              {Format.token(formatUnits(vestingAmount, ENV.BASE_TOKEN_DECIMALS), { symbol: 'COMP' })}
             </Text>
           </Skeleton>
           <Skeleton loading={isLoading}>
@@ -79,7 +79,7 @@ export function RewardRow(props: RewardRowProps) {
               lineHeight='20'
               className='tabular-nums'
             >
-              {Format.token(formatUnits(claimedAmount, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP')}
+              {Format.token(formatUnits(claimedAmount, ENV.BASE_TOKEN_DECIMALS), { symbol: 'COMP' })}
             </Text>
           </Skeleton>
         </div>

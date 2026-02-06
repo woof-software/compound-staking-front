@@ -224,7 +224,7 @@ export function UnstakeFlowBlock() {
                       'text-color-6': !isConnected
                     })}
                   >
-                    {Format.token(lockedStakedBalanceFormatted, 'standard', 'COMP')}
+                    {Format.token(lockedStakedBalanceFormatted, { symbol: 'stCOMP' })}
                   </Text>
                 </Skeleton>
                 <Condition if={isConnected && !!lockedTokenBalance?.amount}>
@@ -300,6 +300,7 @@ export function UnstakeFlowBlock() {
           <Text
             size='11'
             lineHeight='16'
+            weight='500'
             className='text-color-7'
           >
             Your funds are ready to be unstaked

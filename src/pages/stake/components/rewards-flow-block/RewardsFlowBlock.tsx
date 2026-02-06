@@ -172,7 +172,7 @@ export function RewardsFlowBlock() {
                     size='17'
                     className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                   >
-                    {Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP')}
+                    {Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), { symbol: 'COMP' })}
                   </Text>
                 </Skeleton>
                 <Condition if={isConnected && !!totalVesting}>
@@ -221,7 +221,7 @@ export function RewardsFlowBlock() {
                           );
                         }, 0n);
 
-                        return Format.token(formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP');
+                        return Format.token(formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS), { symbol: 'COMP' });
                       }}
                     />
                   </Text>
@@ -300,7 +300,7 @@ export function RewardsFlowBlock() {
                   size='17'
                   className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                 >
-                  {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
+                  {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
                 </Text>
               </Skeleton>
               <Condition if={isConnected && !!availableRewards}>
