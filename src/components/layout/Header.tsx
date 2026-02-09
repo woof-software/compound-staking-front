@@ -1,4 +1,5 @@
 import { WalletButton } from '@/components/common/connect-wallet/WalletButton';
+import { TimeControlButton } from '@/components/common/TimeControl';
 import { COMPOUND_FINANCE_URL } from '@/consts/common';
 
 import CompoundLogoText from '@/assets/compound-logo-text.svg';
@@ -12,7 +13,10 @@ export function Header() {
       >
         <CompoundLogoText className='text-color-2 h-6.75 w-30.25 cursor-pointer' />
       </a>
-      <WalletButton />
+      <div className='flex gap-[8px]'>
+        <TimeControlButton />
+        <WalletButton />
+      </div>
     </header>
   );
 }
