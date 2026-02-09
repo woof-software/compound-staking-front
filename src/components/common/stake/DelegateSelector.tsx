@@ -60,7 +60,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
     >
       <div
         className={cn(
-          'flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
+          'flex h-13 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
           {
             'border-color-white': !hasValue,
             'border-color-8': hasValue
@@ -71,6 +71,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
         {!selectedAddressDelegate ? (
           <Text
             size='13'
+            weight='500'
             lineHeight='16'
             className='text-color-6'
           >
