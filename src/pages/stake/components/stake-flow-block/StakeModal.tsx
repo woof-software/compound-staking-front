@@ -217,6 +217,15 @@ export function StakeModal(props: StakeModalProps) {
       <div className='flex flex-col gap-1'>
         <Skeleton loading={isPriceOrBalanceLoading}>
           <div>
+            <Condition if={!isAmountExceedsBalance}>
+              <Text
+                size='11'
+                weight='500'
+                className='text-color-31 mb-1'
+              >
+                Amount Exceeds Wallet Balance
+              </Text>
+            </Condition>
             <div className='flex items-center justify-between'>
               <div className='flex max-w-72 items-center gap-2'>
                 <img
@@ -244,15 +253,6 @@ export function StakeModal(props: StakeModalProps) {
                 Max
               </Button>
             </div>
-            <Condition if={!isAmountExceedsBalance}>
-              <Text
-                size='11'
-                weight='500'
-                className='text-color-31 mt-2.5'
-              >
-                Amount Exceeds Wallet Balance
-              </Text>
-            </Condition>
           </div>
         </Skeleton>
         <div className='flex w-full items-center justify-between'>

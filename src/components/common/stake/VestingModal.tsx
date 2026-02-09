@@ -175,6 +175,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
             <InfoIcon className='text-color-7 size-4 shrink-0' />
             <Text
               size='11'
+              weight='500'
               lineHeight='16'
               className='text-color-7'
             >
