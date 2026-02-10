@@ -20,7 +20,7 @@ export function TimeControlButton() {
   return (
     <Button
       onClick={() => handleFastForward(TIME_INTERVALS.HOUR, '1 hour')}
-      className='mr-[96px] w-[80px] text-[11px] font-medium dark:bg-gray-600'
+      className='mr-[96px] w-[80px] text-[11px] font-medium text-white'
     >
       +1 Hour
     </Button>
