@@ -83,7 +83,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
   useOutsideClick(() => [ref.current, toggleRef.current], onClose);
 
   return (
-    <div className='relative'>
+    <div className='relative hidden md:block'>
       <Condition if={!isAvailableRewardsLoading || !isWalletBalanceLoading}>
         <div className='rounded-64 bg-color-11 border-color-8 absolute right-[68%] flex h-11 min-w-[6.45rem] cursor-pointer items-center border-[0.25px] py-2 pr-11 pl-4 hover:brightness-90'>
           <CompoundWalletIcon className='size-6 flex-shrink-0' />
