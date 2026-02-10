@@ -70,8 +70,5 @@ export async function fastForwardTime(seconds: number): Promise<void> {
 }
 
 export const TIME_INTERVALS = {
-  HOUR: 60 * 60,
-  DAY: 24 * 60 * 60,
-  WEEK: 7 * 24 * 60 * 60,
-  MONTH: 30 * 24 * 60 * 60
+  HOUR: 60 * 60
 } as const;
