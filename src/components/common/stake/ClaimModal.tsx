@@ -205,6 +205,7 @@ export function ClaimModal(props: ClaimModalProps) {
           <Condition if={walletAddress && !isAddress(walletAddress)}>
             <Text
               size='11'
+              weight='500'
               lineHeight='16'
               className='text-color-31 mt-2.5'
             >
