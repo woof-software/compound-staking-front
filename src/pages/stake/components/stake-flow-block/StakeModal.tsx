@@ -234,7 +234,7 @@ export function StakeModal(props: StakeModalProps) {
                   className='size-6.75 shrink-0 rounded-full'
                 />
                 <AmountInput
-                  className={cn('h-9 max-w-60 min-w-55', {
+                  className={cn('h-9 max-w-47.5 min-w-50 md:max-w-60 md:min-w-55', {
                     'caret-color-30': isAmountExceedsBalance,
                     'caret-color-31': !isAmountExceedsBalance
                   })}
@@ -245,7 +245,7 @@ export function StakeModal(props: StakeModalProps) {
               </div>
               <Button
                 disabled={isLoadingTransaction || hasMaxPosition}
-                className={cn('bg-color-16 h-[33.243px] w-[55.47px] text-[11px] font-medium', {
+                className={cn('bg-color-16 h-8 w-13.75 text-[11px] font-medium md:h-[33.243px] md:w-[55.47px]', {
                   'bg-color-28': isLoadingTransaction
                 })}
                 onClick={onMaxButtonClick}
@@ -282,13 +282,15 @@ export function StakeModal(props: StakeModalProps) {
           selectedAddressDelegate={selectedAddressDelegate}
           onSelect={onDelegateSelect}
         />
-        <Text
-          size='11'
-          weight='500'
-          className='text-color-6 mt-2.5'
-        >
-          Delegate is required
-        </Text>
+        <Condition if={!selectedAddressDelegate}>
+          <Text
+            size='11'
+            weight='500'
+            className='text-color-6 mt-2.5'
+          >
+            Delegate is required
+          </Text>
+        </Condition>
       </Skeleton>
       <Condition if={hasMaxPosition}>
         <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>

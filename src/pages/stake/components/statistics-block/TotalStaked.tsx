@@ -41,7 +41,7 @@ export function TotalStaked() {
   }, [needTotalStakedRefresh, isConnected, refetchTotalStaked]);
 
   return (
-    <div className='flex w-1/2 flex-col items-start gap-1.5'>
+    <div className='bg-statistics-bg flex w-full flex-col items-center gap-1.5 rounded-t-2xl px-4 py-7 md:w-1/2 md:items-start md:!bg-none md:p-0'>
       <Skeleton loading={isLoading}>
         <Text
           size='13'

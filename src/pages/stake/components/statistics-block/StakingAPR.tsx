@@ -15,7 +15,7 @@ export function StakingAPR() {
   const isLoading = isConnected ? isTotalStakedLoading : false;
 
   return (
-    <div className='flex w-1/2 justify-end'>
+    <div className='bg-statistics-bg flex w-full justify-center rounded-t-2xl px-4 py-7 md:w-1/2 md:justify-end md:!bg-none md:p-0'>
       <div className='flex flex-col items-start gap-1.5'>
         <Skeleton loading={isLoading}>
           <Text

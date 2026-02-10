@@ -4,6 +4,7 @@ import { useConnection } from 'wagmi';
 import { Condition } from '@/components/common/Condition';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
+import { Drawer } from '@/components/ui/Drawer';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
@@ -11,6 +12,7 @@ import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMultiplier } from '@/hooks/useMultiplier';
 import { useSubAccount } from '@/hooks/useSubAccount';
 import { useSwitch } from '@/hooks/useSwitch';
@@ -33,6 +35,8 @@ export function StakeFlowBlock() {
   const { isConnected, address, chainId } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
+
+  const isMobile = useMediaQuery('(max-width: 767px)');
 
   const triggerStatisticRefresh = useStatisticStore(({ triggerRefresh }) => triggerRefresh);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
@@ -128,15 +132,45 @@ export function StakeFlowBlock() {
       title='Stake'
       tooltip='Stake your COMP tokens to earn yield every second!'
     >
-      <div className='flex justify-between p-10'>
-        <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            Staked
-          </Text>
-          <div className='flex flex-col gap-1'>
+      <div className='flex flex-col justify-between gap-10 p-5 md:p-10 lg:flex-row'>
+        <div className='grid w-full grid-cols-2 gap-5 md:flex md:flex-wrap md:gap-10'>
+          <div className='flex flex-col gap-3 md:col-span-2'>
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              Staked
+            </Text>
+            <div className='flex flex-col gap-1'>
+              <Skeleton loading={isLoading}>
+                <Text
+                  size='17'
+                  className={cn('text-color-2 tabular-nums', {
+                    'text-color-6': !isConnected
+                  })}
+                >
+                  {Format.token(stakedBalanceFormatted, { symbol: 'COMP' })}
+                </Text>
+              </Skeleton>
+              <Condition if={isConnected && !!stakedBalance?.principal}>
+                <Skeleton loading={isLoading}>
+                  <Text
+                    size='11'
+                    className='text-color-24 tabular-nums'
+                  >
+                    {Format.price(stakedBalancePriceFormatted, 'standard')}
+                  </Text>
+                </Skeleton>
+              </Condition>
+            </div>
+          </div>
+          <div className='flex flex-col gap-3'>
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              stCOMP balance
+            </Text>
             <Skeleton loading={isLoading}>
               <Text
                 size='17'
@@ -144,65 +178,17 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {Format.token(stakedBalanceFormatted, { symbol: 'COMP' })}
+                {Format.token(virtualBalanceFormatted, { symbol: 'stCOMP' })}
               </Text>
             </Skeleton>
-            <Condition if={isConnected && !!stakedBalance?.principal}>
-              <Skeleton loading={isLoading}>
-                <Text
-                  size='11'
-                  className='text-color-24 tabular-nums'
-                >
-                  {Format.price(stakedBalancePriceFormatted, 'standard')}
-                </Text>
-              </Skeleton>
-            </Condition>
           </div>
-        </div>
-        <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            stCOMP balance
-          </Text>
-          <Skeleton loading={isLoading}>
+          <div className='flex flex-col gap-3 md:ml-auto md:max-w-[80px] md:min-w-[80px]'>
             <Text
-              size='17'
-              className={cn('text-color-2 tabular-nums', {
-                'text-color-6': !isConnected
-              })}
+              size='11'
+              className='text-color-24'
             >
-              {Format.token(virtualBalanceFormatted, { symbol: 'stCOMP' })}
+              Multiplier
             </Text>
-          </Skeleton>
-        </div>
-        <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            Multiplier
-          </Text>
-          <Skeleton loading={isLoading}>
-            <Text
-              size='17'
-              className={cn('text-color-2 tabular-nums', {
-                'text-color-6': !isConnected
-              })}
-            >
-              {isConnected ? (multiplier ? `${Format.rate(+multiplierFormatted)}x` : '1x') : '-'}
-            </Text>
-          </Skeleton>
-        </div>
-        <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            Available Rewards
-          </Text>
-          <div className='flex flex-col gap-1'>
             <Skeleton loading={isLoading}>
               <Text
                 size='17'
@@ -210,42 +196,62 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
+                {isConnected ? (multiplier ? `${Format.rate(+multiplierFormatted)}x` : '1x') : '-'}
               </Text>
             </Skeleton>
-            <Condition if={isConnected && !!availableRewards}>
+          </div>
+          <div className='flex flex-col gap-3'>
+            <Text
+              size='11'
+              className='text-color-24'
+            >
+              Available Rewards
+            </Text>
+            <div className='flex flex-col gap-1'>
               <Skeleton loading={isLoading}>
                 <Text
-                  size='11'
-                  className='text-color-24 tabular-nums'
+                  size='17'
+                  className={cn('text-color-2 tabular-nums', {
+                    'text-color-6': !isConnected
+                  })}
                 >
-                  {Format.price(availableRewardsPriceFormatted, 'standard')}
+                  {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
                 </Text>
               </Skeleton>
-            </Condition>
+              <Condition if={isConnected && !!availableRewards}>
+                <Skeleton loading={isLoading}>
+                  <Text
+                    size='11'
+                    className='text-color-24 tabular-nums'
+                  >
+                    {Format.price(availableRewardsPriceFormatted, 'standard')}
+                  </Text>
+                </Skeleton>
+              </Condition>
+            </div>
           </div>
-        </div>
-        <div className='flex flex-col gap-3'>
-          <Text
-            size='11'
-            className='text-color-24'
-          >
-            APR
-          </Text>
-          <Skeleton loading={isLoading}>
+          <div className='flex flex-col gap-3 md:ml-auto md:max-w-[80px] md:min-w-[80px]'>
             <Text
-              size='17'
-              className={cn('text-color-2 tabular-nums', {
-                'text-color-6': !isConnected
-              })}
+              size='11'
+              className='text-color-24'
             >
-              {isConnected ? '0.00' : '0.00'}%
+              APR
             </Text>
-          </Skeleton>
+            <Skeleton loading={isLoading}>
+              <Text
+                size='17'
+                className={cn('text-color-2 tabular-nums', {
+                  'text-color-6': !isConnected
+                })}
+              >
+                {isConnected ? '0.00' : '0.00'}%
+              </Text>
+            </Skeleton>
+          </div>
         </div>
         <Button
           disabled={isStakeButtonDisabled}
-          className='max-w-32.5'
+          className='max-w-full lg:max-w-32.5'
           onClick={onStakeModalOpen}
         >
           <Skeleton
@@ -265,17 +271,38 @@ export function StakeFlowBlock() {
           </Skeleton>
         </Button>
       </div>
-      <Modal
-        title='Stake COMP tokens'
-        open={isOpen}
-        onClose={onModalClose}
-      >
-        <StakeModal
-          delegateAddress={delegateAddress}
-          stakedBalance={stakedBalance?.principal}
-          onStakeConfirmed={onStakeConfirmed}
-        />
-      </Modal>
+      <Condition if={!isMobile}>
+        <Modal
+          title='Stake COMP tokens'
+          open={isOpen}
+          onClose={onModalClose}
+        >
+          <StakeModal
+            delegateAddress={delegateAddress}
+            stakedBalance={stakedBalance?.principal}
+            onStakeConfirmed={onStakeConfirmed}
+          />
+        </Modal>
+      </Condition>
+      <Condition if={isMobile}>
+        <Drawer
+          isOpen={isOpen}
+          onClose={onClose}
+        >
+          <Text
+            size='17'
+            align='center'
+            lineHeight='20'
+          >
+            Stake COMP tokens
+          </Text>
+          <StakeModal
+            delegateAddress={delegateAddress}
+            stakedBalance={stakedBalance?.principal}
+            onStakeConfirmed={onStakeConfirmed}
+          />
+        </Drawer>
+      </Condition>
     </Card>
   );
 }

@@ -77,6 +77,8 @@
 
   --color-border-1: rgba(13, 19, 26, 0.15);
 
+  --color-statistics-bg: linear-gradient(180deg, #D8DFE5 0%, rgba(255, 255, 255, 0.00) 100%);
+
   --shadow-30: 0px 0px 0px 6px #b9bbbc;
 }
 
@@ -119,6 +121,8 @@
 
   --color-border-1: rgba(249, 250, 251, 0.15);
 
+  --color-statistics-bg: linear-gradient(180deg, #1D2833 0%, rgba(29, 40, 51, 0.00) 100%);
+
   --shadow-30: 0px 0px 0px 6px #3C454D;
 }
 
@@ -159,8 +163,11 @@
   --color-color-34: var(--color-34);
 
   --color-border-1: var(--color-border-1);
+
   --color-modal-bg: #0f171f99;
   --color-compound-icon-bg: #131B24;
+
+  --color-statistics-bg: var(--color-statistics-bg);
 
   --shadow-10: 0 2px 1px -1px rgba(0, 0, 0, 0.25), 0 1px 1px 0 rgba(0, 0, 0, 0.25), 0 1px 3px 0 rgba(0, 0, 0, 0.25);
   --shadow-15: 0 2px 8px 0 rgba(0, 0, 0, 0.4);
@@ -304,6 +311,10 @@ body.hide-scrollbar::-webkit-scrollbar {
 .drawer-backdrop {
   backdrop-filter: blur(7.5px);
   background-color: #0f171f99;
+}
+
+.bg-statistics-bg {
+  background: var(--color-statistics-bg);
 }
 
 @keyframes modal-fade-in {

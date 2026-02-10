@@ -12,6 +12,8 @@ import { cn } from '@/lib/utils/cn';
 interface DrawerProps extends PropsWithChildren {
   className?: string;
 
+  contentClassName?: string;
+
   lazy?: boolean;
 
   isOpen?: boolean;
@@ -25,7 +27,7 @@ type DrawerContentInnerProps = DrawerProps & {
 };
 
 const DrawerContentInner = memo((props: DrawerContentInnerProps) => {
-  const { className, children, onClose, isOpen = false, Spring, Gesture } = props;
+  const { className, contentClassName, children, onClose, isOpen = false, Spring, Gesture } = props;
 
   const DURATION_OPEN = 250;
   const DURATION_CLOSE = 150;
@@ -157,7 +159,8 @@ const DrawerContentInner = memo((props: DrawerContentInnerProps) => {
           ref={panelRef}
           className={cn(
             'bg-color-5 pointer-events-auto fixed inset-x-2 bottom-2 z-50 touch-none rounded-2xl p-8 will-change-transform',
-            isOpen ? 'animate-drawer-in' : 'animate-drawer-out'
+            isOpen ? 'animate-drawer-in' : 'animate-drawer-out',
+            contentClassName
           )}
           style={{
             transform: y.to((py) => `translateY(${py}px)`),

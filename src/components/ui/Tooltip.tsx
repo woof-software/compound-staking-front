@@ -20,11 +20,12 @@ export function Tooltip(props: TooltipProps) {
       </button>
       <div
         className={cn(
-          'absolute z-50 w-full max-w-54 min-w-54 rounded-lg p-4',
+          'absolute z-50 max-w-54 min-w-54 rounded-lg p-4',
           'bg-color-4 text-color-24 shadow-md',
           'transition-opacity duration-200',
-          'opacity-0',
-          'group-hover:opacity-100 hover:opacity-100',
+          'pointer-events-none opacity-0',
+          'group-hover:pointer-events-auto group-hover:opacity-100',
+          'hover:pointer-events-auto hover:opacity-100',
           'bottom-5 left-1/2 -translate-x-1/2 -translate-y-1'
         )}
       >
