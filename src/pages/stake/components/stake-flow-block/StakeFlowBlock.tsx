@@ -126,7 +126,7 @@ export function StakeFlowBlock() {
     <Card
       isLoading={isLoading}
       title='Stake'
-      tooltip='Stake your COMP tokens to earn yield every second!'
+      tooltip='Stake COMP for on-chain yield'
     >
       <div className='flex justify-between p-10'>
         <div className='flex flex-col gap-3'>
