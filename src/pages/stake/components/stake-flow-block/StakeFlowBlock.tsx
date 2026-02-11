@@ -266,7 +266,7 @@ export function StakeFlowBlock() {
         </Button>
       </div>
       <Modal
-        title='Stake COMP tokens'
+        title='Stake tokens'
         open={isOpen}
         onClose={onModalClose}
       >

@@ -16,7 +16,7 @@ export function MediaMobile(props: PropsWithChildren) {
           lineHeight='140'
           className='text-color-2'
         >
-          Not available on mobile yet
+          Mobile support coming soon
         </Text>
         <Text
           size='15'
@@ -25,7 +25,7 @@ export function MediaMobile(props: PropsWithChildren) {
           lineHeight='140'
           className='text-color-24 max-w-43'
         >
-          Please use the desktop version for now
+          Use the desktop version to access this feature
         </Text>
       </div>
     </>

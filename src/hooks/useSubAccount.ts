@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSubAccountContract } from '@/hooks/useSubAccountContract';
 import { queryKeys } from '@/shared/query-keys';
 
-const addressSchema = z.string().refine((v): v is Address => isAddress(v), { message: 'Invalid address' });
+const addressSchema = z.string().refine((v): v is Address => isAddress(v), { message: 'Invalid wallet address' });
 
 const schema = z
   .object({

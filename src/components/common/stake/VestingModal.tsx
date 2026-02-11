@@ -112,7 +112,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
             lineHeight='20'
             className='w-full'
           >
-            Amount to be vested
+            Amount to vest
           </Text>
           <div className='flex shrink-0 flex-col items-end'>
             <div className='flex shrink-0 items-end'>
@@ -165,8 +165,8 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
               weight='500'
               className='text-color-22'
             >
-              You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close
-              completed entries or wait until they are finished
+              Maximum vesting limit reached ({maxVestingPositions}). Close completed entries or wait for active ones to
+              finish
             </Text>
           </div>
         </Condition>
@@ -179,7 +179,7 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
               lineHeight='16'
               className='text-color-7'
             >
-              The whole amount will be added to your Claim balance
+              The entire amount will be added to the claim balance
             </Text>
           </div>
         </Condition>

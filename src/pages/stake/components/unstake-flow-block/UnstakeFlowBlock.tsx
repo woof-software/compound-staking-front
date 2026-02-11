@@ -204,7 +204,7 @@ export function UnstakeFlowBlock() {
       <Card
         isLoading={isLoading}
         title='Unstake'
-        tooltip={`Cooldown period for unstaking process is ${FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))}`}
+        tooltip={`Unstaking cooldown: ${FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))}`}
       >
         <div className='flex items-start justify-between p-10'>
           <div className='flex gap-15'>
@@ -288,7 +288,7 @@ export function UnstakeFlowBlock() {
                   'text-white': !isUnstakeButtonDisabled
                 })}
               >
-                {hasActiveLock ? 'Unstake' : 'Request unstake'}
+                {hasActiveLock ? 'Unstake' : 'Request Unstake'}
               </Text>
             </Skeleton>
           </Button>
@@ -303,7 +303,7 @@ export function UnstakeFlowBlock() {
             weight='500'
             className='text-color-7'
           >
-            Your funds are ready to be unstaked
+            Funds are ready to be unstaked
           </Text>
         </div>
       </Condition>
