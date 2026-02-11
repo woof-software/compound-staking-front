@@ -141,7 +141,7 @@ export function DelegateFlowBlock() {
               size='11'
               className='text-color-24'
             >
-              Name of Delegatee
+              Delegated To
             </Text>
             <Skeleton loading={isLoading}>
               {canShowDelegation && delegate?.address ? (

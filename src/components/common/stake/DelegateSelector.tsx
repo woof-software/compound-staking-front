@@ -75,7 +75,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             lineHeight='16'
             className='text-color-6'
           >
-            Choose delegatee
+            Select a delegate
           </Text>
         ) : (
           <div className='flex w-full items-center justify-between'>
@@ -121,7 +121,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
               className={cn('min-h-13', {
                 'border-color-31': !filteredDelegates.length && !!searchValue.length
               })}
-              placeholder='Delegatee name or address'
+              placeholder='Search delegates by name or address'
               value={searchValue}
               onChange={setSearchValue}
             />
@@ -132,7 +132,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 weight='500'
                 className='text-color-31'
               >
-                No delegate found
+                No delegates found
               </Text>
             </Condition>
           </div>
