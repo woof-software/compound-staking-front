@@ -318,7 +318,7 @@ export function StakeModal(props: StakeModalProps) {
             >
               Staking additional COMP will:
             </Text>
-            <ul className='text-color-22 list-disc space-y-1 pl-4 leading-4'>
+            <ul className='text-color-22 list-disc space-y-1 pl-4 leading-4 font-medium'>
               <li className='text-[11px]'>Reset the multiplier to 1x</li>
               <li className='text-[11px]'>Vest all available rewards</li>
               <li className='text-[11px]'>Reassign voting power to the selected delegate</li>
