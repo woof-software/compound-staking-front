@@ -27,7 +27,7 @@ export function StatisticsBlock() {
             weight='500'
             align='center'
           >
-            Stake your{' '}
+            Stake{' '}
             <Text
               tag='span'
               size='45'
@@ -37,7 +37,7 @@ export function StatisticsBlock() {
             >
               COMP
             </Text>{' '}
-            tokens to earn yield every second!
+            for on-chain yield
           </Text>
         </Skeleton>
       </div>
