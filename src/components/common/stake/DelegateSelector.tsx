@@ -203,9 +203,9 @@ export function DelegateSelector(props: DelegateSelectorProps) {
           isOpen={isOpen}
           onClose={onClose}
         >
-          <div className='flex w-full items-center justify-center'>
+          <div className='relative flex w-full items-center justify-center'>
             <ArrowIcon
-              className='text-color-8 size-6 rotate-180'
+              className='text-color-8 absolute left-0 size-6 rotate-180'
               onClick={onClose}
             />
             <Text

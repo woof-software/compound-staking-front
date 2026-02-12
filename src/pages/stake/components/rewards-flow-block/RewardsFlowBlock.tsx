@@ -161,7 +161,7 @@ export function RewardsFlowBlock() {
         title='Rewards'
         tooltip='Vest and claim available rewards'
       >
-        <div className='border-color-8 lgp-10 flex flex-col justify-between gap-10 border-b-[0.5px] p-5 md:flex-row md:gap-0'>
+        <div className='border-color-8 flex flex-col justify-between gap-10 border-b-[0.5px] p-5 md:flex-row md:gap-0 lg:p-10'>
           <div className='flex w-full max-w-120 flex-col justify-between gap-10 md:flex-row md:gap-0'>
             <div className='flex flex-col gap-3'>
               <Text
@@ -273,7 +273,7 @@ export function RewardsFlowBlock() {
             <Button
               disabled={isClaimButtonDisabled}
               onClick={onClaimClick}
-              className='lg:max-w-32.5text-[11px] max-w-full font-medium'
+              className='max-w-full text-[11px] font-medium lg:max-w-32.5'
             >
               <Skeleton
                 loading={isLoading}

@@ -2,9 +2,11 @@ import { useEffect, useEffectEvent, useMemo } from 'react';
 import { useConnection } from 'wagmi';
 
 import { ExternalLinkIcon } from '@/assets/svg';
+import { Condition } from '@/components/common/Condition';
 import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
+import { Drawer } from '@/components/ui/Drawer';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
@@ -12,6 +14,7 @@ import { APPLICATION_CHAIN } from '@/consts/common';
 import { useDelegateDuration } from '@/hooks/useDelegateDuration';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useSubAccount } from '@/hooks/useSubAccount';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
@@ -26,6 +29,8 @@ import { useWalletStore } from '@/stores/useWalletStore';
 
 export function DelegateFlowBlock() {
   const { isConnected, address, chainId } = useConnection();
+
+  const isMobile = useMediaQuery('(max-width: 767px)');
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
@@ -232,18 +237,40 @@ export function DelegateFlowBlock() {
           </Skeleton>
         </Button>
       </div>
-      <Modal
-        open={isOpen}
-        title='Delegate'
-        onClose={onModalClose}
-      >
-        <DelegateModal
-          subAccountAddress={subAccountAddress}
-          delegate={delegate}
+      <Condition if={!isMobile}>
+        <Modal
+          open={isOpen}
+          title='Delegate'
+          onClose={onModalClose}
+        >
+          <DelegateModal
+            subAccountAddress={subAccountAddress}
+            delegate={delegate}
+            onClose={onClose}
+            onDelegateConfirmed={onDelegateConfirmed}
+          />
+        </Modal>
+      </Condition>
+      <Condition if={isMobile}>
+        <Drawer
+          isOpen={isOpen}
           onClose={onClose}
-          onDelegateConfirmed={onDelegateConfirmed}
-        />
-      </Modal>
+        >
+          <Text
+            size='17'
+            align='center'
+            lineHeight='20'
+          >
+            Delegate
+          </Text>
+          <DelegateModal
+            subAccountAddress={subAccountAddress}
+            delegate={delegate}
+            onClose={onClose}
+            onDelegateConfirmed={onDelegateConfirmed}
+          />
+        </Drawer>
+      </Condition>
     </Card>
   );
 }
