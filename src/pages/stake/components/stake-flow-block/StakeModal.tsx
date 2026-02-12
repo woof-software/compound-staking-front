@@ -223,7 +223,7 @@ export function StakeModal(props: StakeModalProps) {
                 weight='500'
                 className='text-color-31 mb-1'
               >
-                Amount Exceeds Wallet Balance
+                Insufficient balance
               </Text>
             </Condition>
             <div className='flex items-center justify-between'>
@@ -288,7 +288,7 @@ export function StakeModal(props: StakeModalProps) {
             weight='500'
             className='text-color-6 mt-2.5'
           >
-            Delegate is required
+            Select a delegate to continue
           </Text>
         </Condition>
       </Skeleton>
@@ -301,23 +301,29 @@ export function StakeModal(props: StakeModalProps) {
             weight='500'
             className='text-color-22'
           >
-            You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close completed
-            entries or wait until they are finished
+            Maximum vesting limit reached ({maxVestingPositions}). Close completed entries or wait for active ones to
+            finish
           </Text>
         </div>
       </Condition>
       <Condition if={!hasMaxPosition && showWarningForAdditionalStake}>
-        <div className='bg-color-21 flex items-center gap-2.5 rounded-lg p-5'>
+        <div className='bg-color-21 flex items-start gap-2.5 rounded-lg p-5'>
           <InfoIcon className='text-color-22 size-4 shrink-0' />
-          <Text
-            size='11'
-            lineHeight='16'
-            weight='500'
-            className='text-color-22'
-          >
-            Multiplier reverts to 1x after staking more COMP. All available rewards get vested. Voting power goes to
-            another delegate
-          </Text>
+          <div className='flex flex-col gap-2'>
+            <Text
+              size='11'
+              lineHeight='16'
+              weight='500'
+              className='text-color-22'
+            >
+              Staking additional COMP will:
+            </Text>
+            <ul className='text-color-22 list-disc space-y-1 pl-4 leading-4 font-medium'>
+              <li className='text-[11px]'>Reset the multiplier to 1x</li>
+              <li className='text-[11px]'>Vest all available rewards</li>
+              <li className='text-[11px]'>Reassign voting power to the selected delegate</li>
+            </ul>
+          </div>
         </div>
       </Condition>
       <div className='flex flex-col gap-2.5'>
@@ -338,7 +344,7 @@ export function StakeModal(props: StakeModalProps) {
                 'after-animate-loading-dots text-white': isApproveLoading
               })}
             >
-              {isApproveLoading ? 'Pending' : 'Approve'}
+              {isApproveLoading ? 'Approving' : 'Approve'}
             </Text>
             <Text
               size='11'

@@ -20,7 +20,7 @@ export function useDelegateSubAccount(chainId?: number, owner?: Address) {
 
   const addressSchema = z
     .string()
-    .refine((v): v is Address => isAddress(v), { message: 'Invalid address' })
+    .refine((v): v is Address => isAddress(v), { message: 'Invalid wallet address' })
     .optional();
 
   return {

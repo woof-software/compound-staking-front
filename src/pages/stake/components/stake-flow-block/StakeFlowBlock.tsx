@@ -130,7 +130,7 @@ export function StakeFlowBlock() {
     <Card
       isLoading={isLoading}
       title='Stake'
-      tooltip='Stake your COMP tokens to earn yield every second!'
+      tooltip='Stake COMP for on-chain yield'
     >
       <div className='flex flex-col justify-between gap-10 p-5 md:p-10 lg:flex-row'>
         <div className='grid w-full grid-cols-2 gap-5 md:flex md:flex-wrap md:gap-10'>
@@ -273,7 +273,7 @@ export function StakeFlowBlock() {
       </div>
       <Condition if={!isMobile}>
         <Modal
-          title='Stake COMP tokens'
+          title='Stake tokens'
           open={isOpen}
           onClose={onModalClose}
         >
@@ -294,7 +294,7 @@ export function StakeFlowBlock() {
             align='center'
             lineHeight='20'
           >
-            Stake COMP tokens
+            Stake tokens
           </Text>
           <StakeModal
             delegateAddress={delegateAddress}

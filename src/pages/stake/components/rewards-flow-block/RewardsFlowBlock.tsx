@@ -156,6 +156,7 @@ export function RewardsFlowBlock() {
       <Card
         isLoading={isLoading}
         title='Rewards'
+        tooltip='Vest and claim available rewards'
       >
         <div className='border-color-8 flex justify-between border-b-[0.5px] p-10'>
           <div className='flex w-full max-w-120 justify-between'>
@@ -343,14 +344,14 @@ export function RewardsFlowBlock() {
                 size='15'
                 lineHeight='16'
               >
-                No Positions Yet
+                No positions
               </Text>
               <Text
                 size='15'
                 lineHeight='21'
                 className='text-color-24'
               >
-                No vested rewards yet
+                Stake COMP and vest rewards to see your positions here
               </Text>
             </div>
           </div>
@@ -365,7 +366,7 @@ export function RewardsFlowBlock() {
         onVestingConfirmed={onVestingConfirmed}
       />
       <Modal
-        title='Claim COMP'
+        title='Claim Rewards'
         open={isClaimOpen}
         onClose={onClaimModalClose}
       >

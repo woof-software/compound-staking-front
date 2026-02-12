@@ -24,7 +24,7 @@ export function StatisticsBlock() {
             <span className='text-color-7 text-[32px] leading-[120%] font-medium md:text-[45px] md:leading-13.5'>
               COMP
             </span>{' '}
-            tokens to earn yield every second!
+            for on-chain yield
           </h1>
         </Skeleton>
       </div>

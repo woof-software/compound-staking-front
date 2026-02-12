@@ -127,7 +127,7 @@ export function ClaimModal(props: ClaimModalProps) {
           lineHeight='20'
           className='w-full'
         >
-          Amount to be claimed
+          Claim amount
         </Text>
         <div className='flex shrink-0 flex-col items-end'>
           <Skeleton loading={isLoading}>
@@ -167,7 +167,7 @@ export function ClaimModal(props: ClaimModalProps) {
           weight='500'
           className='text-color-24'
         >
-          Change wallet address
+          Recipient wallet
         </Text>
         <Switch
           checked={isChangeWallet}
@@ -180,7 +180,7 @@ export function ClaimModal(props: ClaimModalProps) {
             className={cn({
               'border-color-31': walletAddress && !isAddress(walletAddress)
             })}
-            placeholder='Wallet address'
+            placeholder='Enter wallet address'
             value={walletAddress}
             onChange={onWalletAddressChange}
             addonRight={
@@ -209,7 +209,7 @@ export function ClaimModal(props: ClaimModalProps) {
               lineHeight='16'
               className='text-color-31 mt-2.5'
             >
-              Invalid address
+              Invalid wallet address
             </Text>
           </Condition>
         </div>

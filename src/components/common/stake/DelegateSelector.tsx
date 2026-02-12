@@ -208,7 +208,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             align='center'
             lineHeight='20'
           >
-            Choose delegatee
+            Select a delegate
           </Text>
           <Divider
             orientation='horizontal'
@@ -220,7 +220,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
               className={cn('min-h-13', {
                 'border-color-31': !filteredDelegates.length && !!searchValue.length
               })}
-              placeholder='Delegatee name or address'
+              placeholder='Search delegates by name or address'
               value={searchValue}
               onChange={setSearchValue}
             />
@@ -231,7 +231,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 weight='500'
                 className='text-color-31'
               >
-                No delegate found
+                No delegates found
               </Text>
             </Condition>
           </div>
