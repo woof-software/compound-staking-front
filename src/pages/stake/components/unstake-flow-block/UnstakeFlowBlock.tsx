@@ -7,6 +7,7 @@ import { Condition } from '@/components/common/Condition';
 import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
+import { Drawer } from '@/components/ui/Drawer';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
@@ -16,6 +17,7 @@ import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
 import { useUnstakeLockDuration } from '@/hooks/useLockDuration';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMultiplier } from '@/hooks/useMultiplier';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
@@ -42,6 +44,8 @@ export function UnstakeFlowBlock() {
     enable: setIsDurationFinished,
     disable: resetIsDurationFinished
   } = useSwitch();
+
+  const isMobile = useMediaQuery('(max-width: 767px)');
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
@@ -206,7 +210,7 @@ export function UnstakeFlowBlock() {
         title='Unstake'
         tooltip={`Unstaking cooldown: ${FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))}`}
       >
-        <div className='flex flex-col items-start justify-between gap-10 p-5 md:flex-row md:p-10'>
+        <div className='flex flex-col items-start justify-between gap-10 p-5 lg:flex-row lg:p-10'>
           <div className='flex flex-col gap-10 md:flex-row md:gap-15'>
             <div className='flex flex-col gap-3'>
               <Text
@@ -224,7 +228,7 @@ export function UnstakeFlowBlock() {
                       'text-color-6': !isConnected
                     })}
                   >
-                    {Format.token(lockedStakedBalanceFormatted, { symbol: 'stCOMP' })}
+                    {Format.token(lockedStakedBalanceFormatted, { symbol: !isMobile ? 'stCOMP' : undefined })}
                   </Text>
                 </Skeleton>
                 <Condition if={isConnected && !!lockedTokenBalance?.amount}>
@@ -273,7 +277,7 @@ export function UnstakeFlowBlock() {
           </div>
           <Button
             disabled={isUnstakeButtonDisabled}
-            className='max-w-full md:max-w-32.5'
+            className='max-w-full lg:max-w-32.5'
             onClick={onButtonClick}
           >
             <Skeleton
@@ -307,16 +311,36 @@ export function UnstakeFlowBlock() {
           </Text>
         </div>
       </Condition>
-      <Modal
-        title='Unstake'
-        open={isOpen}
-        onClose={onModalClose}
-      >
-        <UnstakeModal
-          isLoading={isTransactionLoading}
-          onClick={onUnstakeRequest}
-        />
-      </Modal>
+      <Condition if={!isMobile}>
+        <Modal
+          title='Unstake'
+          open={isOpen}
+          onClose={onModalClose}
+        >
+          <UnstakeModal
+            isLoading={isTransactionLoading}
+            onClick={onUnstakeRequest}
+          />
+        </Modal>
+      </Condition>
+      <Condition if={isMobile}>
+        <Drawer
+          isOpen={isOpen}
+          onClose={onModalClose}
+        >
+          <Text
+            size='17'
+            align='center'
+            lineHeight='20'
+          >
+            Unstake
+          </Text>
+          <UnstakeModal
+            isLoading={isTransactionLoading}
+            onClick={onUnstakeRequest}
+          />
+        </Drawer>
+      </Condition>
     </div>
   );
 }

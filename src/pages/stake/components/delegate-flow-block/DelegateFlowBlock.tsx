@@ -134,8 +134,8 @@ export function DelegateFlowBlock() {
       title='Delegation'
       tooltip={`Cooldown period for redelegation process is ${FormatTime.cooldownFromSeconds(Number(delegateDuration ?? 0n))}`}
     >
-      <div className='flex justify-between p-10'>
-        <div className='flex gap-15'>
+      <div className='flex flex-col justify-between gap-10 p-5 lg:flex-row lg:p-10'>
+        <div className='flex flex-col gap-10 sm:flex-row md:gap-15'>
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
@@ -215,7 +215,7 @@ export function DelegateFlowBlock() {
         <Button
           onClick={onModalOpen}
           disabled={isDelegateButtonDisabled}
-          className='max-w-32.5'
+          className='max-w-full lg:max-w-32.5'
         >
           <Skeleton
             loading={isLoading}

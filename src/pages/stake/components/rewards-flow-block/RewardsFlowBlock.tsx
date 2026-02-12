@@ -15,6 +15,7 @@ import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { vestingToClaimCalc } from '@/lib/rewards';
@@ -27,6 +28,8 @@ import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export function RewardsFlowBlock() {
+  const isMobile = useMediaQuery('(max-width: 767px)');
+
   const [claimAmount, setClaimAmount] = useState<bigint>(0n);
 
   const { isConnected, address, chainId } = useConnection();
@@ -158,8 +161,8 @@ export function RewardsFlowBlock() {
         title='Rewards'
         tooltip='Vest and claim available rewards'
       >
-        <div className='border-color-8 flex justify-between border-b-[0.5px] p-10'>
-          <div className='flex w-full max-w-120 justify-between'>
+        <div className='border-color-8 lgp-10 flex flex-col justify-between gap-10 border-b-[0.5px] p-5 md:flex-row md:gap-0'>
+          <div className='flex w-full max-w-120 flex-col justify-between gap-10 md:flex-row md:gap-0'>
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
@@ -270,7 +273,7 @@ export function RewardsFlowBlock() {
             <Button
               disabled={isClaimButtonDisabled}
               onClick={onClaimClick}
-              className='max-w-32.5 text-[11px] font-medium'
+              className='lg:max-w-32.5text-[11px] max-w-full font-medium'
             >
               <Skeleton
                 loading={isLoading}
@@ -287,7 +290,7 @@ export function RewardsFlowBlock() {
               </Skeleton>
             </Button>
           </div>
-          <Divider orientation='vertical' />
+          <Divider orientation={isMobile ? 'horizontal' : 'vertical'} />
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
@@ -319,7 +322,7 @@ export function RewardsFlowBlock() {
           <Button
             disabled={isVestButtonDisabled}
             onClick={onVestingClick}
-            className='max-w-32.5 text-[11px] font-medium'
+            className='max-w-full text-[11px] font-medium lg:max-w-32.5'
           >
             <Skeleton
               loading={isLoading}

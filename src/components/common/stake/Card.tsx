@@ -17,7 +17,7 @@ export function Card(props: CardProps) {
 
   return (
     <section className='bg-color-4 w-full rounded-lg'>
-      <div className='bg-color-11 flex items-center gap-3 rounded-lg rounded-b-none p-5 py-3.5 md:p-10'>
+      <div className='bg-color-11 flex items-center gap-3 rounded-lg rounded-b-none p-5 py-3.5 lg:p-10'>
         <Skeleton loading={isLoading}>
           <Text
             size='13'

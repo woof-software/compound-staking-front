@@ -78,6 +78,16 @@ export function ConnectedButtonMobile({ onChangeWallet: onWalletChange }: Connec
     onRefetchData();
   }, [isConnected]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('disable-scroll-vertical');
+    }
+
+    return () => {
+      document.body.classList.remove('disable-scroll-vertical');
+    };
+  }, [isOpen]);
+
   return (
     <div className='block md:hidden'>
       <Button

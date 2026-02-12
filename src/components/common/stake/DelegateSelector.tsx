@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
+import { ArrowIcon, CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Divider } from '@/components/ui/Divider';
 import { Drawer } from '@/components/ui/Drawer';
@@ -29,6 +29,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
   const [searchValue, setSearchValue] = useState('');
 
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const isBelow1100 = useMediaQuery('(max-width: 1100px)');
 
   const { isEnabled: isOpen, toggle: open, disable: close } = useSwitch();
 
@@ -39,7 +40,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
   const onClose = useCallback(() => {
     close();
     setSearchValue('');
-  }, [close]);
+  }, []);
 
   const onDelegateSelect = useCallback(
     (delegate: Delegate) => {
@@ -58,7 +59,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
     open();
   };
 
-  useOutsideClick(() => ref.current, onClose);
+  useOutsideClick(() => ref.current, isBelow1100 ? noop : onClose);
 
   return (
     <>
@@ -202,14 +203,21 @@ export function DelegateSelector(props: DelegateSelectorProps) {
           isOpen={isOpen}
           onClose={onClose}
         >
-          <Text
-            size='17'
-            weight='600'
-            align='center'
-            lineHeight='20'
-          >
-            Select a delegate
-          </Text>
+          <div className='flex w-full items-center justify-center'>
+            <ArrowIcon
+              className='text-color-8 size-6 rotate-180'
+              onClick={onClose}
+            />
+            <Text
+              size='17'
+              weight='400'
+              align='center'
+              lineHeight='20'
+              className='mx-auto'
+            >
+              Select a delegate
+            </Text>
+          </div>
           <Divider
             orientation='horizontal'
             className='my-8'

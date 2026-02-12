@@ -132,7 +132,7 @@ export function StakeFlowBlock() {
       title='Stake'
       tooltip='Stake COMP for on-chain yield'
     >
-      <div className='flex flex-col justify-between gap-10 p-5 md:p-10 lg:flex-row'>
+      <div className='flex flex-col justify-between gap-10 p-5 lg:flex-row lg:p-10'>
         <div className='grid w-full grid-cols-2 gap-5 md:flex md:flex-wrap md:gap-10'>
           <div className='flex flex-col gap-3 md:col-span-2'>
             <Text
@@ -149,7 +149,7 @@ export function StakeFlowBlock() {
                     'text-color-6': !isConnected
                   })}
                 >
-                  {Format.token(stakedBalanceFormatted, { symbol: 'COMP' })}
+                  {Format.token(stakedBalanceFormatted, { symbol: !isMobile ? 'COMP' : undefined })}
                 </Text>
               </Skeleton>
               <Condition if={isConnected && !!stakedBalance?.principal}>
@@ -178,7 +178,7 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {Format.token(virtualBalanceFormatted, { symbol: 'stCOMP' })}
+                {Format.token(virtualBalanceFormatted, { symbol: !isMobile ? 'stCOMP' : undefined })}
               </Text>
             </Skeleton>
           </div>
@@ -215,7 +215,7 @@ export function StakeFlowBlock() {
                     'text-color-6': !isConnected
                   })}
                 >
-                  {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
+                  {Format.token(availableRewardsFormatted, { symbol: !isMobile ? 'COMP' : undefined })}
                 </Text>
               </Skeleton>
               <Condition if={isConnected && !!availableRewards}>
