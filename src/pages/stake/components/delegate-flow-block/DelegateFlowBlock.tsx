@@ -30,7 +30,7 @@ import { useWalletStore } from '@/stores/useWalletStore';
 export function DelegateFlowBlock() {
   const { isConnected, address, chainId } = useConnection();
 
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
@@ -139,8 +139,8 @@ export function DelegateFlowBlock() {
       title='Delegation'
       tooltip={`Cooldown period for redelegation process is ${FormatTime.cooldownFromSeconds(Number(delegateDuration ?? 0n))}`}
     >
-      <div className='flex flex-col justify-between gap-10 p-5 lg:flex-row lg:p-10'>
-        <div className='flex flex-col gap-10 sm:flex-row md:gap-15'>
+      <div className='flex flex-col justify-between gap-10 p-5 md:flex-row md:p-10'>
+        <div className='grid grid-cols-1 flex-col gap-10 sm:grid-cols-3 sm:flex-row md:flex md:gap-15'>
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
@@ -220,7 +220,7 @@ export function DelegateFlowBlock() {
         <Button
           onClick={onModalOpen}
           disabled={isDelegateButtonDisabled}
-          className='max-w-full lg:max-w-32.5'
+          className='max-w-full md:max-w-32.5'
         >
           <Skeleton
             loading={isLoading}
@@ -237,7 +237,7 @@ export function DelegateFlowBlock() {
           </Skeleton>
         </Button>
       </div>
-      <Condition if={!isMobile}>
+      <Condition if={isDesktop}>
         <Modal
           open={isOpen}
           title='Delegate'
@@ -251,7 +251,7 @@ export function DelegateFlowBlock() {
           />
         </Modal>
       </Condition>
-      <Condition if={isMobile}>
+      <Condition if={!isDesktop}>
         <Drawer
           isOpen={isOpen}
           onClose={onClose}

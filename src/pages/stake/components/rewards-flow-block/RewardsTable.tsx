@@ -96,7 +96,7 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
 
   return (
     <>
-      <div className='hidden md:block'>
+      <div className='hidden lg:block'>
         <div className='border-color-8 grid grid-cols-5 items-center border-b-[0.5px] border-solid px-10 py-6'>
           {columns.map(({ accessorKey, header }) => {
             const active = sortBy === accessorKey;
@@ -142,8 +142,8 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
           ))}
         </div>
       </div>
-      <div className='block md:hidden'>
-        <div className='flex flex-col gap-5 px-5'>
+      <div className='block lg:hidden'>
+        <div className='flex flex-col gap-5 px-5 md:px-10'>
           <Divider orientation='horizontal' />
           <Button
             onClick={onOpen}

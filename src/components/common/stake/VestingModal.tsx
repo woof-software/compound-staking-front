@@ -95,7 +95,7 @@ export function VestingModal({ onVestingConfirmed = noop }: VestingModalProps) {
   }, [isVestRewardsSuccess]);
 
   return (
-    <div className='mt-8 flex flex-col gap-8'>
+    <div className='mt-8 flex w-full flex-col gap-8'>
       <Divider orientation='horizontal' />
       <div className='flex'>
         <Text
@@ -175,7 +175,7 @@ export function VestingModal({ onVestingConfirmed = noop }: VestingModalProps) {
         </div>
       </Condition>
       <Button
-        className={cn('h-14 w-85 flex-col', {
+        className={cn('h-14 flex-col', {
           'bg-color-7': isVestingLoading
         })}
         disabled={isVestButtonDisabled}

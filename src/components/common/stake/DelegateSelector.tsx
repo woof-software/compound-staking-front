@@ -28,7 +28,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
 
   const [searchValue, setSearchValue] = useState('');
 
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
   const isBelow1100 = useMediaQuery('(max-width: 1100px)');
 
   const { isEnabled: isOpen, toggle: open, disable: close } = useSwitch();
@@ -46,11 +46,11 @@ export function DelegateSelector(props: DelegateSelectorProps) {
     (delegate: Delegate) => {
       onSelect(delegate);
 
-      if (!isMobile) {
+      if (isDesktop) {
         onClose();
       }
     },
-    [isMobile, onSelect, onClose]
+    [isDesktop, onSelect, onClose]
   );
 
   const onSelectorOpen = () => {
@@ -64,14 +64,14 @@ export function DelegateSelector(props: DelegateSelectorProps) {
   return (
     <>
       <div
-        ref={!isMobile ? ref : undefined}
+        ref={isDesktop ? ref : undefined}
         className={cn('relative w-full', {
           'shadow-30 shadow-30-pulse rounded-lg': !hasValue
         })}
       >
         <div
           className={cn(
-            'flex h-13 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
+            'flex h-13 w-full cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
             {
               'border-color-white': !hasValue,
               'border-color-8': hasValue
@@ -124,7 +124,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             })}
           />
         </div>
-        <Condition if={isOpen && !isMobile}>
+        <Condition if={isOpen && isDesktop}>
           <div className='border-color-8 bg-color-4 absolute top-13 flex max-h-95 w-full flex-col gap-7 rounded-2xl border border-solid p-6'>
             <div className='flex flex-col gap-2.5'>
               <Input
@@ -197,7 +197,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
           </div>
         </Condition>
       </div>
-      <Condition if={isMobile}>
+      <Condition if={!isDesktop}>
         <Drawer
           contentClassName='bg-color-4'
           isOpen={isOpen}

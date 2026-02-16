@@ -47,7 +47,7 @@ export function UnstakeFlowBlock() {
     disable: resetIsDurationFinished
   } = useSwitch();
 
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
@@ -212,8 +212,8 @@ export function UnstakeFlowBlock() {
         title='Unstake'
         tooltip={`Unstaking cooldown: ${FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))}`}
       >
-        <div className='flex flex-col items-start justify-between gap-10 p-5 lg:flex-row lg:p-10'>
-          <div className='flex flex-col gap-10 md:flex-row md:gap-15'>
+        <div className='flex flex-col items-start justify-between gap-10 p-5 md:flex-row md:p-10'>
+          <div className='grid w-full grid-cols-1 flex-col gap-10 sm:grid-cols-2 md:flex md:flex-row md:gap-15'>
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
@@ -232,7 +232,7 @@ export function UnstakeFlowBlock() {
                         'text-color-6': !isConnected
                       })}
                     >
-                      {Format.token(lockedStakedBalanceFormatted, { symbol: !isMobile ? 'stCOMP' : undefined })}
+                      {Format.token(lockedStakedBalanceFormatted, { symbol: isDesktop ? 'stCOMP' : undefined })}
                     </Text>
                   </div>
                 </Skeleton>
@@ -282,7 +282,7 @@ export function UnstakeFlowBlock() {
           </div>
           <Button
             disabled={isUnstakeButtonDisabled}
-            className='max-w-full lg:max-w-32.5'
+            className='max-w-full md:max-w-32.5'
             onClick={onButtonClick}
           >
             <Skeleton
@@ -316,7 +316,7 @@ export function UnstakeFlowBlock() {
           </Text>
         </div>
       </Condition>
-      <Condition if={!isMobile}>
+      <Condition if={isDesktop}>
         <Modal
           title='Unstake'
           open={isOpen}
@@ -328,7 +328,7 @@ export function UnstakeFlowBlock() {
           />
         </Modal>
       </Condition>
-      <Condition if={isMobile}>
+      <Condition if={!isDesktop}>
         <Drawer
           isOpen={isOpen}
           onClose={onModalClose}

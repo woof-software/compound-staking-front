@@ -31,7 +31,7 @@ import { useWalletStore } from '@/stores/useWalletStore';
 import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
 export function RewardsFlowBlock() {
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const [claimAmount, setClaimAmount] = useState<bigint>(0n);
 
@@ -164,129 +164,131 @@ export function RewardsFlowBlock() {
         title='Rewards'
         tooltip='Vest and claim available rewards'
       >
-        <div className='border-color-8 flex flex-col justify-between gap-5 p-5 sm:border-b-0 md:flex-row md:gap-0 md:border-b-[0.5px] lg:gap-10 lg:p-10'>
-          <div className='flex w-full max-w-120 flex-col justify-between gap-5 md:flex-row md:gap-0 lg:gap-10'>
-            <div className='flex flex-col gap-3'>
-              <Text
-                size='11'
-                className='text-color-24'
-              >
-                Total vesting
-              </Text>
-              <div className='flex flex-col gap-2.5 lg:gap-1'>
-                <Skeleton loading={isLoading}>
-                  <div className='flex items-center gap-1.5'>
-                    <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
-                    <Text
-                      size='17'
-                      className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
-                    >
-                      {Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), {
-                        symbol: !isMobile ? 'COMP' : undefined
-                      })}
-                    </Text>
-                  </div>
-                </Skeleton>
-                <Condition if={isConnected && !!totalVesting}>
+        <div className='border-color-8 flex flex-col justify-between gap-5 border-b-0 p-5 md:gap-10 md:p-10 lg:flex-row lg:border-b-[0.5px]'>
+          <div className='flex w-full flex-col justify-between gap-5 md:flex-row md:gap-0 lg:max-w-120 lg:gap-10'>
+            <div className='flex flex-col justify-between gap-5 md:flex-row md:gap-20 lg:gap-10'>
+              <div className='flex flex-col gap-3'>
+                <Text
+                  size='11'
+                  className='text-color-24'
+                >
+                  Total vesting
+                </Text>
+                <div className='flex flex-col gap-2.5 lg:gap-1'>
                   <Skeleton loading={isLoading}>
-                    <Text
-                      size='11'
-                      className='text-color-24 tabular-nums'
-                    >
-                      {Format.price(totalVestingPriceFormatted, 'standard')}
-                    </Text>
+                    <div className='flex items-center gap-1.5'>
+                      <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                      <Text
+                        size='17'
+                        className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
+                      >
+                        {Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), {
+                          symbol: isDesktop ? 'COMP' : undefined
+                        })}
+                      </Text>
+                    </div>
                   </Skeleton>
-                </Condition>
+                  <Condition if={isConnected && !!totalVesting}>
+                    <Skeleton loading={isLoading}>
+                      <Text
+                        size='11'
+                        className='text-color-24 tabular-nums'
+                      >
+                        {Format.price(totalVestingPriceFormatted, 'standard')}
+                      </Text>
+                    </Skeleton>
+                  </Condition>
+                </div>
               </div>
-            </div>
-            <div className='flex flex-col gap-3'>
-              <Text
-                size='11'
-                className='text-color-24'
-              >
-                Total to claim
-              </Text>
-              <div className='flex flex-col gap-2.5 lg:gap-1'>
-                <Skeleton loading={isLoading}>
-                  <div className='flex items-center gap-1.5'>
-                    <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
-                    <Text
-                      size='17'
-                      className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
-                    >
-                      <Duration
-                        end={longestDurationTs * 1000}
-                        unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
-                        render={(secondsLeft = 0) => {
-                          const nowSec = longestDurationTs - secondsLeft;
-
-                          const totalToClaim = rows.reduce((acc, row) => {
-                            const rowSecondsLeft = Math.max(row.endDate - nowSec, 0);
-
-                            return (
-                              acc +
-                              vestingToClaimCalc({
-                                vestingAmount: row.vestingAmount,
-                                claimedAmount: row.claimedAmount,
-                                startDate: row.startDate,
-                                endDate: row.endDate,
-                                secondsLeft: rowSecondsLeft
-                              })
-                            );
-                          }, 0n);
-
-                          return Format.token(formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS), {
-                            symbol: !isMobile ? 'COMP' : undefined
-                          });
-                        }}
-                      />
-                    </Text>
-                  </div>
-                </Skeleton>
-                <Condition if={isConnected && !!totalVesting}>
+              <div className='flex flex-col gap-3'>
+                <Text
+                  size='11'
+                  className='text-color-24'
+                >
+                  Total to claim
+                </Text>
+                <div className='flex flex-col gap-2.5 lg:gap-1'>
                   <Skeleton loading={isLoading}>
-                    <Text
-                      size='11'
-                      className='text-color-24 tabular-nums'
-                    >
-                      <Duration
-                        end={longestDurationTs * 1000}
-                        unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
-                        render={(secondsLeft = 0) => {
-                          const nowSec = longestDurationTs - secondsLeft;
+                    <div className='flex items-center gap-1.5'>
+                      <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                      <Text
+                        size='17'
+                        className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
+                      >
+                        <Duration
+                          end={longestDurationTs * 1000}
+                          unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
+                          render={(secondsLeft = 0) => {
+                            const nowSec = longestDurationTs - secondsLeft;
 
-                          const totalToClaim = rows.reduce((acc, row) => {
-                            const rowSecondsLeft = Math.max(row.endDate - nowSec, 0);
+                            const totalToClaim = rows.reduce((acc, row) => {
+                              const rowSecondsLeft = Math.max(row.endDate - nowSec, 0);
 
-                            return (
-                              acc +
-                              vestingToClaimCalc({
-                                vestingAmount: row.vestingAmount,
-                                claimedAmount: row.claimedAmount,
-                                startDate: row.startDate,
-                                endDate: row.endDate,
-                                secondsLeft: rowSecondsLeft
-                              })
-                            );
-                          }, 0n);
+                              return (
+                                acc +
+                                vestingToClaimCalc({
+                                  vestingAmount: row.vestingAmount,
+                                  claimedAmount: row.claimedAmount,
+                                  startDate: row.startDate,
+                                  endDate: row.endDate,
+                                  secondsLeft: rowSecondsLeft
+                                })
+                              );
+                            }, 0n);
 
-                          const toClaimPriceFormatted = formatUnits(
-                            totalToClaim * (baseTokenPrice ?? 0n),
-                            ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
-                          );
-
-                          return Format.price(toClaimPriceFormatted, 'standard');
-                        }}
-                      />
-                    </Text>
+                            return Format.token(formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS), {
+                              symbol: isDesktop ? 'COMP' : undefined
+                            });
+                          }}
+                        />
+                      </Text>
+                    </div>
                   </Skeleton>
-                </Condition>
+                  <Condition if={isConnected && !!totalVesting}>
+                    <Skeleton loading={isLoading}>
+                      <Text
+                        size='11'
+                        className='text-color-24 tabular-nums'
+                      >
+                        <Duration
+                          end={longestDurationTs * 1000}
+                          unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
+                          render={(secondsLeft = 0) => {
+                            const nowSec = longestDurationTs - secondsLeft;
+
+                            const totalToClaim = rows.reduce((acc, row) => {
+                              const rowSecondsLeft = Math.max(row.endDate - nowSec, 0);
+
+                              return (
+                                acc +
+                                vestingToClaimCalc({
+                                  vestingAmount: row.vestingAmount,
+                                  claimedAmount: row.claimedAmount,
+                                  startDate: row.startDate,
+                                  endDate: row.endDate,
+                                  secondsLeft: rowSecondsLeft
+                                })
+                              );
+                            }, 0n);
+
+                            const toClaimPriceFormatted = formatUnits(
+                              totalToClaim * (baseTokenPrice ?? 0n),
+                              ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
+                            );
+
+                            return Format.price(toClaimPriceFormatted, 'standard');
+                          }}
+                        />
+                      </Text>
+                    </Skeleton>
+                  </Condition>
+                </div>
               </div>
             </div>
             <Button
               disabled={isClaimButtonDisabled}
               onClick={onClaimClick}
-              className='max-w-full text-[11px] font-medium lg:max-w-32.5'
+              className='max-w-full text-[11px] font-medium md:max-w-32.5'
             >
               <Skeleton
                 loading={isLoading}
@@ -303,57 +305,59 @@ export function RewardsFlowBlock() {
               </Skeleton>
             </Button>
           </div>
-          <Divider orientation={isMobile ? 'horizontal' : 'vertical'} />
-          <div className='flex flex-col gap-3'>
-            <Text
-              size='11'
-              className='text-color-24'
-            >
-              Available Rewards
-            </Text>
-            <div className='flex flex-col gap-2.5 lg:gap-1'>
-              <Skeleton loading={isLoading}>
-                <div className='flex items-center gap-1.5'>
-                  <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
-                  <Text
-                    size='17'
-                    className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
-                  >
-                    {Format.token(availableRewardsFormatted, { symbol: !isMobile ? 'COMP' : undefined })}
-                  </Text>
-                </div>
-              </Skeleton>
-              <Condition if={isConnected && !!availableRewards}>
-                <Skeleton loading={isLoading}>
-                  <Text
-                    size='11'
-                    className='text-color-24 tabular-nums'
-                  >
-                    {Format.price(availableRewardsPriceFormatted, 'standard')}
-                  </Text>
-                </Skeleton>
-              </Condition>
-            </div>
-          </div>
-          <Button
-            disabled={isVestButtonDisabled}
-            onClick={onVestingClick}
-            className='max-w-full text-[11px] font-medium lg:max-w-32.5'
-          >
-            <Skeleton
-              loading={isLoading}
-              className='w-full'
-            >
+          <Divider orientation={isDesktop ? 'vertical' : 'horizontal'} />
+          <div className='flex w-full flex-col items-center justify-between gap-5 md:flex-row md:gap-0 lg:max-w-80 lg:gap-10'>
+            <div className='flex flex-col gap-3'>
               <Text
-                tag='p'
                 size='11'
-                align='center'
-                className={cn('text-color-6', { 'text-white': !isVestButtonDisabled })}
+                className='text-color-24'
               >
-                Vest
+                Available Rewards
               </Text>
-            </Skeleton>
-          </Button>
+              <div className='flex flex-col gap-2.5 lg:gap-1'>
+                <Skeleton loading={isLoading}>
+                  <div className='flex items-center gap-1.5'>
+                    <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                    <Text
+                      size='17'
+                      className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
+                    >
+                      {Format.token(availableRewardsFormatted, { symbol: isDesktop ? 'COMP' : undefined })}
+                    </Text>
+                  </div>
+                </Skeleton>
+                <Condition if={isConnected && !!availableRewards}>
+                  <Skeleton loading={isLoading}>
+                    <Text
+                      size='11'
+                      className='text-color-24 tabular-nums'
+                    >
+                      {Format.price(availableRewardsPriceFormatted, 'standard')}
+                    </Text>
+                  </Skeleton>
+                </Condition>
+              </div>
+            </div>
+            <Button
+              disabled={isVestButtonDisabled}
+              onClick={onVestingClick}
+              className='max-w-full text-[11px] font-medium md:max-w-32.5'
+            >
+              <Skeleton
+                loading={isLoading}
+                className='w-full'
+              >
+                <Text
+                  tag='p'
+                  size='11'
+                  align='center'
+                  className={cn('text-color-6', { 'text-white': !isVestButtonDisabled })}
+                >
+                  Vest
+                </Text>
+              </Skeleton>
+            </Button>
+          </div>
         </div>
         <Condition if={!hasPosition}>
           <div className='flex p-10'>
@@ -380,7 +384,7 @@ export function RewardsFlowBlock() {
           <RewardsTable rows={rows} />
         </Condition>
       </Card>
-      <Condition if={!isMobile}>
+      <Condition if={isDesktop}>
         <Modal
           title='Vesting'
           open={isVestingOpen}
@@ -394,7 +398,7 @@ export function RewardsFlowBlock() {
           />
         </Modal>
       </Condition>
-      <Condition if={!isMobile}>
+      <Condition if={isDesktop}>
         <Modal
           title='Claim Rewards'
           open={isClaimOpen}
@@ -407,7 +411,7 @@ export function RewardsFlowBlock() {
           />
         </Modal>
       </Condition>
-      <Condition if={isMobile}>
+      <Condition if={!isDesktop}>
         <Drawer
           isOpen={isVestingOpen}
           onClose={onVestingModalClose}
@@ -427,7 +431,7 @@ export function RewardsFlowBlock() {
           />
         </Drawer>
       </Condition>
-      <Condition if={isMobile}>
+      <Condition if={!isDesktop}>
         <Drawer
           isOpen={isClaimOpen}
           onClose={onClaimModalClose}

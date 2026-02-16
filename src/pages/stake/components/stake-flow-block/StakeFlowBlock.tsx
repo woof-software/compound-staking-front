@@ -38,7 +38,7 @@ export function StakeFlowBlock() {
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const triggerStatisticRefresh = useStatisticStore(({ triggerRefresh }) => triggerRefresh);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
@@ -134,9 +134,9 @@ export function StakeFlowBlock() {
       title='Stake'
       tooltip='Stake COMP for on-chain yield'
     >
-      <div className='flex flex-col justify-between gap-10 p-5 lg:flex-row lg:p-10'>
-        <div className='grid w-full grid-cols-2 gap-5 md:flex md:flex-wrap md:gap-10'>
-          <div className='flex flex-col gap-3 md:col-span-2'>
+      <div className='flex flex-col justify-between gap-10 p-5 md:flex-row md:gap-0 md:p-10 lg:gap-10'>
+        <div className='grid w-full grid-cols-2 gap-5 md:grid-cols-3 md:gap-10 lg:grid-cols-5'>
+          <div className='flex flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -153,7 +153,7 @@ export function StakeFlowBlock() {
                       'text-color-6': !isConnected
                     })}
                   >
-                    {Format.token(stakedBalanceFormatted, { symbol: !isMobile ? 'COMP' : undefined })}
+                    {Format.token(stakedBalanceFormatted, { symbol: isDesktop ? 'COMP' : undefined })}
                   </Text>
                 </div>
               </Skeleton>
@@ -183,11 +183,11 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {Format.token(virtualBalanceFormatted, { symbol: !isMobile ? 'stCOMP' : undefined })}
+                {Format.token(virtualBalanceFormatted, { symbol: isDesktop ? 'stCOMP' : undefined })}
               </Text>
             </Skeleton>
           </div>
-          <div className='flex flex-col gap-3 md:ml-auto md:max-w-[80px] md:min-w-[80px]'>
+          <div className='flex flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -222,7 +222,7 @@ export function StakeFlowBlock() {
                       'text-color-6': !isConnected
                     })}
                   >
-                    {Format.token(availableRewardsFormatted, { symbol: !isMobile ? 'COMP' : undefined })}
+                    {Format.token(availableRewardsFormatted, { symbol: isDesktop ? 'COMP' : undefined })}
                   </Text>
                 </div>
               </Skeleton>
@@ -238,7 +238,7 @@ export function StakeFlowBlock() {
               </Condition>
             </div>
           </div>
-          <div className='flex flex-col gap-3 md:ml-auto md:max-w-[80px] md:min-w-[80px]'>
+          <div className='flex flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -259,7 +259,7 @@ export function StakeFlowBlock() {
         </div>
         <Button
           disabled={isStakeButtonDisabled}
-          className='max-w-full lg:max-w-32.5'
+          className='max-w-full md:max-w-32.5'
           onClick={onStakeModalOpen}
         >
           <Skeleton
@@ -279,7 +279,7 @@ export function StakeFlowBlock() {
           </Skeleton>
         </Button>
       </div>
-      <Condition if={!isMobile}>
+      <Condition if={isDesktop}>
         <Modal
           title='Stake tokens'
           open={isOpen}
@@ -292,7 +292,7 @@ export function StakeFlowBlock() {
           />
         </Modal>
       </Condition>
-      <Condition if={isMobile}>
+      <Condition if={!isDesktop}>
         <Drawer
           isOpen={isOpen}
           onClose={onClose}

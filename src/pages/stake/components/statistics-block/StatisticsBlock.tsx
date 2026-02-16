@@ -28,7 +28,7 @@ export function StatisticsBlock() {
           </h1>
         </Skeleton>
       </div>
-      <section className='flex flex-col items-center justify-center md:flex-row md:gap-25'>
+      <section className='flex flex-col items-center justify-center md:flex-row md:gap-12 lg:gap-25'>
         <StakingAPR />
         <Divider
           orientation='vertical'
