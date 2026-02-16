@@ -306,7 +306,7 @@ export function RewardsFlowBlock() {
             </Button>
           </div>
           <Divider orientation={isDesktop ? 'vertical' : 'horizontal'} />
-          <div className='flex w-full flex-col items-center justify-between gap-5 md:flex-row md:gap-0 lg:max-w-80 lg:gap-10'>
+          <div className='flex w-full flex-col justify-between gap-5 md:flex-row md:gap-0 lg:max-w-80 lg:gap-10'>
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
