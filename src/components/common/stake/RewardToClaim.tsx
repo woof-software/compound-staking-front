@@ -43,6 +43,15 @@ export function RewardToClaim(props: RewardToClaimProps) {
           <div>
             <Skeleton loading={isLoading}>
               <Text
+                size='11'
+                weight='500'
+                className='text-color-24 mb-5 block lg:hidden'
+              >
+                To claim
+              </Text>
+            </Skeleton>
+            <Skeleton loading={isLoading}>
+              <Text
                 size='15'
                 lineHeight='20'
                 className='tabular-nums'

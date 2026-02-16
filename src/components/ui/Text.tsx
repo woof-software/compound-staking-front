@@ -8,6 +8,7 @@ const text = cva('text-color-2', {
     size: {
       '11': 'text-[11px]',
       '13': 'text-[13px]',
+      '14': 'text-[14px]',
       '15': 'text-[15px]',
       '16': 'text-[16px]',
       '17': 'text-[17px]',

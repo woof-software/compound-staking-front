@@ -36,6 +36,8 @@ import { useRewardStore } from '@/stores/useRewardStore';
 import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
+import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
+
 export function UnstakeFlowBlock() {
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
@@ -219,17 +221,20 @@ export function UnstakeFlowBlock() {
               >
                 Unstake
               </Text>
-              <div className='flex flex-col gap-1'>
+              <div className='flex flex-col gap-2.5 lg:gap-1'>
                 <Skeleton loading={isLoading}>
-                  <Text
-                    size='17'
-                    lineHeight='17'
-                    className={cn('text-color-2 tabular-nums', {
-                      'text-color-6': !isConnected
-                    })}
-                  >
-                    {Format.token(lockedStakedBalanceFormatted, { symbol: !isMobile ? 'stCOMP' : undefined })}
-                  </Text>
+                  <div className='flex items-center gap-1.5'>
+                    <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                    <Text
+                      size='17'
+                      lineHeight='17'
+                      className={cn('text-color-2 tabular-nums', {
+                        'text-color-6': !isConnected
+                      })}
+                    >
+                      {Format.token(lockedStakedBalanceFormatted, { symbol: !isMobile ? 'stCOMP' : undefined })}
+                    </Text>
+                  </div>
                 </Skeleton>
                 <Condition if={isConnected && !!lockedTokenBalance?.amount}>
                   <Skeleton loading={isLoading || isStakedTokenPrice}>

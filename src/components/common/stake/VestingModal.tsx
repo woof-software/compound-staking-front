@@ -6,7 +6,6 @@ import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
-import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
@@ -22,12 +21,10 @@ import { useVestRewards } from '@/pages/stake/hooks/useVestRewards';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 export type VestingModalProps = {
-  isOpen?: boolean;
-  onClose?: () => void;
   onVestingConfirmed?: () => void;
 };
 
-export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirmed = noop }: VestingModalProps) {
+export function VestingModal({ onVestingConfirmed = noop }: VestingModalProps) {
   const { address, isConnected, chainId } = useConnection();
   const { switchChainAsync, isPending: isSwitchPending } = useSwitchChain();
 
@@ -88,7 +85,6 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
 
   const onVestRewardsSuccess = useEffectEvent(() => {
     setIsPendingToggle(false);
-    onClose();
     onVestingConfirmed();
   });
 
@@ -99,37 +95,21 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
   }, [isVestRewardsSuccess]);
 
   return (
-    <Modal
-      title='Vesting'
-      open={isOpen}
-      onClose={onClose}
-    >
-      <div className='mt-8 flex flex-col gap-8'>
-        <Divider orientation='horizontal' />
-        <div className='flex'>
-          <Text
-            size='15'
-            lineHeight='20'
-            className='w-full'
-          >
-            Amount to vest
-          </Text>
-          <div className='flex shrink-0 flex-col items-end'>
-            <div className='flex shrink-0 items-end'>
-              <Skeleton loading={isLoading}>
-                <div className='flex gap-1'>
-                  <Condition if={availableRewards}>
-                    <Text
-                      size='15'
-                      weight='500'
-                      lineHeight='20'
-                      className={cn('text-color-2', {
-                        'text-color-6': !isConnected
-                      })}
-                    >
-                      ≈
-                    </Text>
-                  </Condition>
+    <div className='mt-8 flex flex-col gap-8'>
+      <Divider orientation='horizontal' />
+      <div className='flex'>
+        <Text
+          size='15'
+          lineHeight='20'
+          className='w-full'
+        >
+          Amount to vest
+        </Text>
+        <div className='flex shrink-0 flex-col items-end'>
+          <div className='flex shrink-0 items-end'>
+            <Skeleton loading={isLoading}>
+              <div className='flex gap-1'>
+                <Condition if={availableRewards}>
                   <Text
                     size='15'
                     weight='500'
@@ -138,71 +118,81 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
                       'text-color-6': !isConnected
                     })}
                   >
-                    {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
+                    ≈
                   </Text>
-                </div>
-              </Skeleton>
-            </div>
-            <Condition if={isConnected}>
-              <Skeleton loading={isLoading}>
+                </Condition>
                 <Text
-                  size='11'
-                  lineHeight='16'
-                  className='text-color-24'
+                  size='15'
+                  weight='500'
+                  lineHeight='20'
+                  className={cn('text-color-2', {
+                    'text-color-6': !isConnected
+                  })}
                 >
-                  {Format.price(availableRewardsPriceFormatted, 'standard')}
+                  {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
                 </Text>
-              </Skeleton>
-            </Condition>
+              </div>
+            </Skeleton>
           </div>
+          <Condition if={isConnected}>
+            <Skeleton loading={isLoading}>
+              <Text
+                size='11'
+                lineHeight='16'
+                className='text-color-24'
+              >
+                {Format.price(availableRewardsPriceFormatted, 'standard')}
+              </Text>
+            </Skeleton>
+          </Condition>
         </div>
-        <Condition if={hasMaxPosition}>
-          <div className='bg-color-21 flex w-full items-center gap-2.5 rounded-lg px-4 py-5'>
-            <InfoIcon className='text-color-22 size-4 shrink-0' />
-            <Text
-              size='11'
-              lineHeight='16'
-              weight='500'
-              className='text-color-22'
-            >
-              Maximum vesting limit reached ({maxVestingPositions}). Close completed entries or wait for active ones to
-              finish
-            </Text>
-          </div>
-        </Condition>
-        <Condition if={!hasMaxPosition}>
-          <div className='bg-color-26 flex w-full items-center gap-2.5 rounded-lg px-4 py-5'>
-            <InfoIcon className='text-color-7 size-4 shrink-0' />
-            <Text
-              size='11'
-              weight='500'
-              lineHeight='16'
-              className='text-color-7'
-            >
-              The entire amount will be added to the claim balance
-            </Text>
-          </div>
-        </Condition>
-        <Button
-          className={cn('h-14 w-85 flex-col', {
-            'bg-color-7': isVestingLoading
-          })}
-          disabled={isVestButtonDisabled}
-          onClick={onConfirm}
-        >
-          <Text
-            size='13'
-            weight='500'
-            lineHeight='18'
-            className={cn('text-white', {
-              'text-color-6': isVestButtonDisabled,
-              'after-animate-loading-dots text-white': isVestingLoading
-            })}
-          >
-            {isVestingLoading ? 'Pending' : 'Confirm'}
-          </Text>
-        </Button>
       </div>
-    </Modal>
+      <Condition if={hasMaxPosition}>
+        <div className='bg-color-21 flex w-full items-center gap-2.5 rounded-lg px-4 py-5'>
+          <InfoIcon className='text-color-22 size-4 shrink-0' />
+          <Text
+            size='11'
+            lineHeight='16'
+            weight='500'
+            className='text-color-22'
+          >
+            Maximum vesting limit reached ({maxVestingPositions}). Close completed entries or wait for active ones to
+            finish
+          </Text>
+        </div>
+      </Condition>
+      <Condition if={!hasMaxPosition}>
+        <div className='bg-color-26 flex w-full items-center gap-2.5 rounded-lg px-4 py-5'>
+          <InfoIcon className='text-color-7 size-4 shrink-0' />
+          <Text
+            size='11'
+            weight='500'
+            lineHeight='16'
+            className='text-color-7'
+          >
+            The entire amount will be added to the claim balance
+          </Text>
+        </div>
+      </Condition>
+      <Button
+        className={cn('h-14 w-85 flex-col', {
+          'bg-color-7': isVestingLoading
+        })}
+        disabled={isVestButtonDisabled}
+        onClick={onConfirm}
+      >
+        <Text
+          size='13'
+          weight='500'
+          lineHeight='18'
+          className={cn('text-white', {
+            'text-color-6': isVestButtonDisabled,
+            'after-animate-loading-dots text-white': isVestingLoading
+          })}
+        >
+          {isVestingLoading ? 'Pending' : 'Confirm'}
+        </Text>
+      </Button>
+    </div>
   );
 }

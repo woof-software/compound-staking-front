@@ -26,9 +26,18 @@ export function RewardRow(props: RewardRowProps) {
   );
 
   return (
-    <div className='even:bg-color-5 flex flex-col gap-5 rounded-sm px-8 py-12'>
-      <div className='grid grid-cols-5'>
+    <div className='even:bg-color-5 flex flex-col gap-5 rounded-sm px-5 py-5 lg:px-8 lg:py-12'>
+      <div className='grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5 lg:gap-5'>
         <div>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              weight='500'
+              className='text-color-24 mb-5 block lg:hidden'
+            >
+              Vesting amount
+            </Text>
+          </Skeleton>
           <Skeleton loading={isLoading}>
             <Text
               size='15'
@@ -57,6 +66,15 @@ export function RewardRow(props: RewardRowProps) {
           vestingEndDate={endDate}
         />
         <div>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              weight='500'
+              className='text-color-24 mb-5 block lg:hidden'
+            >
+              Start Date
+            </Text>
+          </Skeleton>
           <Text
             size='15'
             lineHeight='20'
@@ -65,6 +83,15 @@ export function RewardRow(props: RewardRowProps) {
           </Text>
         </div>
         <div>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              weight='500'
+              className='text-color-24 mb-5 block lg:hidden'
+            >
+              End Date
+            </Text>
+          </Skeleton>
           <Text
             size='15'
             lineHeight='20'
@@ -73,6 +100,15 @@ export function RewardRow(props: RewardRowProps) {
           </Text>
         </div>
         <div>
+          <Skeleton loading={isLoading}>
+            <Text
+              size='11'
+              weight='500'
+              className='text-color-24 mb-5 block lg:hidden'
+            >
+              Claimed Amount
+            </Text>
+          </Skeleton>
           <Skeleton loading={isLoading}>
             <Text
               size='15'

@@ -215,7 +215,7 @@ export function ClaimModal(props: ClaimModalProps) {
         </div>
       </Condition>
       <Button
-        className={cn('h-14 w-85 flex-col', {
+        className={cn('h-14 w-full flex-col', {
           'bg-color-7': isClaiming
         })}
         disabled={isClaimButtonDisabled}

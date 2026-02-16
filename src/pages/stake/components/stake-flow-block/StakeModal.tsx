@@ -214,7 +214,7 @@ export function StakeModal(props: StakeModalProps) {
   return (
     <div className='mt-8 flex w-full flex-col gap-8'>
       <Divider orientation='horizontal' />
-      <div className='flex flex-col gap-1'>
+      <div className='flex flex-col gap-2.5 lg:gap-1'>
         <Skeleton loading={isPriceOrBalanceLoading}>
           <div>
             <Condition if={!isAmountExceedsBalance}>

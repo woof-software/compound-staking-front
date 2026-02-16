@@ -6,4 +6,5 @@ export { default as CopyIcon } from './copy.svg';
 export { default as CrossIcon } from './cross.svg';
 export { default as ExternalLinkIcon } from './external-link.svg';
 export { default as InfoIcon } from './info.svg';
+export { default as SortIcon } from './sort.svg';
 export { default as SortArrowIcon } from './sort-arrow.svg';

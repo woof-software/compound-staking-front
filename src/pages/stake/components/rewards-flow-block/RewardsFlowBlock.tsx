@@ -9,6 +9,7 @@ import { ClaimModal } from '@/components/common/stake/ClaimModal';
 import { VestingModal } from '@/components/common/stake/VestingModal';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
+import { Drawer } from '@/components/ui/Drawer';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
@@ -26,6 +27,8 @@ import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
+
+import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
 export function RewardsFlowBlock() {
   const isMobile = useMediaQuery('(max-width: 767px)');
@@ -161,8 +164,8 @@ export function RewardsFlowBlock() {
         title='Rewards'
         tooltip='Vest and claim available rewards'
       >
-        <div className='border-color-8 flex flex-col justify-between gap-10 border-b-[0.5px] p-5 md:flex-row md:gap-0 lg:p-10'>
-          <div className='flex w-full max-w-120 flex-col justify-between gap-10 md:flex-row md:gap-0'>
+        <div className='border-color-8 flex flex-col justify-between gap-5 p-5 sm:border-b-0 md:flex-row md:gap-0 md:border-b-[0.5px] lg:gap-10 lg:p-10'>
+          <div className='flex w-full max-w-120 flex-col justify-between gap-5 md:flex-row md:gap-0 lg:gap-10'>
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
@@ -170,14 +173,19 @@ export function RewardsFlowBlock() {
               >
                 Total vesting
               </Text>
-              <div className='flex flex-col gap-1'>
+              <div className='flex flex-col gap-2.5 lg:gap-1'>
                 <Skeleton loading={isLoading}>
-                  <Text
-                    size='17'
-                    className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
-                  >
-                    {Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), { symbol: 'COMP' })}
-                  </Text>
+                  <div className='flex items-center gap-1.5'>
+                    <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                    <Text
+                      size='17'
+                      className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
+                    >
+                      {Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), {
+                        symbol: !isMobile ? 'COMP' : undefined
+                      })}
+                    </Text>
+                  </div>
                 </Skeleton>
                 <Condition if={isConnected && !!totalVesting}>
                   <Skeleton loading={isLoading}>
@@ -198,37 +206,42 @@ export function RewardsFlowBlock() {
               >
                 Total to claim
               </Text>
-              <div className='flex flex-col gap-1'>
+              <div className='flex flex-col gap-2.5 lg:gap-1'>
                 <Skeleton loading={isLoading}>
-                  <Text
-                    size='17'
-                    className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
-                  >
-                    <Duration
-                      end={longestDurationTs * 1000}
-                      unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
-                      render={(secondsLeft = 0) => {
-                        const nowSec = longestDurationTs - secondsLeft;
+                  <div className='flex items-center gap-1.5'>
+                    <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                    <Text
+                      size='17'
+                      className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
+                    >
+                      <Duration
+                        end={longestDurationTs * 1000}
+                        unsafeRound={(msLeft) => Math.max(Math.ceil(msLeft / 1000), 0)}
+                        render={(secondsLeft = 0) => {
+                          const nowSec = longestDurationTs - secondsLeft;
 
-                        const totalToClaim = rows.reduce((acc, row) => {
-                          const rowSecondsLeft = Math.max(row.endDate - nowSec, 0);
+                          const totalToClaim = rows.reduce((acc, row) => {
+                            const rowSecondsLeft = Math.max(row.endDate - nowSec, 0);
 
-                          return (
-                            acc +
-                            vestingToClaimCalc({
-                              vestingAmount: row.vestingAmount,
-                              claimedAmount: row.claimedAmount,
-                              startDate: row.startDate,
-                              endDate: row.endDate,
-                              secondsLeft: rowSecondsLeft
-                            })
-                          );
-                        }, 0n);
+                            return (
+                              acc +
+                              vestingToClaimCalc({
+                                vestingAmount: row.vestingAmount,
+                                claimedAmount: row.claimedAmount,
+                                startDate: row.startDate,
+                                endDate: row.endDate,
+                                secondsLeft: rowSecondsLeft
+                              })
+                            );
+                          }, 0n);
 
-                        return Format.token(formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS), { symbol: 'COMP' });
-                      }}
-                    />
-                  </Text>
+                          return Format.token(formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS), {
+                            symbol: !isMobile ? 'COMP' : undefined
+                          });
+                        }}
+                      />
+                    </Text>
+                  </div>
                 </Skeleton>
                 <Condition if={isConnected && !!totalVesting}>
                   <Skeleton loading={isLoading}>
@@ -298,14 +311,17 @@ export function RewardsFlowBlock() {
             >
               Available Rewards
             </Text>
-            <div className='flex flex-col gap-1'>
+            <div className='flex flex-col gap-2.5 lg:gap-1'>
               <Skeleton loading={isLoading}>
-                <Text
-                  size='17'
-                  className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
-                >
-                  {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
-                </Text>
+                <div className='flex items-center gap-1.5'>
+                  <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                  <Text
+                    size='17'
+                    className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
+                  >
+                    {Format.token(availableRewardsFormatted, { symbol: !isMobile ? 'COMP' : undefined })}
+                  </Text>
+                </div>
               </Skeleton>
               <Condition if={isConnected && !!availableRewards}>
                 <Skeleton loading={isLoading}>
@@ -352,6 +368,7 @@ export function RewardsFlowBlock() {
               <Text
                 size='15'
                 lineHeight='21'
+                align='center'
                 className='text-color-24'
               >
                 Stake COMP and vest rewards to see your positions here
@@ -363,22 +380,72 @@ export function RewardsFlowBlock() {
           <RewardsTable rows={rows} />
         </Condition>
       </Card>
-      <VestingModal
-        isOpen={isVestingOpen}
-        onClose={onVestingModalClose}
-        onVestingConfirmed={onVestingConfirmed}
-      />
-      <Modal
-        title='Claim Rewards'
-        open={isClaimOpen}
-        onClose={onClaimModalClose}
-      >
-        <ClaimModal
-          totalToClaim={claimAmount}
+      <Condition if={!isMobile}>
+        <Modal
+          title='Vesting'
+          open={isVestingOpen}
+          onClose={onVestingModalClose}
+        >
+          <VestingModal
+            onVestingConfirmed={() => {
+              onVestingModalClose();
+              onVestingConfirmed();
+            }}
+          />
+        </Modal>
+      </Condition>
+      <Condition if={!isMobile}>
+        <Modal
+          title='Claim Rewards'
+          open={isClaimOpen}
           onClose={onClaimModalClose}
-          onClaimConfirmed={onClaimConfirmed}
-        />
-      </Modal>
+        >
+          <ClaimModal
+            totalToClaim={claimAmount}
+            onClose={onClaimModalClose}
+            onClaimConfirmed={onClaimConfirmed}
+          />
+        </Modal>
+      </Condition>
+      <Condition if={isMobile}>
+        <Drawer
+          isOpen={isVestingOpen}
+          onClose={onVestingModalClose}
+        >
+          <Text
+            size='17'
+            align='center'
+            lineHeight='20'
+          >
+            Vesting
+          </Text>
+          <VestingModal
+            onVestingConfirmed={() => {
+              onVestingModalClose();
+              onVestingConfirmed();
+            }}
+          />
+        </Drawer>
+      </Condition>
+      <Condition if={isMobile}>
+        <Drawer
+          isOpen={isClaimOpen}
+          onClose={onClaimModalClose}
+        >
+          <Text
+            size='17'
+            align='center'
+            lineHeight='20'
+          >
+            Claim Rewards
+          </Text>
+          <ClaimModal
+            totalToClaim={claimAmount}
+            onClose={onClaimModalClose}
+            onClaimConfirmed={onClaimConfirmed}
+          />
+        </Drawer>
+      </Condition>
     </>
   );
 }

@@ -31,6 +31,8 @@ import { useStatisticStore } from '@/stores/useStatisticStore';
 import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
+import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
+
 export function StakeFlowBlock() {
   const { isConnected, address, chainId } = useConnection();
 
@@ -141,16 +143,19 @@ export function StakeFlowBlock() {
             >
               Staked
             </Text>
-            <div className='flex flex-col gap-1'>
+            <div className='flex flex-col gap-2.5 lg:gap-1'>
               <Skeleton loading={isLoading}>
-                <Text
-                  size='17'
-                  className={cn('text-color-2 tabular-nums', {
-                    'text-color-6': !isConnected
-                  })}
-                >
-                  {Format.token(stakedBalanceFormatted, { symbol: !isMobile ? 'COMP' : undefined })}
-                </Text>
+                <div className='flex items-center gap-1.5'>
+                  <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                  <Text
+                    size='17'
+                    className={cn('text-color-2 tabular-nums', {
+                      'text-color-6': !isConnected
+                    })}
+                  >
+                    {Format.token(stakedBalanceFormatted, { symbol: !isMobile ? 'COMP' : undefined })}
+                  </Text>
+                </div>
               </Skeleton>
               <Condition if={isConnected && !!stakedBalance?.principal}>
                 <Skeleton loading={isLoading}>
@@ -207,16 +212,19 @@ export function StakeFlowBlock() {
             >
               Available Rewards
             </Text>
-            <div className='flex flex-col gap-1'>
+            <div className='flex flex-col gap-2.5 lg:gap-1'>
               <Skeleton loading={isLoading}>
-                <Text
-                  size='17'
-                  className={cn('text-color-2 tabular-nums', {
-                    'text-color-6': !isConnected
-                  })}
-                >
-                  {Format.token(availableRewardsFormatted, { symbol: !isMobile ? 'COMP' : undefined })}
-                </Text>
+                <div className='flex items-center gap-1.5'>
+                  <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                  <Text
+                    size='17'
+                    className={cn('text-color-2 tabular-nums', {
+                      'text-color-6': !isConnected
+                    })}
+                  >
+                    {Format.token(availableRewardsFormatted, { symbol: !isMobile ? 'COMP' : undefined })}
+                  </Text>
+                </div>
               </Skeleton>
               <Condition if={isConnected && !!availableRewards}>
                 <Skeleton loading={isLoading}>
