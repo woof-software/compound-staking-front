@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useDisconnect } from 'wagmi';
 
-import { CopyIcon } from '@/assets/svg';
+import { CopyIcon, SpinnerIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
@@ -18,7 +18,6 @@ import { getAddressContracts } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
-import Spinner from '@/assets/spinner.svg';
 
 export type ConnectedButtonProps = {
   onChangeWallet: () => void;
@@ -116,7 +115,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
         </Condition>
         <Condition if={isPending}>
           <div className='bg-color-7 rounded-64 relative -top-[0.5px] flex h-11 min-w-28 items-center justify-center gap-2 hover:brightness-90'>
-            <Spinner className='size-4 flex-shrink-0 animate-spin' />
+            <SpinnerIcon className='size-4 flex-shrink-0 animate-spin text-white' />
             <Text
               size='11'
               weight='500'

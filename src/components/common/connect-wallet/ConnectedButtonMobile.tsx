@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useDisconnect } from 'wagmi';
 
-import { CopyIcon, CrossIcon } from '@/assets/svg';
+import { CopyIcon, CrossIcon, SpinnerIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -93,13 +93,22 @@ export function ConnectedButtonMobile({ onChangeWallet: onWalletChange }: Connec
       <Button
         onClick={onToggle}
         className={cn(
-          'bg-color-9 relative flex h-11 w-11 items-center justify-center rounded-full text-[11px] leading-4 font-medium hover:brightness-100 md:hidden',
+          'bg-color-9 text-color-2 relative flex h-11 w-11 items-center justify-center rounded-full hover:brightness-100 md:hidden',
           {
             'bg-color-7': isPending
           }
         )}
       >
-        <Condition if={isPending}>1</Condition>
+        <Condition if={isPending}>
+          <Text
+            size='11'
+            weight='500'
+            lineHeight='16'
+            className='text-white'
+          >
+            1
+          </Text>
+        </Condition>{' '}
         <Condition if={!isOpen && !isPending}>
           <Wallet
             width='16'
@@ -114,11 +123,12 @@ export function ConnectedButtonMobile({ onChangeWallet: onWalletChange }: Connec
           />
         </Condition>
         <Condition if={!isOpen}>
-          <div
-            className={cn('bg-color-7 border-color-1 absolute right-0 -bottom-[1px] h-4 w-4 rounded-full border-3', {
-              'bg-color-23': isPending
-            })}
-          />
+          <Condition if={isPending}>
+            <SpinnerIcon className='text-color-7 bg-color-1 absolute right-0 -bottom-[1px] size-4 animate-spin rounded-full' />
+          </Condition>
+          <Condition if={!isPending}>
+            <div className='bg-color-7 border-color-1 absolute right-0 -bottom-[1px] size-4 rounded-full border-3' />
+          </Condition>
         </Condition>
       </Button>
       <aside
