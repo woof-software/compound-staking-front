@@ -110,7 +110,9 @@ function createSandboxConnector() {
     async getProvider() {
       return walletClient.transport;
     },
-    async disconnect() {},
+    async disconnect() {
+      localStorage.removeItem(STORAGE_KEY);
+    },
     onAccountsChanged() {},
     onChainChanged() {},
     onDisconnect() {}
