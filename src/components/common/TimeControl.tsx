@@ -1,7 +1,12 @@
+import { useConnection } from 'wagmi';
+
 import { Button } from '@/components/ui/Button';
+import { cn } from '@/lib/utils/cn';
 import { fastForwardTime, TIME_INTERVALS } from '@/lib/utils/tenderly';
 
 export function TimeControlButton() {
+  const { isConnected } = useConnection();
+
   const handleFastForward = async (seconds: number, label: string) => {
     try {
       await fastForwardTime(seconds);
@@ -20,7 +25,9 @@ export function TimeControlButton() {
   return (
     <Button
       onClick={() => handleFastForward(TIME_INTERVALS.HOUR, '1 hour')}
-      className='mr-[96px] w-[80px] text-[11px] font-medium text-white'
+      className={cn('w-[80px] text-[11px] font-medium text-white', {
+        'mr-[96px]': isConnected
+      })}
     >
       +1 Hour
     </Button>
