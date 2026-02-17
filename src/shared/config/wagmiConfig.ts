@@ -19,7 +19,7 @@ function createSandboxConnector() {
       chains: [sepolia],
       ssr: true,
       transports: {
-        [sepolia.id]: http('https://virtual.sepolia.eu.rpc.tenderly.co/be13bd77-e574-49da-86c9-e3d2422cea28')
+        [sepolia.id]: http('https://virtual.sepolia.eu.rpc.tenderly.co/7dd95cea-6f80-4d6b-a6a9-ae155728a443')
       }
     });
   }
@@ -31,7 +31,7 @@ function createSandboxConnector() {
     localStorage.setItem(STORAGE_KEY, privatekey);
     const { address } = privateKeyToAccount(<Hex>privatekey);
 
-    fetch('https://virtual.sepolia.eu.rpc.tenderly.co/5c22cdc8-568e-486c-88b5-76c7da6c29fb', {
+    fetch('https://virtual.sepolia.eu.rpc.tenderly.co/9ae5ce7a-8d6b-4ce0-bef1-c73b9562fee0', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -44,7 +44,7 @@ function createSandboxConnector() {
       })
     });
 
-    fetch('https://virtual.sepolia.eu.rpc.tenderly.co/5c22cdc8-568e-486c-88b5-76c7da6c29fb', {
+    fetch('https://virtual.sepolia.eu.rpc.tenderly.co/9ae5ce7a-8d6b-4ce0-bef1-c73b9562fee0', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -62,7 +62,7 @@ function createSandboxConnector() {
     throw new Error('Wrong private key format');
   }
 
-  const forkUrl = 'https://virtual.sepolia.eu.rpc.tenderly.co/be13bd77-e574-49da-86c9-e3d2422cea28';
+  const forkUrl = 'https://virtual.sepolia.eu.rpc.tenderly.co/7dd95cea-6f80-4d6b-a6a9-ae155728a443';
   const forkChainId = 111555111;
   const name = 'Sandbox';
 

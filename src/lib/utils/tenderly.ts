@@ -1,5 +1,5 @@
-const TENDERLY_ADMIN_URL = 'https://virtual.sepolia.eu.rpc.tenderly.co/5c22cdc8-568e-486c-88b5-76c7da6c29fb';
-const TENDERLY_RPC_URL = 'https://virtual.sepolia.eu.rpc.tenderly.co/be13bd77-e574-49da-86c9-e3d2422cea28';
+const TENDERLY_ADMIN_URL = 'https://virtual.sepolia.eu.rpc.tenderly.co/9ae5ce7a-8d6b-4ce0-bef1-c73b9562fee0';
+const TENDERLY_RPC_URL = 'https://virtual.sepolia.eu.rpc.tenderly.co/7dd95cea-6f80-4d6b-a6a9-ae155728a443';
 
 export async function makeTenderlyRequest(method: string, params: any[], id: number = 0) {
   const response = await fetch(TENDERLY_ADMIN_URL, {
