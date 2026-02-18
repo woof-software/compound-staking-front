@@ -6,6 +6,7 @@ import { Portal } from '@/components/common/Portal';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
+import { useThemeStore } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils/cn';
 import { getChainLogo, getChainName } from '@/lib/utils/helpers';
 import { useSwitchNetworkModalStore } from '@/stores/useSwitchNetworkModalStore';
@@ -13,6 +14,8 @@ import { useSwitchNetworkModalStore } from '@/stores/useSwitchNetworkModalStore'
 export function SwitchNetworkModal() {
   const { isConnected, chainId } = useConnection();
   const { switchChainAsync, isPending } = useSwitchChain();
+
+  const { theme } = useThemeStore();
 
   const isOpen = useSwitchNetworkModalStore(({ isOpen }) => isOpen);
   const close = useSwitchNetworkModalStore(({ close }) => close);
@@ -69,13 +72,13 @@ export function SwitchNetworkModal() {
           </div>
           <div className='mt-10 mb-5 flex items-center justify-center gap-3'>
             <img
-              src={getChainLogo(chainId)}
+              src={getChainLogo(chainId, theme)}
               alt='chain-logo'
               className='size-12 rounded-full'
             />
             <div className='chain-slide inline-block size-6 shrink-0' />
             <img
-              src={getChainLogo(APPLICATION_CHAIN)}
+              src={getChainLogo(APPLICATION_CHAIN, theme)}
               alt='chain-logo'
               className='size-12 rounded-full'
             />

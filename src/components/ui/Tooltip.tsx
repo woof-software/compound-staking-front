@@ -11,25 +11,24 @@ export function Tooltip(props: TooltipProps) {
   const { content, className, children } = props;
 
   return (
-    <div className={cn('group relative inline-flex', className)}>
+    <div className={cn('relative inline-flex', className)}>
       <button
         type='button'
-        className='inline-flex items-center focus:outline-none'
+        className='group inline-flex items-center focus:outline-none'
       >
         {children}
+        <div
+          className={cn(
+            'pointer-events-none absolute z-50 w-full max-w-54 min-w-54 rounded-lg p-4',
+            'bg-color-4 text-color-24 shadow-md',
+            'transition-opacity duration-200',
+            'opacity-0 group-hover:opacity-100',
+            'bottom-5 left-1/2 -translate-x-1/2 -translate-y-1'
+          )}
+        >
+          <div className='relative text-[11px] leading-4 font-medium'>{content}</div>
+        </div>
       </button>
-      <div
-        className={cn(
-          'absolute z-50 w-full max-w-54 min-w-54 rounded-lg p-4',
-          'bg-color-4 text-color-24 shadow-md',
-          'transition-opacity duration-200',
-          'opacity-0',
-          'group-hover:opacity-100 hover:opacity-100',
-          'bottom-5 left-1/2 -translate-x-1/2 -translate-y-1'
-        )}
-      >
-        <div className='relative text-[11px] leading-4 font-medium'>{content}</div>
-      </div>
     </div>
   );
 }

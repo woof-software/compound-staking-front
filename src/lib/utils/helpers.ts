@@ -4,6 +4,7 @@ import { getDeployment } from '@woof-software/compound-staked-comp-artifacts/dep
 
 import { type Delegate, DELEGATES } from '@/consts/common';
 import { ENV } from '@/consts/env';
+import type { Theme } from '@/hooks/useTheme';
 
 type Contracts = {
   baseTokenAddress: Address | undefined;
@@ -14,13 +15,13 @@ type Contracts = {
   vestingManagerAddress: Address | undefined;
 };
 
-export function getChainLogo(chainId?: number) {
+export function getChainLogo(chainId?: number, theme: Omit<Theme, 'system'> = 'light') {
   if (!chainId) return '/assets/chains/fallback-chain.svg';
 
-  const isChainInclude = [1, 10, 130, 137, 2020, 5000, 8453, 42161, 43114, 59144, 534352].includes(chainId);
+  const isChainInclude = [1, 11155111, 10, 130, 137, 2020, 5000, 8453, 42161, 43114, 59144, 534352].includes(chainId);
 
   if (isChainInclude) {
-    return `/assets/chains/${chainId}.svg`;
+    return theme === 'dark' ? `/assets/chains/${chainId}.svg` : `/assets/chains/${chainId}-light.svg`;
   } else {
     return '/assets/chains/fallback-chain.svg';
   }
