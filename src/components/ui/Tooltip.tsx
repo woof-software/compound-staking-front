@@ -17,26 +17,24 @@ export function Tooltip(props: TooltipProps) {
 
   return (
     <>
-      <div className={cn('group relative hidden lg:inline-flex', className)}>
+      <div className={cn('relative inline-flex', className)}>
         <button
           type='button'
-          className='inline-flex items-center focus:outline-none'
+          className='group inline-flex items-center focus:outline-none'
         >
           {children}
+          <div
+            className={cn(
+              'pointer-events-none absolute z-50 w-full max-w-54 min-w-54 rounded-lg p-4',
+              'bg-color-4 text-color-24 shadow-md',
+              'transition-opacity duration-200',
+              'opacity-0 group-hover:opacity-100',
+              'bottom-5 left-1/2 -translate-x-1/2 -translate-y-1'
+            )}
+          >
+            <div className='relative text-[11px] leading-4 font-medium'>{content}</div>
+          </div>
         </button>
-        <div
-          className={cn(
-            'absolute z-50 max-w-54 min-w-54 rounded-lg p-4',
-            'bg-color-4 text-color-24 shadow-md',
-            'transition-opacity duration-200',
-            'pointer-events-none opacity-0',
-            'group-hover:pointer-events-auto group-hover:opacity-100',
-            'hover:pointer-events-auto hover:opacity-100',
-            'bottom-5 left-1/2 -translate-x-1/2 -translate-y-1'
-          )}
-        >
-          <div className='relative text-[11px] leading-4 font-medium'>{content}</div>
-        </div>
       </div>
       <div className={cn('group relative inline-flex lg:hidden', className)}>
         <button

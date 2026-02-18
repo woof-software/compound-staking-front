@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useState } from 'react';
 import { type Address, formatUnits, parseUnits } from 'viem';
 import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
-import COMP_AVIF from '@/assets/comp.avif';
+import COMP_AVIF from '@/assets/comp-2.avif';
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
@@ -217,15 +217,15 @@ export function StakeModal(props: StakeModalProps) {
       <div className='flex flex-col gap-2.5 lg:gap-1'>
         <Skeleton loading={isPriceOrBalanceLoading}>
           <div>
-            <Condition if={!isAmountExceedsBalance}>
-              <Text
-                size='11'
-                weight='500'
-                className='text-color-31 mb-1'
-              >
-                Insufficient balance
-              </Text>
-            </Condition>
+            <Text
+              size='11'
+              weight='500'
+              className={cn('text-color-31 mb-1 opacity-0', {
+                'opacity-100': !isAmountExceedsBalance
+              })}
+            >
+              Insufficient balance
+            </Text>
             <div className='flex items-center justify-between'>
               <div className='flex max-w-72 items-center gap-2'>
                 <img
