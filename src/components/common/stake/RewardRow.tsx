@@ -5,7 +5,10 @@ import { RewardVestingTimer } from '@/components/common/stake/RewardVestingTimer
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Format, FormatTime } from '@/lib/utils/format';
+
+import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
 
 export interface RewardRowProps {
   baseTokenPriceValue: bigint;
@@ -19,6 +22,8 @@ export interface RewardRowProps {
 
 export function RewardRow(props: RewardRowProps) {
   const { baseTokenPriceValue, isLoading, vestingAmount, claimedAmount, startDate, endDate } = props;
+
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const vestingAmountPriceFormatted = formatUnits(
     vestingAmount * baseTokenPriceValue,
@@ -39,13 +44,18 @@ export function RewardRow(props: RewardRowProps) {
             </Text>
           </Skeleton>
           <Skeleton loading={isLoading}>
-            <Text
-              size='15'
-              lineHeight='20'
-              className='tabular-nums'
-            >
-              {Format.token(formatUnits(vestingAmount, ENV.BASE_TOKEN_DECIMALS), { symbol: 'COMP' })}
-            </Text>
+            <div className='flex items-center gap-1.5'>
+              <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+              <Text
+                size='15'
+                lineHeight='20'
+                className='tabular-nums'
+              >
+                {Format.token(formatUnits(vestingAmount, ENV.BASE_TOKEN_DECIMALS), {
+                  symbol: isDesktop ? 'COMP' : undefined
+                })}
+              </Text>
+            </div>
           </Skeleton>
           <Skeleton loading={isLoading}>
             <Text
@@ -110,13 +120,18 @@ export function RewardRow(props: RewardRowProps) {
             </Text>
           </Skeleton>
           <Skeleton loading={isLoading}>
-            <Text
-              size='15'
-              lineHeight='20'
-              className='tabular-nums'
-            >
-              {Format.token(formatUnits(claimedAmount, ENV.BASE_TOKEN_DECIMALS), { symbol: 'COMP' })}
-            </Text>
+            <div className='flex items-center gap-1.5'>
+              <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+              <Text
+                size='15'
+                lineHeight='20'
+                className='tabular-nums'
+              >
+                {Format.token(formatUnits(claimedAmount, ENV.BASE_TOKEN_DECIMALS), {
+                  symbol: isDesktop ? 'COMP' : undefined
+                })}
+              </Text>
+            </div>
           </Skeleton>
         </div>
       </div>

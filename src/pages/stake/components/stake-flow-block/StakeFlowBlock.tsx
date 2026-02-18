@@ -135,7 +135,7 @@ export function StakeFlowBlock() {
       tooltip='Stake COMP for on-chain yield'
     >
       <div className='flex flex-col justify-between gap-10 p-5 md:flex-row md:gap-0 md:p-10 lg:gap-10'>
-        <div className='grid w-full grid-cols-2 gap-5 md:grid-cols-3 md:gap-10 lg:grid-cols-5'>
+        <div className='grid w-full grid-cols-2 gap-5 md:grid-cols-3 md:gap-10 lg:flex lg:flex-wrap lg:justify-between'>
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
