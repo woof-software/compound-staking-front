@@ -68,6 +68,8 @@ export function RewardsFlowBlock() {
     });
   }, [vestingPositions]);
 
+  const tableRows = isConnected ? rows : [];
+
   const availableRewardsPriceFormatted = formatUnits(
     (availableRewards ?? 0n) * (baseTokenPrice ?? 0n),
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
@@ -85,7 +87,7 @@ export function RewardsFlowBlock() {
   );
 
   const hasAvailableRewards = (availableRewards ?? 0n) > 0n;
-  const hasPosition = rows.length > 0;
+  const hasPosition = tableRows.length > 0;
 
   const isLoading = isConnected ? isVestingLoading || isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
 
@@ -173,7 +175,9 @@ export function RewardsFlowBlock() {
                     size='17'
                     className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                   >
-                    {Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), { symbol: 'COMP' })}
+                    {Format.token(isConnected ? formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS) : 0, {
+                      symbol: 'COMP'
+                    })}
                   </Text>
                 </Skeleton>
                 <Condition if={isConnected && !!totalVesting}>
@@ -222,7 +226,9 @@ export function RewardsFlowBlock() {
                           );
                         }, 0n);
 
-                        return Format.token(formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS), { symbol: 'COMP' });
+                        return Format.token(isConnected ? formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS) : 0, {
+                          symbol: 'COMP'
+                        });
                       }}
                     />
                   </Text>
@@ -357,7 +363,7 @@ export function RewardsFlowBlock() {
           </div>
         </Condition>
         <Condition if={isConnected && hasPosition}>
-          <RewardsTable rows={rows} />
+          <RewardsTable rows={tableRows} />
         </Condition>
       </Card>
       <VestingModal
