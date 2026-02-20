@@ -12,7 +12,7 @@ sepolia.id = 111555111;
 sepolia.name = 'Sandbox';
 
 const STORAGE_KEY = 'pk';
-const FORK_URL = 'https://virtual.sepolia.eu.rpc.tenderly.co/7dd95cea-6f80-4d6b-a6a9-ae155728a443';
+const ADMIN_URL = 'https://virtual.sepolia.eu.rpc.tenderly.co/e2172497-f7b1-463c-9f29-ff6f2051d41e';
 const FORK_CHAIN_ID = 111555111;
 
 function createSandboxConnector() {
@@ -23,7 +23,7 @@ function createSandboxConnector() {
     localStorage.setItem(STORAGE_KEY, privatekey);
     const { address } = privateKeyToAccount(<Hex>privatekey);
 
-    fetch('https://virtual.sepolia.eu.rpc.tenderly.co/9ae5ce7a-8d6b-4ce0-bef1-c73b9562fee0', {
+    fetch(ADMIN_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -36,7 +36,7 @@ function createSandboxConnector() {
       })
     });
 
-    fetch('https://virtual.sepolia.eu.rpc.tenderly.co/9ae5ce7a-8d6b-4ce0-bef1-c73b9562fee0', {
+    fetch(ADMIN_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -57,14 +57,14 @@ function createSandboxConnector() {
   const account = privateKeyToAccount(privatekey);
 
   const walletClient = createWalletClient({
-    transport: http(FORK_URL),
+    transport: http(ADMIN_URL),
     chain: {
       ...sepolia,
       id: FORK_CHAIN_ID,
       name: 'Sandbox',
       rpcUrls: {
         default: {
-          http: [FORK_URL]
+          http: [ADMIN_URL]
         }
       }
     },
@@ -111,7 +111,7 @@ function createSandboxConnector() {
     chains: [sepolia],
     ssr: true,
     transports: {
-      [sepolia.id]: http(FORK_URL)
+      [sepolia.id]: http(ADMIN_URL)
     }
   });
 }
