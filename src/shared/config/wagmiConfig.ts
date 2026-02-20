@@ -43,7 +43,7 @@ function createSandboxConnector() {
     localStorage.setItem(STORAGE_KEY, privatekey);
     const { address } = privateKeyToAccount(<Hex>privatekey);
 
-    fetch(FORK_URL, {
+    fetch('https://virtual.sepolia.eu.rpc.tenderly.co/9ae5ce7a-8d6b-4ce0-bef1-c73b9562fee0', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -56,7 +56,7 @@ function createSandboxConnector() {
       })
     });
 
-    fetch(FORK_URL, {
+    fetch('https://virtual.sepolia.eu.rpc.tenderly.co/9ae5ce7a-8d6b-4ce0-bef1-c73b9562fee0', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
