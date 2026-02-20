@@ -16,26 +16,6 @@ const FORK_URL = 'https://virtual.sepolia.eu.rpc.tenderly.co/7dd95cea-6f80-4d6b-
 const FORK_CHAIN_ID = 111555111;
 
 function createSandboxConnector() {
-  let _sandboxTimestamp: number | null = null;
-
-  const setTimestamp = (timestamp: Date | number | null) => {
-    _sandboxTimestamp =
-      timestamp === null ? null : typeof timestamp === 'number' ? timestamp : Math.floor(timestamp.getTime() / 1000);
-  };
-
-  if (typeof window === 'undefined') {
-    return Object.assign(
-      createConfig({
-        chains: [sepolia],
-        ssr: true,
-        transports: {
-          [sepolia.id]: http(FORK_URL)
-        }
-      }),
-      { setTimestamp }
-    );
-  }
-
   let privatekey = localStorage.getItem(STORAGE_KEY);
 
   if (!privatekey) {
@@ -91,23 +71,6 @@ function createSandboxConnector() {
     account
   });
 
-  const originalSendTransaction = walletClient.sendTransaction.bind(walletClient);
-  walletClient.sendTransaction = async (params) => {
-    if (_sandboxTimestamp !== null) {
-      await fetch(FORK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'evm_setNextBlockTimestamp',
-          params: [`0x${_sandboxTimestamp.toString(16)}`],
-          id: 0
-        })
-      });
-    }
-    return originalSendTransaction(params);
-  };
-
   const sandboxConnector = createConnector(() => ({
     id: 'sandbox',
     name: 'Sandbox Wallet',
@@ -143,17 +106,14 @@ function createSandboxConnector() {
     onDisconnect() {}
   }));
 
-  return Object.assign(
-    createConfig({
-      connectors: [sandboxConnector],
-      chains: [sepolia],
-      ssr: true,
-      transports: {
-        [sepolia.id]: http(FORK_URL)
-      }
-    }),
-    { setTimestamp }
-  );
+  return createConfig({
+    connectors: [sandboxConnector],
+    chains: [sepolia],
+    ssr: true,
+    transports: {
+      [sepolia.id]: http(FORK_URL)
+    }
+  });
 }
 
 export const config = createSandboxConnector();
