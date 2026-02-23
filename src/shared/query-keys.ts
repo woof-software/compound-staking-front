@@ -26,5 +26,8 @@ export const queryKeys = {
     root: () => ['subAccountManager'],
     subAccountOf: (...args: unknown[]) => ['subAccountManager', 'subAccountOf', ...args],
     delegationDelay: (...args: unknown[]) => ['subAccountManager', 'delegationDelay', ...args]
+  },
+  unstakeRequest: {
+    perChain: (chainId?: number) => ['unstakeRequest', chainId] as const
   }
 };

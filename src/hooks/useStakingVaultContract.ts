@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { type MockStakingVault, MockStakingVault__factory } from '@woof-software/compound-staked-comp-artifacts/types';
+import { type StakingVault, StakingVault__factory } from '@woof-software/compound-staked-comp-artifacts/types';
 
 import { getAddressContracts } from '@/lib/utils/helpers';
 import { getEthersProvider, getEthersSigner } from '@/lib/utils/wagmi';
@@ -17,17 +17,17 @@ export function useStakingVaultContract(chainId?: number) {
   const readContract = useMemo(() => {
     if (!stakingVaultAddress) return null;
 
-    return MockStakingVault__factory.connect(stakingVaultAddress, provider);
+    return StakingVault__factory.connect(stakingVaultAddress, provider);
   }, [stakingVaultAddress, provider]);
 
-  const writeContract = async (): Promise<MockStakingVault | null> => {
+  const writeContract = async (): Promise<StakingVault | null> => {
     try {
       const params = chainId === undefined ? {} : { chainId };
       const signer = await getEthersSigner(config, params);
 
       if (!signer || !stakingVaultAddress) return null;
 
-      return MockStakingVault__factory.connect(stakingVaultAddress, signer);
+      return StakingVault__factory.connect(stakingVaultAddress, signer);
     } catch {
       return null;
     }

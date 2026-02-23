@@ -24,7 +24,7 @@ export function useLockedBalance(chainId?: number, address?: Address) {
     queryFn: async () => {
       if (!address || !read) return undefined;
 
-      const [amount, duration, startTime] = await read.activeLockOf(address);
+      const [amount, duration, startTime] = await read.lockOf(address);
 
       return {
         amount,
