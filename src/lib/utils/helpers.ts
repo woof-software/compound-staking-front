@@ -98,12 +98,12 @@ export function getAddressContracts(chainId?: number): Contracts {
     };
   }
 
-  const baseTokenAddress = getAddress(getDeployment(11155111, 'MockComp').address);
-  const stakedTokenAddress = getAddress(getDeployment(11155111, 'MockStComp').address);
-  const stakingVaultAddress = getAddress(getDeployment(11155111, 'MockStakingVault').address);
-  const lockManagerAddress = getAddress(getDeployment(11155111, 'LockManager').address);
-  const subaccountManagerAddress = getAddress(getDeployment(11155111, 'SubAccountManager').address);
-  const vestingManagerAddress = getAddress(getDeployment(11155111, 'VestingManager').address);
+  const baseTokenAddress = getAddress(getDeployment(111555111, 'MockComp').address);
+  const stakedTokenAddress = getAddress(getDeployment(111555111, 'MockStComp').address);
+  const stakingVaultAddress = getAddress(getDeployment(111555111, 'MockStakingVault').address);
+  const lockManagerAddress = getAddress(getDeployment(111555111, 'LockManager').address);
+  const subaccountManagerAddress = getAddress(getDeployment(111555111, 'SubAccountManager').address);
+  const vestingManagerAddress = getAddress(getDeployment(111555111, 'VestingManager').address);
 
   return {
     baseTokenAddress,
