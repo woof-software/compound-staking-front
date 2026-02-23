@@ -58,6 +58,7 @@ function buildEnvOrThrow() {
     BASE_TOKEN_PRICE_FEED_ADDRESS: requiredAddress('VITE_BASE_TOKEN_PRICE_FEED_ADDRESS'),
     BASE_TOKEN_DECIMALS: requiredInt('VITE_BASE_TOKEN_DECIMALS', { min: 0, max: 255 }),
     BASE_TOKEN_PRICE_FEED_DECIMALS: requiredInt('VITE_BASE_TOKEN_PRICE_FEED_DECIMALS', { min: 0, max: 255 }),
+    BASE_APR_DECIMALS: requiredInt('VITE_BASE_APR_DECIMALS', { min: 0, max: 255 }),
 
     STAKED_TOKEN_DECIMALS: requiredInt('VITE_STAKED_TOKEN_DECIMALS', { min: 0, max: 255 }),
 

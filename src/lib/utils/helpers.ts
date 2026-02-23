@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { type Address, getAddress, type Hash, isHash } from 'viem';
-import { getDeployment } from '@woof-software/compound-staked-comp-artifacts/deployments';
+import { getCompAddress, getDeployment } from '@woof-software/compound-staked-comp-artifacts/deployments';
 
 import { type Delegate, DELEGATES } from '@/consts/common';
 import { ENV } from '@/consts/env';
@@ -101,12 +101,12 @@ export function getAddressContracts(chainId?: number): Contracts {
     };
   }
 
-  const baseTokenAddress = getAddress(getDeployment(chainId, 'MockComp').address);
-  const stakedTokenAddress = getAddress(getDeployment(chainId, 'MockStComp').address);
-  const stakingVaultAddress = getAddress(getDeployment(chainId, 'MockStakingVault').address);
-  const lockManagerAddress = getAddress(getDeployment(chainId, 'LockManager').address);
-  const subaccountManagerAddress = getAddress(getDeployment(chainId, 'SubAccountManager').address);
-  const vestingManagerAddress = getAddress(getDeployment(chainId, 'VestingManager').address);
+  const baseTokenAddress = getAddress(getCompAddress(chainId));
+  const stakedTokenAddress = getAddress(getDeployment(chainId, 'StComp').address);
+  const stakingVaultAddress = getAddress(getDeployment(chainId, 'StakingVaultProxy').address);
+  const lockManagerAddress = getAddress(getDeployment(chainId, 'LockManagerProxy').address);
+  const subaccountManagerAddress = getAddress(getDeployment(chainId, 'SubAccountsManagerProxy').address);
+  const vestingManagerAddress = getAddress(getDeployment(chainId, 'VestingManagerProxy').address);
 
   return {
     baseTokenAddress,

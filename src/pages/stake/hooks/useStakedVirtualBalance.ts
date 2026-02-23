@@ -14,7 +14,7 @@ export function useStakedVirtualBalance(chainId?: number, address?: Address) {
     queryFn: () => {
       if (!address || !read) return;
 
-      return read.virtualBalanceOf(address);
+      return read.effectiveStakedOf(address);
     }
   });
 

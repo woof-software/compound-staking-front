@@ -1,18 +1,24 @@
+import { formatUnits } from 'viem';
 import { useConnection } from 'wagmi';
 
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
+import { ENV } from '@/consts/env';
+import { Format } from '@/lib/utils/format';
 import { useStatisticStakingAPR } from '@/pages/stake/hooks/useStatisticStakingAPR';
 import { useTotalStaked } from '@/pages/stake/hooks/useTotalStaked';
 
 export function StakingAPR() {
-  const { isConnected } = useConnection();
-  const { stakingAPR } = useStatisticStakingAPR();
+  const { isConnected, chainId } = useConnection();
+
+  const { data: stakingApr = 0n } = useStatisticStakingAPR(chainId);
 
   const { isLoading: isTotalStakedLoading } = useTotalStaked(APPLICATION_CHAIN);
 
   const isLoading = isConnected ? isTotalStakedLoading : false;
+
+  const stakingAprFormatted = Format.rate(+formatUnits(stakingApr, ENV.BASE_APR_DECIMALS));
 
   return (
     <div className='bg-statistics-bg flex w-full justify-center rounded-t-2xl px-4 py-7 md:w-1/2 md:justify-end md:!bg-none md:p-0'>
@@ -31,7 +37,7 @@ export function StakingAPR() {
             size='40'
             weight='500'
           >
-            {isConnected ? stakingAPR : '0.00'}
+            {isConnected ? stakingAprFormatted : '0.00'}
             <Text
               tag='span'
               size='40'

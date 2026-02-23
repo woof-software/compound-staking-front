@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
-import { type SubAccountManager } from '@woof-software/compound-staked-comp-artifacts/types';
-import { SubAccountManager__factory } from '@woof-software/compound-staked-comp-artifacts/types/factories/contracts/SubAccountManager__factory.js';
+import {
+  type SubAccountsManager,
+  SubAccountsManager__factory
+} from '@woof-software/compound-staked-comp-artifacts/types';
 
 import { getAddressContracts } from '@/lib/utils/helpers';
 import { getEthersProvider, getEthersSigner } from '@/lib/utils/wagmi';
@@ -18,17 +20,17 @@ export function useSubAccountManagerContract(chainId?: number) {
   const readContract = useMemo(() => {
     if (!subaccountManagerAddress) return null;
 
-    return SubAccountManager__factory.connect(subaccountManagerAddress, provider);
+    return SubAccountsManager__factory.connect(subaccountManagerAddress, provider);
   }, [subaccountManagerAddress, provider]);
 
-  const writeContract = async (): Promise<SubAccountManager | null> => {
+  const writeContract = async (): Promise<SubAccountsManager | null> => {
     try {
       const params = chainId === undefined ? {} : { chainId };
       const signer = await getEthersSigner(config, params);
 
       if (!signer || !subaccountManagerAddress) return null;
 
-      return SubAccountManager__factory.connect(subaccountManagerAddress, signer);
+      return SubAccountsManager__factory.connect(subaccountManagerAddress, signer);
     } catch {
       return null;
     }
