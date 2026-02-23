@@ -59,6 +59,13 @@
     "vite": "^7.2.4",
     "vite-plugin-svgr": "^4.5.0"
   },
+  "overrides": {
+    "ox": "^0.13.0",
+    "@adraffy/ens-normalize": "^1.11.1",
+    "@noble/curves": "^1.9.7",
+    "abitype": "^1.2.3",
+    "@noble/hashes": "^1.8.0"
+  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "eslint --cache --fix",
