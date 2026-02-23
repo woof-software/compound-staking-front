@@ -21,7 +21,9 @@ export function getChainLogo(chainId?: number, theme: Omit<Theme, 'system'> = 'l
   const isChainInclude = [1, 11155111, 10, 130, 137, 2020, 5000, 8453, 42161, 43114, 59144, 534352].includes(chainId);
 
   if (isChainInclude) {
-    return theme === 'dark' ? `/assets/chains/${chainId}.svg` : `/assets/chains/${chainId}-light.svg`;
+    if (chainId === 137 && theme === 'light') return '/assets/chains/137-light.svg';
+
+    return `/assets/chains/${chainId}.svg`;
   } else {
     return '/assets/chains/fallback-chain.svg';
   }

@@ -153,7 +153,7 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
             Sort
           </Button>
         </div>
-        <div className='mt-5 max-h-300 overflow-y-auto'>
+        <div className='hide-scrollbar mt-5 max-h-300 overflow-y-auto'>
           {sortedData.map((row) => (
             <RewardRow
               key={`${row.startDate}-${row.endDate}`}
