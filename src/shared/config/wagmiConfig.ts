@@ -44,7 +44,7 @@ function createSandboxConnector() {
       body: JSON.stringify({
         jsonrpc: '2.0',
         method: 'tenderly_setErc20Balance',
-        params: [getDeployment(11155111, 'MockComp').address, address, '0x8AC7230489E80000'],
+        params: [getDeployment(111555111, 'MockComp').address, address, '0x8AC7230489E80000'],
         id: 1
       })
     });
