@@ -177,10 +177,21 @@ export function AmountInput(props: AmountInputProps) {
       const inputEl = event.target;
       const caret = inputEl.selectionStart ?? 0;
 
+      const nativeInputEvent = event.nativeEvent as InputEvent | undefined;
+      const inputType = nativeInputEvent?.inputType;
+
       const before = inputEl.value;
       const beforeCommas = (before.match(/,/g) || []).length;
 
       let rawValue = before.replace(/,/g, '');
+
+      if (
+        (inputType === 'deleteContentBackward' || inputType === 'deleteContentForward') &&
+        rawValue.endsWith('.') &&
+        rawValue !== '.'
+      ) {
+        rawValue = rawValue.slice(0, -1);
+      }
 
       const regex = spawnFloatRegex(integerPartLength, decimals);
       const m = regex.exec(rawValue);
@@ -207,6 +218,10 @@ export function AmountInput(props: AmountInputProps) {
 
         if (nextCommas > beforeCommas) nextCaret += 1;
         if (nextCommas < beforeCommas) nextCaret -= 1;
+
+        if ((inputType === 'deleteContentBackward' || inputType === 'deleteContentForward') && before.endsWith('.')) {
+          nextCaret -= 1;
+        }
 
         nextCaret = Math.max(0, Math.min(nextCaret, nextDisplay.length));
 
