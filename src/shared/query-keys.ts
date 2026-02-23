@@ -5,7 +5,8 @@ export const queryKeys = {
     virtualBalanceOf: (...args: unknown[]) => ['stakingVault', 'virtualBalanceOf', ...args],
     multiplierOf: (...args: unknown[]) => ['stakingVault', 'multiplierOf', ...args],
     availableRewardsOf: (...args: unknown[]) => ['stakingVault', 'availableRewardsOf', ...args],
-    totalStaked: (...args: unknown[]) => ['stakingVault', 'totalStaked', ...args]
+    totalStaked: (...args: unknown[]) => ['stakingVault', 'totalStaked', ...args],
+    baseApr: (...args: unknown[]) => ['stakingVault', 'baseApr', ...args]
   },
   lockManager: {
     root: () => ['lockManager'],
@@ -26,5 +27,8 @@ export const queryKeys = {
     root: () => ['subAccountManager'],
     subAccountOf: (...args: unknown[]) => ['subAccountManager', 'subAccountOf', ...args],
     delegationDelay: (...args: unknown[]) => ['subAccountManager', 'delegationDelay', ...args]
+  },
+  unstakeRequest: {
+    perChain: (chainId?: number) => ['unstakeRequest', chainId] as const
   }
 };

@@ -27,12 +27,12 @@ export function useVestingPosition(chainId?: number, address?: Address) {
     queryFn: async () => {
       if (!address || !read) return undefined;
 
-      const res = await read.activeVestingsOf(address);
+      const res = await read.vestingsOf(address);
 
       return res.map((v) => ({
         amount: v.amount,
         claimedAmount: v.claimedAmount,
-        startTime: v.startTime,
+        startTime: v.startTimestamp,
         duration: v.duration
       }));
     }

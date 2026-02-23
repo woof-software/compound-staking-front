@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
-import { type VestingManager } from '@woof-software/compound-staked-comp-artifacts/types';
-import { VestingManager__factory } from '@woof-software/compound-staked-comp-artifacts/types/factories/contracts/VestingManager__factory.js';
+import { type VestingManager, VestingManager__factory } from '@woof-software/compound-staked-comp-artifacts/types';
 
 import { getAddressContracts } from '@/lib/utils/helpers';
 import { getEthersProvider, getEthersSigner } from '@/lib/utils/wagmi';

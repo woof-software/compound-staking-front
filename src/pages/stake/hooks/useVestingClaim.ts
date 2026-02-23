@@ -16,7 +16,7 @@ export function useVestingClaim(chainId?: number) {
 
       if (!contract) return;
 
-      const tx = await contract.claim(address);
+      const tx = await contract.claimTo(address);
 
       const hash = tx.hash;
 
