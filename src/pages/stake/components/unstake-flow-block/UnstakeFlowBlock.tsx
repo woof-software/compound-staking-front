@@ -215,7 +215,7 @@ export function UnstakeFlowBlock() {
               <div className='flex flex-col gap-2.5 lg:gap-1'>
                 <Skeleton loading={isLoading}>
                   <div className='flex items-center gap-1.5'>
-                    <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                    <CompoundBlackCircle className='text-compound-icon-bg block size-4 lg:hidden' />
                     <Text
                       size='17'
                       lineHeight='17'
@@ -223,7 +223,7 @@ export function UnstakeFlowBlock() {
                         'text-color-6': !isConnected
                       })}
                     >
-                      {Format.token(lockedStakedBalanceFormatted, { symbol: isDesktop ? 'stCOMP' : undefined })}
+                      {Format.token(lockedStakedBalanceFormatted, { symbol: isDesktop ? 'COMP' : undefined })}
                     </Text>
                   </div>
                 </Skeleton>

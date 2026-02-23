@@ -17,7 +17,7 @@ export function Tooltip(props: TooltipProps) {
 
   return (
     <>
-      <div className={cn('relative inline-flex', className)}>
+      <div className={cn('relative hidden lg:inline-flex', className)}>
         <button
           type='button'
           className='group inline-flex items-center focus:outline-none'

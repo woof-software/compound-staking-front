@@ -21,7 +21,7 @@ export function StakingAPR() {
   const stakingAprFormatted = Format.rate(+formatUnits(stakingApr, ENV.BASE_APR_DECIMALS));
 
   return (
-    <div className='bg-statistics-bg flex w-full justify-center rounded-t-2xl px-4 py-7 md:w-1/2 md:justify-end md:!bg-none md:p-0'>
+    <div className='bg-card-border bg-statistics-bg relative flex w-full justify-center rounded-t-2xl px-4 py-7 md:w-1/2 md:justify-end md:!bg-none md:p-0'>
       <div className='flex flex-col items-start gap-1.5'>
         <Skeleton loading={isLoading}>
           <Text
@@ -34,16 +34,15 @@ export function StakingAPR() {
         </Skeleton>
         <Skeleton loading={isLoading}>
           <Text
-            size='40'
             weight='500'
+            className='text-[32px] md:text-[40px]'
           >
             {isConnected ? stakingAprFormatted : '0.00'}
             <Text
               tag='span'
-              size='40'
               weight='700'
               lineHeight='38'
-              className='text-color-25'
+              className='text-color-25 text-[32px] md:text-[40px]'
             >
               %
             </Text>

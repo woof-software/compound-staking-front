@@ -167,7 +167,7 @@ export function RewardsFlowBlock() {
         tooltip='Vest and claim available rewards'
       >
         <div className='border-color-8 flex flex-col justify-between gap-5 border-b-0 p-5 md:gap-10 md:p-10 lg:flex-row lg:border-b-[0.5px]'>
-          <div className='flex w-full flex-col justify-between gap-5 md:flex-row md:gap-0 lg:max-w-120 lg:gap-10'>
+          <div className='flex w-full flex-col justify-between gap-10 md:flex-row md:gap-0 lg:max-w-120'>
             <div className='flex flex-col justify-between gap-5 md:flex-row md:gap-20 lg:gap-10'>
               <div className='flex flex-col gap-3'>
                 <Text
@@ -179,7 +179,7 @@ export function RewardsFlowBlock() {
                 <div className='flex flex-col gap-2.5 lg:gap-1'>
                   <Skeleton loading={isLoading}>
                     <div className='flex items-center gap-1.5'>
-                      <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                      <CompoundBlackCircle className='text-compound-icon-bg block size-4 lg:hidden' />
                       <Text
                         size='17'
                         className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
@@ -212,7 +212,7 @@ export function RewardsFlowBlock() {
                 <div className='flex flex-col gap-2.5 lg:gap-1'>
                   <Skeleton loading={isLoading}>
                     <div className='flex items-center gap-1.5'>
-                      <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                      <CompoundBlackCircle className='text-compound-icon-bg block size-4 lg:hidden' />
                       <Text
                         size='17'
                         className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
@@ -308,7 +308,7 @@ export function RewardsFlowBlock() {
             </Button>
           </div>
           <Divider orientation={isDesktop ? 'vertical' : 'horizontal'} />
-          <div className='flex w-full flex-col justify-between gap-5 md:flex-row md:gap-0 lg:max-w-80 lg:gap-10'>
+          <div className='flex w-full flex-col justify-between gap-10 md:flex-row md:gap-0 lg:max-w-80'>
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
@@ -319,7 +319,7 @@ export function RewardsFlowBlock() {
               <div className='flex flex-col gap-2.5 lg:gap-1'>
                 <Skeleton loading={isLoading}>
                   <div className='flex items-center gap-1.5'>
-                    <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                    <CompoundBlackCircle className='text-compound-icon-bg block size-4 lg:hidden' />
                     <Text
                       size='17'
                       className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}

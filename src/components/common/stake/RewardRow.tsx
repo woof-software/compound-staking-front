@@ -32,20 +32,20 @@ export function RewardRow(props: RewardRowProps) {
 
   return (
     <div className='even:bg-color-5 flex flex-col gap-5 rounded-sm px-5 py-5 md:px-10 md:py-10 lg:px-8 lg:py-12'>
-      <div className='grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5 lg:gap-5'>
+      <div className='grid grid-cols-2 gap-10 md:grid-cols-3 lg:grid-cols-5 lg:gap-5'>
         <div>
           <Skeleton loading={isLoading}>
             <Text
               size='11'
               weight='500'
-              className='text-color-24 mb-5 block lg:hidden'
+              className='text-color-24 mb-3 block lg:mb-5 lg:hidden'
             >
               Vesting amount
             </Text>
           </Skeleton>
           <Skeleton loading={isLoading}>
             <div className='flex items-center gap-1.5'>
-              <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+              <CompoundBlackCircle className='text-compound-icon-bg block size-4 lg:hidden' />
               <Text
                 size='15'
                 lineHeight='20'
@@ -80,7 +80,7 @@ export function RewardRow(props: RewardRowProps) {
             <Text
               size='11'
               weight='500'
-              className='text-color-24 mb-5 block lg:hidden'
+              className='text-color-24 mb-3 block lg:mb-5 lg:hidden'
             >
               Start Date
             </Text>
@@ -97,7 +97,7 @@ export function RewardRow(props: RewardRowProps) {
             <Text
               size='11'
               weight='500'
-              className='text-color-24 mb-5 block lg:hidden'
+              className='text-color-24 mb-3 block lg:mb-5 lg:hidden'
             >
               End Date
             </Text>
@@ -114,14 +114,14 @@ export function RewardRow(props: RewardRowProps) {
             <Text
               size='11'
               weight='500'
-              className='text-color-24 mb-5 block lg:hidden'
+              className='text-color-24 mb-3 block lg:mb-5 lg:hidden'
             >
               Claimed Amount
             </Text>
           </Skeleton>
           <Skeleton loading={isLoading}>
             <div className='flex items-center gap-1.5'>
-              <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+              <CompoundBlackCircle className='text-compound-icon-bg block size-4 lg:hidden' />
               <Text
                 size='15'
                 lineHeight='20'

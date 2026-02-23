@@ -50,14 +50,14 @@ export function RewardToClaim(props: RewardToClaimProps) {
               <Text
                 size='11'
                 weight='500'
-                className='text-color-24 mb-5 block lg:hidden'
+                className='text-color-24 mb-3 block lg:mb-5 lg:hidden'
               >
                 To claim
               </Text>
             </Skeleton>
             <Skeleton loading={isLoading}>
               <div className='flex items-center gap-1.5'>
-                <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                <CompoundBlackCircle className='text-compound-icon-bg block size-4 lg:hidden' />
                 <Text
                   size='15'
                   lineHeight='20'

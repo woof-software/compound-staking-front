@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { Drawer } from '@/components/ui/Drawer';
@@ -40,23 +40,21 @@ export function SortDrawer<T extends string>({
   const DEFAULT_TYPE: SortDirection = 'desc';
   const DEFAULT_TAB: TabValue = 'Descending';
 
-  const [tabValue, setTabValue] = useState<TabValue>(DEFAULT_TAB);
-  const [radioValue, setRadioValue] = useState<T | null>(DEFAULT_KEY);
+  const [tabValue, setTabValue] = useState<string>(sortType?.type === 'asc' ? 'Ascending' : 'Descending');
+  const [radioValue, setRadioValue] = useState<T | null>(sortType.key ?? null);
 
-  const initialRef = useRef<{ tabValue: TabValue; radioValue: T | null }>({
-    tabValue: DEFAULT_TAB,
-    radioValue: DEFAULT_KEY
-  });
+  const initButtonValues = useMemo(() => {
+    return {
+      tabValue,
+      radioValue
+    };
+  }, [isOpen]);
 
-  const canClearAll = useMemo(() => {
-    return radioValue !== DEFAULT_KEY || tabValue !== DEFAULT_TAB;
-  }, [radioValue, tabValue, DEFAULT_KEY]);
+  const canClearAll = radioValue !== DEFAULT_KEY || tabValue !== DEFAULT_TAB;
 
-  const canApply = useMemo(() => Boolean(radioValue) && Boolean(tabValue), [radioValue, tabValue]);
+  const isApplyButtonDisabled = Boolean(radioValue) && Boolean(tabValue);
 
-  const isChanged = useMemo(() => {
-    return initialRef.current.tabValue !== tabValue || initialRef.current.radioValue !== radioValue;
-  }, [radioValue, tabValue]);
+  const isApplyButtonChanged = initButtonValues.tabValue !== tabValue || initButtonValues.radioValue !== radioValue;
 
   const onTabsChange = useCallback((value: TabValue) => {
     setTabValue(value);
@@ -79,32 +77,19 @@ export function SortDrawer<T extends string>({
     onTypeSelect(DEFAULT_TYPE);
 
     onClose();
-  }, [DEFAULT_KEY, DEFAULT_TAB, DEFAULT_TYPE, onClose, onKeySelect, onTypeSelect]);
+  }, [onClose, onKeySelect, onTypeSelect]);
 
   const onDrawerClose = useCallback(() => {
-    const nextTab: TabValue = sortType.type === 'asc' ? 'Ascending' : 'Descending';
-    const nextRadio: T = sortType.key;
+    setRadioValue(sortType?.key);
 
-    setTabValue(nextTab);
-    setRadioValue(nextRadio);
+    setTabValue(sortType?.type === 'asc' ? 'Ascending' : 'Descending');
 
-    onKeySelect(nextRadio);
-    onTypeSelect(sortType.type);
+    onKeySelect(sortType?.key);
+
+    onTypeSelect(sortType?.type);
 
     onClose();
-  }, [onClose, onKeySelect, onTypeSelect, sortType.key, sortType.type]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const nextRadio = sortType?.key ?? DEFAULT_KEY;
-    const nextTab: TabValue = (sortType?.type ?? DEFAULT_TYPE) === 'asc' ? 'Ascending' : 'Descending';
-
-    setTabValue(nextTab);
-    setRadioValue(nextRadio);
-
-    initialRef.current = { tabValue: nextTab, radioValue: nextRadio };
-  }, [isOpen, sortType.key, sortType.type, DEFAULT_KEY, DEFAULT_TYPE]);
+  }, [onClose, onKeySelect, onTypeSelect, sortType]);
 
   return (
     <Drawer
@@ -189,11 +174,20 @@ export function SortDrawer<T extends string>({
           Clear All
         </Button>
         <Button
-          disabled={!(canApply && isChanged)}
+          disabled={!Boolean(isApplyButtonDisabled && isApplyButtonChanged)}
           onClick={onApply}
           className='h-11 text-[11px] font-medium'
         >
-          Apply
+          <Text
+            tag='p'
+            size='11'
+            align='center'
+            className={cn('text-color-6', {
+              'text-white': Boolean(isApplyButtonDisabled && isApplyButtonChanged)
+            })}
+          >
+            Apply
+          </Text>
         </Button>
       </div>
     </Drawer>

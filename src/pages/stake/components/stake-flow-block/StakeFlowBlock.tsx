@@ -135,8 +135,8 @@ export function StakeFlowBlock() {
       tooltip='Stake COMP for on-chain yield'
     >
       <div className='flex flex-col justify-between gap-10 p-5 md:flex-row md:gap-0 md:p-10 lg:gap-10'>
-        <div className='grid w-full grid-cols-2 gap-5 md:grid-cols-3 md:gap-10 lg:flex lg:flex-wrap lg:justify-between'>
-          <div className='flex flex-col gap-3'>
+        <div className='grid w-full grid-cols-2 gap-10 md:grid-cols-3 lg:flex lg:flex-wrap lg:justify-start'>
+          <div className='flex min-w-32 flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -146,7 +146,7 @@ export function StakeFlowBlock() {
             <div className='flex flex-col gap-2.5 lg:gap-1'>
               <Skeleton loading={isLoading}>
                 <div className='flex items-center gap-1.5'>
-                  <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                  <CompoundBlackCircle className='text-compound-icon-bg block size-4 lg:hidden' />
                   <Text
                     size='17'
                     className={cn('text-color-2 tabular-nums', {
@@ -161,7 +161,7 @@ export function StakeFlowBlock() {
                 <Skeleton loading={isLoading}>
                   <Text
                     size='11'
-                    className='text-color-24 tabular-nums'
+                    className='text-color-24 max-w-40 truncate tabular-nums'
                   >
                     {Format.price(stakedBalancePriceFormatted, 'standard')}
                   </Text>
@@ -169,7 +169,7 @@ export function StakeFlowBlock() {
               </Condition>
             </div>
           </div>
-          <div className='flex flex-col gap-3'>
+          <div className='flex min-w-32 flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -179,7 +179,7 @@ export function StakeFlowBlock() {
             <Skeleton loading={isLoading}>
               <Text
                 size='17'
-                className={cn('text-color-2 tabular-nums', {
+                className={cn('text-color-2 max-w-40 truncate tabular-nums', {
                   'text-color-6': !isConnected
                 })}
               >
@@ -187,7 +187,7 @@ export function StakeFlowBlock() {
               </Text>
             </Skeleton>
           </div>
-          <div className='flex flex-col gap-3'>
+          <div className='flex min-w-32 flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -197,7 +197,7 @@ export function StakeFlowBlock() {
             <Skeleton loading={isLoading}>
               <Text
                 size='17'
-                className={cn('text-color-2 tabular-nums', {
+                className={cn('text-color-2 max-w-40 truncate tabular-nums', {
                   'text-color-6': !isConnected
                 })}
               >
@@ -205,7 +205,7 @@ export function StakeFlowBlock() {
               </Text>
             </Skeleton>
           </div>
-          <div className='flex flex-col gap-3'>
+          <div className='flex min-w-32 flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -214,8 +214,8 @@ export function StakeFlowBlock() {
             </Text>
             <div className='flex flex-col gap-2.5 lg:gap-1'>
               <Skeleton loading={isLoading}>
-                <div className='flex items-center gap-1.5'>
-                  <CompoundBlackCircle className='text-compound-icon-bg block size-3.5 lg:hidden' />
+                <div className='flex max-w-40 items-center gap-1.5 truncate'>
+                  <CompoundBlackCircle className='text-compound-icon-bg block size-4 lg:hidden' />
                   <Text
                     size='17'
                     className={cn('text-color-2 tabular-nums', {
@@ -230,7 +230,7 @@ export function StakeFlowBlock() {
                 <Skeleton loading={isLoading}>
                   <Text
                     size='11'
-                    className='text-color-24 tabular-nums'
+                    className='text-color-24 max-w-40 truncate tabular-nums'
                   >
                     {Format.price(availableRewardsPriceFormatted, 'standard')}
                   </Text>
@@ -238,7 +238,7 @@ export function StakeFlowBlock() {
               </Condition>
             </div>
           </div>
-          <div className='flex flex-col gap-3'>
+          <div className='flex min-w-32 flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -248,7 +248,7 @@ export function StakeFlowBlock() {
             <Skeleton loading={isLoading}>
               <Text
                 size='17'
-                className={cn('text-color-2 tabular-nums', {
+                className={cn('text-color-2 max-w-40 truncate tabular-nums', {
                   'text-color-6': !isConnected
                 })}
               >
