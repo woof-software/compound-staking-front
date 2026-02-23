@@ -2,39 +2,62 @@ name: DEV-Lint
 
 on:
   workflow_dispatch:
+
   pull_request:
-    types: [opened, reopened, synchronize]
-    branches: [develop]
-    paths-ignore: ['.github/workflows/**']
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - develop
+    paths-ignore:
+      - '.github/workflows/**'
   push:
-    branches: [develop]
-    paths-ignore: ['.github/workflows/**']
+    branches:
+      - develop
+    paths-ignore:
+      - '.github/workflows/**'
 
 jobs:
-  lint:
+  Lint:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
-          registry-url: https://npm.pkg.github.com
-          scope: '@woof-software'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Configure npm auth for GitHub Packages
+        run: |
+          echo "@woof-software:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> ~/.npmrc
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Lint
-        run: npm run lint
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules/
+          key: node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            node-
 
-      - name: TypeScript check
-        run: tsc --noEmit
+      - name: Install Node Modules
+        run: |
+          npm ci
+
+      - name: Lint
+        run: |
+          npm run lint
+
+      - name: Typescript check
+        run: |
+          tsc --noEmit
 
       - name: Build
-        run: npm run build
+        run: |
+          npm run build
