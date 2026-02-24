@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
-import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
 import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -28,7 +28,8 @@ export type VestingModalProps = {
 };
 
 export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirmed = noop }: VestingModalProps) {
-  const { isConnected, address } = useConnection();
+  const { address, isConnected, chainId } = useConnection();
+  const { switchChainAsync, isPending: isSwitchPending } = useSwitchChain();
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
@@ -67,13 +68,20 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
   const hasPosition = !!vestingPositions?.length;
   const hasMaxPosition = hasPosition ? vestingPositions?.length === Number(maxVestingPositions ?? 0n) : false;
 
-  const isVestingLoading = isVestingPositionsLoading || isVestRewardsConfirming || isVestRewardsPending;
+  const isVestingLoading =
+    isSwitchPending || isVestingPositionsLoading || isVestRewardsConfirming || isVestRewardsPending;
   const isLoading = isConnected ? isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
 
   const isVestButtonDisabled = isLoading || isVestingLoading || hasMaxPosition;
 
+  const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
+
   const onConfirm = async () => {
     if (!address) return;
+
+    if (isWrongNetwork) {
+      await switchChainAsync({ chainId: APPLICATION_CHAIN });
+    }
 
     await vestRewardsRequest();
   };
@@ -104,22 +112,35 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
             lineHeight='20'
             className='w-full'
           >
-            Amount to be vested
+            Amount to vest
           </Text>
           <div className='flex shrink-0 flex-col items-end'>
             <div className='flex shrink-0 items-end'>
               <Skeleton loading={isLoading}>
-                <Text
-                  size='15'
-                  weight='500'
-                  lineHeight='20'
-                  className={cn('text-color-2', {
-                    'text-color-6': !isConnected
-                  })}
-                >
-                  {availableRewards && '≈'}
-                  {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
-                </Text>
+                <div className='flex gap-1'>
+                  <Condition if={availableRewards}>
+                    <Text
+                      size='15'
+                      weight='500'
+                      lineHeight='20'
+                      className={cn('text-color-2', {
+                        'text-color-6': !isConnected
+                      })}
+                    >
+                      ≈
+                    </Text>
+                  </Condition>
+                  <Text
+                    size='15'
+                    weight='500'
+                    lineHeight='20'
+                    className={cn('text-color-2', {
+                      'text-color-6': !isConnected
+                    })}
+                  >
+                    {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
+                  </Text>
+                </div>
               </Skeleton>
             </div>
             <Condition if={isConnected}>
@@ -141,10 +162,11 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
             <Text
               size='11'
               lineHeight='16'
+              weight='500'
               className='text-color-22'
             >
-              You have reached the maximum limit ({maxVestingPositions}) for Vesting entries. You need to close
-              completed entries or wait until they are finished.
+              Maximum vesting limit reached ({maxVestingPositions}). Close completed entries or wait for active ones to
+              finish
             </Text>
           </div>
         </Condition>
@@ -153,10 +175,11 @@ export function VestingModal({ isOpen = false, onClose = noop, onVestingConfirme
             <InfoIcon className='text-color-7 size-4 shrink-0' />
             <Text
               size='11'
+              weight='500'
               lineHeight='16'
               className='text-color-7'
             >
-              The whole amount will be added to your Claim balance.
+              The entire amount will be added to the claim balance
             </Text>
           </div>
         </Condition>

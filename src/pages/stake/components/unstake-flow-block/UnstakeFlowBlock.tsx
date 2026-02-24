@@ -28,7 +28,7 @@ import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useStakedVirtualBalance } from '@/pages/stake/hooks/useStakedVirtualBalance';
 import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
-import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
+import { useUnstakeRequests } from '@/pages/stake/hooks/useUnstakeRequest';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
@@ -70,24 +70,21 @@ export function UnstakeFlowBlock() {
 
   const { data: stakedTokenPrice, isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
-  const {
-    data: unstakeHash,
-    sendTransactionAsync: unstakeRequest,
-    isPending: isUnstakePending
-  } = useUnstakeRequest(APPLICATION_CHAIN);
+  const [earliestUnstakeRequestState] = useUnstakeRequests(APPLICATION_CHAIN);
 
-  const { isLoading: isUnstakeRequestConfirming, isSuccess: isUnstakeRequestSuccess } = useWaitForTransactionReceipt({
-    hash: unstakeHash
-  });
+  const { isLoading: isUnstakeTransactionMining, isSuccess: isUnstakeTransactionSucceed } =
+    useWaitForTransactionReceipt({
+      hash: earliestUnstakeRequestState?.state.data
+    });
 
   const {
-    data: unlockHash,
-    sendTransactionAsync: unlockRequest,
-    isPending: isUnlockPending
+    data: unlockTransactionHash,
+    sendTransactionAsync: sendUnlockTransaction,
+    isPending: isUnlockTransactionConfirming
   } = useUnlockRequest(APPLICATION_CHAIN);
 
-  const { isLoading: isUnlockRequesConfirming, isSuccess: isUnlockRequestSuccess } = useWaitForTransactionReceipt({
-    hash: unlockHash
+  const { isLoading: isUnlockTransactionMining, isSuccess: isUnlockTransactionSucceed } = useWaitForTransactionReceipt({
+    hash: unlockTransactionHash
   });
 
   const lockedStakedBalanceFormatted = formatUnits(lockedTokenBalance?.amount ?? 0n, ENV.BASE_TOKEN_DECIMALS);
@@ -118,19 +115,13 @@ export function UnstakeFlowBlock() {
   /* Loading */
   const isLoading = isConnected ? isLockedTokenBalanceLoading : false;
   const isTransactionLoading =
-    isUnstakePending || isUnlockPending || isUnstakeRequestConfirming || isUnlockRequesConfirming;
+    earliestUnstakeRequestState?.state.status === 'pending' ||
+    isUnlockTransactionConfirming ||
+    isUnstakeTransactionMining ||
+    isUnlockTransactionMining;
 
   const isUnstakeButtonDisabled =
     !isConnected || isOpen || isTransactionLoading || isBalancesLoading || !hasSomethingToUnstake || isCooldownBlocked;
-
-  const onUnstakeRequest = async () => {
-    setIsPendingToggle(true);
-    try {
-      await unstakeRequest();
-    } finally {
-      setIsPendingToggle(false);
-    }
-  };
 
   const onButtonClick = async () => {
     if (!lockManagerAddress) return;
@@ -138,7 +129,7 @@ export function UnstakeFlowBlock() {
     trySwitchToApplicationChain(chainId);
 
     if (hasActiveLock) {
-      await unlockRequest();
+      await sendUnlockTransaction();
     } else {
       onOpen();
     }
@@ -184,18 +175,18 @@ export function UnstakeFlowBlock() {
   }, [isBalancesLoading, hasActiveLock, remainingSeconds]);
 
   useEffect(() => {
-    if (isUnlockRequestSuccess) {
+    if (isUnlockTransactionSucceed) {
       refetchAllowance();
     }
 
-    if (isUnstakeRequestSuccess || isUnlockRequestSuccess) {
+    if (isUnstakeTransactionSucceed || isUnlockTransactionSucceed) {
       onRequestSuccess();
     }
 
-    if (isUnstakeRequestSuccess) {
+    if (isUnstakeTransactionSucceed) {
       onClose();
     }
-  }, [isUnstakeRequestSuccess, isUnlockRequestSuccess]);
+  }, [isUnstakeTransactionSucceed, isUnlockTransactionSucceed]);
 
   useExecuteAtTime(setIsDurationFinished, durationSec);
 
@@ -204,7 +195,7 @@ export function UnstakeFlowBlock() {
       <Card
         isLoading={isLoading}
         title='Unstake'
-        tooltip={`Cooldown period for unstaking process is ${FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))}`}
+        tooltip={`Unstaking cooldown: ${FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))}`}
       >
         <div className='flex items-start justify-between p-10'>
           <div className='flex gap-15'>
@@ -215,7 +206,7 @@ export function UnstakeFlowBlock() {
               >
                 Unstake
               </Text>
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1'>
                 <Skeleton loading={isLoading}>
                   <Text
                     size='17'
@@ -224,7 +215,7 @@ export function UnstakeFlowBlock() {
                       'text-color-6': !isConnected
                     })}
                   >
-                    {Format.token(lockedStakedBalanceFormatted, 'standard', 'COMP')}
+                    {Format.token(lockedStakedBalanceFormatted, { symbol: 'stCOMP' })}
                   </Text>
                 </Skeleton>
                 <Condition if={isConnected && !!lockedTokenBalance?.amount}>
@@ -288,7 +279,7 @@ export function UnstakeFlowBlock() {
                   'text-white': !isUnstakeButtonDisabled
                 })}
               >
-                {hasActiveLock ? 'Unstake' : 'Request unstake'}
+                {hasActiveLock ? 'Unstake' : 'Request Unstake'}
               </Text>
             </Skeleton>
           </Button>
@@ -300,9 +291,10 @@ export function UnstakeFlowBlock() {
           <Text
             size='11'
             lineHeight='16'
+            weight='500'
             className='text-color-7'
           >
-            Your funds are ready to be unstaked
+            Funds are ready to be unstaked
           </Text>
         </div>
       </Condition>
@@ -311,10 +303,7 @@ export function UnstakeFlowBlock() {
         open={isOpen}
         onClose={onModalClose}
       >
-        <UnstakeModal
-          isLoading={isTransactionLoading}
-          onClick={onUnstakeRequest}
-        />
+        <UnstakeModal />
       </Modal>
     </div>
   );

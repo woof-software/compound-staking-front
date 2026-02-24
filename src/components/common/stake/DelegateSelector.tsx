@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon, InfoIcon } from '@/assets/svg';
+import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/Text';
@@ -14,13 +14,12 @@ import { getExplorerAddressUrl } from '@/lib/utils/helpers';
 
 export type DelegateSelectorProps = {
   disabled?: boolean;
-  isError?: boolean;
   selectedAddressDelegate: Delegate | null;
   onSelect?: (addressDelegate: Delegate | null) => void;
 };
 
 export function DelegateSelector(props: DelegateSelectorProps) {
-  const { disabled, selectedAddressDelegate, isError, onSelect = noop } = props;
+  const { disabled, selectedAddressDelegate, onSelect = noop } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const [searchValue, setSearchValue] = useState('');
@@ -28,6 +27,8 @@ export function DelegateSelector(props: DelegateSelectorProps) {
   const { isEnabled: isOpen, toggle: open, disable: close } = useSwitch();
 
   const filteredDelegates = useDelegateSelector(searchValue);
+
+  const hasValue = !!selectedAddressDelegate;
 
   const onClose = useCallback(() => {
     close();
@@ -53,13 +54,16 @@ export function DelegateSelector(props: DelegateSelectorProps) {
   return (
     <div
       ref={ref}
-      className='relative w-full'
+      className={cn('relative w-full', {
+        'shadow-30 shadow-30-pulse rounded-lg': !hasValue
+      })}
     >
       <div
         className={cn(
-          'border-color-6 flex h-12 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
+          'flex h-13 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
           {
-            'border-color-32': isError
+            'border-color-white': !hasValue,
+            'border-color-8': hasValue
           }
         )}
         onClick={onSelectorOpen}
@@ -67,10 +71,11 @@ export function DelegateSelector(props: DelegateSelectorProps) {
         {!selectedAddressDelegate ? (
           <Text
             size='13'
+            weight='500'
             lineHeight='16'
             className='text-color-6'
           >
-            Choose delegatee
+            Select a delegate
           </Text>
         ) : (
           <div className='flex w-full items-center justify-between'>
@@ -114,23 +119,21 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             <Input
               autoFocus
               className={cn('min-h-13', {
-                'border-color-29': !filteredDelegates.length && !!searchValue.length
+                'border-color-31': !filteredDelegates.length && !!searchValue.length
               })}
-              placeholder='Delegatee name or address'
+              placeholder='Search delegates by name or address'
               value={searchValue}
               onChange={setSearchValue}
             />
             <Condition if={!filteredDelegates.length}>
-              <div className='bg-color-21 flex items-center gap-2.5 rounded-lg px-5 py-4.5'>
-                <InfoIcon className='text-color-31' />
-                <Text
-                  size='11'
-                  lineHeight='16'
-                  className='text-color-31'
-                >
-                  No delegate found
-                </Text>
-              </div>
+              <Text
+                size='11'
+                lineHeight='16'
+                weight='500'
+                className='text-color-31'
+              >
+                No delegates found
+              </Text>
             </Condition>
           </div>
           <Condition if={filteredDelegates.length}>

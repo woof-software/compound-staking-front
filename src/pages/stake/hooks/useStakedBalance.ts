@@ -31,7 +31,7 @@ export function useStakedBalance(chainId?: number, address?: Address) {
     queryFn: async () => {
       if (!read || !address) return;
 
-      const res = await read.stakeInfoOf(address);
+      const res = await read.stakeOf(address);
 
       return schemaFlexible.parse(res);
     }

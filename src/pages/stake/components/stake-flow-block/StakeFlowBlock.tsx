@@ -23,6 +23,7 @@ import { getAddressContracts } from '@/lib/utils/helpers';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
+import { useUserAPR } from '@/pages/stake/hooks/useUserAPR';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { useStatisticStore } from '@/stores/useStatisticStore';
@@ -64,6 +65,10 @@ export function StakeFlowBlock() {
 
   const { isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
   const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, baseTokenAddress);
+
+  const { data: userApr } = useUserAPR(address, APPLICATION_CHAIN);
+
+  const formattedUserApr = Format.rate(+formatUnits(userApr ?? 0n, ENV.BASE_APR_DECIMALS));
 
   /* Loading */
   const isPriceOrBalanceLoading = isStakedTokenPrice || isStakedTokenWalletBalance;
@@ -126,7 +131,7 @@ export function StakeFlowBlock() {
     <Card
       isLoading={isLoading}
       title='Stake'
-      tooltip='Stake your COMP tokens to earn yield every second!'
+      tooltip='Stake COMP for on-chain yield'
     >
       <div className='flex justify-between p-10'>
         <div className='flex flex-col gap-3'>
@@ -136,7 +141,7 @@ export function StakeFlowBlock() {
           >
             Staked
           </Text>
-          <div className='flex flex-col gap-2'>
+          <div className='flex flex-col gap-1'>
             <Skeleton loading={isLoading}>
               <Text
                 size='17'
@@ -144,7 +149,7 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {Format.token(stakedBalanceFormatted, 'compact', 'COMP')}
+                {Format.token(stakedBalanceFormatted, { symbol: 'COMP' })}
               </Text>
             </Skeleton>
             <Condition if={isConnected && !!stakedBalance?.principal}>
@@ -173,7 +178,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {Format.token(virtualBalanceFormatted, 'compact', 'stCOMP')}
+              {Format.token(virtualBalanceFormatted, { symbol: 'stCOMP' })}
             </Text>
           </Skeleton>
         </div>
@@ -202,7 +207,7 @@ export function StakeFlowBlock() {
           >
             Available Rewards
           </Text>
-          <div className='flex flex-col gap-2'>
+          <div className='flex flex-col gap-1'>
             <Skeleton loading={isLoading}>
               <Text
                 size='17'
@@ -210,7 +215,7 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
+                {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
               </Text>
             </Skeleton>
             <Condition if={isConnected && !!availableRewards}>
@@ -239,7 +244,7 @@ export function StakeFlowBlock() {
                 'text-color-6': !isConnected
               })}
             >
-              {isConnected ? '0.00' : '0.00'}%
+              {isConnected ? formattedUserApr : '0.00'}%
             </Text>
           </Skeleton>
         </div>
@@ -266,7 +271,7 @@ export function StakeFlowBlock() {
         </Button>
       </div>
       <Modal
-        title='Stake COMP tokens'
+        title='Stake tokens'
         open={isOpen}
         onClose={onModalClose}
       >

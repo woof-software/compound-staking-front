@@ -36,7 +36,8 @@ const text = cva('text-color-2', {
       '44': 'leading-[44px]',
       '54': 'leading-[54px]',
       '100': 'leading-[100%]',
-      '120': 'leading-[120%]'
+      '120': 'leading-[120%]',
+      '140': 'leading-[140%]'
     },
     align: {
       left: 'text-left',

@@ -21,7 +21,7 @@ export function useIncreaseStakeTransaction(chainId?: number) {
 
       if (!contract) return;
 
-      const tx = await contract.increaseStake(delegatee, amount);
+      const tx = await contract.stake(amount, delegatee);
 
       const hash = tx.hash;
 

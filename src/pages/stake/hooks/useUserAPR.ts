@@ -4,16 +4,17 @@ import { useQuery } from '@tanstack/react-query';
 import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
 import { queryKeys } from '@/shared/query-keys';
 
-export function useStatisticStakingAPR(chainId?: number) {
+export function useUserAPR(address?: string, chainId?: number) {
   const { read } = useStakingVaultContract(chainId);
 
   const { data, ...query } = useQuery<bigint | undefined>({
-    queryKey: queryKeys.stakingVault.baseApr([chainId]),
+    queryKey: queryKeys.stakingVault.userApr(address, chainId),
     queryFn: () => {
-      if (!read) return;
+      if (!read || !address) return;
 
-      return read.getBaseAprWad();
-    }
+      return read.aprWadOf(address);
+    },
+    enabled: !!address
   });
 
   const schema = z.bigint().optional();

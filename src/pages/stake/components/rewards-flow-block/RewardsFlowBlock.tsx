@@ -68,6 +68,8 @@ export function RewardsFlowBlock() {
     });
   }, [vestingPositions]);
 
+  const tableRows = isConnected ? rows : [];
+
   const availableRewardsPriceFormatted = formatUnits(
     (availableRewards ?? 0n) * (baseTokenPrice ?? 0n),
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
@@ -85,7 +87,7 @@ export function RewardsFlowBlock() {
   );
 
   const hasAvailableRewards = (availableRewards ?? 0n) > 0n;
-  const hasPosition = rows.length > 0;
+  const hasPosition = tableRows.length > 0;
 
   const isLoading = isConnected ? isVestingLoading || isAvailableRewardsLoading || isBaseTokenPriceLoading : false;
 
@@ -156,8 +158,9 @@ export function RewardsFlowBlock() {
       <Card
         isLoading={isLoading}
         title='Rewards'
+        tooltip='Vest and claim available rewards'
       >
-        <div className='border-color-8 flex justify-between border-b-1 p-10'>
+        <div className='border-color-8 flex justify-between border-b-[0.5px] p-10'>
           <div className='flex w-full max-w-120 justify-between'>
             <div className='flex flex-col gap-3'>
               <Text
@@ -166,13 +169,15 @@ export function RewardsFlowBlock() {
               >
                 Total vesting
               </Text>
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1'>
                 <Skeleton loading={isLoading}>
                   <Text
                     size='17'
                     className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                   >
-                    {Format.token(formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP')}
+                    {Format.token(isConnected ? formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS) : 0, {
+                      symbol: 'COMP'
+                    })}
                   </Text>
                 </Skeleton>
                 <Condition if={isConnected && !!totalVesting}>
@@ -194,7 +199,7 @@ export function RewardsFlowBlock() {
               >
                 Total to claim
               </Text>
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1'>
                 <Skeleton loading={isLoading}>
                   <Text
                     size='17'
@@ -221,7 +226,9 @@ export function RewardsFlowBlock() {
                           );
                         }, 0n);
 
-                        return Format.token(formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS), 'compact', 'COMP');
+                        return Format.token(isConnected ? formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS) : 0, {
+                          symbol: 'COMP'
+                        });
                       }}
                     />
                   </Text>
@@ -294,13 +301,13 @@ export function RewardsFlowBlock() {
             >
               Available Rewards
             </Text>
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1'>
               <Skeleton loading={isLoading}>
                 <Text
                   size='17'
                   className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                 >
-                  {Format.token(availableRewardsFormatted, 'compact', 'COMP')}
+                  {Format.token(availableRewardsFormatted, { symbol: 'COMP' })}
                 </Text>
               </Skeleton>
               <Condition if={isConnected && !!availableRewards}>
@@ -343,20 +350,20 @@ export function RewardsFlowBlock() {
                 size='15'
                 lineHeight='16'
               >
-                No Positions Yet
+                No positions
               </Text>
               <Text
                 size='15'
                 lineHeight='21'
                 className='text-color-24'
               >
-                No vested rewards yet
+                Stake COMP and vest rewards to see your positions here
               </Text>
             </div>
           </div>
         </Condition>
         <Condition if={isConnected && hasPosition}>
-          <RewardsTable rows={rows} />
+          <RewardsTable rows={tableRows} />
         </Condition>
       </Card>
       <VestingModal
@@ -365,7 +372,7 @@ export function RewardsFlowBlock() {
         onVestingConfirmed={onVestingConfirmed}
       />
       <Modal
-        title='Claim COMP'
+        title='Claim Rewards'
         open={isClaimOpen}
         onClose={onClaimModalClose}
       >

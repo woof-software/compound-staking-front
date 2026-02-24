@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 import { formatUnits, isAddress } from 'viem';
-import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
 import { CrossIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -30,7 +30,8 @@ export function ClaimModal(props: ClaimModalProps) {
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
-  const { isConnected, address } = useConnection();
+  const { address, isConnected, chainId } = useConnection();
+  const { switchChainAsync, isPending: isSwitchPending } = useSwitchChain();
 
   const [walletAddress, setWalletAddress] = useState<string>('');
 
@@ -60,9 +61,11 @@ export function ClaimModal(props: ClaimModalProps) {
   );
 
   const isLoading = isConnected ? isBaseTokenPriceLoading : false;
-  const isClaiming = isClaimPending || isClaimConfirming;
+  const isClaiming = isSwitchPending || isClaimPending || isClaimConfirming;
 
-  const isClaimButtonDisabled = isLoading || !isValidAddress;
+  const isClaimButtonDisabled = isLoading || isClaiming || !isValidAddress;
+
+  const isWrongNetwork = isConnected && !!chainId && chainId !== APPLICATION_CHAIN;
 
   const onWalletAddressChange = (value: string) => {
     setWalletAddress(value);
@@ -86,6 +89,10 @@ export function ClaimModal(props: ClaimModalProps) {
   };
 
   const onConfirm = async () => {
+    if (isWrongNetwork) {
+      await switchChainAsync({ chainId: APPLICATION_CHAIN });
+    }
+
     if (isAddress(walletAddress)) {
       await claimRequest(walletAddress);
       return;
@@ -120,18 +127,28 @@ export function ClaimModal(props: ClaimModalProps) {
           lineHeight='20'
           className='w-full'
         >
-          Amount to be claimed
+          Claim amount
         </Text>
         <div className='flex shrink-0 flex-col items-end'>
           <Skeleton loading={isLoading}>
-            <Text
-              size='15'
-              weight='500'
-              lineHeight='20'
-            >
-              {totalToClaim > 0 && '≈'}
-              {Format.token(totalClaimFormatted, 'compact', 'COMP')}
-            </Text>
+            <div className='flex gap-1'>
+              <Condition if={totalToClaim > 0}>
+                <Text
+                  size='15'
+                  weight='500'
+                  lineHeight='20'
+                >
+                  ≈
+                </Text>
+              </Condition>
+              <Text
+                size='15'
+                weight='500'
+                lineHeight='20'
+              >
+                {Format.token(totalClaimFormatted, { symbol: 'COMP' })}
+              </Text>
+            </div>
           </Skeleton>
           <Skeleton loading={isLoading}>
             <Text
@@ -150,7 +167,7 @@ export function ClaimModal(props: ClaimModalProps) {
           weight='500'
           className='text-color-24'
         >
-          Change wallet address
+          Recipient wallet
         </Text>
         <Switch
           checked={isChangeWallet}
@@ -160,7 +177,10 @@ export function ClaimModal(props: ClaimModalProps) {
       <Condition if={isChangeWallet}>
         <div>
           <Input
-            placeholder='Wallet address'
+            className={cn({
+              'border-color-31': walletAddress && !isAddress(walletAddress)
+            })}
+            placeholder='Enter wallet address'
             value={walletAddress}
             onChange={onWalletAddressChange}
             addonRight={
@@ -185,10 +205,11 @@ export function ClaimModal(props: ClaimModalProps) {
           <Condition if={walletAddress && !isAddress(walletAddress)}>
             <Text
               size='11'
+              weight='500'
               lineHeight='16'
               className='text-color-31 mt-2.5'
             >
-              Invalid address.
+              Invalid wallet address
             </Text>
           </Condition>
         </div>
