@@ -3,7 +3,9 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { sepolia } from 'viem/chains';
 import { createConnector, http } from 'wagmi';
 import { createConfig } from 'wagmi';
-import { getDeployment } from '@woof-software/compound-staked-comp-artifacts/deployments';
+import { getCompAddress } from '@woof-software/compound-staked-comp-artifacts/deployments';
+
+import { APPLICATION_CHAIN } from '@/consts/common';
 
 // @ts-expect-error - we do not really care about it while having demo
 sepolia.id = 111555111;
@@ -44,7 +46,7 @@ function createSandboxConnector() {
       body: JSON.stringify({
         jsonrpc: '2.0',
         method: 'tenderly_setErc20Balance',
-        params: [getDeployment(111555111, 'MockComp').address, address, '0x8AC7230489E80000'],
+        params: [getCompAddress(APPLICATION_CHAIN), address, '0x8AC7230489E80000'],
         id: 1
       })
     });
