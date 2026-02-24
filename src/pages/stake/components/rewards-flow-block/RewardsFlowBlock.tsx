@@ -168,7 +168,7 @@ export function RewardsFlowBlock() {
       >
         <div className='border-color-8 flex flex-col justify-between gap-5 border-b-0 p-5 md:gap-10 md:p-10 lg:flex-row lg:border-b-[0.5px]'>
           <div className='flex w-full flex-col justify-between gap-10 md:flex-row md:gap-0 lg:max-w-120'>
-            <div className='flex flex-col justify-between gap-5 md:flex-row md:gap-20 lg:gap-10'>
+            <div className='flex flex-col justify-between gap-10 md:flex-row md:gap-20 lg:gap-10'>
               <div className='flex flex-col gap-3'>
                 <Text
                   size='11'

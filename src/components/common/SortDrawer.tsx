@@ -181,6 +181,7 @@ export function SortDrawer<T extends string>({
           <Text
             tag='p'
             size='11'
+            weight='500'
             align='center'
             className={cn('text-color-6', {
               'text-white': Boolean(isApplyButtonDisabled && isApplyButtonChanged)

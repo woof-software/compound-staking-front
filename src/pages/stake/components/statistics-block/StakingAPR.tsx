@@ -22,7 +22,7 @@ export function StakingAPR() {
 
   return (
     <div className='bg-card-border bg-statistics-bg relative flex w-full justify-center rounded-t-2xl px-4 py-7 md:w-1/2 md:justify-end md:!bg-none md:p-0'>
-      <div className='flex flex-col items-start gap-1.5'>
+      <div className='flex flex-col items-start gap-2.5'>
         <Skeleton loading={isLoading}>
           <Text
             size='13'

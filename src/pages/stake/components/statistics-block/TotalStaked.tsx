@@ -41,7 +41,7 @@ export function TotalStaked() {
   }, [needTotalStakedRefresh, isConnected, refetchTotalStaked]);
 
   return (
-    <div className='bg-card-border bg-statistics-bg relative flex w-full flex-col items-center gap-1.5 rounded-t-2xl px-4 py-7 md:w-1/2 md:items-start md:!bg-none md:p-0'>
+    <div className='bg-card-border bg-statistics-bg relative flex w-full flex-col items-center gap-2.5 rounded-t-2xl px-4 py-7 md:w-1/2 md:items-start md:!bg-none md:p-0'>
       <Skeleton loading={isLoading}>
         <Text
           size='13'

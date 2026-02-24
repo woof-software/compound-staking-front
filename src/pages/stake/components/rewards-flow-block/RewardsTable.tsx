@@ -143,7 +143,7 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
         </div>
       </div>
       <div className='block lg:hidden'>
-        <div className='flex flex-col gap-5 px-5 md:px-10'>
+        <div className='mb-5 flex flex-col gap-5 px-5 md:px-10'>
           <Divider orientation='horizontal' />
           <Button
             onClick={onOpen}

@@ -136,7 +136,7 @@ export function StakeFlowBlock() {
     >
       <div className='flex flex-col justify-between gap-10 p-5 md:flex-row md:gap-0 md:p-10 lg:gap-10'>
         <div className='grid w-full grid-cols-2 gap-10 md:grid-cols-3 lg:flex lg:flex-wrap lg:justify-start'>
-          <div className='flex min-w-32 flex-col gap-3'>
+          <div className='flex flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -169,7 +169,7 @@ export function StakeFlowBlock() {
               </Condition>
             </div>
           </div>
-          <div className='flex min-w-32 flex-col gap-3'>
+          <div className='flex flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -187,7 +187,7 @@ export function StakeFlowBlock() {
               </Text>
             </Skeleton>
           </div>
-          <div className='flex min-w-32 flex-col gap-3'>
+          <div className='flex flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -205,7 +205,7 @@ export function StakeFlowBlock() {
               </Text>
             </Skeleton>
           </div>
-          <div className='flex min-w-32 flex-col gap-3'>
+          <div className='flex flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'
@@ -238,7 +238,7 @@ export function StakeFlowBlock() {
               </Condition>
             </div>
           </div>
-          <div className='flex min-w-32 flex-col gap-3'>
+          <div className='flex flex-col gap-3'>
             <Text
               size='11'
               className='text-color-24'

@@ -349,13 +349,25 @@ body.hide-scrollbar::-webkit-scrollbar {
 }
 
 @media (max-width: 767px) {
+  .dark {
+    .bg-card-border::before {
+      background: linear-gradient(
+              180deg,
+              rgba(81, 96, 112, 1) 0%,
+              rgba(81, 96, 112, 0.75) 35%,
+              rgba(81, 96, 112, 0.28) 70%,
+              rgba(81, 96, 112, 0) 100%
+      );
+    }
+  }
+
   .bg-card-border::before {
     background: linear-gradient(
             180deg,
-            rgba(81, 96, 112, 1) 0%,
-            rgba(81, 96, 112, 0.75) 35%,
-            rgba(81, 96, 112, 0.28) 70%,
-            rgba(81, 96, 112, 0) 100%
+            rgba(167, 180, 194, 1) 0%,
+            rgba(167, 180, 194, 0.75) 35%,
+            rgba(167, 180, 194, 0.28) 70%,
+            rgba(167, 180, 194, 0) 100%
     );
   }
 }

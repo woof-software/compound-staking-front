@@ -188,7 +188,7 @@ export function ClaimModal(props: ClaimModalProps) {
                 <Condition if={walletAddress.length}>
                   <CrossIcon
                     onClick={onClear}
-                    className='text-color-25 size-4 shrink-0 cursor-pointer'
+                    className='text-color-25 size-6 shrink-0 cursor-pointer'
                   />
                 </Condition>
                 <Condition if={!walletAddress.length}>
