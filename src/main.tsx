@@ -18,6 +18,30 @@ declare module '@tanstack/react-router' {
   }
 }
 
+const MineBlock = () => {
+  const mineBlock = () =>
+    fetch('https://virtual.sepolia.eu.rpc.tenderly.co/e2172497-f7b1-463c-9f29-ff6f2051d41e', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'evm_mine',
+        params: [],
+        id: 1
+      })
+    });
+
+  useEffect(() => {
+    const isReload = window.performance
+      ?.getEntriesByType('navigation')
+      .some((nav) => (nav as PerformanceNavigationTiming).type === 'reload');
+
+    if (isReload) mineBlock();
+  }, []);
+
+  return null;
+};
+
 function AutoConnect() {
   const { connectors, connect } = useConnect();
   const { isConnected } = useAccount();
@@ -39,6 +63,7 @@ createRoot(document.getElementById('root')!).render(
   <WagmiProvider config={config}>
     <QueryClientRootProvider>
       <AutoConnect />
+      <MineBlock />
       <RouterProvider router={router} />
       {/*<ReactQueryDevtools initialIsOpen={false} />*/}
     </QueryClientRootProvider>
