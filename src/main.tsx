@@ -32,11 +32,7 @@ const MineBlock = () => {
     });
 
   useEffect(() => {
-    const isReload = window.performance
-      ?.getEntriesByType('navigation')
-      .some((nav) => (nav as PerformanceNavigationTiming).type === 'reload');
-
-    if (isReload) mineBlock();
+    mineBlock();
   }, []);
 
   return null;
