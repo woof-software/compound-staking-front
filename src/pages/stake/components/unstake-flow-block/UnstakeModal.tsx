@@ -108,6 +108,9 @@ export function UnstakeModal() {
     // Must show loading during transaction confirmation and mining
     if (isApproveTransactionPending) return true;
     if (isApproveTransactionMining) return true;
+
+    // Must be disabled if max vesting positions reached
+    if (hasReachedPositionsLimit) return true;
   })();
 
   const isUnstakeButtonLoading = (() => {
@@ -132,6 +135,9 @@ export function UnstakeModal() {
     // Must be disabled if transaction in progress
     if (isUnstakeTransactionConfirming) return true;
     if (isUnstakeTransactionMining) return true;
+
+    // Must be disabled if max vesting positions reached
+    if (hasReachedPositionsLimit) return true;
   })();
 
   const onUnstake = async () => {

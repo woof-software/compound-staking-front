@@ -18,10 +18,12 @@ import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useSwitch } from '@/hooks/useSwitch';
+import { useInvalidateTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { vestingToClaimCalc } from '@/lib/rewards';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
+import { getAddressContracts } from '@/lib/utils/helpers';
 import { RewardsTable, type RewardsTableItem } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useRewardStore } from '@/stores/useRewardStore';
@@ -43,6 +45,10 @@ export function RewardsFlowBlock() {
 
   const { isEnabled: isVestingOpen, enable: onVestingOpen, disable: onVestingClose } = useSwitch();
   const { isEnabled: isClaimOpen, enable: onClaimOpen, disable: onClaimClose } = useSwitch();
+
+  const { baseTokenAddress } = getAddressContracts(APPLICATION_CHAIN);
+
+  const invalidateTokenBalance = useInvalidateTokenBalance();
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
@@ -107,6 +113,14 @@ export function RewardsFlowBlock() {
 
   const onClaimConfirmed = async () => {
     await refetchVestingPositions();
+
+    if (address && baseTokenAddress) {
+      await invalidateTokenBalance({
+        chainId: APPLICATION_CHAIN,
+        owner: address,
+        token: baseTokenAddress
+      });
+    }
   };
 
   const onClaimModalOpen = () => {
