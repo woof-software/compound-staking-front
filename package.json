@@ -19,7 +19,7 @@
     "@tanstack/react-router": "^1.139.14",
     "@wagmi/core": "^3.4.0",
     "@walletconnect/ethereum-provider": "^2.21.10",
-    "@woof-software/compound-staked-comp-artifacts": "1.4.3",
+    "@woof-software/compound-staked-comp-artifacts": "1.4.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.19",
