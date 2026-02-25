@@ -7,7 +7,7 @@ import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
-import { APPLICATION_CHAIN } from '@/consts/common';
+import { APPLICATION_CHAIN, BASE_COOLDOWN_BUFFER_SECONDS } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useApproveTransaction } from '@/hooks/useApproveTransaction';
 import { useUnstakeLockDuration } from '@/hooks/useLockDuration';
@@ -28,7 +28,13 @@ export function UnstakeModal() {
 
   const { lockManagerAddress } = getAddressContracts(APPLICATION_CHAIN);
 
-  const { data: lockDuration } = useUnstakeLockDuration(APPLICATION_CHAIN, lockManagerAddress);
+  const { data: baseLockDuration } = useUnstakeLockDuration(APPLICATION_CHAIN, lockManagerAddress);
+
+  let bufferedLockDuration = 0n;
+
+  if (baseLockDuration) {
+    bufferedLockDuration += baseLockDuration + BigInt(BASE_COOLDOWN_BUFFER_SECONDS);
+  }
 
   const { data: stakedTokenBalance } = useStakedBalance(APPLICATION_CHAIN, address);
 
@@ -209,7 +215,7 @@ export function UnstakeModal() {
           weight='500'
           lineHeight='20'
         >
-          {FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0n))}
+          {FormatTime.cooldownFromSeconds(Number(bufferedLockDuration ?? 0n))}
         </Text>
       </div>
       <Condition if={hasReachedPositionsLimit}>

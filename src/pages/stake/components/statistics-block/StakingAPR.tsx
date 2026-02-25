@@ -10,9 +10,9 @@ import { useStatisticStakingAPR } from '@/pages/stake/hooks/useStatisticStakingA
 import { useTotalStaked } from '@/pages/stake/hooks/useTotalStaked';
 
 export function StakingAPR() {
-  const { isConnected, chainId } = useConnection();
+  const { isConnected } = useConnection();
 
-  const { data: stakingApr = 0n } = useStatisticStakingAPR(chainId);
+  const { data: stakingApr = 0n } = useStatisticStakingAPR(APPLICATION_CHAIN);
 
   const { isLoading: isTotalStakedLoading } = useTotalStaked(APPLICATION_CHAIN);
 

@@ -6,7 +6,8 @@ export const queryKeys = {
     multiplierOf: (...args: unknown[]) => ['stakingVault', 'multiplierOf', ...args],
     availableRewardsOf: (...args: unknown[]) => ['stakingVault', 'availableRewardsOf', ...args],
     totalStaked: (...args: unknown[]) => ['stakingVault', 'totalStaked', ...args],
-    baseApr: (...args: unknown[]) => ['stakingVault', 'baseApr', ...args]
+    baseApr: (...args: unknown[]) => ['stakingVault', 'baseApr', ...args],
+    userApr: (address?: string, chainId?: number) => ['stakingVault', 'userApr', address, chainId]
   },
   lockManager: {
     root: () => ['lockManager'],

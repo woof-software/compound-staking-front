@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useMemo } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
@@ -11,7 +11,7 @@ import { Drawer } from '@/components/ui/Drawer';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
-import { APPLICATION_CHAIN } from '@/consts/common';
+import { APPLICATION_CHAIN, BASE_COOLDOWN_BUFFER_SECONDS } from '@/consts/common';
 import { ENV } from '@/consts/env';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
@@ -107,11 +107,11 @@ export function UnstakeFlowBlock() {
 
   const isBalancesLoading = isLockedTokenBalanceLoading || (isConnected && !lockedTokenBalance);
 
-  const durationSec = useMemo(() => {
-    if (isBalancesLoading || !hasActiveLock) return 0;
+  let unstakeCooldownEnd = 0;
 
-    return unlockTimestampSec * 1000;
-  }, [isBalancesLoading, hasActiveLock, unlockTimestampSec]);
+  if (!isBalancesLoading && hasActiveLock) {
+    unstakeCooldownEnd = (unlockTimestampSec + BASE_COOLDOWN_BUFFER_SECONDS) * 1000;
+  }
 
   const isInfoVisible = isConnected && !isBalancesLoading && hasActiveLock && isDurationFinished;
   const isCooldownBlocked = !isBalancesLoading && hasActiveLock && !isDurationFinished;
@@ -194,14 +194,14 @@ export function UnstakeFlowBlock() {
     }
   }, [isUnstakeTransactionSucceed, isUnlockTransactionSucceed]);
 
-  useExecuteAtTime(setIsDurationFinished, durationSec);
+  useExecuteAtTime(setIsDurationFinished, unstakeCooldownEnd);
 
   return (
     <div className='flex flex-col gap-1.5'>
       <Card
         isLoading={isLoading}
         title='Unstake'
-        tooltip={`Unstaking cooldown: ${FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))}`}
+        tooltip={`Unstaking cooldown: ${FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))} + 1 block offset (${FormatTime.cooldownFromSeconds(BASE_COOLDOWN_BUFFER_SECONDS)}).`}
       >
         <div className='flex flex-col items-start justify-between gap-10 p-5 md:flex-row md:p-10'>
           <div className='grid w-full grid-cols-1 flex-col gap-10 sm:grid-cols-2 md:flex md:flex-row md:gap-15'>
@@ -248,7 +248,7 @@ export function UnstakeFlowBlock() {
               </Text>
               <Skeleton loading={isLoading}>
                 <Duration
-                  end={durationSec}
+                  end={unstakeCooldownEnd}
                   unsafeRound={(msLeft) => {
                     return Math.max(Math.ceil(msLeft / 1000), 0);
                   }}

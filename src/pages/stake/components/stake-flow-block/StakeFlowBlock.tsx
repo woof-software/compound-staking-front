@@ -25,6 +25,7 @@ import { getAddressContracts } from '@/lib/utils/helpers';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
+import { useUserAPR } from '@/pages/stake/hooks/useUserAPR';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { useStatisticStore } from '@/stores/useStatisticStore';
@@ -70,6 +71,10 @@ export function StakeFlowBlock() {
 
   const { isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
   const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, baseTokenAddress);
+
+  const { data: userApr } = useUserAPR(address, APPLICATION_CHAIN);
+
+  const formattedUserApr = Format.rate(+formatUnits(userApr ?? 0n, ENV.BASE_APR_DECIMALS));
 
   /* Loading */
   const isPriceOrBalanceLoading = isStakedTokenPrice || isStakedTokenWalletBalance;
@@ -252,7 +257,7 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {isConnected ? '0.00' : '0.00'}%
+                {isConnected ? formattedUserApr : '0.00'}%
               </Text>
             </Skeleton>
           </div>
