@@ -30,8 +30,10 @@ import { UnstakeModal } from '@/pages/stake/components/unstake-flow-block/Unstak
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useStakedVirtualBalance } from '@/pages/stake/hooks/useStakedVirtualBalance';
+import { useStatisticStakingAPR } from '@/pages/stake/hooks/useStatisticStakingAPR';
 import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
 import { useUnstakeRequests } from '@/pages/stake/hooks/useUnstakeRequest';
+import { useUserAPR } from '@/pages/stake/hooks/useUserAPR';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
@@ -76,6 +78,10 @@ export function UnstakeFlowBlock() {
   } = useLockedBalance(APPLICATION_CHAIN, address);
 
   const { data: stakedTokenPrice, isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
+
+  const { refetch: refetchUerAPR } = useUserAPR(address, APPLICATION_CHAIN);
+
+  const { refetch: refetchStatisticStakingAPR } = useStatisticStakingAPR(APPLICATION_CHAIN);
 
   const [earliestUnstakeRequestState] = useUnstakeRequests(APPLICATION_CHAIN);
 
@@ -157,6 +163,8 @@ export function UnstakeFlowBlock() {
     refetchMultiplier();
     refetchAvailableRewards();
     refetchLockedTokenBalance();
+    refetchUerAPR();
+    refetchStatisticStakingAPR();
   });
 
   useEffect(() => {

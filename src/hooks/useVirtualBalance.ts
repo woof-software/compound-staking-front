@@ -2,6 +2,7 @@ import { type Address } from 'viem';
 import { z } from 'zod';
 import { useQuery } from '@tanstack/react-query';
 
+import { REFETCH_TIME_MS } from '@/consts/common';
 import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
 import { queryKeys } from '@/shared/query-keys';
 
@@ -15,7 +16,8 @@ export function useVirtualBalance(chainId?: number, address?: Address) {
       if (!address || !read) return;
 
       return read.effectiveStakedOf(address);
-    }
+    },
+    refetchInterval: REFETCH_TIME_MS
   });
 
   return {

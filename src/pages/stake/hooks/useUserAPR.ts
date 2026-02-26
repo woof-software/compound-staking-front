@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { useQuery } from '@tanstack/react-query';
 
+import { REFETCH_TIME_MS } from '@/consts/common';
 import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
 import { queryKeys } from '@/shared/query-keys';
 
@@ -14,7 +15,8 @@ export function useUserAPR(address?: string, chainId?: number) {
 
       return read.aprWadOf(address);
     },
-    enabled: !!address
+    enabled: !!address,
+    refetchInterval: REFETCH_TIME_MS
   });
 
   const schema = z.bigint().optional();

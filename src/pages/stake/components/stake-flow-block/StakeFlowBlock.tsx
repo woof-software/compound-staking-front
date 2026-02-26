@@ -26,6 +26,7 @@ import { getAddressContracts, when } from '@/lib/utils/helpers';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
+import { useStatisticStakingAPR } from '@/pages/stake/hooks/useStatisticStakingAPR';
 import { useUserAPR } from '@/pages/stake/hooks/useUserAPR';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
@@ -73,7 +74,9 @@ export function StakeFlowBlock() {
   const { isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
   const { isLoading: isStakedTokenWalletBalance } = useTokenBalance(address, baseTokenAddress);
 
-  const { data: userApr } = useUserAPR(address, APPLICATION_CHAIN);
+  const { data: userApr, refetch: refetchUerAPR } = useUserAPR(address, APPLICATION_CHAIN);
+
+  const { refetch: refetchStatisticStakingAPR } = useStatisticStakingAPR(APPLICATION_CHAIN);
 
   const formattedUserApr = Format.rate(+formatUnits(userApr ?? 0n, ENV.BASE_APR_DECIMALS));
 
@@ -112,6 +115,8 @@ export function StakeFlowBlock() {
     refetchVirtualBalance();
     refetchMultiplier();
     refetchAvailableRewards();
+    refetchUerAPR();
+    refetchStatisticStakingAPR();
 
     triggerStatisticRefresh();
     triggerDelegateRefresh();
