@@ -1,8 +1,8 @@
 import { type Connector, type CreateConnectorFn, useConnect, useConnectors } from 'wagmi';
 
 import coinbase from '@/assets/coinbase.avif';
+import { ArrowIcon } from '@/assets/icons';
 import metamask from '@/assets/metamask-and-browsers.avif';
-import { ArrowIcon } from '@/assets/svg';
 import walletconnect from '@/assets/walletconnect.avif';
 import { Condition } from '@/components/common/Condition';
 import { cn } from '@/lib/utils/cn';

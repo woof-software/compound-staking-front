@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { Drawer } from '@/components/ui/Drawer';
@@ -17,10 +17,17 @@ type SortAccessor<T extends string> = {
   accessorKey: T;
 };
 
+type SortDefaults<T extends string> = {
+  key: T;
+  type: SortDirection;
+  tab: TabValue;
+};
+
 interface SortDrawerProps<T extends string> {
   isOpen: boolean;
   sortType: SortAdapter<T>;
   columns: SortAccessor<T>[];
+  defaults: SortDefaults<T>;
   onClose: () => void;
   onKeySelect: (value: T) => void;
   onTypeSelect: (value: SortDirection) => void;
@@ -32,54 +39,51 @@ export function SortDrawer<T extends string>({
   isOpen,
   sortType,
   columns,
+  defaults,
   onClose,
   onKeySelect,
   onTypeSelect
 }: SortDrawerProps<T>) {
-  const DEFAULT_KEY = 'startDate' as T;
-  const DEFAULT_TYPE: SortDirection = 'desc';
-  const DEFAULT_TAB: TabValue = 'Descending';
+  const [tabValue, setTabValue] = useState<string>(sortType.type === 'asc' ? 'Ascending' : 'Descending');
+  const [radioValue, setRadioValue] = useState<T>(sortType.key);
 
-  const [tabValue, setTabValue] = useState<string>(sortType?.type === 'asc' ? 'Ascending' : 'Descending');
-  const [radioValue, setRadioValue] = useState<T | null>(sortType.key ?? null);
-
-  const initButtonValues = useMemo(() => {
+  const { tabValue: initialTabValue, radioValue: initialRadioValue } = useMemo(() => {
     return {
       tabValue,
       radioValue
     };
   }, [isOpen]);
 
-  const canClearAll = radioValue !== DEFAULT_KEY || tabValue !== DEFAULT_TAB;
+  const isClearAllDisabled = radioValue === defaults.key || tabValue === defaults.tab;
 
-  const isApplyButtonDisabled = Boolean(radioValue) && Boolean(tabValue);
+  const isApplyButtonDisabled = !!(radioValue && tabValue);
 
-  const isApplyButtonChanged = initButtonValues.tabValue !== tabValue || initButtonValues.radioValue !== radioValue;
+  const isApplyButtonChanged = initialTabValue !== tabValue || initialRadioValue !== radioValue;
 
-  const onTabsChange = useCallback((value: TabValue) => {
+  const onTabsChange = (value: TabValue) => {
     setTabValue(value);
-  }, []);
+  };
 
-  const onApply = useCallback(() => {
+  const onApply = () => {
     if (!radioValue) return;
 
     onKeySelect(radioValue);
     onTypeSelect(tabValue === 'Ascending' ? 'asc' : 'desc');
 
     onClose();
-  }, [onClose, onKeySelect, onTypeSelect, radioValue, tabValue]);
+  };
 
-  const onClearAll = useCallback(() => {
-    setRadioValue(DEFAULT_KEY);
-    setTabValue(DEFAULT_TAB);
+  const onClearAll = () => {
+    setRadioValue(defaults.key);
+    setTabValue(defaults.tab);
 
-    onKeySelect(DEFAULT_KEY);
-    onTypeSelect(DEFAULT_TYPE);
+    onKeySelect(defaults.key);
+    onTypeSelect(defaults.type);
 
     onClose();
-  }, [onClose, onKeySelect, onTypeSelect]);
+  };
 
-  const onDrawerClose = useCallback(() => {
+  const onDrawerClose = () => {
     setRadioValue(sortType?.key);
 
     setTabValue(sortType?.type === 'asc' ? 'Ascending' : 'Descending');
@@ -89,7 +93,7 @@ export function SortDrawer<T extends string>({
     onTypeSelect(sortType?.type);
 
     onClose();
-  }, [onClose, onKeySelect, onTypeSelect, sortType]);
+  };
 
   return (
     <Drawer
@@ -165,16 +169,16 @@ export function SortDrawer<T extends string>({
       </div>
       <div className='mt-5 flex w-full gap-3'>
         <Button
-          disabled={!canClearAll}
+          disabled={isClearAllDisabled}
           onClick={onClearAll}
           className={cn('h-11 text-[11px] font-medium', {
-            'border-color-7 text-color-2 border-2 bg-transparent': canClearAll
+            'border-color-7 text-color-2 border-2 bg-transparent': !isClearAllDisabled
           })}
         >
           Clear All
         </Button>
         <Button
-          disabled={!Boolean(isApplyButtonDisabled && isApplyButtonChanged)}
+          disabled={!(isApplyButtonDisabled && isApplyButtonChanged)}
           onClick={onApply}
           className='h-11 text-[11px] font-medium'
         >
@@ -184,7 +188,7 @@ export function SortDrawer<T extends string>({
             weight='500'
             align='center'
             className={cn('text-color-6', {
-              'text-white': Boolean(isApplyButtonDisabled && isApplyButtonChanged)
+              'text-white': isApplyButtonDisabled && isApplyButtonChanged
             })}
           >
             Apply

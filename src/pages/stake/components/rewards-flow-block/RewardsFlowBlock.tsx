@@ -15,6 +15,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
+import { MIN_1024 } from '@/consts/media';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useSwitch } from '@/hooks/useSwitch';
@@ -23,17 +24,17 @@ import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { vestingToClaimCalc } from '@/lib/rewards';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
-import { getAddressContracts } from '@/lib/utils/helpers';
+import { getAddressContracts, when } from '@/lib/utils/helpers';
 import { RewardsTable, type RewardsTableItem } from '@/pages/stake/components/rewards-flow-block/RewardsTable';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
-import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
+import CompoundBlackCircle from '@/assets/svg/compound-black-circle.svg';
 
 export function RewardsFlowBlock() {
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const isDesktop = useMediaQuery(MIN_1024);
 
   const [claimAmount, setClaimAmount] = useState<bigint>(0n);
 
@@ -199,7 +200,7 @@ export function RewardsFlowBlock() {
                         className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                       >
                         {Format.token(isConnected ? formatUnits(totalVesting, ENV.BASE_TOKEN_DECIMALS) : 0, {
-                          symbol: isDesktop ? 'COMP' : undefined
+                          symbol: when(isDesktop, 'COMP')
                         })}
                       </Text>
                     </div>
@@ -253,7 +254,7 @@ export function RewardsFlowBlock() {
                             }, 0n);
 
                             return Format.token(isConnected ? formatUnits(totalToClaim, ENV.BASE_TOKEN_DECIMALS) : 0, {
-                              symbol: isDesktop ? 'COMP' : undefined
+                              symbol: when(isDesktop, 'COMP')
                             });
                           }}
                         />
@@ -338,7 +339,7 @@ export function RewardsFlowBlock() {
                       size='17'
                       className={cn('text-color-2 tabular-nums', { 'text-color-6': !isConnected })}
                     >
-                      {Format.token(availableRewardsFormatted, { symbol: isDesktop ? 'COMP' : undefined })}
+                      {Format.token(availableRewardsFormatted, { symbol: when(isDesktop, 'COMP') })}
                     </Text>
                   </div>
                 </Skeleton>

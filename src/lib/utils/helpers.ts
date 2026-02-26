@@ -134,4 +134,26 @@ export function getHash(hash: string): Hash {
   return hash as Hash;
 }
 
-export const cleanCommas = (value: string) => value.replace(/,/g, '');
+/**
+ * Conditionally returns a value or a fallback.
+ *
+ * @example
+ * when(true, 'hello'); // 'hello'
+ *
+ * @example
+ * when(false, 'hello'); // undefined
+ *
+ * @example
+ * when(false, 'hello', 'fallback'); // 'fallback'
+ *
+ * @example
+ * const address = when(isConnected, walletAddress);
+ * if isConnected === true -> walletAddress
+ * if isConnected === false -> undefined
+ *
+ * @example
+ * const amount = when(balance > 0n, balance, 0n); // bigint fallback
+ */
+export function when<T>(condition: boolean, value: T | undefined, fallback = undefined): T | undefined {
+  return condition ? value : fallback;
+}

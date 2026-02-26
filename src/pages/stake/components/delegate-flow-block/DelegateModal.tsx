@@ -2,7 +2,8 @@ import { useEffect, useEffectEvent, useState } from 'react';
 import type { Address } from 'viem';
 import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
-import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
+import { DesktopDelegateSelector } from '@/components/common/stake/DelegateSelector/DesktopDelegateSelector';
+import { MobileDelegateSelector } from '@/components/common/stake/DelegateSelector/MobileDelegateSelector';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
@@ -79,7 +80,12 @@ export function DelegateModal(props: DelegateModalProps) {
   return (
     <div className='mt-8 flex w-full flex-col gap-8'>
       <Divider orientation='horizontal' />
-      <DelegateSelector
+      <DesktopDelegateSelector
+        disabled={isDelegateLoading}
+        selectedAddressDelegate={selectedAddressDelegate}
+        onSelect={onDelegateSelect}
+      />
+      <MobileDelegateSelector
         disabled={isDelegateLoading}
         selectedAddressDelegate={selectedAddressDelegate}
         onSelect={onDelegateSelect}

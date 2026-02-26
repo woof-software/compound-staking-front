@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useDisconnect } from 'wagmi';
 
-import { CopyIcon, SpinnerIcon } from '@/assets/svg';
+import { CopyIcon, SpinnerIcon } from '@/assets/icons';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
@@ -17,13 +17,13 @@ import { Format } from '@/lib/utils/format';
 import { getAddressContracts } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
 
-import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
+import CompoundWalletIcon from '@/assets/svg/compound-wallet-icon.svg';
 
 export type ConnectedButtonProps = {
   onChangeWallet: () => void;
 };
 
-export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedButtonProps) {
+export function DesktopConnectedButton({ onChangeWallet: onWalletChange }: ConnectedButtonProps) {
   const ref = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLDivElement>(null);
 

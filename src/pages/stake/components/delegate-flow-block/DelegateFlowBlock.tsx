@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useMemo } from 'react';
 import { useConnection } from 'wagmi';
 
-import { ExternalLinkIcon } from '@/assets/svg';
+import { ExternalLinkIcon } from '@/assets/icons';
 import { Condition } from '@/components/common/Condition';
 import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
+import { MIN_1024 } from '@/consts/media';
 import { useDelegateDuration } from '@/hooks/useDelegateDuration';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
@@ -30,7 +31,7 @@ import { useWalletStore } from '@/stores/useWalletStore';
 export function DelegateFlowBlock() {
   const { isConnected, address, chainId } = useConnection();
 
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const isDesktop = useMediaQuery(MIN_1024);
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 

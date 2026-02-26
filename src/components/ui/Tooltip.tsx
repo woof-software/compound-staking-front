@@ -1,5 +1,6 @@
 import { type PropsWithChildren, type ReactNode, useRef } from 'react';
 
+import { MAX_1099 } from '@/consts/media';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useOutsideClick } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
@@ -16,12 +17,10 @@ export function Tooltip(props: TooltipProps) {
 
   const ref = useRef<HTMLDivElement>(null);
 
-  // < 1100px => click mode
-  const isBelow1100 = useMediaQuery('(max-width: 1099px)');
+  const isBelow1100 = useMediaQuery(MAX_1099);
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  // Закрытие по клику снаружи нужно только в click-mode
   useOutsideClick(() => ref.current, isBelow1100 ? onClose : noop);
 
   const handleClick = () => {

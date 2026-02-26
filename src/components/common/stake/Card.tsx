@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react';
 
-import { InfoIcon } from '@/assets/svg';
+import { InfoIcon } from '@/assets/icons';
 import { Condition } from '@/components/common/Condition';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';

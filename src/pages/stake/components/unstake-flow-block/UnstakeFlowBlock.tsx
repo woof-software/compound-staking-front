@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
-import { InfoIcon } from '@/assets/svg';
+import { InfoIcon } from '@/assets/icons';
 import { Condition } from '@/components/common/Condition';
 import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN, BASE_COOLDOWN_BUFFER_SECONDS } from '@/consts/common';
 import { ENV } from '@/consts/env';
+import { MIN_1024 } from '@/consts/media';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
@@ -24,7 +25,7 @@ import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
 import { Format, FormatTime } from '@/lib/utils/format';
-import { getAddressContracts, getRemainingSeconds, normalizeUnixSeconds } from '@/lib/utils/helpers';
+import { getAddressContracts, getRemainingSeconds, normalizeUnixSeconds, when } from '@/lib/utils/helpers';
 import { UnstakeModal } from '@/pages/stake/components/unstake-flow-block/UnstakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
@@ -36,7 +37,7 @@ import { useRewardStore } from '@/stores/useRewardStore';
 import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
-import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
+import CompoundBlackCircle from '@/assets/svg/compound-black-circle.svg';
 
 export function UnstakeFlowBlock() {
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
@@ -47,7 +48,7 @@ export function UnstakeFlowBlock() {
     disable: resetIsDurationFinished
   } = useSwitch();
 
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const isDesktop = useMediaQuery(MIN_1024);
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
@@ -223,7 +224,7 @@ export function UnstakeFlowBlock() {
                         'text-color-6': !isConnected
                       })}
                     >
-                      {Format.token(lockedStakedBalanceFormatted, { symbol: isDesktop ? 'COMP' : undefined })}
+                      {Format.token(lockedStakedBalanceFormatted, { symbol: when(isDesktop, 'COMP') })}
                     </Text>
                   </div>
                 </Skeleton>

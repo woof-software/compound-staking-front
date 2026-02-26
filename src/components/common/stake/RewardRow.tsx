@@ -5,10 +5,12 @@ import { RewardVestingTimer } from '@/components/common/stake/RewardVestingTimer
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { MIN_1024 } from '@/consts/media';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Format, FormatTime } from '@/lib/utils/format';
+import { when } from '@/lib/utils/helpers';
 
-import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
+import CompoundBlackCircle from '@/assets/svg/compound-black-circle.svg';
 
 export interface RewardRowProps {
   baseTokenPriceValue: bigint;
@@ -23,7 +25,7 @@ export interface RewardRowProps {
 export function RewardRow(props: RewardRowProps) {
   const { baseTokenPriceValue, isLoading, vestingAmount, claimedAmount, startDate, endDate } = props;
 
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const isDesktop = useMediaQuery(MIN_1024);
 
   const vestingAmountPriceFormatted = formatUnits(
     vestingAmount * baseTokenPriceValue,
@@ -52,7 +54,7 @@ export function RewardRow(props: RewardRowProps) {
                 className='tabular-nums'
               >
                 {Format.token(formatUnits(vestingAmount, ENV.BASE_TOKEN_DECIMALS), {
-                  symbol: isDesktop ? 'COMP' : undefined
+                  symbol: when(isDesktop, 'COMP')
                 })}
               </Text>
             </div>
@@ -128,7 +130,7 @@ export function RewardRow(props: RewardRowProps) {
                 className='tabular-nums'
               >
                 {Format.token(formatUnits(claimedAmount, ENV.BASE_TOKEN_DECIMALS), {
-                  symbol: isDesktop ? 'COMP' : undefined
+                  symbol: when(isDesktop, 'COMP')
                 })}
               </Text>
             </div>

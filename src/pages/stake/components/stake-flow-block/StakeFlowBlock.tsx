@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
 import { ENV } from '@/consts/env';
+import { MIN_1024 } from '@/consts/media';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -21,7 +22,7 @@ import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { useVirtualBalance } from '@/hooks/useVirtualBalance';
 import { cn } from '@/lib/utils/cn';
 import { Format } from '@/lib/utils/format';
-import { getAddressContracts } from '@/lib/utils/helpers';
+import { getAddressContracts, when } from '@/lib/utils/helpers';
 import { StakeModal } from '@/pages/stake/components/stake-flow-block/StakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
@@ -32,14 +33,14 @@ import { useStatisticStore } from '@/stores/useStatisticStore';
 import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
-import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
+import CompoundBlackCircle from '@/assets/svg/compound-black-circle.svg';
 
 export function StakeFlowBlock() {
   const { isConnected, address, chainId } = useConnection();
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const isDesktop = useMediaQuery(MIN_1024);
 
   const triggerStatisticRefresh = useStatisticStore(({ triggerRefresh }) => triggerRefresh);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
@@ -99,7 +100,7 @@ export function StakeFlowBlock() {
     ENV.BASE_TOKEN_DECIMALS + ENV.BASE_TOKEN_PRICE_FEED_DECIMALS
   );
 
-  const delegateAddress = (stakedBalance?.principal ?? 0n) > 0n ? delegateData?.delegatee : undefined;
+  const delegateAddress = when((stakedBalance?.principal ?? 0n) > 0n, delegateData?.delegatee);
 
   const onModalClose = () => {
     setIsPendingToggle(false);
@@ -158,7 +159,7 @@ export function StakeFlowBlock() {
                       'text-color-6': !isConnected
                     })}
                   >
-                    {Format.token(stakedBalanceFormatted, { symbol: isDesktop ? 'COMP' : undefined })}
+                    {Format.token(stakedBalanceFormatted, { symbol: when(isDesktop, 'COMP') })}
                   </Text>
                 </div>
               </Skeleton>
@@ -188,7 +189,7 @@ export function StakeFlowBlock() {
                   'text-color-6': !isConnected
                 })}
               >
-                {Format.token(virtualBalanceFormatted, { symbol: isDesktop ? 'stCOMP' : undefined })}
+                {Format.token(virtualBalanceFormatted, { symbol: when(isDesktop, 'stCOMP') })}
               </Text>
             </Skeleton>
           </div>
@@ -227,7 +228,7 @@ export function StakeFlowBlock() {
                       'text-color-6': !isConnected
                     })}
                   >
-                    {Format.token(availableRewardsFormatted, { symbol: isDesktop ? 'COMP' : undefined })}
+                    {Format.token(availableRewardsFormatted, { symbol: when(isDesktop, 'COMP') })}
                   </Text>
                 </div>
               </Skeleton>

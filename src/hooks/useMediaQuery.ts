@@ -17,13 +17,11 @@ export function useMediaQuery(query: string) {
 
     setMatches(media.matches);
 
-    if (media.addEventListener) {
-      media.addEventListener('change', onChange);
-      return () => media.removeEventListener('change', onChange);
-    }
+    media.addEventListener('change', onChange);
 
-    media.addListener(onChange);
-    return () => media.removeListener(onChange);
+    return () => {
+      media.removeEventListener('change', onChange);
+    };
   }, [query]);
 
   return matches;

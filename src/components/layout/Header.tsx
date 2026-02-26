@@ -1,8 +1,8 @@
 import { WalletButton } from '@/components/common/connect-wallet/WalletButton';
 import { COMPOUND_FINANCE_URL } from '@/consts/common';
 
-import CompoundLogo from '@/assets/compound-logo.svg';
-import CompoundLogoText from '@/assets/compound-logo-text.svg';
+import CompoundLogo from '@/assets/svg/compound-logo.svg';
+import CompoundLogoText from '@/assets/svg/compound-logo-text.svg';
 
 export function Header() {
   return (

@@ -1,41 +1,32 @@
 import { memo, type PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
+import { a, easings, useSpring } from '@react-spring/web';
+import { useDrag } from '@use-gesture/react';
 
-import {
-  AnimationProvider,
-  type GestureType,
-  type SpringType,
-  useAnimationLibs
-} from '@/components/ui/AnimationProvider';
 import { Portal } from '@/components/ui/Portal';
 import { cn } from '@/lib/utils/cn';
 
 interface DrawerProps extends PropsWithChildren {
   className?: string;
-
   contentClassName?: string;
-
-  lazy?: boolean;
-
   isOpen?: boolean;
-
   onClose?: () => void;
 }
 
-type DrawerContentInnerProps = DrawerProps & {
-  Spring: SpringType;
-  Gesture: GestureType;
-};
+const DURATION_OPEN = 250;
+const DURATION_CLOSE = 150;
 
-const DrawerContentInner = memo((props: DrawerContentInnerProps) => {
-  const { className, contentClassName, children, onClose, isOpen = false, Spring, Gesture } = props;
+const DRAG_UP_CANCEL_PX = 70;
+const CLOSE_BY_DISTANCE_RATIO = 0.4;
+const CLOSE_BY_VELOCITY = 0.5;
+const CLOSE_BY_VELOCITY_DIR_Y = 0;
 
-  const DURATION_OPEN = 250;
-  const DURATION_CLOSE = 150;
+const EASE_OPEN = easings.easeOutCubic;
+const EASE_CLOSE = easings.easeInCubic;
 
-  const EASE_OPEN = Spring.easings.easeOutCubic;
-  const EASE_CLOSE = Spring.easings.easeInCubic;
+export const Drawer = memo(function Drawer(props: DrawerProps) {
+  const { className, contentClassName, children, onClose, isOpen = false } = props;
 
-  const [{ y }, api] = Spring.useSpring(() => ({ y: 0 }));
+  const [{ y }, api] = useSpring(() => ({ y: 0 }));
 
   const panelRef = useRef<HTMLDivElement | null>(null);
   const panelHeightRef = useRef(0);
@@ -61,7 +52,7 @@ const DrawerContentInner = memo((props: DrawerContentInnerProps) => {
       to: { y: 0 },
       config: { duration: DURATION_OPEN, easing: EASE_OPEN }
     });
-  }, [api, EASE_OPEN]);
+  }, [api]);
 
   const animateClose = useCallback(
     (notify = false) => {
@@ -82,7 +73,7 @@ const DrawerContentInner = memo((props: DrawerContentInnerProps) => {
         }
       });
     },
-    [api, onClose, EASE_CLOSE]
+    [api, onClose]
   );
 
   useEffect(() => {
@@ -112,14 +103,16 @@ const DrawerContentInner = memo((props: DrawerContentInnerProps) => {
     return () => cancelAnimationFrame(raf);
   }, [mounted, measurePanel, animateOpen]);
 
-  const bind = Gesture.useDrag(
+  const bind = useDrag(
     ({ last, velocity: [, vy], direction: [, dy], movement: [, my], cancel }) => {
-      if (my < -70) cancel();
+      if (my < -DRAG_UP_CANCEL_PX) cancel();
 
       const h = panelHeightRef.current || 1;
 
       if (last) {
-        const shouldClose = my > h * 0.4 || (vy > 0.5 && dy > 0);
+        const closedByDistance = my > h * CLOSE_BY_DISTANCE_RATIO;
+        const closedByVelocity = vy > CLOSE_BY_VELOCITY && dy > CLOSE_BY_VELOCITY_DIR_Y;
+        const shouldClose = closedByDistance || closedByVelocity;
 
         if (shouldClose) {
           animateClose(true);
@@ -150,11 +143,11 @@ const DrawerContentInner = memo((props: DrawerContentInnerProps) => {
   return (
     <Portal element={document.getElementById('drawer') ?? document.body}>
       <div className={cn('fixed inset-0 z-10 flex items-end overflow-hidden lg:hidden', className)}>
-        <Spring.a.div
+        <a.div
           className='drawer-backdrop pointer-events-auto fixed inset-0'
           onClick={() => animateClose(true)}
         />
-        <Spring.a.div
+        <a.div
           {...bind()}
           ref={panelRef}
           className={cn(
@@ -168,30 +161,8 @@ const DrawerContentInner = memo((props: DrawerContentInnerProps) => {
           }}
         >
           {children}
-        </Spring.a.div>
+        </a.div>
       </div>
     </Portal>
   );
 });
-
-function DrawerAsync(props: DrawerProps) {
-  const { isLoaded, Spring, Gesture } = useAnimationLibs();
-
-  if (!isLoaded || !Spring || !Gesture) return null;
-
-  return (
-    <DrawerContentInner
-      {...props}
-      Spring={Spring}
-      Gesture={Gesture}
-    />
-  );
-}
-
-export function Drawer(props: DrawerProps) {
-  return (
-    <AnimationProvider>
-      <DrawerAsync {...props} />
-    </AnimationProvider>
-  );
-}

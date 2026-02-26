@@ -20,7 +20,6 @@ createRoot(document.getElementById('root')!).render(
   <WagmiProvider config={config}>
     <QueryClientRootProvider>
       <RouterProvider router={router} />
-      {/*<ReactQueryDevtools initialIsOpen={false} />*/}
     </QueryClientRootProvider>
   </WagmiProvider>
 );

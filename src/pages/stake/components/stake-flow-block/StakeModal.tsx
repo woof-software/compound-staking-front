@@ -3,9 +3,10 @@ import { type Address, formatUnits, parseUnits } from 'viem';
 import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
 import COMP_AVIF from '@/assets/comp-2.avif';
-import { InfoIcon } from '@/assets/svg';
+import { InfoIcon } from '@/assets/icons';
 import { Condition } from '@/components/common/Condition';
-import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
+import { DesktopDelegateSelector } from '@/components/common/stake/DelegateSelector/DesktopDelegateSelector';
+import { MobileDelegateSelector } from '@/components/common/stake/DelegateSelector/MobileDelegateSelector';
 import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
@@ -277,7 +278,12 @@ export function StakeModal(props: StakeModalProps) {
         </div>
       </div>
       <Skeleton loading={isPriceOrBalanceLoading}>
-        <DelegateSelector
+        <DesktopDelegateSelector
+          disabled={isLoadingTransaction || hasMaxPosition}
+          selectedAddressDelegate={selectedAddressDelegate}
+          onSelect={onDelegateSelect}
+        />
+        <MobileDelegateSelector
           disabled={isLoadingTransaction || hasMaxPosition}
           selectedAddressDelegate={selectedAddressDelegate}
           onSelect={onDelegateSelect}

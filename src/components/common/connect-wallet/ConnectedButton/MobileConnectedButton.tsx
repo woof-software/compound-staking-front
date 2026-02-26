@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useDisconnect } from 'wagmi';
 
-import { CopyIcon, CrossIcon, SpinnerIcon } from '@/assets/svg';
+import { CopyIcon, CrossIcon, SpinnerIcon } from '@/assets/icons';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -18,17 +18,17 @@ import { Format } from '@/lib/utils/format';
 import { getAddressContracts } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
 
-import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
-import Wallet from '@/assets/wallet.svg';
+import CompoundWalletIcon from '@/assets/svg/compound-wallet-icon.svg';
+import Wallet from '@/assets/svg/wallet.svg';
 
 export type ConnectedButtonProps = {
   onChangeWallet: () => void;
 };
 
-export function ConnectedButtonMobile({ onChangeWallet: onWalletChange }: ConnectedButtonProps) {
+export function MobileConnectedButton({ onChangeWallet: onWalletChange }: ConnectedButtonProps) {
   const isPending = useWalletStore(({ isPending }) => isPending);
 
-  const { address, isConnected } = useConnection();
+  const { address } = useConnection();
   const { disconnect } = useDisconnect();
 
   const { baseTokenAddress } = getAddressContracts(APPLICATION_CHAIN);
@@ -73,10 +73,10 @@ export function ConnectedButtonMobile({ onChangeWallet: onWalletChange }: Connec
   });
 
   useEffect(() => {
-    if (!isConnected) return;
+    if (!address) return;
 
     onRefetchData();
-  }, [isConnected]);
+  }, [address]);
 
   useEffect(() => {
     if (isOpen) {

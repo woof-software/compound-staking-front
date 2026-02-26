@@ -4,10 +4,11 @@ import { Drawer } from '@/components/ui/Drawer';
 import { Modal } from '@/components/ui/Modal';
 import { Text } from '@/components/ui/Text';
 import { TERMS_URL } from '@/consts/common';
+import { MAX_768 } from '@/consts/media';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { noop } from '@/lib/utils/common';
 
-import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
+import CompoundBlackCircle from '@/assets/svg/compound-black-circle.svg';
 
 export type ConnectorsModalProps = {
   isOpen?: boolean;
@@ -17,7 +18,7 @@ export type ConnectorsModalProps = {
 export function ConnectorsModal(props: ConnectorsModalProps) {
   const { isOpen = false, onClose = noop } = props;
 
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isMobile = useMediaQuery(MAX_768);
 
   return (
     <>

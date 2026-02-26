@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { SortArrowIcon, SortIcon } from '@/assets/svg';
+import { SortArrowIcon, SortIcon } from '@/assets/icons';
 import { SortDrawer } from '@/components/common/SortDrawer';
 import { RewardRow } from '@/components/common/stake/RewardRow';
 import { Button } from '@/components/ui/Button';
@@ -80,9 +80,11 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
 
   const sortedData = useMemo(() => {
     const col = columns.find((c) => c.accessorKey === sortBy);
-    if (!col?.sort) return rows;
+    const sortPredicate = col?.sort;
 
-    return [...rows].sort((a, b) => col.sort!(a, b, sortDir));
+    if (!sortPredicate) return rows;
+
+    return [...rows].sort((a, b) => sortPredicate(a, b, sortDir));
   }, [rows, sortBy, sortDir]);
 
   const onHeaderClick = (accessorKey: SortKey) => {
@@ -106,7 +108,7 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
                 role='button'
                 tabIndex={0}
                 className='flex cursor-pointer items-center'
-                onClick={() => onHeaderClick(accessorKey as SortKey)}
+                onClick={() => onHeaderClick(accessorKey)}
               >
                 <Text
                   tag='span'
@@ -167,6 +169,11 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
           isOpen={isOpen}
           sortType={sortType}
           columns={columns}
+          defaults={{
+            key: 'startDate',
+            type: 'desc',
+            tab: 'Descending'
+          }}
           onClose={onClose}
           onKeySelect={setSortBy}
           onTypeSelect={setSortDir}

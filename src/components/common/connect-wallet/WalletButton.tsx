@@ -1,13 +1,13 @@
 import { useConnection } from 'wagmi';
 
 import { Condition } from '@/components/common/Condition';
-import { ConnectedButton } from '@/components/common/connect-wallet/ConnectedButton';
-import { ConnectedButtonMobile } from '@/components/common/connect-wallet/ConnectedButtonMobile';
+import { DesktopConnectedButton } from '@/components/common/connect-wallet/ConnectedButton/DesktopConnectedButton';
+import { MobileConnectedButton } from '@/components/common/connect-wallet/ConnectedButton/MobileConnectedButton';
 import { ConnectorsModal } from '@/components/common/connect-wallet/ConnectorsModal';
 import { Button } from '@/components/ui/Button';
 import { useSwitch } from '@/hooks/useSwitch';
 
-import Wallet from '@/assets/wallet.svg';
+import Wallet from '@/assets/svg/wallet.svg';
 
 export function WalletButton() {
   const { address } = useConnection();
@@ -35,8 +35,8 @@ export function WalletButton() {
         </Button>
       </Condition>
       <Condition if={address}>
-        <ConnectedButton onChangeWallet={onOpen} />
-        <ConnectedButtonMobile onChangeWallet={onOpen} />
+        <DesktopConnectedButton onChangeWallet={onOpen} />
+        <MobileConnectedButton onChangeWallet={onOpen} />
       </Condition>
       <ConnectorsModal
         isOpen={isOpen}

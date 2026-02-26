@@ -4,11 +4,13 @@ import { Duration } from '@/components/common/Duration';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { MIN_1024 } from '@/consts/media';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { vestingToClaimCalc } from '@/lib/rewards';
 import { Format } from '@/lib/utils/format';
+import { when } from '@/lib/utils/helpers';
 
-import CompoundBlackCircle from '@/assets/compound-black-circle.svg';
+import CompoundBlackCircle from '@/assets/svg/compound-black-circle.svg';
 
 export type RewardToClaimProps = {
   isLoading: boolean;
@@ -22,7 +24,7 @@ export type RewardToClaimProps = {
 export function RewardToClaim(props: RewardToClaimProps) {
   const { isLoading, baseTokenPriceValue, vesting, claimed, vestingStartDate, vestingEndDate } = props;
 
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const isDesktop = useMediaQuery(MIN_1024);
 
   return (
     <Duration
@@ -63,7 +65,7 @@ export function RewardToClaim(props: RewardToClaimProps) {
                   lineHeight='20'
                   className='tabular-nums'
                 >
-                  {Format.token(toClaimFormatted, { symbol: isDesktop ? 'COMP' : undefined })}
+                  {Format.token(toClaimFormatted, { symbol: when(isDesktop, 'COMP') })}
                 </Text>
               </div>
             </Skeleton>
