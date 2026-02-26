@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -26,19 +26,16 @@ export function DesktopDelegateSelector(props: DelegateSelectorProps) {
 
   const hasValue = !!selectedAddressDelegate;
 
-  const onClose = useCallback(() => {
+  const onClose = () => {
     close();
     setSearchValue('');
-  }, []);
+  };
 
-  const onDelegateSelect = useCallback(
-    (delegate: Delegate) => {
-      onSelect(delegate);
+  const onDelegateSelect = (delegate: Delegate) => {
+    onSelect(delegate);
 
-      onClose();
-    },
-    [onSelect, onClose]
-  );
+    onClose();
+  };
 
   const onSelectorOpen = () => {
     if (disabled) return;
@@ -116,7 +113,7 @@ export function DesktopDelegateSelector(props: DelegateSelectorProps) {
             <Input
               autoFocus
               className={cn('min-h-13', {
-                'border-color-31': !filteredDelegates.length && !!searchValue.length
+                'border-color-31': !filteredDelegates.length && searchValue.length
               })}
               placeholder='Delegatee name or address'
               value={searchValue}
@@ -141,8 +138,7 @@ export function DesktopDelegateSelector(props: DelegateSelectorProps) {
                   className={cn(
                     'hover:bg-color-5 flex h-13 cursor-pointer items-center justify-between rounded-lg px-3 py-4',
                     {
-                      'bg-color-5':
-                        selectedAddressDelegate?.address.toLocaleLowerCase() === el.address.toLocaleLowerCase()
+                      'bg-color-5': selectedAddressDelegate?.address.toLowerCase() === el.address.toLowerCase()
                     }
                   )}
                   onClick={() => onDelegateSelect(el)}

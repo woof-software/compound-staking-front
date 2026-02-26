@@ -205,7 +205,7 @@ export function RewardsFlowBlock() {
                       </Text>
                     </div>
                   </Skeleton>
-                  <Condition if={isConnected && !!totalVesting}>
+                  <Condition if={isConnected && totalVesting}>
                     <Skeleton loading={isLoading}>
                       <Text
                         size='11'
@@ -261,7 +261,7 @@ export function RewardsFlowBlock() {
                       </Text>
                     </div>
                   </Skeleton>
-                  <Condition if={isConnected && !!totalVesting}>
+                  <Condition if={isConnected && totalVesting}>
                     <Skeleton loading={isLoading}>
                       <Text
                         size='11'
@@ -343,7 +343,7 @@ export function RewardsFlowBlock() {
                     </Text>
                   </div>
                 </Skeleton>
-                <Condition if={isConnected && !!availableRewards}>
+                <Condition if={isConnected && availableRewards}>
                   <Skeleton loading={isLoading}>
                     <Text
                       size='11'

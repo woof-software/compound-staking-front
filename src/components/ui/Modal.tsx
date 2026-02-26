@@ -5,18 +5,19 @@ import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
 import { cn } from '@/lib/utils/cn';
+import { noop } from '@/lib/utils/common';
 
 import { Portal } from './Portal';
 
 export interface ModalProps extends PropsWithChildren {
-  open: boolean;
+  open?: boolean;
   title?: string;
   className?: string;
   onClose?: () => void;
 }
 
 export function Modal(props: ModalProps) {
-  const { open, title, children, className, onClose } = props;
+  const { open = false, title, children, className, onClose = noop } = props;
 
   useEffect(() => {
     if (open) {
@@ -38,7 +39,6 @@ export function Modal(props: ModalProps) {
           className
         )}
         onPointerDown={(e) => {
-          if (!onClose) return;
           if (e.target === e.currentTarget) onClose();
         }}
       >

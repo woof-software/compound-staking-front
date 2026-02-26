@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 import { ArrowIcon, CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
@@ -30,10 +30,10 @@ export function MobileDelegateSelector(props: DelegateSelectorProps) {
     open();
   };
 
-  const onClose = useCallback(() => {
+  const onClose = () => {
     close();
     setSearchValue('');
-  }, []);
+  };
 
   return (
     <>
@@ -126,7 +126,7 @@ export function MobileDelegateSelector(props: DelegateSelectorProps) {
           <Input
             autoFocus
             className={cn('min-h-13', {
-              'border-color-31': !filteredDelegates.length && !!searchValue.length
+              'border-color-31': !filteredDelegates.length && searchValue.length
             })}
             placeholder='Search delegates by name or address'
             value={searchValue}
@@ -151,8 +151,7 @@ export function MobileDelegateSelector(props: DelegateSelectorProps) {
                 className={cn(
                   'hover:bg-color-5 flex h-14 cursor-pointer items-center justify-between rounded-lg px-3 py-4',
                   {
-                    'bg-color-5':
-                      selectedAddressDelegate?.address.toLocaleLowerCase() === el.address.toLocaleLowerCase()
+                    'bg-color-5': selectedAddressDelegate?.address.toLowerCase() === el.address.toLowerCase()
                   }
                 )}
                 onClick={() => onSelect(el)}

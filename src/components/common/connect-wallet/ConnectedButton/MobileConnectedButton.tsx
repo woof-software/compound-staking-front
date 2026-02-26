@@ -13,7 +13,7 @@ import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { cn } from '@/lib/utils/cn';
-import { sliceAddress } from '@/lib/utils/common';
+import { noop, sliceAddress } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 import { getAddressContracts } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
@@ -22,10 +22,12 @@ import CompoundWalletIcon from '@/assets/svg/compound-wallet-icon.svg';
 import Wallet from '@/assets/svg/wallet.svg';
 
 export type ConnectedButtonProps = {
-  onChangeWallet: () => void;
+  onChangeWallet?: () => void;
 };
 
-export function MobileConnectedButton({ onChangeWallet: onWalletChange }: ConnectedButtonProps) {
+export function MobileConnectedButton(props: ConnectedButtonProps) {
+  const { onChangeWallet: onWalletChange = noop } = props;
+
   const isPending = useWalletStore(({ isPending }) => isPending);
 
   const { address } = useConnection();

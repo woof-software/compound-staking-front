@@ -168,7 +168,7 @@ export function StakeFlowBlock() {
                   </Text>
                 </div>
               </Skeleton>
-              <Condition if={isConnected && !!stakedBalance?.principal}>
+              <Condition if={isConnected && stakedBalance?.principal}>
                 <Skeleton loading={isLoading}>
                   <Text
                     size='11'
@@ -237,7 +237,7 @@ export function StakeFlowBlock() {
                   </Text>
                 </div>
               </Skeleton>
-              <Condition if={isConnected && !!availableRewards}>
+              <Condition if={isConnected && availableRewards}>
                 <Skeleton loading={isLoading}>
                   <Text
                     size='11'

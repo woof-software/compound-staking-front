@@ -19,12 +19,13 @@ export type RewardsTableItem = {
   endDate: number;
 };
 
-type SortKey = keyof RewardsTableItem;
+type SortKey = Extract<keyof RewardsTableItem, string>;
+type SortDirection = 'asc' | 'desc';
 
-export type Column<T> = {
-  accessorKey: keyof T;
+export type Column<T extends Record<string, unknown>> = {
+  accessorKey: Extract<keyof T, string>;
   header: string;
-  sort?: (a: T, b: T, direction: 'asc' | 'desc') => number;
+  sort?: (a: T, b: T, direction: SortDirection) => number;
 };
 
 const columns: Column<RewardsTableItem>[] = [
@@ -65,7 +66,7 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
   const { rows } = props;
 
   const [sortBy, setSortBy] = useState<SortKey>('startDate');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [sortDir, setSortDir] = useState<SortDirection>('desc');
 
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
@@ -102,13 +103,14 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
         <div className='border-color-8 grid grid-cols-5 items-center border-b-[0.5px] border-solid px-10 py-6'>
           {columns.map(({ accessorKey, header }) => {
             const active = sortBy === accessorKey;
+
             return (
               <div
                 key={accessorKey}
                 role='button'
                 tabIndex={0}
                 className='flex cursor-pointer items-center'
-                onClick={() => onHeaderClick(accessorKey)}
+                onClick={() => onHeaderClick(accessorKey as SortKey)}
               >
                 <Text
                   tag='span'
@@ -165,15 +167,13 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
             />
           ))}
         </div>
-        <SortDrawer
+        <SortDrawer<SortKey>
           isOpen={isOpen}
           sortType={sortType}
           columns={columns}
-          defaults={{
-            key: 'startDate',
-            type: 'desc',
-            tab: 'Descending'
-          }}
+          defaultSortKey='startDate'
+          defaultSortDirection='desc'
+          defaultTab='Descending'
           onClose={onClose}
           onKeySelect={setSortBy}
           onTypeSelect={setSortDir}

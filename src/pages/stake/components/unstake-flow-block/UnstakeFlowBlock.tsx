@@ -236,7 +236,7 @@ export function UnstakeFlowBlock() {
                     </Text>
                   </div>
                 </Skeleton>
-                <Condition if={isConnected && !!lockedTokenBalance?.amount}>
+                <Condition if={isConnected && lockedTokenBalance?.amount}>
                   <Skeleton loading={isLoading || isStakedTokenPrice}>
                     <Text
                       size='11'

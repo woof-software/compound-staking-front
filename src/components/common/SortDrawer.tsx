@@ -4,93 +4,80 @@ import { Button } from '@/components/ui/Button';
 import { Drawer } from '@/components/ui/Drawer';
 import { Text } from '@/components/ui/Text';
 import { cn } from '@/lib/utils/cn';
+import { noop } from '@/lib/utils/common';
 
 type SortDirection = 'asc' | 'desc';
-
-type SortAdapter<T extends string> = {
-  key: T;
-  type: SortDirection;
-};
+type TabValue = 'Ascending' | 'Descending';
 
 type SortAccessor<T extends string> = {
   header: string;
   accessorKey: T;
 };
 
-type SortDefaults<T extends string> = {
-  key: T;
-  type: SortDirection;
-  tab: TabValue;
-};
-
-interface SortDrawerProps<T extends string> {
-  isOpen: boolean;
-  sortType: SortAdapter<T>;
+export interface SortDrawerProps<T extends string> {
+  isOpen?: boolean;
+  sortType: {
+    key: T;
+    type: SortDirection;
+  };
   columns: SortAccessor<T>[];
-  defaults: SortDefaults<T>;
-  onClose: () => void;
-  onKeySelect: (value: T) => void;
-  onTypeSelect: (value: SortDirection) => void;
+  defaultSortKey: T;
+  defaultSortDirection: SortDirection;
+  defaultTab: TabValue;
+  onClose?: () => void;
+  onKeySelect?: (value: T) => void;
+  onTypeSelect?: (value: SortDirection) => void;
 }
 
-type TabValue = 'Ascending' | 'Descending';
+export function SortDrawer<T extends string>(props: SortDrawerProps<T>) {
+  const {
+    isOpen = false,
+    sortType,
+    columns,
+    defaultSortKey,
+    defaultSortDirection,
+    defaultTab,
+    onClose = noop,
+    onKeySelect = noop,
+    onTypeSelect = noop
+  } = props;
 
-export function SortDrawer<T extends string>({
-  isOpen,
-  sortType,
-  columns,
-  defaults,
-  onClose,
-  onKeySelect,
-  onTypeSelect
-}: SortDrawerProps<T>) {
-  const [tabValue, setTabValue] = useState<string>(sortType.type === 'asc' ? 'Ascending' : 'Descending');
+  const [tabValue, setTabValue] = useState<TabValue>(sortType.type === 'asc' ? 'Ascending' : 'Descending');
   const [radioValue, setRadioValue] = useState<T>(sortType.key);
 
   const { tabValue: initialTabValue, radioValue: initialRadioValue } = useMemo(() => {
-    return {
-      tabValue,
-      radioValue
-    };
+    return { tabValue, radioValue };
   }, [isOpen]);
 
-  const isClearAllDisabled = radioValue === defaults.key || tabValue === defaults.tab;
+  const isClearAllDisabled = radioValue === defaultSortKey && tabValue === defaultTab;
 
-  const isApplyButtonDisabled = !!(radioValue && tabValue);
-
+  const isApplyButtonDisabled = Boolean(radioValue) && Boolean(tabValue);
   const isApplyButtonChanged = initialTabValue !== tabValue || initialRadioValue !== radioValue;
 
-  const onTabsChange = (value: TabValue) => {
-    setTabValue(value);
-  };
+  const onTabsChange = (value: TabValue) => setTabValue(value);
 
   const onApply = () => {
-    if (!radioValue) return;
-
     onKeySelect(radioValue);
     onTypeSelect(tabValue === 'Ascending' ? 'asc' : 'desc');
-
     onClose();
   };
 
   const onClearAll = () => {
-    setRadioValue(defaults.key);
-    setTabValue(defaults.tab);
+    setRadioValue(defaultSortKey);
+    setTabValue(defaultTab);
 
-    onKeySelect(defaults.key);
-    onTypeSelect(defaults.type);
+    onKeySelect(defaultSortKey);
+    onTypeSelect(defaultSortDirection);
 
     onClose();
   };
 
   const onDrawerClose = () => {
-    setRadioValue(sortType?.key);
+    setRadioValue(sortType.key);
+    setTabValue(sortType.type === 'asc' ? 'Ascending' : 'Descending');
 
-    setTabValue(sortType?.type === 'asc' ? 'Ascending' : 'Descending');
-
-    onKeySelect(sortType?.key);
-
-    onTypeSelect(sortType?.type);
+    onKeySelect(sortType.key);
+    onTypeSelect(sortType.type);
 
     onClose();
   };

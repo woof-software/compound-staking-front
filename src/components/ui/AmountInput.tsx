@@ -177,8 +177,8 @@ export function AmountInput(props: AmountInputProps) {
       const inputEl = event.target;
       const caret = inputEl.selectionStart ?? 0;
 
-      const nativeInputEvent = event.nativeEvent as InputEvent | undefined;
-      const inputType = nativeInputEvent?.inputType;
+      const nativeInputEvent = event.nativeEvent;
+      const inputType = 'inputType' in nativeInputEvent ? nativeInputEvent?.inputType : undefined;
 
       const before = inputEl.value;
       const beforeCommas = (before.match(/,/g) || []).length;

@@ -6,6 +6,7 @@ import { ArrowIcon } from '@/assets/svg';
 import walletconnect from '@/assets/walletconnect.avif';
 import { Condition } from '@/components/common/Condition';
 import { cn } from '@/lib/utils/cn';
+import { noop } from '@/lib/utils/common';
 
 import { Text } from '../../ui/Text';
 
@@ -34,8 +35,13 @@ const ICONS: Record<string, string> = {
   coinbase
 };
 
-export const WalletList = (props: { className?: string; onModalClose: () => void }) => {
-  const { className, onModalClose } = props;
+export type WalletListProps = {
+  className?: string;
+  onModalClose?: () => void;
+};
+
+export const WalletList = (props: WalletListProps) => {
+  const { className, onModalClose = noop } = props;
 
   const { connect } = useConnect();
   const connectors = useConnectors();

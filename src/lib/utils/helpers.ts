@@ -154,6 +154,6 @@ export function getHash(hash: string): Hash {
  * @example
  * const amount = when(balance > 0n, balance, 0n); // bigint fallback
  */
-export function when<T>(condition: boolean, value: T | undefined, fallback = undefined): T | undefined {
+export function when<T, R extends undefined>(condition: boolean, value: T, fallback?: R): T | R | undefined {
   return condition ? value : fallback;
 }

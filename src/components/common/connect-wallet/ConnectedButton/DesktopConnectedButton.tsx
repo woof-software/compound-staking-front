@@ -12,7 +12,7 @@ import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useOutsideClick } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
-import { sliceAddress } from '@/lib/utils/common';
+import { noop, sliceAddress } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 import { getAddressContracts } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
@@ -20,10 +20,12 @@ import { useWalletStore } from '@/stores/useWalletStore';
 import CompoundWalletIcon from '@/assets/svg/compound-wallet-icon.svg';
 
 export type ConnectedButtonProps = {
-  onChangeWallet: () => void;
+  onChangeWallet?: () => void;
 };
 
-export function DesktopConnectedButton({ onChangeWallet: onWalletChange }: ConnectedButtonProps) {
+export function DesktopConnectedButton(props: ConnectedButtonProps) {
+  const { onChangeWallet: onWalletChange = noop } = props;
+
   const ref = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLDivElement>(null);
 
