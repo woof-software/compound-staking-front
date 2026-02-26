@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useConnection, useSwitchChain } from 'wagmi';
 
-import { CloseIcon } from '@/assets/icons';
+import { CloseIcon } from '@/assets/svg';
 import { Button } from '@/components/ui/Button';
 import { Portal } from '@/components/ui/Portal';
 import { Text } from '@/components/ui/Text';

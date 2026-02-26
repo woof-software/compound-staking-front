@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { SortArrowIcon, SortIcon } from '@/assets/icons';
+import { SortArrowIcon, SortIcon } from '@/assets/svg';
 import { SortDrawer } from '@/components/common/SortDrawer';
 import { RewardRow } from '@/components/common/stake/RewardRow';
 import { Button } from '@/components/ui/Button';

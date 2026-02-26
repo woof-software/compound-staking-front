@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useMemo } from 'react';
 import { useConnection } from 'wagmi';
 
-import { ExternalLinkIcon } from '@/assets/icons';
+import { ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';

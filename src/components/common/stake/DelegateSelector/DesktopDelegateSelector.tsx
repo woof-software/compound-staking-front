@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/icons';
+import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import type { DelegateSelectorProps } from '@/components/common/stake/DelegateSelector/type';
 import { Input } from '@/components/ui/Input';

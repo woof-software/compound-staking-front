@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
-import { InfoIcon } from '@/assets/icons';
+import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';

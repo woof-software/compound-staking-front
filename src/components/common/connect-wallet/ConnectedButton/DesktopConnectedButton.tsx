@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useDisconnect } from 'wagmi';
 
-import { CopyIcon, SpinnerIcon } from '@/assets/icons';
+import { CopyIcon, SpinnerIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';

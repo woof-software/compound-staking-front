@@ -1,6 +1,6 @@
 import { type PropsWithChildren, useEffect } from 'react';
 
-import { CloseIcon } from '@/assets/icons';
+import { CloseIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
