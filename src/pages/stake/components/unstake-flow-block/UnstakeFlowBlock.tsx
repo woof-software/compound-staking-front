@@ -31,6 +31,7 @@ import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useStakedVirtualBalance } from '@/pages/stake/hooks/useStakedVirtualBalance';
 import { useStatisticStakingAPR } from '@/pages/stake/hooks/useStatisticStakingAPR';
+import { useTotalStaked } from '@/pages/stake/hooks/useTotalStaked';
 import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
 import { useUnstakeRequests } from '@/pages/stake/hooks/useUnstakeRequest';
 import { useUserAPR } from '@/pages/stake/hooks/useUserAPR';
@@ -55,6 +56,7 @@ export function UnstakeFlowBlock() {
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
+  // const triggerStatisticRefresh = useStatisticStore(({ triggerRefresh }) => triggerRefresh);
 
   const { isConnected, address, chainId } = useConnection();
 
@@ -68,6 +70,7 @@ export function UnstakeFlowBlock() {
   const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(APPLICATION_CHAIN, address);
   const { refetch: refetchMultiplier } = useMultiplier(APPLICATION_CHAIN, address);
   const { refetch: refetchAvailableRewards } = useAvailableRewards(APPLICATION_CHAIN, address);
+  const { refetch: refetchTotalStaked } = useTotalStaked(APPLICATION_CHAIN);
 
   const { refetch: refetchWalletBalance } = useTokenBalance(address, baseTokenAddress);
 
@@ -165,6 +168,7 @@ export function UnstakeFlowBlock() {
     refetchLockedTokenBalance();
     refetchUerAPR();
     refetchStatisticStakingAPR();
+    refetchTotalStaked();
   });
 
   useEffect(() => {
