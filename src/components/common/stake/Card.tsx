@@ -1,10 +1,11 @@
 import type { PropsWithChildren } from 'react';
 
-import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { Tooltip } from '@/components/ui/Tooltip';
+
+import InfoIcon from '@/assets/svg/info.svg';
 
 export interface CardProps extends PropsWithChildren {
   title: string;
@@ -17,7 +18,7 @@ export function Card(props: CardProps) {
 
   return (
     <section className='bg-color-4 w-full rounded-lg'>
-      <div className='bg-color-11 flex items-center gap-3 rounded-lg rounded-b-none p-10 py-3.5'>
+      <div className='bg-color-11 flex items-center gap-3 rounded-lg rounded-b-none px-5 py-3.5 lg:px-10'>
         <Skeleton loading={isLoading}>
           <Text
             size='13'

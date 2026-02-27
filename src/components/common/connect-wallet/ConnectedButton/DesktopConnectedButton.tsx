@@ -2,7 +2,6 @@ import { useEffect, useEffectEvent, useRef } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useDisconnect } from 'wagmi';
 
-import { CopyIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
@@ -12,19 +11,22 @@ import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useOutsideClick } from '@/hooks/useOnClickOutside';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
-import { sliceAddress } from '@/lib/utils/common';
+import { noop, sliceAddress } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 import { getAddressContracts } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
 
-import CompoundWalletIcon from '@/assets/compound-wallet-icon.svg';
-import Spinner from '@/assets/spinner.svg';
+import CompoundWalletIcon from '@/assets/svg/compound-wallet-icon.svg';
+import CopyIcon from '@/assets/svg/copy.svg';
+import SpinnerIcon from '@/assets/svg/spinner.svg';
 
 export type ConnectedButtonProps = {
-  onChangeWallet: () => void;
+  onChangeWallet?: () => void;
 };
 
-export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedButtonProps) {
+export function DesktopConnectedButton(props: ConnectedButtonProps) {
+  const { onChangeWallet: onWalletChange = noop } = props;
+
   const ref = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLDivElement>(null);
 
@@ -83,7 +85,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
   useOutsideClick(() => [ref.current, toggleRef.current], onClose);
 
   return (
-    <div className='relative'>
+    <div className='relative hidden md:block'>
       <Condition if={!isAvailableRewardsLoading || !isWalletBalanceLoading}>
         <div className='rounded-64 bg-color-11 border-color-8 absolute right-[68%] flex h-11 min-w-[6.45rem] cursor-pointer items-center border-[0.25px] py-2 pr-11 pl-4 hover:brightness-90'>
           <CompoundWalletIcon className='size-6 flex-shrink-0' />
@@ -116,7 +118,7 @@ export function ConnectedButton({ onChangeWallet: onWalletChange }: ConnectedBut
         </Condition>
         <Condition if={isPending}>
           <div className='bg-color-7 rounded-64 relative -top-[0.5px] flex h-11 min-w-28 items-center justify-center gap-2 hover:brightness-90'>
-            <Spinner className='size-4 flex-shrink-0 animate-spin' />
+            <SpinnerIcon className='size-4 flex-shrink-0 animate-spin text-white' />
             <Text
               size='11'
               weight='500'

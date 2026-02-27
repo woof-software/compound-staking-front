@@ -2,11 +2,14 @@ import { type Connector, type CreateConnectorFn, useConnect, useConnectors } fro
 
 import coinbase from '@/assets/coinbase.avif';
 import metamask from '@/assets/metamask-and-browsers.avif';
-import { ArrowIcon } from '@/assets/svg';
 import walletconnect from '@/assets/walletconnect.avif';
 import { Condition } from '@/components/common/Condition';
+import { cn } from '@/lib/utils/cn';
+import { noop } from '@/lib/utils/common';
 
 import { Text } from '../../ui/Text';
+
+import ArrowIcon from '@/assets/svg/arrow.svg';
 
 const CONNECTORS = [
   {
@@ -33,7 +36,14 @@ const ICONS: Record<string, string> = {
   coinbase
 };
 
-export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
+export type WalletListProps = {
+  className?: string;
+  onModalClose?: () => void;
+};
+
+export const WalletList = (props: WalletListProps) => {
+  const { className, onModalClose = noop } = props;
+
   const { connect } = useConnect();
   const connectors = useConnectors();
 
@@ -44,7 +54,7 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
   };
 
   return (
-    <div className='my-8 flex w-full flex-col'>
+    <div className={cn('my-8 flex w-full flex-col', className)}>
       {CONNECTORS.map(({ id, title, description, icon }) => {
         const connector = connectors.find((c) => c.id === id);
 
@@ -53,13 +63,13 @@ export const WalletList = ({ onModalClose }: { onModalClose: () => void }) => {
         return (
           <div
             key={id}
-            className='group hover:bg-color-4 flex cursor-pointer items-center gap-3 rounded-lg p-3 opacity-100 data-[disabled=true]:opacity-60'
+            className='group hover:bg-color-4 flex cursor-pointer items-center gap-5 rounded-lg p-3 opacity-100 data-[disabled=true]:opacity-60 md:gap-3'
             onClick={() => onConnectorSelect(connector)}
           >
             <img
               src={ICONS[icon]}
               alt='wallet-icon'
-              className='size-10 flex-shrink-0 rounded-[8px]'
+              className='size-8 flex-shrink-0 rounded-[8px] md:size-10'
             />
             <div className='flex flex-col'>
               <Text

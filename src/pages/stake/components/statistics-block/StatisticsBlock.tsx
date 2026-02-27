@@ -2,7 +2,6 @@ import { useConnection } from 'wagmi';
 
 import { Divider } from '@/components/ui/Divider';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
 import { useTotalStaked } from '@/pages/stake/hooks/useTotalStaked';
 
@@ -20,30 +19,21 @@ export function StatisticsBlock() {
     <>
       <div className='mx-auto max-w-164 p-2.5'>
         <Skeleton loading={isLoading}>
-          <Text
-            tag='h1'
-            size='45'
-            lineHeight='54'
-            weight='500'
-            align='center'
-          >
-            Stake{' '}
-            <Text
-              tag='span'
-              size='45'
-              lineHeight='54'
-              weight='500'
-              className='text-color-7'
-            >
+          <h1 className='text-center text-[32px] leading-[120%] font-medium md:text-[45px] md:leading-13.5'>
+            Stake your{' '}
+            <span className='text-color-7 text-[32px] leading-[120%] font-medium md:text-[45px] md:leading-13.5'>
               COMP
-            </Text>{' '}
+            </span>{' '}
             for on-chain yield
-          </Text>
+          </h1>
         </Skeleton>
       </div>
-      <section className='flex items-center justify-center gap-25'>
+      <section className='flex flex-col items-center justify-center md:flex-row md:gap-12 lg:gap-25'>
         <StakingAPR />
-        <Divider orientation='vertical' />
+        <Divider
+          orientation='vertical'
+          className='hidden md:block'
+        />
         <TotalStaked />
       </section>
     </>

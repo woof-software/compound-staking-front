@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
-import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
@@ -20,6 +19,8 @@ import { getAddressContracts } from '@/lib/utils/helpers';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
+
+import InfoIcon from '@/assets/svg/info.svg';
 
 export function UnstakeModal() {
   const { address, isConnected, chainId } = useConnection();
@@ -114,6 +115,9 @@ export function UnstakeModal() {
     // Must show loading during transaction confirmation and mining
     if (isApproveTransactionPending) return true;
     if (isApproveTransactionMining) return true;
+
+    // Must be disabled if max vesting positions reached
+    if (hasReachedPositionsLimit) return true;
   })();
 
   const isUnstakeButtonLoading = (() => {
@@ -138,6 +142,9 @@ export function UnstakeModal() {
     // Must be disabled if transaction in progress
     if (isUnstakeTransactionConfirming) return true;
     if (isUnstakeTransactionMining) return true;
+
+    // Must be disabled if max vesting positions reached
+    if (hasReachedPositionsLimit) return true;
   })();
 
   const onUnstake = async () => {

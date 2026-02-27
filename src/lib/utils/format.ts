@@ -9,7 +9,7 @@ export namespace Format {
   export type FormatView = 'standard' | 'compact';
 
   export type FormatTokenOptions = {
-    symbol?: string;
+    symbol?: string | undefined;
     view?: FormatView;
     fractionDigits?: number;
     useGrouping?: boolean;

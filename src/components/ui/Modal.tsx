@@ -1,20 +1,24 @@
 import { type PropsWithChildren, useEffect } from 'react';
 
-import { CloseIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
+import { cn } from '@/lib/utils/cn';
+import { noop } from '@/lib/utils/common';
 
-import { Portal } from '../common/Portal';
+import { Portal } from './Portal';
+
+import CloseIcon from '@/assets/svg/close.svg';
 
 export interface ModalProps extends PropsWithChildren {
-  open: boolean;
+  open?: boolean;
   title?: string;
+  className?: string;
   onClose?: () => void;
 }
 
 export function Modal(props: ModalProps) {
-  const { open, title, children, onClose } = props;
+  const { open = false, title, children, className, onClose = noop } = props;
 
   useEffect(() => {
     if (open) {
@@ -31,9 +35,11 @@ export function Modal(props: ModalProps) {
   return (
     <Portal>
       <div
-        className='modal-fade-in bg-modal-bg fixed inset-0 z-50 flex items-center justify-center backdrop-blur-[7.5px]'
+        className={cn(
+          'modal-fade-in bg-modal-bg fixed inset-0 z-50 flex items-center justify-center backdrop-blur-[7.5px]',
+          className
+        )}
         onPointerDown={(e) => {
-          if (!onClose) return;
           if (e.target === e.currentTarget) onClose();
         }}
       >

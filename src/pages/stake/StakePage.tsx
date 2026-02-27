@@ -6,9 +6,9 @@ import { UnstakeFlowBlock } from '@/pages/stake/components/unstake-flow-block/Un
 
 export function StakePage() {
   return (
-    <main className='flex flex-1 flex-col gap-10 pt-10 pb-15'>
+    <main className='mx-2 flex flex-1 flex-col gap-10 pt-10 pb-15 md:mx-0'>
       <StatisticsBlock />
-      <div className='flex flex-col gap-5'>
+      <div className='flex flex-col gap-2.5 lg:gap-5'>
         <StakeFlowBlock />
         <UnstakeFlowBlock />
         <DelegateFlowBlock />

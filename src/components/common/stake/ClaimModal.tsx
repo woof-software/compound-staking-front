@@ -2,7 +2,6 @@ import { useEffect, useEffectEvent, useState } from 'react';
 import { formatUnits, isAddress } from 'viem';
 import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
-import { CrossIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
@@ -18,6 +17,8 @@ import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 import { useVestingClaim } from '@/pages/stake/hooks/useVestingClaim';
 import { useWalletStore } from '@/stores/useWalletStore';
+
+import CrossIcon from '@/assets/svg/cross.svg';
 
 export type ClaimModalProps = {
   totalToClaim?: bigint;
@@ -188,7 +189,7 @@ export function ClaimModal(props: ClaimModalProps) {
                 <Condition if={walletAddress.length}>
                   <CrossIcon
                     onClick={onClear}
-                    className='text-color-25 size-4 shrink-0 cursor-pointer'
+                    className='text-color-25 size-6 shrink-0 cursor-pointer'
                   />
                 </Condition>
                 <Condition if={!walletAddress.length}>
@@ -215,7 +216,7 @@ export function ClaimModal(props: ClaimModalProps) {
         </div>
       </Condition>
       <Button
-        className={cn('h-14 w-85 flex-col', {
+        className={cn('h-14 w-full flex-col', {
           'bg-color-7': isClaiming
         })}
         disabled={isClaimButtonDisabled}

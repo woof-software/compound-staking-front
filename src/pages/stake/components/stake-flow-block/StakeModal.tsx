@@ -3,9 +3,9 @@ import { type Address, formatUnits, parseUnits } from 'viem';
 import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
 import COMP_AVIF from '@/assets/comp-2.avif';
-import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
-import { DelegateSelector } from '@/components/common/stake/DelegateSelector';
+import { DesktopDelegateSelector } from '@/components/common/stake/DelegateSelector/DesktopDelegateSelector';
+import { MobileDelegateSelector } from '@/components/common/stake/DelegateSelector/MobileDelegateSelector';
 import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
@@ -26,6 +26,8 @@ import { Format } from '@/lib/utils/format';
 import { getAddressContracts, getDelegateByAddress } from '@/lib/utils/helpers';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useWalletStore } from '@/stores/useWalletStore';
+
+import InfoIcon from '@/assets/svg/info.svg';
 
 export type StakeModalProps = {
   delegateAddress?: Address | undefined;
@@ -214,7 +216,7 @@ export function StakeModal(props: StakeModalProps) {
   return (
     <div className='mt-8 flex w-full flex-col gap-8'>
       <Divider orientation='horizontal' />
-      <div className='flex flex-col gap-1'>
+      <div className='flex flex-col gap-2.5 lg:gap-1'>
         <Skeleton loading={isPriceOrBalanceLoading}>
           <div>
             <Text
@@ -234,7 +236,7 @@ export function StakeModal(props: StakeModalProps) {
                   className='size-6.75 shrink-0 rounded-full'
                 />
                 <AmountInput
-                  className={cn('h-9 max-w-60 min-w-55', {
+                  className={cn('h-9 max-w-47.5 min-w-50 md:max-w-60 md:min-w-55', {
                     'caret-color-30': isAmountExceedsBalance,
                     'caret-color-31': !isAmountExceedsBalance
                   })}
@@ -245,7 +247,7 @@ export function StakeModal(props: StakeModalProps) {
               </div>
               <Button
                 disabled={isLoadingTransaction || hasMaxPosition}
-                className={cn('bg-color-16 h-[33.243px] w-[55.47px] text-[11px] font-medium', {
+                className={cn('bg-color-16 h-8 w-13.75 text-[11px] font-medium md:h-[33.243px] md:w-[55.47px]', {
                   'bg-color-28': isLoadingTransaction
                 })}
                 onClick={onMaxButtonClick}
@@ -277,7 +279,12 @@ export function StakeModal(props: StakeModalProps) {
         </div>
       </div>
       <Skeleton loading={isPriceOrBalanceLoading}>
-        <DelegateSelector
+        <DesktopDelegateSelector
+          disabled={isLoadingTransaction || hasMaxPosition}
+          selectedAddressDelegate={selectedAddressDelegate}
+          onSelect={onDelegateSelect}
+        />
+        <MobileDelegateSelector
           disabled={isLoadingTransaction || hasMaxPosition}
           selectedAddressDelegate={selectedAddressDelegate}
           onSelect={onDelegateSelect}
