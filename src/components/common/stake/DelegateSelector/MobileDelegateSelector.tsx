@@ -157,7 +157,7 @@ export function MobileDelegateSelector(props: DelegateSelectorProps) {
                 onClick={() => onSelect(el)}
               >
                 <div className='flex items-center gap-1.5'>
-                  {selectedAddressDelegate?.address === el.address && (
+                  {selectedAddressDelegate?.address.toLowerCase() === el.address.toLowerCase() && (
                     <CheckMarkIcon className='text-color-27 size-5 shrink-0' />
                   )}
                   <Text
