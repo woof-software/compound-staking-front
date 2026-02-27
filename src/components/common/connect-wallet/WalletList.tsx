@@ -2,13 +2,14 @@ import { type Connector, type CreateConnectorFn, useConnect, useConnectors } fro
 
 import coinbase from '@/assets/coinbase.avif';
 import metamask from '@/assets/metamask-and-browsers.avif';
-import { ArrowIcon } from '@/assets/svg';
 import walletconnect from '@/assets/walletconnect.avif';
 import { Condition } from '@/components/common/Condition';
 import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 
 import { Text } from '../../ui/Text';
+
+import ArrowIcon from '@/assets/svg/arrow.svg';
 
 const CONNECTORS = [
   {

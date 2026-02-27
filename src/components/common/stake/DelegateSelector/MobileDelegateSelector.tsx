@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { ArrowIcon, CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import type { DelegateSelectorProps } from '@/components/common/stake/DelegateSelector/type';
 import { Divider } from '@/components/ui/Divider';
@@ -12,6 +11,11 @@ import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
 import { noop, sliceAddress } from '@/lib/utils/common';
 import { getExplorerAddressUrl } from '@/lib/utils/helpers';
+
+import ArrowIcon from '@/assets/svg/arrow.svg';
+import CheckMarkIcon from '@/assets/svg/check-mark.svg';
+import ChevronIcon from '@/assets/svg/chevron.svg';
+import ExternalLinkIcon from '@/assets/svg/external-link.svg';
 
 export function MobileDelegateSelector(props: DelegateSelectorProps) {
   const { disabled, selectedAddressDelegate, onSelect = noop } = props;

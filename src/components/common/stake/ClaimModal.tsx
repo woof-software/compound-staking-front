@@ -2,7 +2,6 @@ import { useEffect, useEffectEvent, useState } from 'react';
 import { formatUnits, isAddress } from 'viem';
 import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
-import { CrossIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
@@ -18,6 +17,8 @@ import { noop } from '@/lib/utils/common';
 import { Format } from '@/lib/utils/format';
 import { useVestingClaim } from '@/pages/stake/hooks/useVestingClaim';
 import { useWalletStore } from '@/stores/useWalletStore';
+
+import CrossIcon from '@/assets/svg/cross.svg';
 
 export type ClaimModalProps = {
   totalToClaim?: bigint;

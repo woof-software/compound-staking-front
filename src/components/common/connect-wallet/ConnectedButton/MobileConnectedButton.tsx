@@ -2,7 +2,6 @@ import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useDisconnect } from 'wagmi';
 
-import { CopyIcon, CrossIcon, SpinnerIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -19,6 +18,9 @@ import { getAddressContracts } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 import CompoundWalletIcon from '@/assets/svg/compound-wallet-icon.svg';
+import CopyIcon from '@/assets/svg/copy.svg';
+import CrossIcon from '@/assets/svg/cross.svg';
+import SpinnerIcon from '@/assets/svg/spinner.svg';
 import Wallet from '@/assets/svg/wallet.svg';
 
 export type ConnectedButtonProps = {

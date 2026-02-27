@@ -2,7 +2,6 @@ import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
-import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
@@ -19,6 +18,8 @@ import { Format } from '@/lib/utils/format';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useVestRewards } from '@/pages/stake/hooks/useVestRewards';
 import { useWalletStore } from '@/stores/useWalletStore';
+
+import InfoIcon from '@/assets/svg/info.svg';
 
 export type VestingModalProps = {
   onVestingConfirmed?: () => void;

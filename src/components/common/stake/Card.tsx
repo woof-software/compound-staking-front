@@ -1,10 +1,11 @@
 import type { PropsWithChildren } from 'react';
 
-import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { Tooltip } from '@/components/ui/Tooltip';
+
+import InfoIcon from '@/assets/svg/info.svg';
 
 export interface CardProps extends PropsWithChildren {
   title: string;

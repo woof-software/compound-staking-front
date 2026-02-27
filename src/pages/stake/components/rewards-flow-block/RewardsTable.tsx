@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 
-import { SortArrowIcon, SortIcon } from '@/assets/svg';
 import { SortDrawer } from '@/components/common/SortDrawer';
 import { RewardRow } from '@/components/common/stake/RewardRow';
 import { Button } from '@/components/ui/Button';
@@ -10,6 +9,9 @@ import { ENV } from '@/consts/env';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
+
+import SortIcon from '@/assets/svg/sort.svg';
+import SortArrowIcon from '@/assets/svg/sort-arrow.svg';
 
 export type RewardsTableItem = {
   vestingAmount: bigint;

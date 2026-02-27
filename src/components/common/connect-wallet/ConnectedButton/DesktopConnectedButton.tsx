@@ -2,7 +2,6 @@ import { useEffect, useEffectEvent, useRef } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useDisconnect } from 'wagmi';
 
-import { CopyIcon, SpinnerIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
@@ -18,6 +17,8 @@ import { getAddressContracts } from '@/lib/utils/helpers';
 import { useWalletStore } from '@/stores/useWalletStore';
 
 import CompoundWalletIcon from '@/assets/svg/compound-wallet-icon.svg';
+import CopyIcon from '@/assets/svg/copy.svg';
+import SpinnerIcon from '@/assets/svg/spinner.svg';
 
 export type ConnectedButtonProps = {
   onChangeWallet?: () => void;

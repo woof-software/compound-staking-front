@@ -3,7 +3,6 @@ import { type Address, formatUnits, parseUnits } from 'viem';
 import { useConnection, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 
 import COMP_AVIF from '@/assets/comp-2.avif';
-import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { DesktopDelegateSelector } from '@/components/common/stake/DelegateSelector/DesktopDelegateSelector';
 import { MobileDelegateSelector } from '@/components/common/stake/DelegateSelector/MobileDelegateSelector';
@@ -27,6 +26,8 @@ import { Format } from '@/lib/utils/format';
 import { getAddressContracts, getDelegateByAddress } from '@/lib/utils/helpers';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 import { useWalletStore } from '@/stores/useWalletStore';
+
+import InfoIcon from '@/assets/svg/info.svg';
 
 export type StakeModalProps = {
   delegateAddress?: Address | undefined;

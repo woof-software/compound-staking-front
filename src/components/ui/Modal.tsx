@@ -1,6 +1,5 @@
 import { type PropsWithChildren, useEffect } from 'react';
 
-import { CloseIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/Text';
@@ -8,6 +7,8 @@ import { cn } from '@/lib/utils/cn';
 import { noop } from '@/lib/utils/common';
 
 import { Portal } from './Portal';
+
+import CloseIcon from '@/assets/svg/close.svg';
 
 export interface ModalProps extends PropsWithChildren {
   open?: boolean;

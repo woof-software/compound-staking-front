@@ -1,7 +1,6 @@
 import { useEffect, useEffectEvent, useMemo } from 'react';
 import { useConnection } from 'wagmi';
 
-import { ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
@@ -27,6 +26,8 @@ import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
+
+import ExternalLinkIcon from '@/assets/svg/external-link.svg';
 
 export function DelegateFlowBlock() {
   const { isConnected, address, chainId } = useConnection();

@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useConnection, useSwitchChain } from 'wagmi';
 
-import { CloseIcon } from '@/assets/svg';
 import { Button } from '@/components/ui/Button';
 import { Portal } from '@/components/ui/Portal';
 import { Text } from '@/components/ui/Text';
@@ -10,6 +9,8 @@ import { useThemeStore } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils/cn';
 import { getChainLogo, getChainName } from '@/lib/utils/helpers';
 import { useSwitchNetworkModalStore } from '@/stores/useSwitchNetworkModalStore';
+
+import CloseIcon from '@/assets/svg/close.svg';
 
 export function SwitchNetworkModal() {
   const { isConnected, chainId } = useConnection();

@@ -2,7 +2,6 @@ import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
-import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
@@ -41,6 +40,7 @@ import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore
 import { useWalletStore } from '@/stores/useWalletStore';
 
 import CompoundBlackCircle from '@/assets/svg/compound-black-circle.svg';
+import InfoIcon from '@/assets/svg/info.svg';
 
 export function UnstakeFlowBlock() {
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
