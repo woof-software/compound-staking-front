@@ -10,11 +10,13 @@ on:
       - synchronize
     branches:
       - develop
+      - sandbox
     paths-ignore:
       - '.github/workflows/**'
   push:
     branches:
       - develop
+      - sandbox
     paths-ignore:
       - '.github/workflows/**'
 
