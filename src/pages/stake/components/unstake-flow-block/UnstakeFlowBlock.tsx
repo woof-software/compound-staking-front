@@ -86,11 +86,13 @@ export function UnstakeFlowBlock() {
 
   const { refetch: refetchStatisticStakingAPR } = useStatisticStakingAPR(APPLICATION_CHAIN);
 
-  const [earliestUnstakeRequestState] = useUnstakeRequests(APPLICATION_CHAIN);
+  const unstakeRequests = useUnstakeRequests(APPLICATION_CHAIN);
 
-  const { isLoading: isUnstakeTransactionMining, isSuccess: isUnstakeTransactionSucceed } =
+  const latestUnstakeRequestState = unstakeRequests.at(-1);
+
+  const { isLoading: isUnstakeRequestTransactionMining, isSuccess: isUnstakeRequestTransactionSucceed } =
     useWaitForTransactionReceipt({
-      hash: earliestUnstakeRequestState?.state.data
+      hash: latestUnstakeRequestState?.state.data
     });
 
   const {
@@ -131,9 +133,9 @@ export function UnstakeFlowBlock() {
   /* Loading */
   const isLoading = isConnected ? isLockedTokenBalanceLoading : false;
   const isTransactionLoading =
-    earliestUnstakeRequestState?.state.status === 'pending' ||
+    latestUnstakeRequestState?.state.status === 'pending' ||
     isUnlockTransactionConfirming ||
-    isUnstakeTransactionMining ||
+    isUnstakeRequestTransactionMining ||
     isUnlockTransactionMining;
 
   const isUnstakeButtonDisabled =
@@ -198,14 +200,14 @@ export function UnstakeFlowBlock() {
       refetchAllowance();
     }
 
-    if (isUnstakeTransactionSucceed || isUnlockTransactionSucceed) {
+    if (isUnstakeRequestTransactionSucceed || isUnlockTransactionSucceed) {
       onRequestSuccess();
     }
 
-    if (isUnstakeTransactionSucceed) {
+    if (isUnstakeRequestTransactionSucceed) {
       onClose();
     }
-  }, [isUnstakeTransactionSucceed, isUnlockTransactionSucceed]);
+  }, [isUnstakeRequestTransactionSucceed, isUnlockTransactionSucceed]);
 
   useExecuteAtTime(setIsDurationFinished, unstakeCooldownEnd);
 
