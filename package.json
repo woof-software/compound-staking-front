@@ -23,6 +23,7 @@
     "@wagmi/core": "^3.4.0",
     "@walletconnect/ethereum-provider": "^2.21.10",
     "@woof-software/compound-staked-comp-artifacts": "1.4.1",
+    "axios": "^1.13.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.19",
@@ -68,7 +69,6 @@
     "@noble/curves": "^1.9.7",
     "abitype": "^1.2.3",
     "@noble/hashes": "^1.8.0",
-    "axios": "^1.13.6",
     "@base-org/account": "^2.5.2"
   },
   "lint-staged": {
