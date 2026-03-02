@@ -1,11 +1,17 @@
 import { useMemo, useState } from 'react';
 
-import { SortArrowIcon } from '@/assets/svg';
+import { SortDrawer } from '@/components/common/SortDrawer';
 import { RewardRow } from '@/components/common/stake/RewardRow';
+import { Button } from '@/components/ui/Button';
+import { Divider } from '@/components/ui/Divider';
 import { Text } from '@/components/ui/Text';
 import { ENV } from '@/consts/env';
+import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
+
+import SortIcon from '@/assets/svg/sort.svg';
+import SortArrowIcon from '@/assets/svg/sort-arrow.svg';
 
 export type RewardsTableItem = {
   vestingAmount: bigint;
@@ -15,12 +21,13 @@ export type RewardsTableItem = {
   endDate: number;
 };
 
-type SortKey = keyof RewardsTableItem;
+type SortKey = Extract<keyof RewardsTableItem, string>;
+type SortDirection = 'asc' | 'desc';
 
-export type Column<T> = {
-  accessorKey: keyof T;
+export type Column<T extends Record<string, unknown>> = {
+  accessorKey: Extract<keyof T, string>;
   header: string;
-  sort?: (a: T, b: T, direction: 'asc' | 'desc') => number;
+  sort?: (a: T, b: T, direction: SortDirection) => number;
 };
 
 const columns: Column<RewardsTableItem>[] = [
@@ -61,72 +68,119 @@ export function RewardsTable(props: { rows: RewardsTableItem[] }) {
   const { rows } = props;
 
   const [sortBy, setSortBy] = useState<SortKey>('startDate');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [sortDir, setSortDir] = useState<SortDirection>('desc');
+
+  const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
 
   const { data: baseTokenPrice, isLoading: isBaseTokenPriceLoading } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
 
   const baseTokenPriceValue = baseTokenPrice ?? 0n;
 
+  const sortType = {
+    type: sortDir,
+    key: sortBy
+  };
+
   const sortedData = useMemo(() => {
     const col = columns.find((c) => c.accessorKey === sortBy);
-    if (!col?.sort) return rows;
+    const sortPredicate = col?.sort;
 
-    return [...rows].sort((a, b) => col.sort!(a, b, sortDir));
+    if (!sortPredicate) return rows;
+
+    return [...rows].sort((a, b) => sortPredicate(a, b, sortDir));
   }, [rows, sortBy, sortDir]);
 
   const onHeaderClick = (accessorKey: SortKey) => {
-    if (sortBy === accessorKey) setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-    else {
+    if (sortBy === accessorKey) {
+      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
       setSortBy(accessorKey);
       setSortDir('asc');
     }
   };
 
   return (
-    <div>
-      <div className='border-color-8 grid grid-cols-5 items-center border-b-[0.5px] border-solid px-10 py-6'>
-        {columns.map(({ accessorKey, header }) => {
-          const active = sortBy === accessorKey;
+    <>
+      <div className='hidden lg:block'>
+        <div className='border-color-8 grid grid-cols-5 items-center border-b-[0.5px] border-solid px-10 py-6'>
+          {columns.map(({ accessorKey, header }) => {
+            const active = sortBy === accessorKey;
 
-          return (
-            <div
-              key={accessorKey}
-              role='button'
-              tabIndex={0}
-              className='flex cursor-pointer items-center'
-              onClick={() => onHeaderClick(accessorKey as SortKey)}
-            >
-              <Text
-                tag='span'
-                size='11'
-                weight='500'
-                lineHeight='16'
-                className='text-color-24'
+            return (
+              <div
+                key={accessorKey}
+                role='button'
+                tabIndex={0}
+                className='flex cursor-pointer items-center'
+                onClick={() => onHeaderClick(accessorKey as SortKey)}
               >
-                {header}
-              </Text>
-              <div className='flex flex-col justify-center p-1'>
-                <SortArrowIcon
-                  className={cn('text-color-24 size-[5px]', { 'opacity-50': active && sortDir === 'asc' })}
-                />
-                <SortArrowIcon
-                  className={cn('text-color-24 size-[5px] rotate-180', { 'opacity-50': active && sortDir === 'desc' })}
-                />
+                <Text
+                  tag='span'
+                  size='11'
+                  weight='500'
+                  lineHeight='16'
+                  className='text-color-24'
+                >
+                  {header}
+                </Text>
+                <div className='flex flex-col justify-center p-1'>
+                  <SortArrowIcon
+                    className={cn('text-color-24 size-[5px]', { 'opacity-50': active && sortDir === 'asc' })}
+                  />
+                  <SortArrowIcon
+                    className={cn('text-color-24 size-[5px] rotate-180', {
+                      'opacity-50': active && sortDir === 'desc'
+                    })}
+                  />
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+        <div className='hide-scrollbar m-0 max-h-300 overflow-y-auto lg:m-2'>
+          {sortedData.map((row) => (
+            <RewardRow
+              key={`${row.startDate}-${row.endDate}`}
+              baseTokenPriceValue={baseTokenPriceValue}
+              isLoading={isBaseTokenPriceLoading}
+              {...row}
+            />
+          ))}
+        </div>
       </div>
-      <div className='m-2 max-h-300 overflow-y-auto'>
-        {sortedData.map((row) => (
-          <RewardRow
-            key={`${row.startDate}-${row.endDate}`}
-            baseTokenPriceValue={baseTokenPriceValue}
-            isLoading={isBaseTokenPriceLoading}
-            {...row}
-          />
-        ))}
+      <div className='block lg:hidden'>
+        <div className='mb-5 flex flex-col gap-5 px-5 md:px-10'>
+          <Divider orientation='horizontal' />
+          <Button
+            onClick={onOpen}
+            className='border-color-8 bg-color-5 text-color-6 flex h-9 items-center justify-center gap-1.5 rounded-lg border-[0.5px] text-[11px] font-semibold'
+          >
+            <SortIcon className='text-color-6' />
+            Sort
+          </Button>
+        </div>
+        <div className='hide-scrollbar max-h-300 overflow-y-auto'>
+          {sortedData.map((row) => (
+            <RewardRow
+              key={`${row.startDate}-${row.endDate}`}
+              baseTokenPriceValue={baseTokenPriceValue}
+              isLoading={isBaseTokenPriceLoading}
+              {...row}
+            />
+          ))}
+        </div>
+        <SortDrawer<SortKey>
+          isOpen={isOpen}
+          sortType={sortType}
+          columns={columns}
+          defaultSortKey='startDate'
+          defaultSortDirection='desc'
+          defaultTab='Descending'
+          onClose={onClose}
+          onKeySelect={setSortBy}
+          onTypeSelect={setSortDir}
+        />
       </div>
-    </div>
+    </>
   );
 }

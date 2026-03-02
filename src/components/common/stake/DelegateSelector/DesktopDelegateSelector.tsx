@@ -1,7 +1,7 @@
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
-import { CheckMarkIcon, ChevronIcon, ExternalLinkIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
+import type { DelegateSelectorProps } from '@/components/common/stake/DelegateSelector/type';
 import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/Text';
 import type { Delegate } from '@/consts/common';
@@ -12,16 +12,15 @@ import { cn } from '@/lib/utils/cn';
 import { noop, sliceAddress } from '@/lib/utils/common';
 import { getExplorerAddressUrl } from '@/lib/utils/helpers';
 
-export type DelegateSelectorProps = {
-  disabled?: boolean;
-  selectedAddressDelegate: Delegate | null;
-  onSelect?: (addressDelegate: Delegate | null) => void;
-};
+import CheckMarkIcon from '@/assets/svg/check-mark.svg';
+import ChevronIcon from '@/assets/svg/chevron.svg';
+import ExternalLinkIcon from '@/assets/svg/external-link.svg';
 
-export function DelegateSelector(props: DelegateSelectorProps) {
+export function DesktopDelegateSelector(props: DelegateSelectorProps) {
   const { disabled, selectedAddressDelegate, onSelect = noop } = props;
 
   const ref = useRef<HTMLDivElement>(null);
+
   const [searchValue, setSearchValue] = useState('');
 
   const { isEnabled: isOpen, toggle: open, disable: close } = useSwitch();
@@ -30,18 +29,16 @@ export function DelegateSelector(props: DelegateSelectorProps) {
 
   const hasValue = !!selectedAddressDelegate;
 
-  const onClose = useCallback(() => {
+  const onClose = () => {
     close();
     setSearchValue('');
-  }, [close]);
+  };
 
-  const onDelegateSelect = useCallback(
-    (delegate: Delegate) => {
-      onSelect(delegate);
-      onClose();
-    },
-    [onSelect, onClose]
-  );
+  const onDelegateSelect = (delegate: Delegate) => {
+    onSelect(delegate);
+
+    onClose();
+  };
 
   const onSelectorOpen = () => {
     if (disabled) return;
@@ -54,13 +51,13 @@ export function DelegateSelector(props: DelegateSelectorProps) {
   return (
     <div
       ref={ref}
-      className={cn('relative w-full', {
+      className={cn('relative hidden w-full lg:block', {
         'shadow-30 shadow-30-pulse rounded-lg': !hasValue
       })}
     >
       <div
         className={cn(
-          'flex h-13 w-full max-w-88 cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
+          'flex h-13 w-full cursor-pointer items-center justify-between gap-5 rounded-lg border border-solid p-3',
           {
             'border-color-white': !hasValue,
             'border-color-8': hasValue
@@ -75,7 +72,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             lineHeight='16'
             className='text-color-6'
           >
-            Select a delegate
+            Choose delegatee
           </Text>
         ) : (
           <div className='flex w-full items-center justify-between'>
@@ -84,7 +81,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 size='13'
                 weight='500'
                 lineHeight='16'
-                className='text-color-2'
+                className='text-color-2 max-w-25 truncate md:max-w-full'
               >
                 {selectedAddressDelegate?.name || sliceAddress(selectedAddressDelegate?.address ?? '')}
               </Text>
@@ -119,9 +116,9 @@ export function DelegateSelector(props: DelegateSelectorProps) {
             <Input
               autoFocus
               className={cn('min-h-13', {
-                'border-color-31': !filteredDelegates.length && !!searchValue.length
+                'border-color-31': !filteredDelegates.length && searchValue.length
               })}
-              placeholder='Search delegates by name or address'
+              placeholder='Delegatee name or address'
               value={searchValue}
               onChange={setSearchValue}
             />
@@ -132,7 +129,7 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                 weight='500'
                 className='text-color-31'
               >
-                No delegates found
+                No delegate found
               </Text>
             </Condition>
           </div>
@@ -144,14 +141,13 @@ export function DelegateSelector(props: DelegateSelectorProps) {
                   className={cn(
                     'hover:bg-color-5 flex h-13 cursor-pointer items-center justify-between rounded-lg px-3 py-4',
                     {
-                      'bg-color-5':
-                        selectedAddressDelegate?.address.toLocaleLowerCase() === el.address.toLocaleLowerCase()
+                      'bg-color-5': selectedAddressDelegate?.address.toLowerCase() === el.address.toLowerCase()
                     }
                   )}
                   onClick={() => onDelegateSelect(el)}
                 >
                   <div className='flex items-center gap-1.5'>
-                    {selectedAddressDelegate?.address === el.address && (
+                    {selectedAddressDelegate?.address.toLowerCase() === el.address.toLowerCase() && (
                       <CheckMarkIcon className='text-color-27 size-5 shrink-0' />
                     )}
                     <Text

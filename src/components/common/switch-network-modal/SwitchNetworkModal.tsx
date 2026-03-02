@@ -1,15 +1,16 @@
 import { useEffect } from 'react';
 import { useConnection, useSwitchChain } from 'wagmi';
 
-import { CloseIcon } from '@/assets/svg';
-import { Portal } from '@/components/common/Portal';
 import { Button } from '@/components/ui/Button';
+import { Portal } from '@/components/ui/Portal';
 import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
 import { useThemeStore } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils/cn';
 import { getChainLogo, getChainName } from '@/lib/utils/helpers';
 import { useSwitchNetworkModalStore } from '@/stores/useSwitchNetworkModalStore';
+
+import CloseIcon from '@/assets/svg/close.svg';
 
 export function SwitchNetworkModal() {
   const { isConnected, chainId } = useConnection();
@@ -50,7 +51,7 @@ export function SwitchNetworkModal() {
           if (e.target === e.currentTarget) close();
         }}
       >
-        <div className='bg-color-5 modal-content-in relative flex w-full max-w-105 flex-col items-center rounded-lg p-10'>
+        <div className='bg-color-5 modal-content-in w-[calc(100% - 16px)] absolute bottom-2 mx-2 flex max-w-full flex-col items-center rounded-lg p-10 md:relative md:mx-0 md:w-full md:max-w-105'>
           <div className='flex w-full items-center justify-end'>
             <Text
               tag='h4'
@@ -59,13 +60,13 @@ export function SwitchNetworkModal() {
               align='center'
               weight='600'
               font='font-grot-disp'
-              className='mr-4 ml-10 w-full'
+              className='w-full md:mr-4 md:ml-10'
             >
               Confirm Network Switch
             </Text>
             <Button
               onClick={close}
-              className='size-auto bg-transparent p-0'
+              className='hidden size-auto bg-transparent p-0 md:block'
             >
               <CloseIcon className='text-color-18 ml-auto size-6 cursor-pointer' />
             </Button>
@@ -95,7 +96,7 @@ export function SwitchNetworkModal() {
           <Button
             disabled={isPending}
             onClick={onSwitch}
-            className={cn('rounded-100 bg-color-16 mt-10 h-[57px] text-[13px] font-medium', {
+            className={cn('rounded-100 bg-color-7 mt-10 h-[57px] text-[13px] font-medium', {
               'after-animate-loading-dots': isPending
             })}
           >

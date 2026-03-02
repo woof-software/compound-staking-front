@@ -1,17 +1,20 @@
 import { useEffect, useEffectEvent, useMemo } from 'react';
 import { useConnection } from 'wagmi';
 
-import { ExternalLinkIcon } from '@/assets/svg';
+import { Condition } from '@/components/common/Condition';
 import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
+import { Drawer } from '@/components/ui/Drawer';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN } from '@/consts/common';
+import { MIN_1024 } from '@/consts/media';
 import { useDelegateDuration } from '@/hooks/useDelegateDuration';
 import { useDelegateSubAccount } from '@/hooks/useDelegateSubAccount';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useSubAccount } from '@/hooks/useSubAccount';
 import { useSwitch } from '@/hooks/useSwitch';
 import { cn } from '@/lib/utils/cn';
@@ -24,8 +27,12 @@ import { useDelegateStore } from '@/stores/useDelegateStore';
 import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
 
+import ExternalLinkIcon from '@/assets/svg/external-link.svg';
+
 export function DelegateFlowBlock() {
   const { isConnected, address, chainId } = useConnection();
+
+  const isDesktop = useMediaQuery(MIN_1024);
 
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
 
@@ -134,8 +141,8 @@ export function DelegateFlowBlock() {
       title='Delegation'
       tooltip={`Cooldown period for redelegation process is ${FormatTime.cooldownFromSeconds(Number(delegateDuration ?? 0n))}`}
     >
-      <div className='flex justify-between p-10'>
-        <div className='flex gap-15'>
+      <div className='flex flex-col justify-between gap-10 p-5 md:flex-row md:p-10'>
+        <div className='grid grid-cols-1 flex-col gap-10 sm:grid-cols-3 sm:flex-row md:flex md:gap-15'>
           <div className='flex flex-col gap-3'>
             <Text
               size='11'
@@ -215,7 +222,7 @@ export function DelegateFlowBlock() {
         <Button
           onClick={onModalOpen}
           disabled={isDelegateButtonDisabled}
-          className='max-w-32.5'
+          className='max-w-full md:max-w-32.5'
         >
           <Skeleton
             loading={isLoading}
@@ -232,18 +239,40 @@ export function DelegateFlowBlock() {
           </Skeleton>
         </Button>
       </div>
-      <Modal
-        open={isOpen}
-        title='Delegate'
-        onClose={onModalClose}
-      >
-        <DelegateModal
-          subAccountAddress={subAccountAddress}
-          delegate={delegate}
+      <Condition if={isDesktop}>
+        <Modal
+          open={isOpen}
+          title='Delegate'
+          onClose={onModalClose}
+        >
+          <DelegateModal
+            subAccountAddress={subAccountAddress}
+            delegate={delegate}
+            onClose={onClose}
+            onDelegateConfirmed={onDelegateConfirmed}
+          />
+        </Modal>
+      </Condition>
+      <Condition if={!isDesktop}>
+        <Drawer
+          isOpen={isOpen}
           onClose={onClose}
-          onDelegateConfirmed={onDelegateConfirmed}
-        />
-      </Modal>
+        >
+          <Text
+            size='17'
+            align='center'
+            lineHeight='20'
+          >
+            Delegate
+          </Text>
+          <DelegateModal
+            subAccountAddress={subAccountAddress}
+            delegate={delegate}
+            onClose={onClose}
+            onDelegateConfirmed={onDelegateConfirmed}
+          />
+        </Drawer>
+      </Condition>
     </Card>
   );
 }

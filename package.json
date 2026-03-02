@@ -14,9 +14,11 @@
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "^4.3.7",
+    "@react-spring/web": "^10.0.3",
     "@tanstack/react-query": "^5.90.11",
-    "@tanstack/react-query-devtools": "^5.91.2",
+    "@tanstack/react-query-devtools": "^5.91.3",
     "@tanstack/react-router": "^1.139.14",
+    "@use-gesture/react": "^10.3.1",
     "@wagmi/core": "^3.4.0",
     "@walletconnect/ethereum-provider": "^2.21.10",
     "@woof-software/compound-staked-comp-artifacts": "1.4.4",

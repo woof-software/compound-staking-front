@@ -14,7 +14,7 @@ export function VestingTimerLine(props: VestingTimerProps) {
   const { completedProgress, remainingProgress, leftSec, totalSec } = props;
 
   return (
-    <div className='flex items-center gap-5'>
+    <div className='flex flex-row items-start gap-2.5 lg:items-center lg:gap-5'>
       <Text
         size='11'
         lineHeight='16'

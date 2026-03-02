@@ -2,37 +2,45 @@ import { useEffect, useEffectEvent } from 'react';
 import { formatUnits } from 'viem';
 import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 
-import { InfoIcon } from '@/assets/svg';
 import { Condition } from '@/components/common/Condition';
 import { Duration } from '@/components/common/Duration';
 import { Card } from '@/components/common/stake/Card';
 import { Button } from '@/components/ui/Button';
+import { Drawer } from '@/components/ui/Drawer';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Text } from '@/components/ui/Text';
 import { APPLICATION_CHAIN, BASE_COOLDOWN_BUFFER_SECONDS } from '@/consts/common';
 import { ENV } from '@/consts/env';
+import { MIN_1024 } from '@/consts/media';
 import { useAvailableRewards } from '@/hooks/useAvailableRewards';
 import { useBaseTokenAllowance } from '@/hooks/useBaseTokenAllowance';
 import { useExecuteAtTime } from '@/hooks/useExecuteAtTime';
 import { useUnstakeLockDuration } from '@/hooks/useLockDuration';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMultiplier } from '@/hooks/useMultiplier';
 import { useSwitch } from '@/hooks/useSwitch';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { cn } from '@/lib/utils/cn';
 import { Format, FormatTime } from '@/lib/utils/format';
-import { getAddressContracts, getRemainingSeconds, normalizeUnixSeconds } from '@/lib/utils/helpers';
+import { getAddressContracts, getRemainingSeconds, normalizeUnixSeconds, when } from '@/lib/utils/helpers';
 import { UnstakeModal } from '@/pages/stake/components/unstake-flow-block/UnstakeModal';
 import { useLockedBalance } from '@/pages/stake/hooks/useLockedBalance';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
 import { useStakedVirtualBalance } from '@/pages/stake/hooks/useStakedVirtualBalance';
+import { useStatisticStakingAPR } from '@/pages/stake/hooks/useStatisticStakingAPR';
+import { useTotalStaked } from '@/pages/stake/hooks/useTotalStaked';
 import { useUnlockRequest } from '@/pages/stake/hooks/useUnlockRequest';
 import { useUnstakeRequests } from '@/pages/stake/hooks/useUnstakeRequest';
+import { useUserAPR } from '@/pages/stake/hooks/useUserAPR';
 import { useDelegateStore } from '@/stores/useDelegateStore';
 import { useRewardStore } from '@/stores/useRewardStore';
 import { trySwitchToApplicationChain } from '@/stores/useSwitchNetworkModalStore';
 import { useWalletStore } from '@/stores/useWalletStore';
+
+import CompoundBlackCircle from '@/assets/svg/compound-black-circle.svg';
+import InfoIcon from '@/assets/svg/info.svg';
 
 export function UnstakeFlowBlock() {
   const { isEnabled: isOpen, enable: onOpen, disable: onClose } = useSwitch();
@@ -43,9 +51,12 @@ export function UnstakeFlowBlock() {
     disable: resetIsDurationFinished
   } = useSwitch();
 
+  const isDesktop = useMediaQuery(MIN_1024);
+
   const setIsPendingToggle = useWalletStore(({ setIsPendingToggle }) => setIsPendingToggle);
   const triggerDelegateRefresh = useDelegateStore(({ triggerRefresh }) => triggerRefresh);
   const triggerRewardRefresh = useRewardStore(({ triggerRefresh }) => triggerRefresh);
+  // const triggerStatisticRefresh = useStatisticStore(({ triggerRefresh }) => triggerRefresh);
 
   const { isConnected, address, chainId } = useConnection();
 
@@ -59,6 +70,7 @@ export function UnstakeFlowBlock() {
   const { refetch: refetchVirtualTokenBalance } = useStakedVirtualBalance(APPLICATION_CHAIN, address);
   const { refetch: refetchMultiplier } = useMultiplier(APPLICATION_CHAIN, address);
   const { refetch: refetchAvailableRewards } = useAvailableRewards(APPLICATION_CHAIN, address);
+  const { refetch: refetchTotalStaked } = useTotalStaked(APPLICATION_CHAIN);
 
   const { refetch: refetchWalletBalance } = useTokenBalance(address, baseTokenAddress);
 
@@ -69,6 +81,10 @@ export function UnstakeFlowBlock() {
   } = useLockedBalance(APPLICATION_CHAIN, address);
 
   const { data: stakedTokenPrice, isLoading: isStakedTokenPrice } = useTokenPrice(ENV.BASE_TOKEN_PRICE_FEED_ADDRESS);
+
+  const { refetch: refetchUerAPR } = useUserAPR(address, APPLICATION_CHAIN);
+
+  const { refetch: refetchStatisticStakingAPR } = useStatisticStakingAPR(APPLICATION_CHAIN);
 
   const [earliestUnstakeRequestState] = useUnstakeRequests(APPLICATION_CHAIN);
 
@@ -150,6 +166,9 @@ export function UnstakeFlowBlock() {
     refetchMultiplier();
     refetchAvailableRewards();
     refetchLockedTokenBalance();
+    refetchUerAPR();
+    refetchStatisticStakingAPR();
+    refetchTotalStaked();
   });
 
   useEffect(() => {
@@ -197,8 +216,8 @@ export function UnstakeFlowBlock() {
         title='Unstake'
         tooltip={`Unstaking cooldown: ${FormatTime.cooldownFromSeconds(Number(lockDuration ?? 0))} + 1 block offset (${FormatTime.cooldownFromSeconds(BASE_COOLDOWN_BUFFER_SECONDS)}).`}
       >
-        <div className='flex items-start justify-between p-10'>
-          <div className='flex gap-15'>
+        <div className='flex flex-col items-start justify-between gap-10 p-5 md:flex-row md:p-10'>
+          <div className='grid w-full grid-cols-1 flex-col gap-10 sm:grid-cols-2 md:flex md:flex-row md:gap-15'>
             <div className='flex flex-col gap-3'>
               <Text
                 size='11'
@@ -206,19 +225,22 @@ export function UnstakeFlowBlock() {
               >
                 Unstake
               </Text>
-              <div className='flex flex-col gap-1'>
+              <div className='flex flex-col gap-2.5 lg:gap-1'>
                 <Skeleton loading={isLoading}>
-                  <Text
-                    size='17'
-                    lineHeight='17'
-                    className={cn('text-color-2 tabular-nums', {
-                      'text-color-6': !isConnected
-                    })}
-                  >
-                    {Format.token(lockedStakedBalanceFormatted, { symbol: 'stCOMP' })}
-                  </Text>
+                  <div className='flex items-center gap-1.5'>
+                    <CompoundBlackCircle className='text-compound-icon-bg block size-4 lg:hidden' />
+                    <Text
+                      size='17'
+                      lineHeight='17'
+                      className={cn('text-color-2 tabular-nums', {
+                        'text-color-6': !isConnected
+                      })}
+                    >
+                      {Format.token(lockedStakedBalanceFormatted, { symbol: when(isDesktop, 'COMP') })}
+                    </Text>
+                  </div>
                 </Skeleton>
-                <Condition if={isConnected && !!lockedTokenBalance?.amount}>
+                <Condition if={isConnected && lockedTokenBalance?.amount}>
                   <Skeleton loading={isLoading || isStakedTokenPrice}>
                     <Text
                       size='11'
@@ -264,7 +286,7 @@ export function UnstakeFlowBlock() {
           </div>
           <Button
             disabled={isUnstakeButtonDisabled}
-            className='max-w-32.5'
+            className='max-w-full md:max-w-32.5'
             onClick={onButtonClick}
           >
             <Skeleton
@@ -298,13 +320,30 @@ export function UnstakeFlowBlock() {
           </Text>
         </div>
       </Condition>
-      <Modal
-        title='Unstake'
-        open={isOpen}
-        onClose={onModalClose}
-      >
-        <UnstakeModal />
-      </Modal>
+      <Condition if={isDesktop}>
+        <Modal
+          title='Unstake'
+          open={isOpen}
+          onClose={onModalClose}
+        >
+          <UnstakeModal />
+        </Modal>
+      </Condition>
+      <Condition if={!isDesktop}>
+        <Drawer
+          isOpen={isOpen}
+          onClose={onModalClose}
+        >
+          <Text
+            size='17'
+            align='center'
+            lineHeight='20'
+          >
+            Unstake
+          </Text>
+          <UnstakeModal />
+        </Drawer>
+      </Condition>
     </div>
   );
 }
