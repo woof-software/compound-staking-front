@@ -10,7 +10,7 @@ export function useAllowance(owner?: Address, tokenAddress?: Address, spender?: 
     args: owner && spender ? [owner, spender] : undefined,
     query: {
       enabled: !!owner && !!spender,
-      refetchInterval: 5000
+      refetchOnMount: true
     }
   });
 

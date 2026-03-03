@@ -1,4 +1,4 @@
-import type { SetStateAction } from 'react';
+import { type SetStateAction, useRef } from 'react';
 import { useMemo, useState } from 'react';
 
 type UseSwitchRet = {
@@ -9,25 +9,31 @@ type UseSwitchRet = {
   update: (v: SetStateAction<boolean>) => void;
 };
 
-export function useSwitch(initial?: boolean): UseSwitchRet {
-  const [isEnabled, setIsEnabled] = useState<boolean>(initial ?? false);
+export function useSwitch(initial: boolean = false): UseSwitchRet {
+  const [isEnabled, setIsEnabled] = useState<boolean>(initial);
 
-  if (typeof initial === 'boolean' && initial !== isEnabled) {
-    setIsEnabled(initial);
-  }
+  const stateRef = useRef(isEnabled);
+
+  stateRef.current = isEnabled;
 
   const actions = useMemo(() => {
     return {
       enable: () => {
+        if (stateRef.current) return;
+
         setIsEnabled(true);
       },
       disable: () => {
+        if (!stateRef.current) return;
+
         setIsEnabled(false);
       },
       toggle: () => {
         setIsEnabled((v) => !v);
       },
       update: (v: SetStateAction<boolean>) => {
+        if (stateRef.current === v) return;
+
         setIsEnabled(v);
       }
     };

@@ -4,7 +4,7 @@ import { useLockManagerContract } from '@/hooks/useLockManagerContract';
 import { getHash } from '@/lib/utils/helpers';
 import { queryKeys } from '@/shared/query-keys';
 
-export function useUnlockRequest(chainId?: number) {
+export function useUnstakeTransaction(chainId?: number) {
   const queryClient = useQueryClient();
 
   const { write } = useLockManagerContract(chainId);
