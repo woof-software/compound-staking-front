@@ -46,7 +46,7 @@ function createSandboxConnector() {
       body: JSON.stringify({
         jsonrpc: '2.0',
         method: 'tenderly_setErc20Balance',
-        params: [getCompAddress(APPLICATION_CHAIN), address, '0x8AC7230489E80000'],
+        params: [getCompAddress(APPLICATION_CHAIN), address, '0x56BC75E2D63100000'],
         id: 1
       })
     });
