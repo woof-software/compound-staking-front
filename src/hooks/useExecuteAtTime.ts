@@ -17,6 +17,10 @@ export function useExecuteAtTime(callback: () => void, executionTimestampMs?: nu
 
       if (tillTheEnd <= 0) {
         safeCallback.current();
+
+        cancelAnimationFrame(id);
+
+        return;
       }
 
       id = requestAnimationFrame(iterate);

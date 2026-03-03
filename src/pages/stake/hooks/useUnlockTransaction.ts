@@ -6,7 +6,7 @@ import { useStakingVaultContract } from '@/hooks/useStakingVaultContract';
 import { getHash } from '@/lib/utils/helpers';
 import { queryKeys } from '@/shared/query-keys';
 
-export function useUnstakeRequest(chainId?: number) {
+export function useUnlockTransaction(chainId?: number) {
   const queryClient = useQueryClient();
 
   const { write } = useStakingVaultContract(chainId);
@@ -35,7 +35,7 @@ export function useUnstakeRequest(chainId?: number) {
   };
 }
 
-export function useUnstakeRequests(chainId?: number) {
+export function useUnlockTransactions(chainId?: number) {
   return useMutationState({
     filters: {
       mutationKey: queryKeys.unstakeRequest.perChain(chainId)

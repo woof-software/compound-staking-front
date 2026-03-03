@@ -1,3 +1,5 @@
+// TODO: move date utils into separate file
+
 import dayjs from 'dayjs';
 import { type Address, getAddress, type Hash, isHash } from 'viem';
 import { getCompAddress, getDeployment } from '@woof-software/compound-staked-comp-artifacts/deployments';
@@ -83,10 +85,6 @@ export function getRemainingSeconds(unlockTimestampSec: number, nowUnix = dayjs(
   if (!unlockTimestampSec) return 0;
 
   return Math.max(0, unlockTimestampSec - nowUnix);
-}
-
-export function normalizeUnixSeconds(ts: number): number {
-  return ts > 1e12 ? Math.floor(ts / 1000) : Math.floor(ts);
 }
 
 export function getAddressContracts(chainId?: number): Contracts {

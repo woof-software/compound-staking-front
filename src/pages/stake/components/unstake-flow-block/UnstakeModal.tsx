@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils/cn';
 import { Format, FormatTime } from '@/lib/utils/format';
 import { getAddressContracts } from '@/lib/utils/helpers';
 import { useStakedBalance } from '@/pages/stake/hooks/useStakedBalance';
-import { useUnstakeRequest } from '@/pages/stake/hooks/useUnstakeRequest';
+import { useUnlockTransaction } from '@/pages/stake/hooks/useUnlockTransaction';
 import { useVestingPosition } from '@/pages/stake/hooks/useVestingPosition';
 
 import InfoIcon from '@/assets/svg/info.svg';
@@ -29,12 +29,12 @@ export function UnstakeModal() {
 
   const { lockManagerAddress } = getAddressContracts(APPLICATION_CHAIN);
 
-  const { data: baseLockDuration } = useUnstakeLockDuration(APPLICATION_CHAIN, lockManagerAddress);
+  const { data: baseLockDurationInSec } = useUnstakeLockDuration(APPLICATION_CHAIN, lockManagerAddress);
 
-  let bufferedLockDuration = 0n;
+  let bufferedLockDurationInSec = 0;
 
-  if (baseLockDuration) {
-    bufferedLockDuration += baseLockDuration + BigInt(BASE_COOLDOWN_BUFFER_SECONDS);
+  if (baseLockDurationInSec) {
+    bufferedLockDurationInSec += Number(baseLockDurationInSec) + BASE_COOLDOWN_BUFFER_SECONDS;
   }
 
   const { data: stakedTokenBalance } = useStakedBalance(APPLICATION_CHAIN, address);
@@ -68,7 +68,7 @@ export function UnstakeModal() {
     data: unstakeTransactionHash,
     isPending: isUnstakeTransactionConfirming,
     sendTransactionAsync: unstake
-  } = useUnstakeRequest(APPLICATION_CHAIN);
+  } = useUnlockTransaction(APPLICATION_CHAIN);
 
   const { isLoading: isUnstakeTransactionMining } = useWaitForTransactionReceipt({
     hash: unstakeTransactionHash
@@ -224,7 +224,7 @@ export function UnstakeModal() {
           weight='500'
           lineHeight='20'
         >
-          {FormatTime.cooldownFromSeconds(Number(bufferedLockDuration ?? 0n))}
+          {FormatTime.cooldownFromSeconds(bufferedLockDurationInSec)}
         </Text>
       </div>
       <Condition if={hasReachedPositionsLimit}>
