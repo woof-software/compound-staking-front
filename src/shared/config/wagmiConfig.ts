@@ -4,7 +4,7 @@ import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors';
 
 import { ENV } from '@/consts/env';
 
-const ANKR_RPC = `https://rpc.ankr.com/eth_sepolia/${ENV.ANKR_RPC_KEY}`;
+const rpc = `https://multi-billowing-lambo.ethereum-sepolia.quiknode.pro/dfabb094d57c748cefa1c35f8273f5e74955f663/`;
 
 export const config = createConfig({
   chains: [sepolia],
@@ -16,6 +16,6 @@ export const config = createConfig({
     })
   ],
   transports: {
-    [sepolia.id]: http(ANKR_RPC)
+    [sepolia.id]: http(rpc)
   }
 });
